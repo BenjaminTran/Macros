@@ -67,5 +67,21 @@
 ./InvMassFit_cpp.so: /usr/local/root/include/TDictionary.h
 ./InvMassFit_cpp.so: /usr/local/root/include/Property.h
 ./InvMassFit_cpp.so: /usr/local/root/include/ESTLType.h
+./InvMassFit_cpp.so: /usr/local/root/include/TCanvas.h
+./InvMassFit_cpp.so: /usr/local/root/include/TPad.h
+./InvMassFit_cpp.so: /usr/local/root/include/TVirtualPad.h
+./InvMassFit_cpp.so: /usr/local/root/include/TAttPad.h
+./InvMassFit_cpp.so: /usr/local/root/include/TVirtualX.h
+./InvMassFit_cpp.so: /usr/local/root/include/GuiTypes.h
+./InvMassFit_cpp.so: /usr/local/root/include/Buttons.h
+./InvMassFit_cpp.so: /usr/local/root/include/TQObject.h
+./InvMassFit_cpp.so: /usr/local/root/include/TAttCanvas.h
+./InvMassFit_cpp.so: /usr/local/root/include/TCanvasImp.h
+./InvMassFit_cpp.so: /usr/local/root/include/TGaxis.h
+./InvMassFit_cpp.so: /usr/local/root/include/TLine.h
+./InvMassFit_cpp.so: /usr/local/root/include/TLegend.h
+./InvMassFit_cpp.so: /usr/local/root/include/TPave.h
+./InvMassFit_cpp.so: /usr/local/root/include/TBox.h
+./InvMassFit_cpp.so: /usr/local/root/include/TMathText.h
 ./InvMassFit_cpp.so: /usr/local/root/include/cintdictversion.h /usr/local/root/include/RVersion.h
 InvMassFit_cpp__ROOTBUILDVERSION= 5.34/18

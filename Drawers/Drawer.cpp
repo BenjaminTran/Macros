@@ -14,7 +14,9 @@ void Drawer()
 
     //TFile* f1 = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/XiPtBins.root");
     //TFile* f1 = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/HLT185_220_XiMass_Pt.root");
-    TFile* f1 = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/XiAnalysisCorrelation.root");
+    //TFile* f1 = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/XiAnalysisCorrelation.root");
+    TFile* f1 = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/NoPtCut/XiAnalysisCorrelationNoPtCutTotal.root");
+    //TFile* f1 = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/NoPtCut/XiAnalysisCorrelationNoPtCutTotal_Prelim.root");
 
     TH1D* Inv_Mass = (TH1D*) f1->Get("xiCorrelation/InvMassXi");
 
