@@ -64,5 +64,7 @@
 ./Drawer_cpp.so: /usr/local/root/include/TLatex.h
 ./Drawer_cpp.so: /usr/local/root/include/TText.h
 ./Drawer_cpp.so: /usr/local/root/include/TStyle.h
+./Drawer_cpp.so: /usr/local/root/include/TGaxis.h
+./Drawer_cpp.so: /usr/local/root/include/TLine.h
 ./Drawer_cpp.so: /usr/local/root/include/cintdictversion.h /usr/local/root/include/RVersion.h
 Drawer_cpp__ROOTBUILDVERSION= 5.34/18

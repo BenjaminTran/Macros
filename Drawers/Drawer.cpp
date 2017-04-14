@@ -6,6 +6,7 @@
 #include "TCanvas.h"
 #include "TLatex.h"
 #include "TStyle.h"
+#include "TGaxis.h"
 
 void Drawer()
 {
@@ -17,6 +18,7 @@ void Drawer()
     //TFile* f1 = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/XiAnalysisCorrelation.root");
     TFile* f1 = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/NoPtCut/XiAnalysisCorrelationNoPtCutTotal.root");
     //TFile* f1 = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/NoPtCut/XiAnalysisCorrelationNoPtCutTotal_Prelim.root");
+    //TFile* f1 = new TFile( "/volumes/MacHD/Users/blt1/research/TestRootFiles/XiAnalysisCorrelationNoPtCut8TeV_1.root" );
 
     TH1D* Inv_Mass = (TH1D*) f1->Get("xiCorrelation/InvMassXi");
 
@@ -132,7 +134,8 @@ void Drawer()
     Pt_Spec->SetMarkerStyle(20);
     Pt_Spec->SetMarkerSize( 0.7 );
 
-    TH2D* Background = ( TH2D* ) f1->Get( "xiCorrelation/Background" );
+    /*
+    TH2D* Background = ( TH2D* ) f1->Get( "xiCorrelation/CorrelationSide" );
     Background->SetTitle( "Background" );
     Background->GetXaxis(  )->SetRangeUser( -4,4 );
     Background->GetYaxis(  )->SetRangeUser( -4,4.5 );
@@ -141,7 +144,7 @@ void Drawer()
     Background->GetYaxis(  )->SetTitle( "#Delta#phi" );
     Background->GetYaxis(  )->SetTitleOffset( 1.4 );
 
-    TH2D* Signal = ( TH2D* ) f1->Get( "xiCorrelation/Signal" );
+    TH2D* Signal = ( TH2D* ) f1->Get( "xiCorrelation/CorrelationPeak" );
     Signal->SetTitle( "Signal" );
     Signal->GetXaxis(  )->SetRangeUser( -4,4 );
     Signal->GetYaxis(  )->SetRangeUser( -4,4.5 );
@@ -150,6 +153,16 @@ void Drawer()
     Signal->GetYaxis(  )->SetTitle( "#Delta#phi" );
     Signal->GetYaxis(  )->SetTitleOffset( 1.4 );
 
+    TH2D* Correlation = ( TH2D* ) f1->Get( "xiCorrelation/CorrelationHad" );
+    Correlation->GetXaxis(  )->SetRangeUser( -4,4 );
+    Correlation->GetYaxis(  )->SetRangeUser( -4,4.5 );
+    Correlation->GetXaxis(  )->SetTitle( "#Delta#eta" );
+    Correlation->GetXaxis(  )->SetTitleOffset( 1.4 );
+    Correlation->GetYaxis(  )->SetTitle( "#Delta#phi" );
+    Correlation->GetYaxis(  )->SetTitleOffset( 1.4 );
+    */
+
+    TGaxis::SetMaxDigits( 1 );
     TH2D* Correlation = ( TH2D* ) f1->Get( "xiCorrelation/Correlation" );
     Correlation->GetXaxis(  )->SetRangeUser( -4,4 );
     Correlation->GetYaxis(  )->SetRangeUser( -4,4.5 );
@@ -157,6 +170,11 @@ void Drawer()
     Correlation->GetXaxis(  )->SetTitleOffset( 1.4 );
     Correlation->GetYaxis(  )->SetTitle( "#Delta#phi" );
     Correlation->GetYaxis(  )->SetTitleOffset( 1.4 );
+    Correlation->GetZaxis(  )->SetTitle( "#frac{1}{N_{#lower[-0.3]{trig}}} #frac{d^{2}N^{pair}}{d#Delta#phi d#Delta#eta}" );
+    Correlation->GetZaxis(  )->SetTitleOffset( 2 );
+    Correlation->GetZaxis(  )->SetNdivisions( 4, kFALSE );
+    Correlation->SetTitle( "" );
+    Correlation->SetStats( kFALSE );
 
 
     //InvMass by itself
@@ -254,6 +272,7 @@ void Drawer()
     TCanvas* c6 = new TCanvas( "c6", "", 1600,800 );
     c6->Divide( 2,1 );
 
+    /*
     c6->cd( 1 );
     //gPad->SetTickx();
     //gPad->SetTicky();
@@ -263,11 +282,24 @@ void Drawer()
     //gPad->SetTickx();
     //gPad->SetTicky();
     Signal->Draw( "SURF1" );
+    */
 
     //Correlation
-    TCanvas* c7 = new TCanvas( "c7", "", 800,800 );
+    TCanvas* c7 = new TCanvas( "c7", "", 1000,1000 );
     c7->cd(  );
+    c7->SetLeftMargin( 0.2 );
     Correlation->Draw( "SURF1" );
+
+    TLatex *ltx1 = new TLatex(  );
+    ltx1->SetTextSize( 0.035 );
+    ltx1->SetNDC( kTRUE );
+    ltx1->SetTextFont( 42 );
+
+    ltx1->DrawLatex( 0.05, 0.95, "CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 5.02 TeV, L_{#lower[-0.25]{int}} = 35 nb^{-1}" );
+    ltx1->DrawLatex( 0.05, 0.88, "185 #leq N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 220" );
+    ltx1->DrawLatex( 0.05, 0.81, "1 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{assoc}}} < 3 GeV" );
+    ltx1->DrawLatex( 0.05, 0.75, "1 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{trig}}} < 3 GeV" );
+    ltx1->DrawLatex( 0.85, 0.88, "#Xi^{#pm} - h^{#pm}" );
 
     //TCanvas* c6 = new TCanvas("c5", "", 1600, 800);
     //c5->Divide( 2,2 );
