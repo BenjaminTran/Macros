@@ -72,7 +72,7 @@ Double_t bkgfuncdisplay( Double_t *x, Double_t *par )
     return bg + bgsig;
 }
 
-void InvMassFit(  )
+void v2Fit(  )
 {
     //TLatex
     std::ostringstream os; // stringstream for making dynamic TLatex labels
@@ -104,7 +104,9 @@ void InvMassFit(  )
 
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/XiAnalysisCorrelation.root " );
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/NoPtCut/XiAnalysisCorrelationNoPtCutTotal.root " );
-    TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/NoPtCutPeakAndSide/XiAnalysisCorrelationNoPtCutPeakAndSideTotal.root " );
+    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/NoPtCutPeakAndSide/XiAnalysisCorrelationNoPtCutPeakAndSideTotal.root " );
+    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/NoPtCutPeakAndSide/XiAnalysisSeparated.root " );
+    TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/8TeV/XiAnalysisNoPtCut8TeVPD1246Incomplete.root " );
 
     //Pull InvMass
     TH1F* invMass = ( TH1F* ) f->Get( "xiCorrelation/InvMassXi" );
@@ -248,24 +250,27 @@ void InvMassFit(  )
     cout << "The signal yield fraction in the peak region is " << sigYieldFrac << endl;
 
     //Calculating number of cascades in peak region
-    int bin1 = 70;
-    int bin2 = 90;
+    int bin1 = 61;
+    int bin2 = 83;
     double XiCounter = 0;
+    double XiCounterInt = invMass->Integral( 61,83 );
 
     for( int i = bin1; i<=bin2; i++ ){
         XiCounter += invMass->GetBinContent( i );   
+        cout << i << ": " << invMass->GetBinContent( i ) << endl;
     }
 
     cout << "Number of cascades " << XiCounter << endl;
     cout << "Number of signal cascades " << XiCounter*sigYieldFrac << endl;
+    cout << "By integral method" << XiCounterInt*sigYieldFrac << endl;
 
     
 
     //FITTING FOR V2
     //
     //Define divided hist
-    bool Peak = true;
-    //bool Peak = false;
+    //bool Peak = true;
+    bool Peak = false;
     if( Peak ){
         TH1D *dPhiPeak = new TH1D( "dPhiPeak", "#Xi - h^{#pm} ", 31, -( 0.5 -
                     1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
@@ -513,13 +518,25 @@ void InvMassFit(  )
         TH2D *hsignalSide     = (TH2D*)   f->Get( "xiCorrelation/SignalSide" );
         TH2D *hBackgroundHad = ( TH2D* ) f->Get( "xiCorrelation/BackgroundHad" );
         TH2D *hSignalHad = ( TH2D* ) f->Get( "xiCorrelation/SignalHad" );
-        //Project Phi
-        TH1D* hbPhiTotSide = hbackgroundSide->ProjectionY( "PhiBkgTot", 0, 10 );
-        TH1D* hsPhiTotSide = hsignalSide->ProjectionY( "PhiSigTot", 0, 10 );
-        TH1D* hbHadPhiTot = hBackgroundHad->ProjectionY( "PhiBkgHadTot", 0, 10 );
-        TH1D* hsHadPhiTot = hSignalHad->ProjectionY( "PhiSigHadTot", 0, 10 );
 
         TH1::SetDefaultSumw2(  );
+
+        //Project Phi
+        TH1D* hbPhiTotSide = hbackgroundSide->ProjectionY( "PhiBkgTot", 0, 10 );
+        TH1D* hbPhiOthSide = hbackgroundSide->ProjectionY( "PhiBkgOthPeak", 23, -1 );
+        TH1D* hsPhiTotSide = hsignalSide->ProjectionY( "PhiSigTot", 0, 10 );
+        TH1D* hsPhiOthSide = hsignalSide->ProjectionY( "PhiSigOthPeak", 23, -1 );
+        TH1D* hbHadPhiTot = hBackgroundHad->ProjectionY( "PhiBkgHadTot", 0, 10 );
+        TH1D* hbHadPhiOth = hBackgroundHad->ProjectionY( "PhiBkgHadOth", 23, -1 );
+        TH1D* hsHadPhiTot = hSignalHad->ProjectionY( "PhiSigHadTot", 0, 10 );
+        TH1D* hsHadPhiOth = hSignalHad->ProjectionY( "PhiSigHadOth", 23, -1 );
+
+
+        hbPhiTotSide->Add( hbPhiOthSide );
+        hsPhiTotSide->Add( hsPhiOthSide );
+
+        hbHadPhiTot->Add( hbHadPhiOth );
+        hsHadPhiTot->Add( hsHadPhiOth );
 
         //Divide
         dPhiSide->Divide( hsPhiTotSide, hbPhiTotSide );
