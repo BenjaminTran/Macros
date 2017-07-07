@@ -71,18 +71,28 @@ void InvMassFit(  )
     TH1::SetDefaultSumw2(  );
 
     //TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/8TeV/MassPt8TeVPD1.root" );
-    TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/TestRootFiles/XiAnalysisCorrelationPtCut8TeVPD1_4_Inc.root" );
-
+    //TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/TestRootFiles/XiAnalysisCorrelationPtCut8TeVPD1_4_Inc.root" );
+    //TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/TestRootFiles/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root" );
+    //TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/Flow/CasCutLoose/CasCutLooseJL1.root" );
+    //TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/Flow/CasCutLoose/CasCutLooseJL2.root" );
+    //TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/Flow/CasCutLoose/CasCutLooseJL3.root" );
+    //TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/Flow/CasCutLoose/CasCutLooseJL4.root" );
+    TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/Flow/CasCutLoose/CasCutLooseJL5.root" );
 
     int numPtBins = 7;
+    int numFiles = 5;
+
+    TFile* Files[numFiles];
+
     TH1D* InvMassPtBinned[numPtBins];
     double p[] = {1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0}; //if number of bins changes make sure you change numPtBins
     std::vector<double> PtBin( p, p+8 );
     std::vector<double> MassMean;
     std::vector<double> MassStd;
     std::vector<double> Fsig;
+    std::vector<double> sig;
     int PtBinSize = PtBin.size(  ) - 1;
-    bool publish = true;
+    bool publish = true; // Adds Latex labels
 
     TF1* BgFit[numPtBins];
     TF1* SigFit[numPtBins];
@@ -90,8 +100,8 @@ void InvMassFit(  )
     TF1* FitFcn[numPtBins]; //For drawing and fsig calc
     TF1* BackFcn[numPtBins];
 
-    //TH2D* MassPt = ( TH2D* )f->Get( "xiMassPt/MassPt" );
-    TH2D* MassPt = ( TH2D* )f->Get( "xiCorrelation/MassPt" );
+    TH2D* MassPt = ( TH2D* )f->Get( "xiMassPt/MassPt" );
+    //TH2D* MassPt = ( TH2D* )f->Get( "xiCorrelation/MassPt" );
 
     TVirtualFitter::SetMaxIterations( 300000 );
 
@@ -240,17 +250,28 @@ void InvMassFit(  )
             bkgInt = BackFcn[i]->Integral( FitTot[i]->GetParameter( "gausMean" ) - 2*rmsSigma, FitTot[i]->GetParameter( "gausMean" ) + 2*rmsSigma );
 
             Fsig.push_back( ( totInt - bkgInt )/totInt );
+            sig.push_back( totInt - bkgInt );
             MassMean.push_back( FitTot[i]->GetParameter( "gausMean" ) );
             MassStd.push_back( rmsSigma );
     }
 
     int PtBinCounter=0;
 
+    // Sig yield values
+    cout << "==========================================================" << endl;
+    cout << "Signal Yield" << endl;
+    cout << "==========================================================" << endl;
+
+    for( std::vector<double>::iterator it = sig.begin(  ); it != sig.end(  ); ++it ){ 
+        cout << PtBin[PtBinCounter] << " < Pt =< " << PtBin[PtBinCounter+1] << ": " << *it << endl;
+        PtBinCounter++;
+    }
+
     // Fsig values
     cout << "==========================================================" << endl;
     cout << "Signal Fraction Yield" << endl;
     cout << "==========================================================" << endl;
-
+    PtBinCounter = 0;
     for( std::vector<double>::iterator it = Fsig.begin(  ); it != Fsig.end(  ); ++it ){ 
         cout << PtBin[PtBinCounter] << " < Pt =< " << PtBin[PtBinCounter+1] << ": " << *it << endl;
         PtBinCounter++;
