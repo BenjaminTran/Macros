@@ -67,38 +67,43 @@ Double_t total( Double_t *x, Double_t *par )
 
 void InvMassFit(  )
 {
+    const char* FN[] = {
+        "/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/Flow/CasCutLoose/CasCutLooseJL1.root",
+        "/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/Flow/CasCutLoose/CasCutLooseJL2.root"
+    };
+    double p[] = {1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0}; //if number of bins changes make sure you change PtBinSize
+
     std::ostringstream os;
     TH1::SetDefaultSumw2(  );
-
-    //TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/8TeV/MassPt8TeVPD1.root" );
-    //TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/TestRootFiles/XiAnalysisCorrelationPtCut8TeVPD1_4_Inc.root" );
-    //TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/TestRootFiles/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root" );
-    //TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/Flow/CasCutLoose/CasCutLooseJL1.root" );
-    //TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/Flow/CasCutLoose/CasCutLooseJL2.root" );
-    //TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/Flow/CasCutLoose/CasCutLooseJL3.root" );
-    //TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/Flow/CasCutLoose/CasCutLooseJL4.root" );
-    TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/Flow/CasCutLoose/CasCutLooseJL5.root" );
-
-    int numPtBins = 7;
-    int numFiles = 5;
-
-    TFile* Files[numFiles];
-
-    TH1D* InvMassPtBinned[numPtBins];
-    double p[] = {1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0}; //if number of bins changes make sure you change numPtBins
-    std::vector<double> PtBin( p, p+8 );
     std::vector<double> MassMean;
     std::vector<double> MassStd;
     std::vector<double> Fsig;
     std::vector<double> sig;
+    std::vector<TFile*> FILES;
+    std::vector<const char*> Fn( FN, FN+2 );
+    std::vector<double> PtBin( p, p+8 );
+
     int PtBinSize = PtBin.size(  ) - 1;
+
+    for( std::vector<const char*>::iterator it=Fn.begin(  ); it!=Fn.end(  ); ++it ){
+        TFile* f = new TFile( *it );
+        FILES.push_back( f );
+    }
+
+    cout << PtBin.size(  ) << endl;
+    
+    TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/Flow/CasCutLoose/CasCutLooseJL5.root" );
+
+    TH1D* InvMassPtBinned[PtBinSize];
+    //std::vector<TF1*> BGFIT;
     bool publish = true; // Adds Latex labels
 
-    TF1* BgFit[numPtBins];
-    TF1* SigFit[numPtBins];
-    TF1* FitTot[numPtBins];
-    TF1* FitFcn[numPtBins]; //For drawing and fsig calc
-    TF1* BackFcn[numPtBins];
+    TF1* BgFit[PtBinSize];
+    //BGFIT->push_back( BgFit );
+    TF1* SigFit[PtBinSize];
+    TF1* FitTot[PtBinSize];
+    TF1* FitFcn[PtBinSize]; //For drawing and fsig calc
+    TF1* BackFcn[PtBinSize];
 
     TH2D* MassPt = ( TH2D* )f->Get( "xiMassPt/MassPt" );
     //TH2D* MassPt = ( TH2D* )f->Get( "xiCorrelation/MassPt" );
@@ -191,7 +196,7 @@ void InvMassFit(  )
             BgFit[i]->SetParameter( 0,3.17496e1 );
             BgFit[i]->SetParameter( 1,5.97019e-1 );
             BgFit[i]->SetParNames( "bkgScale","bkgPow" );
- ;
+
             SigFit[i] = new TF1( Form( "sigfit_%d",i ), sgfunc, 1.26,1.4,7 );
             SigFit[i]->SetNpx( 250 );
             SigFit[i]->SetParNames( "gaus1Norm","gausMean","gaus1std","gaus2Norm","gaus2std","sbkgScale","sbkgPow" );
@@ -207,7 +212,6 @@ void InvMassFit(  )
             FitTot[i] = new TF1( Form( "fitTot_%d",i ), total, 1.26, 1.4, 9 );
             FitTot[i]->SetNpx( 250 );
             FitTot[i]->SetParNames( "bkgScale","bkgPow","gaus1Norm","gausMean","gaus1std","gaus2Norm","gaus2std","sbkgScale","sbkgPow" );
-
             
             Double_t partest[9];
             InvMassPtBinned[i]->Fit( Form( "bgfit_%d",i ), "L","",1.26,1.31 );
@@ -301,7 +305,7 @@ void InvMassFit(  )
     // Draw Histgorams
     TCanvas* cHist = new TCanvas( "Canvas","",1600,800 );
     cHist->Divide( 4,2 );
-    for( int i=0; i<numPtBins; i++ ){
+    for( int i=0; i<PtBinSize; i++ ){
         cHist->cd( i+1 );
         InvMassPtBinned[i]->Draw( "E1" );
     }
