@@ -48,6 +48,10 @@
 ./InvMassFit_cpp.so: /usr/local/root/include/TPave.h
 ./InvMassFit_cpp.so: /usr/local/root/include/TBox.h
 ./InvMassFit_cpp.so: /usr/local/root/include/TMathText.h
+./InvMassFit_cpp.so: /usr/local/root/include/TImage.h
+./InvMassFit_cpp.so: /usr/local/root/include/TAttImage.h
+./InvMassFit_cpp.so: /usr/local/root/include/GuiTypes.h
+./InvMassFit_cpp.so: /usr/local/root/include/TVectorDfwd.h
 ./InvMassFit_cpp.so: /usr/local/root/include/TH1D.h
 ./InvMassFit_cpp.so: /usr/local/root/include/TH1.h
 ./InvMassFit_cpp.so: /usr/local/root/include/TAxis.h
@@ -56,7 +60,6 @@
 ./InvMassFit_cpp.so: /usr/local/root/include/TArrayS.h
 ./InvMassFit_cpp.so: /usr/local/root/include/TArrayF.h
 ./InvMassFit_cpp.so: /usr/local/root/include/TVectorFfwd.h
-./InvMassFit_cpp.so: /usr/local/root/include/TVectorDfwd.h
 ./InvMassFit_cpp.so: /usr/local/root/include/TFitResultPtr.h
 ./InvMassFit_cpp.so: /usr/local/root/include/TH2D.h
 ./InvMassFit_cpp.so: /usr/local/root/include/TH2.h
@@ -66,7 +69,6 @@
 ./InvMassFit_cpp.so: /usr/local/root/include/TVirtualPad.h
 ./InvMassFit_cpp.so: /usr/local/root/include/TAttPad.h
 ./InvMassFit_cpp.so: /usr/local/root/include/TVirtualX.h
-./InvMassFit_cpp.so: /usr/local/root/include/GuiTypes.h
 ./InvMassFit_cpp.so: /usr/local/root/include/Buttons.h
 ./InvMassFit_cpp.so: /usr/local/root/include/TQObject.h
 ./InvMassFit_cpp.so: /usr/local/root/include/TFile.h
