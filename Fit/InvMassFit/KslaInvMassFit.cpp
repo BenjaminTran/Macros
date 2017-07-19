@@ -73,7 +73,7 @@ void KslaInvMassFit(  )
     std::vector<double> PtBin_ks( pks, pks+numPtBins_ks );
     std::vector<double> PtBin_la( pla, pla+numPtBins_la );
 
-    bool publish = false; // Adds Latex labels
+    bool publish = true; // Adds Latex labels
     bool Correlation = false;
 
     int PtBinSize_ks = PtBin_ks.size(  ) - 1;
@@ -125,40 +125,41 @@ void KslaInvMassFit(  )
     InvMass_la->SetMarkerStyle( 21 );
     InvMass_la->SetMarkerSize( 0.5 );
 
-    TF1* bgfit_ks = new TF1( Form( "bgfit_ks_%d",0 ), V0bgfunc, 0.432,0.54,5 );
+    TF1* bgfit_ks = new TF1( Form( "bgfit_ks_%d",0 ), V0bgfunc, 0.432,0.56,5 );
     bgfit_ks->SetNpx( 60 );
-    bgfit_ks->SetParameter( 0,-3e2 );
-    bgfit_ks->SetParameter( 1,0 );
-    bgfit_ks->SetParameter( 2,0 );
-    bgfit_ks->SetParameter( 3,0 );
-    bgfit_ks->SetParameter( 4,0 );
+    bgfit_ks->SetParameter( 0,1.19173e+5 );
+    bgfit_ks->SetParameter( 1,-2.23090e+6 );
+    bgfit_ks->SetParameter( 2,8.92425e+06 );
+    bgfit_ks->SetParameter( 3,-1.18417e+07 );
+    bgfit_ks->SetParameter( 4,4.28776e+06 );
     bgfit_ks->SetParNames( "const_ks","pow1_ks","pow2_ks","pow3_ks","pow4_ks" );
     bgfit_ks->SetLineColor( kBlue );
     TF1* bgfit_la = new TF1( Form( "bgfit_la_%d",0 ), V0bgfunc, 1.08,1.155,5 );
     bgfit_la->SetNpx( 60 );
-    bgfit_la->SetParameter( 0,1e6 );
-    bgfit_la->SetParameter( 1,100 );
-    bgfit_la->SetParameter( 2,100 );
-    bgfit_la->SetParameter( 3,100 );
-    bgfit_la->SetParameter( 4,100 );
+    bgfit_la->SetParameter( 0,1.14210e6);
+    bgfit_la->SetParameter( 1,-4.91504e5 );
+    bgfit_la->SetParameter( 2,-1.07651e6 );
+    bgfit_la->SetParameter( 3,-4.78854e5 );
+    bgfit_la->SetParameter( 4,9.19325e5 );
     bgfit_la->SetParNames( "const_la","pow1_la","pow2_la","pow3_la","pow4_la" );
+    bgfit_la->SetLineColor( kBlue );
 
-    TF1* sigfit_ks = new TF1( Form( "sigfit_ks_%d",0 ), V0sgfunc,0.43,0.565,5 );
+    TF1* sigfit_ks = new TF1( Form( "sigfit_ks_%d",0 ), V0sgfunc,0.432,0.56,5 );
     sigfit_ks->SetNpx( 250 );
     sigfit_ks->SetParNames( "gaus1Norm_ks","gausMean_ks","gaus1std_ks","gaus2Norm_ks","gaus2std_ks");
-    sigfit_ks->SetParameter( 0,6.6688e3 );
-    sigfit_ks->SetParameter( 1,1.32219 );
-    sigfit_ks->SetParameter( 2,3.15655e-3 );
-    sigfit_ks->SetParameter( 3,3.67793e3 );
-    sigfit_ks->SetParameter( 4,3.69916e-3 );
-    TF1* sigfit_la = new TF1( Form( "sigfit_la_%d",0 ), V0sgfunc,0.43,0.565,5 );
+    sigfit_ks->SetParameter( 0,1.10181e6 );
+    sigfit_ks->SetParameter( 1,0.497640 );
+    sigfit_ks->SetParameter( 2,3.51731e-3 );
+    sigfit_ks->SetParameter( 3,5.08507e5 );
+    sigfit_ks->SetParameter( 4,8.58842e-3 );
+    TF1* sigfit_la = new TF1( Form( "sigfit_la_%d",0 ), V0sgfunc,1.08,1.155,5 );
     sigfit_la->SetNpx( 250 );
     sigfit_la->SetParNames( "gaus1Norm_la","gausMean_la","gaus1std_la","gaus2Norm_la","gaus2std_la");
-    sigfit_la->SetParameter( 0,6.6688e3 );
-    sigfit_la->SetParameter( 1,1.32219 );
-    sigfit_la->SetParameter( 2,3.15655e-3 );
-    sigfit_la->SetParameter( 3,3.67793e3 );
-    sigfit_la->SetParameter( 4,3.69916e-3 );
+    sigfit_la->SetParameter( 0,7.04193e5 );
+    sigfit_la->SetParameter( 1,1.11602 );
+    sigfit_la->SetParameter( 2,2.27978e-3 );
+    sigfit_la->SetParameter( 3,2.28144e4 );
+    sigfit_la->SetParameter( 4,2.36644e-2 );
 
     TF1* fitTot_ks = new TF1( Form( "fitTot_ks_%d",0 ), V0total, 0.43,0.565, 10 );
     fitTot_ks->SetNpx( 250 );
@@ -167,14 +168,15 @@ void KslaInvMassFit(  )
     fitTot_la->SetNpx( 250 );
     fitTot_la->SetParNames( "const_la","pow1_la","pow2_la","pow3_la","pow4_la","gaus1Norm_la","gausMean_la","gaus1std_la","gaus2Norm_la","gaus2std_la");
 
+
     //for test function
     Double_t partestTot_ks[10];
     Double_t partestTot_la[10];
 
-    InvMass_ks->Fit( Form( "bgfit_ks_%d",0 ),"L","",0.43,0.565 );
-    InvMass_ks->Fit( Form( "sigfit_ks_%d",0 ), "L R","",0.43,0.565 );
-    InvMass_la->Fit( Form( "bgfit_la_%d",0 ),"L","",1.08,1.155 );
-    InvMass_la->Fit( Form( "sigfit_la_%d",0 ), "L R","",1.08,1.155 );
+    InvMass_ks->Fit( Form( "bgfit_ks_%d",0 ),"LQ","",0.432,0.465 ); //0.46
+    InvMass_ks->Fit( Form( "sigfit_ks_%d",0 ), "L RQ","",0.48,0.51 );
+    InvMass_la->Fit( Form( "bgfit_la_%d",0 ),"LQ","",1.082,1.1 );
+    InvMass_la->Fit( Form( "sigfit_la_%d",0 ), "L RQ","",1.1,1.13 );
 
     bgfit_ks->GetParameters( &partestTot_ks[0] );
     sigfit_ks->GetParameters( &partestTot_ks[5] );
@@ -204,14 +206,13 @@ void KslaInvMassFit(  )
     fitFcn_ks->SetNpx( 250 );
     fitFcn_ks->SetParameters( parfordrawTot_ks );
     fitFcn_ks->SetLineColor( kRed );
-    /* Only if signal fit needs a background piece as well
-       TF1* backFcn_ks = new TF1( Form( "backFcn_ks_%d",0 ), xi_bkgfuncdisplay, 1.26,1.4,4 );
-       backFcn_->SetParameter( 0,fitTot_->GetParameter( 0 ) );
-       backFcn_->SetParameter( 1,fitTot_->GetParameter( 1 ) );
-       backFcn_->SetParameter( 2,fitTot_->GetParameter( 7 ) );
-       backFcn_->SetParameter( 3,fitTot_->GetParameter( 8 ) );
-       backFcn_->SetLineColor( kBlue );
-       */
+
+    bgfit_ks->SetParameter( 0,fitTot_ks->GetParameter( 0 ) );
+    bgfit_ks->SetParameter( 1,fitTot_ks->GetParameter( 1 ) );
+    bgfit_ks->SetParameter( 2,fitTot_ks->GetParameter( 2 ) );
+    bgfit_ks->SetParameter( 3,fitTot_ks->GetParameter( 3 ) );
+    bgfit_ks->SetParameter( 4,fitTot_ks->GetParameter( 4 ) );
+
 
     InvMass_la->SetTitle( "" );
     InvMass_la->GetYaxis(  )->SetTitleOffset( 1.5 );
@@ -233,55 +234,100 @@ void KslaInvMassFit(  )
     fitFcn_la->SetParameters( parfordrawTot_la );
     fitFcn_la->SetLineColor( kRed );
 
+    bgfit_la->SetParameter( 0,fitTot_la->GetParameter( 0 ) );
+    bgfit_la->SetParameter( 1,fitTot_la->GetParameter( 1 ) );
+    bgfit_la->SetParameter( 2,fitTot_la->GetParameter( 2 ) );
+    bgfit_la->SetParameter( 3,fitTot_la->GetParameter( 3 ) );
+    bgfit_la->SetParameter( 4,fitTot_la->GetParameter( 4 ) );
+
     double rmsSigmaTot_ks = TMath::Sqrt( 0.5*fitTot_ks->GetParameter( "gaus1std_ks" )*fitTot_ks->GetParameter( "gaus1std_ks" ) + 0.5*fitTot_ks->GetParameter( "gaus2std_ks" )*fitTot_ks->GetParameter( "gaus2std_ks" ) );
     double rmsSigmaTot_la = TMath::Sqrt( 0.5*fitTot_la->GetParameter( "gaus1std_la" )*fitTot_la->GetParameter( "gaus1std_la" ) + 0.5*fitTot_la->GetParameter( "gaus2std_la" )*fitTot_la->GetParameter( "gaus2std_la" ) );
     double meanTot_ks = fitTot_ks->GetParameter( "gausMean_ks" );
     double meanTot_la = fitTot_la->GetParameter( "gausMean_la" );
 
-    /*
     for( int i=0; i<PtBinSize_ks; i++ ){
         TH1D* InvMassPtBinned_k = ( TH1D* )MassPt_ks->ProjectionX( Form( "InvMass_pT_ks_%d",i ), PtBin_ks[i]*10+1, PtBin_ks[i+1]*10 );
+        double maxBin = InvMassPtBinned_k->GetMaximum(  );
+        cout << maxBin << endl;
         os << PtBin_ks[i] << "_Pt_" << PtBin_ks[i+1];
         InvMassPtBinned_k->SetTitle( os.str(  ).c_str(  ) );
         os.str( std::string(  ) );
 
 
         //Perform Fits Kshort
-        TF1* bgFit_ks = new TF1(  Form( "bgfit_ks_%d",i ), V0bgfunc, 0.43,0.565,5  );
-        bgFit_ks->SetNpx( 60 );
-        bgFit_ks->SetParameter( 0,1 );
-        bgFit_ks->SetParameter( 1,1 );
-        bgFit_ks->SetParameter( 2,1 );
-        bgFit_ks->SetParameter( 3,1 );
-        bgFit_ks->SetParameter( 4,1 );
-        bgFit_ks->SetParNames( "const_ks","pow1_ks","pow2_ks","pow3_ks","pow4_ks" );
+        
+        TF1* bgFit_ks = new TF1(  Form( "bgfit_pt_ks_%d",i ), V0bgfunc, 0.43,0.56,5  );
+        TF1* sigFit_ks = new TF1( Form( "sigfit_pt_ks_%d",i ), V0sgfunc, 0.43,0.565,5 ) ;
+        if( maxBin > 130000 && maxBin < 500000)
+        {
+            bgFit_ks->SetNpx( 60 );
+            bgFit_ks->SetParameter( 0,5.19173e+5 );
+            bgFit_ks->SetParameter( 1,-2.23090e+6 );
+            bgFit_ks->SetParameter( 2,8.92425e+06 );
+            bgFit_ks->SetParameter( 3,-1.18417e+07 );
+            bgFit_ks->SetParameter( 4,4.28776e+06 );
 
-        TF1* sigFit_ks = new TF1( Form( "sigfit_ks_%d",i ), V0sgfunc, 0.43,0.565,5 ) ;
-        sigFit_ks->SetParameter( 0,1 );
-        sigFit_ks->SetParameter( 1,1 );
-        sigFit_ks->SetParameter( 2,1 );
-        sigFit_ks->SetParameter( 3,1 );
-        sigFit_ks->SetParameter( 4,1 );
+            sigFit_ks->SetParameter( 0,1.18917e+06 );
+            sigFit_ks->SetParameter( 1,4.97654e-01 );
+            sigFit_ks->SetParameter( 2,3.78771e-03 );
+            sigFit_ks->SetParameter( 3,3.79208e+05 );
+            sigFit_ks->SetParameter( 4,9.07022e-03 );
+        }
+        else if( maxBin < 130000 && maxBin > 50000)
+        {
+            bgFit_ks->SetNpx( 60 );
+            bgFit_ks->SetParameter( 0,2.61667e+05);
+            bgFit_ks->SetParameter( 1,-2.13714e+06) ;
+            bgFit_ks->SetParameter( 2,7.63720e+06 );
+            bgFit_ks->SetParameter( 3,-1.23066e+07 );
+            bgFit_ks->SetParameter( 4,7.81857e+06 );
+
+            sigFit_ks->SetParameter( 0,1.03306e+06);
+            sigFit_ks->SetParameter( 1,4.97654e-01 );
+            sigFit_ks->SetParameter( 2,3.78771e-03 );
+            sigFit_ks->SetParameter( 3,3.03445e+05 );
+            sigFit_ks->SetParameter( 4,9.07022e-03 );
+        }
+        else if( maxBin < 50000 && maxBin > 20000)
+        {
+            bgFit_ks->SetNpx( 60 );
+            bgFit_ks->SetParameter( 0,1.39173e+5 );
+            bgFit_ks->SetParameter( 1,-2.06090e+6 );
+            bgFit_ks->SetParameter( 2,9.06425e+06 );
+            bgFit_ks->SetParameter( 3,-1.25417e+07 );
+            bgFit_ks->SetParameter( 4,8.88776e+06 );
+
+            sigFit_ks->SetParameter( 0,1.08917e+06 );
+            sigFit_ks->SetParameter( 1,4.97654e-01 );
+            sigFit_ks->SetParameter( 2,3.78871e-03 );
+            sigFit_ks->SetParameter( 3,3.79208e+05 );
+            sigFit_ks->SetParameter( 4,9.07022e-03 );
+        }
+
+
+        bgFit_ks->SetParNames( "const_ks","pow1_ks","pow2_ks","pow3_ks","pow4_ks" );
         sigFit_ks->SetParNames( "gaus1Norm_ks","gausMean_ks","gaus1std_ks","gaus2Norm_ks","gaus2std_ks");
 
-        TF1* FitTot_pt_ks = new TF1( Form( "fitTot_ks_%d",i ), V0total, 0.43,0.565, 10 ) ;
+        TF1* FitTot_pt_ks = new TF1( Form( "fitTot_pt_ks_%d",i ), V0total, 0.43,0.565, 10 ) ;
         FitTot_pt_ks->SetNpx( 250 );
         FitTot_pt_ks->SetParNames( "const_ks","pow1_ks","pow2_ks","pow3_ks","pow4_ks","gaus1Norm_ks","gausMean_ks","gaus1std_ks","gaus2Norm_ks","gaus2std_ks");
 
         Double_t partest_ks[10];
 
-        InvMassPtBinned_k->Fit( Form( "bgfit_ks_%d",i ), "L","",0.43,0.565 );
-        InvMassPtBinned_k->Fit( Form( "sigfit_ks_%d",i ), "L R", "",0.43,0.565 );
+        cout << "Ks " << i << endl;
+        InvMassPtBinned_k->Fit( Form( "bgfit_pt_ks_%d",i ), "L","",0.432,0.465 );
+        InvMassPtBinned_k->Fit( Form( "sigfit_pt_ks_%d",i ), "L R", "",0.48,0.51 );
 
         bgFit_ks ->GetParameters( &partest_ks[0] );
         sigFit_ks->GetParameters( &partest_ks[5] );
 
         FitTot_pt_ks->SetParameters( partest_ks );
 
-        InvMassPtBinned_k->Fit( Form( "FitTot_pt_ks_%d",i ), "L","",0.43,0.565 );
+        InvMassPtBinned_k->Fit( Form( "fitTot_pt_ks_%d",i ), "L","",0.43,0.565 );
 
         //Draw signal and background fit also need bkg fit for fsig calc
 
+        /*
         Double_t parfordraw_ks[10];
         FitTot_pt_ks->GetParameters( &parfordraw_ks[0] );
         TF1* fitFcn_pt_ks = new TF1( Form( "fitFcn_pt_ks_%d",i ), V0total, 0.43,0.565,10 );
@@ -289,6 +335,7 @@ void KslaInvMassFit(  )
         fitFcn_pt_ks->SetParameters( parfordraw_ks );
         fitFcn_pt_ks->SetLineColor( kRed );
         fitFcn_pt_ks->Draw( "same" );
+        */
 
         //Calculate values
 
@@ -311,11 +358,12 @@ void KslaInvMassFit(  )
         BgFit_ks.push_back( bgFit_ks );
         SigFit_ks.push_back( sigFit_ks );
         FitTot_ks.push_back( FitTot_pt_ks );
-        FitFcn_pt_ks.push_back( fitFcn_pt_ks );
+        //FitFcn_pt_ks.push_back( fitFcn_pt_ks );
         InvMassPtBinned_ks.push_back( InvMassPtBinned_k );
     }
 
     
+    /*
     for( int i=0; i<PtBinSize_la; i++ ){
         TH1D* InvMassPtBinned_l = ( TH1D* )MassPt_la->ProjectionX( Form( "InvMass_pT_la_%d",i ), PtBin_la[i]*10+1, PtBin_la[i+1]*10 );
         os << PtBin_la[i] << "_Pt_" << PtBin_la[i+1];
@@ -323,44 +371,44 @@ void KslaInvMassFit(  )
         os.str( std::string(  ) );
 
         //Perform Fits Lambda
-        TF1* bgFit_la = new TF1(  Form( "bgfit_la_%d",i ), V0bgfunc, 0.43,0.565,5  );
+        TF1* bgFit_la = new TF1(  Form( "bgfit_la_%d",i ), V0bgfunc, 1.08,1.155,5  );
         bgFit_la->SetNpx( 60 );
-        bgFit_la->SetParameter( 0,1 );
-        bgFit_la->SetParameter( 1,1 );
-        bgFit_la->SetParameter( 2,1 );
-        bgFit_la->SetParameter( 3,1 );
-        bgFit_la->SetParameter( 4,1 );
+        bgFit_la->SetParameter( 0,1.14210e6);
+        bgFit_la->SetParameter( 1,-4.91504e5 );
+        bgFit_la->SetParameter( 2,-1.07651e6 );
+        bgFit_la->SetParameter( 3,-4.78854e5 );
+        bgFit_la->SetParameter( 4,9.19325e5 );
         bgFit_la->SetParNames( "const_la","pow1_la","pow2_la","pow3_la","pow4_la" );
 
-        TF1* sigFit_la = new TF1( Form( "sigfit_la_%d",i ), V0sgfunc, 0.43,0.565,5 ) ;
-        sigFit_la->SetParameter( 0,1 );
-        sigFit_la->SetParameter( 1,1 );
-        sigFit_la->SetParameter( 2,1 );
-        sigFit_la->SetParameter( 3,1 );
-        sigFit_la->SetParameter( 4,1 );
+        TF1* sigFit_la = new TF1( Form( "sigfit_la_%d",i ), V0sgfunc, 1.08,1.155,5 ) ;
+        sigFit_la->SetParameter( 0,7.04193e5 );
+        sigFit_la->SetParameter( 1,1.11602 );
+        sigFit_la->SetParameter( 2,2.27978e-3 );
+        sigFit_la->SetParameter( 3,2.28144e4 );
+        sigFit_la->SetParameter( 4,2.36644e-2 );
         sigFit_la->SetParNames( "gaus1Norm_la","gausMean_la","gaus1std_la","gaus2Norm_la","gaus2std_la");
 
-        TF1* FitTot_pt_la = new TF1( Form( "fitTot_la_%d",i ), V0total, 0.43,0.565, 10 ) ;
+        TF1* FitTot_pt_la = new TF1( Form( "fitTot_la_%d",i ), V0total, 1.08,1.155, 10 ) ;
         FitTot_pt_la->SetNpx( 250 );
         FitTot_pt_la->SetParNames( "const_la","pow1_la","pow2_la","pow3_la","pow4_la","gaus1Norm_la","gausMean_la","gaus1std_la","gaus2Norm_la","gaus2std_la");
 
         Double_t partest_la[10];
 
-        InvMassPtBinned_l->Fit( Form( "bgfit_la_%d",i ), "L","",0.43,0.565 );
-        InvMassPtBinned_l->Fit( Form( "sigfit_la_%d",i ), "L R", "",0.43,0.565 );
+        InvMassPtBinned_l->Fit( Form( "bgfit_la_%d",i ), "L","",1.082,1.1 );
+        InvMassPtBinned_l->Fit( Form( "sigfit_la_%d",i ), "L R", "",1.1,1.13 );
 
         bgFit_la ->GetParameters( &partest_la[0] );
         sigFit_la->GetParameters( &partest_la[5] );
 
         FitTot_pt_la->SetParameters( partest_la );
 
-        InvMassPtBinned_l->Fit( Form( "FitTot_pt_la_%d",i ), "L","",0.43,0.565 );
+        InvMassPtBinned_l->Fit( Form( "FitTot_pt_la_%d",i ), "L","",1.08,1.155 );
 
         //Draw signal and background fit also need bkg fit for fsig calc
 
         Double_t parfordraw_la[10];
         FitTot_pt_la->GetParameters( &parfordraw_la[0] );
-        TF1* fitFcn_pt_la = new TF1( Form( "fitFcn_pt_la_%d",i ), V0total, 0.43,0.565,10 );
+        TF1* fitFcn_pt_la = new TF1( Form( "fitFcn_pt_la_%d",i ), V0total, 1.08,1.155,10 );
         fitFcn_pt_la->SetNpx( 250 );
         fitFcn_pt_la->SetParameters( parfordraw_la );
         fitFcn_pt_la->SetLineColor( kRed );
@@ -391,6 +439,7 @@ void KslaInvMassFit(  )
 
 
     }
+    */
         
     
 
@@ -444,6 +493,7 @@ void KslaInvMassFit(  )
     PtBinCounter = 0;
 
 
+    /*
     cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
     cout << "LAMBDA LAMBDA LAMBDA" << endl;
     cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
@@ -490,19 +540,21 @@ void KslaInvMassFit(  )
         PtBinCounter++;
     }
     PtBinCounter = 0;
+    */
     
 
     // Draw Histgorams
     TCanvas* cHist_ks = new TCanvas( "Canvas_ks","KS",1600,800 );
     cHist_ks->Divide( 4,3 );
-    for( int i=0; i<numPtBins_ks; i++ ){
+    for( int i=0; i<PtBinSize_ks; i++ ){
         cHist_ks->cd( i+1 );
         InvMassPtBinned_ks[i]->Draw( "E1" );
     }
 
+    /*
     TCanvas* cHist_la = new TCanvas( "Canvas_la","KS",1600,800 );
     cHist_la->Divide( 4,3 );
-    for( int i=0; i<numPtBins_la; i++ ){
+    for( int i=0; i<PtBinSize_la; i++ ){
         cHist_la->cd( i+1 );
         InvMassPtBinned_la[i]->Draw( "E1" );
     }
@@ -559,13 +611,15 @@ void KslaInvMassFit(  )
     gPad->SetTicky(  );
     InvMass_la->Draw( "E1 9" );
     fitFcn_la->Draw( "same" );
+    //sigfit_la->Draw( "same" );
     bgfit_la->Draw( "same" );
 
     cMass_ks->cd(  );
     gPad->SetTickx(  );
     gPad->SetTicky(  );
     InvMass_ks->Draw( "E1 9" );
-    //fitFcn_ks->Draw( "same" );
+    fitFcn_ks->Draw( "same" );
+    //sigfit_ks->Draw( "same" );
     bgfit_ks->Draw( "same" );
 
     if( publish ) 
@@ -615,7 +669,7 @@ void KslaInvMassFit(  )
         os << "185 #leq  N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 220";
         ltx1->DrawLatex( 0.23, 0.67, os.str(  ).c_str(  ) );
         os.str( std::string(  ) );
-        ltx2->DrawLatex( 0.23, 0.60, "#Lambda/ #overline{#Lambda} " );
+        ltx2->DrawLatex( 0.23, 0.60, "#Lambda/ #bar{#Lambda} " );
 
         TLegend* leg = new TLegend( 0.6,0.5,0.85,0.6);
         leg->AddEntry( "fitFcn", "Complete fit function", "1L" );
