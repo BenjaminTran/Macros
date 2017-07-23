@@ -35,7 +35,7 @@
 Double_t V0bgfunc( Double_t *x, Double_t *par )
 {
     Double_t xx = x[0];
-    Double_t bg = par[0] + par[1]*xx + par[2]*xx*xx + par[3]*TMath::Power( xx, 3 ) + par[4]*TMath::Power( xx,4 ); 
+    Double_t bg = par[0] + par[1]*xx + par[2]*xx*xx + par[3]*TMath::Power( xx, 3 ) + par[4]*TMath::Power( xx,4 );    
     return bg;
 }
 
@@ -60,9 +60,9 @@ void KslaInvMassFit(  )
 {
     using namespace std;
 
-    int numPtBins_ks = 12;
+    int numPtBins_ks = 13;
     int numPtBins_la = 11;
-    double pks[] = {0.6,0.8,1.0,1.4,1.8,2.2,2.8,3.6,4.6,6.0,9.0,12.0}; //if number of bins changes make sure you change numPtBins
+    double pks[] = {0.4,0.6,0.8,1.0,1.4,1.8,2.2,2.8,3.6,4.6,6.0,9.0,12.0}; //if number of bins changes make sure you change numPtBins
     double pla[] = {0.8,1.0,1.4,1.8,2.2,2.8,3.6,4.6,6.0,9.0,12.0}; //if number of bins changes make sure you change numPtBins
 
     TFile* f = new TFile( "/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/Flow/Ksla/kslaMassPtJL1.root" );
@@ -91,6 +91,7 @@ void KslaInvMassFit(  )
 
     std::vector<TH1D*> InvMassPtBinned_la;
     std::vector<TF1*> BgFit_la;
+    std::vector<TF1*> BgFit_pt_la;
     std::vector<TF1*> SigFit_la;
     std::vector<TF1*> FitTot_la;
     std::vector<TF1*> FitFcn_pt_la;
@@ -303,7 +304,36 @@ void KslaInvMassFit(  )
             sigFit_ks->SetParameter( 3,3.79208e+05 );
             sigFit_ks->SetParameter( 4,9.07022e-03 );
         }
+        else if( maxBin <50000 && maxBin >10000 )
+        {
+            bgFit_ks->SetNpx( 60 );
+            bgFit_ks->SetParameter( 0,2.24670e+05 );
+            bgFit_ks->SetParameter( 1,-1.55250e+04 );
+            bgFit_ks->SetParameter( 2,4.30693e+04 );
+            bgFit_ks->SetParameter( 3,2.64150e+04 );
+            bgFit_ks->SetParameter( 4,-9.40287e+04 );
 
+            sigFit_ks->SetParameter( 0,5.80279e+05 );
+            sigFit_ks->SetParameter( 1,4.97490e-01 );
+            sigFit_ks->SetParameter( 2,3.64976e-03 );
+            sigFit_ks->SetParameter( 3,5.19794e+05 );
+            sigFit_ks->SetParameter( 4,9.25625e-03 );
+        }
+        else if ( maxBin < 2000 )
+        {
+            bgFit_ks->SetNpx( 60 );
+            bgFit_ks->SetParameter( 0, 1.13967e+04);
+            bgFit_ks->SetParameter( 1,-2.95342e+04);
+            bgFit_ks->SetParameter( 2,9.99929e+04);
+            bgFit_ks->SetParameter( 3,-2.66791e+04);
+            bgFit_ks->SetParameter( 4,-9.80732e+04);
+
+            sigFit_ks->SetParameter( 0,1.41877e+04 );
+            sigFit_ks->SetParameter( 1, 4.97598e-01);
+            sigFit_ks->SetParameter( 2, 4.16968e-03);
+            sigFit_ks->SetParameter( 3, 1.66385e+04);
+            sigFit_ks->SetParameter( 4, 1.01304e-02);
+        }
 
         bgFit_ks->SetParNames( "const_ks","pow1_ks","pow2_ks","pow3_ks","pow4_ks" );
         sigFit_ks->SetParNames( "gaus1Norm_ks","gausMean_ks","gaus1std_ks","gaus2Norm_ks","gaus2std_ks");
@@ -323,11 +353,10 @@ void KslaInvMassFit(  )
 
         FitTot_pt_ks->SetParameters( partest_ks );
 
-        InvMassPtBinned_k->Fit( Form( "fitTot_pt_ks_%d",i ), "L","",0.43,0.565 );
+        InvMassPtBinned_k->Fit( Form( "fitTot_pt_ks_%d",i ), "L","",0.44,0.56 );
 
         //Draw signal and background fit also need bkg fit for fsig calc
 
-        /*
         Double_t parfordraw_ks[10];
         FitTot_pt_ks->GetParameters( &parfordraw_ks[0] );
         TF1* fitFcn_pt_ks = new TF1( Form( "fitFcn_pt_ks_%d",i ), V0total, 0.43,0.565,10 );
@@ -335,7 +364,12 @@ void KslaInvMassFit(  )
         fitFcn_pt_ks->SetParameters( parfordraw_ks );
         fitFcn_pt_ks->SetLineColor( kRed );
         fitFcn_pt_ks->Draw( "same" );
-        */
+        bgFit_ks->SetParameter(0, parfordraw_ks[0]  );
+        bgFit_ks->SetParameter(1, parfordraw_ks[1]  );
+        bgFit_ks->SetParameter(2, parfordraw_ks[2]  );
+        bgFit_ks->SetParameter(3, parfordraw_ks[3]  );
+        bgFit_ks->SetParameter(4, parfordraw_ks[4]  );
+        BgFit_pt_la.push_back( bgFit_ks );
 
         //Calculate values
 
@@ -549,6 +583,7 @@ void KslaInvMassFit(  )
     for( int i=0; i<PtBinSize_ks; i++ ){
         cHist_ks->cd( i+1 );
         InvMassPtBinned_ks[i]->Draw( "E1" );
+        BgFit_pt_la[i]->Draw( "same" );
     }
 
     /*

@@ -45,8 +45,8 @@ void PtBinv2Fit(  )
 
 
     //For Enabling TLatex labels
-    Bool_t publish = kTRUE;
-    //Bool_t publish = kFALSE; 
+    //Bool_t publish = kTRUE;
+    Bool_t publish = kFALSE; 
     
     gStyle->SetOptFit( 1111 );
     gStyle->SetErrorX( 0 ); //removes horizontal error bars

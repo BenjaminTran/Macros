@@ -1,5 +1,4 @@
-#include <TLatex.h>
-#include <TStyle.h>
+#include <TLatex.h>#include <TStyle.h>
 #include "TF1.h"
 #include "TFile.h"
 #include "TH2F.h"
@@ -269,8 +268,8 @@ void v2Fit(  )
     //FITTING FOR V2
     //
     //Define divided hist
-    //bool Peak = true;
-    bool Peak = false;
+    bool Peak = true;
+    //bool Peak = false;
     if( Peak ){
         TH1D *dPhiPeak = new TH1D( "dPhiPeak", "#Xi - h^{#pm} ", 31, -( 0.5 -
                     1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
