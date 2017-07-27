@@ -133,10 +133,10 @@ void InvMassFit(  )
     std::vector<double> PtBin( p, p+numPtBins );
 
     bool publish = false; // Adds Latex labels
-    bool Loose = true;
+    bool Loose = false;
 
     if( !Loose )
-        Fn.push_back( "/Volumes/MacHD/Users/blt1/research/TestRootFiles/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root" );
+        Fn.push_back( "/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/Thesis/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root" );
     else
     {
         //Fn.push_back( "/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/Flow/CasCutLoose/CasCutLooseJL4.root" );

@@ -61,16 +61,17 @@ void V0PtBinv2Fit(  )
     gStyle->SetTextFont( 42 ); //2=times-bold-r-normal, 2=precision for TLatex to work
 
 
-    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/XiAnalysisCorrelation.root " );
-    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/NoPtCut/XiAnalysisCorrelationNoPtCutTotal.root " );
-    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/NoPtCutPeakAndSide/XiAnalysisCorrelationNoPtCutPeakAndSideTotal.root " );
-    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/NoPtCutPeakAndSide/XiAnalysisSeparated.root " );
-    TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/Flow/V0Corr/V0CorrelationJL3_4.root" );
+    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/XiAnalysisCorrelation.root " );
+    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/NoPtCut/XiAnalysisCorrelationNoPtCutTotal.root " );
+    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/NoPtCutPeakAndSide/XiAnalysisCorrelationNoPtCutPeakAndSideTotal.root " );
+    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/NoPtCutPeakAndSide/XiAnalysisSeparated.root " );
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/V0Corr/V0CorrelationJL3_4.root" );
+    TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/V0Corr/V0CorrelationJL7_8.root" );
     TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/TestRootFiles/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root" ); //For v2 of hadron
 
     TVirtualFitter::SetMaxIterations( 300000 );
     TH1::SetDefaultSumw2(  );
-    int numPtBins_ks = 11
+    int numPtBins_ks = 11;
     int numPtBins_la = 8;
     TH1D* dPhiFourierPeak_ks[numPtBins_ks];
     TH1D* dPhiFourierSide_ks[numPtBins_ks];
@@ -88,8 +89,6 @@ void V0PtBinv2Fit(  )
     double pla[] = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0}; //if number of bins changes make sure you change numPtBins
     std::vector<double> PtBin_ks( pks, pks+(numPtBins_ks+1) );
     std::vector<double> PtBin_la( pla, pla+(numPtBins_la+1) );
-    int PtBinSize_ks = PtBin_ks.size(  ) - 1;
-    int PtBinSize_la = PtBin_la.size(  ) - 1;
     std::vector<double> v2values_ks;
     std::vector<double> v2error_ks;
 
@@ -112,7 +111,7 @@ void V0PtBinv2Fit(  )
 	cout << "================================================================================" << endl;
 	cout << "================================================================================" << endl;
 	cout << "================================================================================" << endl;
-    for( int i=0; i<PtBinSize_ks; i++ )
+    for( int i=0; i<numPtBins_ks; i++ )
     {
         if( Peak ){
             dPhiPeak_ks[i] = new TH1D( Form( "dPhiPeak_ks%d",i ), "K_{S}^{0} - h^{#pm} ", 31, -( 0.5 -
@@ -595,7 +594,7 @@ void V0PtBinv2Fit(  )
 	cout << "================================================================================" << endl;
 	cout << "================================================================================" << endl;
 	cout << "================================================================================" << endl;
-    for( int i=0; i<PtBinSize_la; i++ )
+    for( int i=0; i<numPtBins_la; i++ )
     {
         if( Peak ){
             dPhiPeak_la[i] = new TH1D( Form( "dPhiPeak_la%d",i ), "#Lambda - h^{#pm} ", 31, -( 0.5 -

@@ -39,8 +39,8 @@ void BenMassFit()
     RooMsgService::instance().setStreamStatus(0,kFALSE);
     RooMsgService::instance().setStreamStatus(1,kFALSE);
 
-    TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/Flow/Ksla/kslaMassPtJL1.root");
-    //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/Flow/Ksla/kslaMassPtJL2.root");
+    TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/Ksla/kslaMassPtJL1.root");
+    //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/Ksla/kslaMassPtJL2.root");
 
     TH1D* massks;
     TH1D* massla;
@@ -49,7 +49,6 @@ void BenMassFit()
 	TH2D* MassLa;
 	bool lambda;
 
-	//int pTksLength = 12;
 	int pTksLength = 26; // the number of bins to be fitted is half of this number
 	double pks[] = {3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,90, 91,120};
 	double pla[] = {0,0, 0,0, 0,0, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,90, 91,120};
