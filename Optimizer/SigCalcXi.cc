@@ -1,3 +1,4 @@
+//Includes
 #include <iostream>
 #include <iomanip>
 #include <stdio.h>
@@ -8,6 +9,8 @@
 #include <cstdio>
 #include <TROOT.h>
 #include <TStyle.h>
+#include <vector>
+#include <sys/stat.h>
 
 #include "TF1.h"
 #include "TH1.h"
@@ -36,11 +39,8 @@
 #include "RooFormulaVar.h"
 #include "TString.h"
 
-#include <vector>
-
 void SigCalcXi(std::string name)// uses cut parameter name
 {
-
     //Initializers
     using namespace RooFit;
     gStyle->SetMarkerSize(0.8);
@@ -48,7 +48,7 @@ void SigCalcXi(std::string name)// uses cut parameter name
     RooMsgService::instance().setStreamStatus(0,kFALSE);
     RooMsgService::instance().setStreamStatus(1,kFALSE);
 
-    TFile* file = new TFile("Sample.root");
+    TFile* file = new TFile("Test.root");
 
 	int pTxiLength = 14; // the number of bins to be fitted is half of this number
 	double pxi[] = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60};
@@ -58,6 +58,7 @@ void SigCalcXi(std::string name)// uses cut parameter name
 	std::vector<double> std_xi;
 	std::vector<double> fsig_xi;
 	std::vector<double> covQual_xi;
+    std::vector<double> significance_xi;
     std::ostringstream os;
     std::ostringstream fileos;
     std::ostringstream imageos;
@@ -65,10 +66,9 @@ void SigCalcXi(std::string name)// uses cut parameter name
     TH1D* massxi;
 	TH2D* MassXi;
     std::string filename = name + ".txt";
-    std::string histname = "hxi_" + name + "_";
 
     //Cut Parameters CHANGELINE
-    int numparam             = 1;
+    int numparam             = 2;
     float xi_xi3dipsig[]     = {2.5 , 2.7 , 2.9 , 3.1 , 10.0};
     float xi_xipi3dipsig[]   = {5.0 , 4.5 , 3.0 , 2.5 , 2.0};
     float xi_vtrkpi3dipsig[] = {4.0 , 5.0 , 6.0 , 7.0 , 8.0};
@@ -78,14 +78,27 @@ void SigCalcXi(std::string name)// uses cut parameter name
 
     // Open output txt file
     ofstream myfile;
-    myfile.open (filename.c_str(), std::ios_base::app);
-    myfile << "Parameter: " + name + "\n";
+    struct stat buffer;
+    if(stat(filename.c_str(), &buffer) == 0)
+    {
+        cout << "File with this name already exists, will append with line OVERWRITE" << endl;
+        myfile.open(filename.c_str(), std::ios_base::app);
+        myfile << "OVERWRITE OVERWRITE OVERWRITE \n";
+    }
+    else
+    {
+        myfile.open(filename.c_str());
+    }
 
     int pxicounter = 0; //for correct bin counting
-    int hbincounter =1; //histogram bin counting
     for(int hlooper=0; hlooper<numparam; hlooper++)
     {
-        fileos << "hxi_" << name << "_" << xi_xi3dipsig[hlooper]; //CHANGELINE
+        //fileos << "hxi_" << name << "_" << xi_xi3dipsig[hlooper]; //CHANGELINE
+        //fileos << "hxi_" << name << "_" << xi_xipi3dipsig[hlooper]; //CHANGELINE
+        fileos << "hxi_" << name << "_" << xi_vtrkpi3dipsig[hlooper]; //CHANGELINE
+        //fileos << "hxi_" << name << "_" << xi_vtrkp3dipsig[hlooper]; //CHANGELINE
+        //fileos << "hxi_" << name << "_" << xi_xiflightsig[hlooper]; //CHANGELINE
+        //fileos << "hxi_" << name << "_" << xi_distancesig[hlooper]; //CHANGELINE
         //MassXi = (TH2D*)file->Get("XiMassPt/MassPt");
         //MassXi = (TH2D*)file->Get("xiCorrelation/MassPt");
         MassXi = (TH2D*)file->Get(fileos.str().c_str());
@@ -103,7 +116,7 @@ void SigCalcXi(std::string name)// uses cut parameter name
 
             tex->SetTextSize(tex->GetTextSize()*0.95);
 
-            //kshort
+            //Fit
             RooRealVar x("x","mass",1.26,1.4);
             RooDataHist data("data","dataset",x,massxi);
             RooRealVar mean("mean","mean",1.32,1.29,1.33);
@@ -127,44 +140,6 @@ void SigCalcXi(std::string name)// uses cut parameter name
             //sum.fitTo(data,Range("cut"));
             //sum.fitTo(data,Range("cut"));
 
-            double mean_xi = mean.getVal(  );
-            double rms_xi = TMath::Sqrt( 0.5*sigma1.getVal(  )*sigma1.getVal(  ) + 0.5*sigma2.getVal(  )*sigma2.getVal(  ) );
-
-            x.setRange( "peak", mean.getVal(  ) - 2*rms_xi, mean.getVal(  ) + 2*rms_xi);
-
-            double gaus1F_xi = sig1.getVal(  );
-            double gaus2F_xi = sig2.getVal(  );
-            double qsig_xi = qsig.getVal(  );
-
-            RooAbsReal* Intgaus1_xi = gaus1.createIntegral( x, x,  "peak" );
-            RooAbsReal* Intgaus2_xi = gaus2.createIntegral( x, x, "peak" );
-            RooAbsReal* Intbackground_xi = background.createIntegral( x, x, "peak" );
-
-            double Intgaus1E_xi = gaus1F_xi*Intgaus1_xi->getVal(  );
-            double Intgaus2E_xi = gaus2F_xi*Intgaus2_xi->getVal(  );
-            double IntbackgroundE_xi = qsig_xi*Intbackground_xi->getVal(  );
-            double totsig_xi = Intgaus1E_xi + Intgaus2E_xi + IntbackgroundE_xi;
-            double sig_xi = Intgaus1E_xi + Intgaus2E_xi;
-
-            double Fsig_xi = sig_xi/totsig_xi;
-
-            mass_xi.push_back( mean_xi );
-            std_xi.push_back( rms_xi );
-            fsig_xi.push_back( Fsig_xi );
-            covQual_xi.push_back( r_xi->covQual(  ) );
-
-            cout << "adjusted background integral ( xi ) " << IntbackgroundE_xi << endl;
-
-            cout << "Norm Int Tot peak ( xi ) " << totsig_xi << endl;
-            cout << "Norm Int background peak ( xi )" << IntbackgroundE_xi << endl;
-
-
-            cout << "Fsig ( xi ): " << Fsig_xi << endl;
-            cout << "std ( xi ): " << rms_xi << endl;
-            cout << "mass ( xi ): " << mean_xi << endl;
-
-            cout << "covQual ( xi )" << r_xi->covQual(  ) << endl;
-
             RooPlot* xframe = x.frame(270);
             xframe->GetXaxis()->SetTitle("invariant mass (GeV/c^{2})");
             xframe->GetYaxis()->SetTitle("Candidates / 0.001 GeV");
@@ -182,7 +157,45 @@ void SigCalcXi(std::string name)// uses cut parameter name
             //tex->DrawLatex(0.59,0.87,label_mean[0]);
             //tex->DrawLatex(0.59,0.81,label_sigma[0]);
 
+            //Calculation
+            double mean_xi = mean.getVal(  );
+            double rms_xi = TMath::Sqrt( 0.5*sigma1.getVal(  )*sigma1.getVal(  ) + 0.5*sigma2.getVal(  )*sigma2.getVal(  ) );
 
+            //x.setRange( "whole", mean.getVal(  ) - 2*rms_xi, mean.getVal(  ) + 2*rms_xi);
+
+            double gaus1F_xi = sig1.getVal(  );
+            double gaus2F_xi = sig2.getVal(  );
+            double qsig_xi = qsig.getVal(  );
+
+            RooAbsReal* Intgaus1_xi = gaus1.createIntegral( x, x,  "cut" );
+            RooAbsReal* Intgaus2_xi = gaus2.createIntegral( x, x, "cut" );
+            RooAbsReal* Intbackground_xi = background.createIntegral( x, x, "cut" );
+
+            double Intgaus1E_xi = gaus1F_xi*Intgaus1_xi->getVal(  );
+            double Intgaus2E_xi = gaus2F_xi*Intgaus2_xi->getVal(  );
+            double IntbackgroundE_xi = qsig_xi*Intbackground_xi->getVal(  );
+            double totsig_xi = Intgaus1E_xi + Intgaus2E_xi + IntbackgroundE_xi;
+            double sig_xi = Intgaus1E_xi + Intgaus2E_xi;
+
+            double Fsig_xi = sig_xi/totsig_xi;
+            double Significance = sig_xi/(TMath::Sqrt(totsig_xi));
+
+            mass_xi.push_back( mean_xi );
+            std_xi.push_back( rms_xi );
+            fsig_xi.push_back( Fsig_xi );
+            covQual_xi.push_back( r_xi->covQual(  ) );
+            significance_xi.push_back(Significance);
+
+            cout << "adjusted background integral ( xi ) " << IntbackgroundE_xi << endl;
+
+            cout << "Norm Int Tot peak ( xi ) " << totsig_xi << endl;
+            cout << "Norm Int background peak ( xi )" << IntbackgroundE_xi << endl;
+
+            cout << "Fsig ( xi ): " << Fsig_xi << endl;
+            cout << "std ( xi ): " << rms_xi << endl;
+            cout << "mass ( xi ): " << mean_xi << endl;
+
+            cout << "covQual ( xi )" << r_xi->covQual(  ) << endl;
 
             cc1->cd(1);
             os << "Pt Bin: " << (pxi[i]-1)/10 << " - " << pxi[i+1]/10;
@@ -194,36 +207,45 @@ void SigCalcXi(std::string name)// uses cut parameter name
             //tex->DrawLatex(0.15,0.58,label_cms[1]);
             os.str( std::string(  ) );
 
-            //cc1->Print("massfit.pdf");
-            //cc1->Print("massfit.gif");
-            if(hlooper == 0 && i==0)
+            //Make PDF
+            if(i==0)
             {
-                imageos << name << "_" << xi_xi3dipsig[hlooper]*10 << "bin" << (i+2)/2 << ".pdf("; //CHANGELINE
+                //imageos << name << "_" << xi_xi3dipsig[hlooper]*10 << ".pdf("; //CHANGELINE
+                //imageos << name << "_" << xi_xipi3dipsig[hlooper]*10 << ".pdf("; //changeline
+                imageos << name << "_" << xi_vtrkpi3dipsig[hlooper]*10 << ".pdf("; //changeline
+                //imageos << name << "_" << xi_vtrkp3dipsig[hlooper]*10 << ".pdf("; //changeline
+                //imageos << name << "_" << xi_xiflightsig[hlooper]*10 << ".pdf("; //changeline
+                //imageos << name << "_" << xi_distancesig[hlooper]*10 << ".pdf("; //changeline
                 cc1->Print(imageos.str().c_str(),"pdf");
             }
-            else if(hlooper < numparam-1)
+            else if(i != (pTxiLength-2))
             {
-                imageos << name << "_" << xi_xi3dipsig[hlooper]*10 << "bin" << (i+2)/2 << ".pdf"; //CHANGELINE
-                cc1->Print(imageos.str().c_str(),"pdf");
-            }
-            else if(hlooper == numparam-1 && i != (pTxiLength-2))
-            {
-                imageos << name << "_" << xi_xi3dipsig[hlooper]*10 << "bin" << (i+2)/2 << ".pdf"; //CHANGELINE
+                //imageos << name << "_" << xi_xi3dipsig[hlooper]*10 << ".pdf"; //CHANGELINE
+                //imageos << name << "_" << xi_xipi3dipsig[hlooper]*10 << ".pdf"; //changeline
+                imageos << name << "_" << xi_vtrkpi3dipsig[hlooper]*10 << ".pdf"; //changeline
+                //imageos << name << "_" << xi_vtrkp3dipsig[hlooper]*10 << ".pdf"; //changeline
+                //imageos << name << "_" << xi_xiflightsig[hlooper]*10 << ".pdf"; //changeline
+                //imageos << name << "_" << xi_distancesig[hlooper]*10 << ".pdf"; //changeline
                 cc1->Print(imageos.str().c_str(),"pdf");
             }
             else
             {
-                imageos << name << "_" << xi_xi3dipsig[hlooper]*10 << "bin" << (i+2)/2 << ".pdf)"; //CHANGELINE
+                //imageos << name << "_" << xi_xi3dipsig[hlooper]*10 << ".pdf)"; //CHANGELINE
+                //imageos << name << "_" << xi_xipi3dipsig[hlooper]*10 << ".pdf)"; //changeline
+                imageos << name << "_" << xi_vtrkpi3dipsig[hlooper]*10 << ".pdf)"; //changeline
+                //imageos << name << "_" << xi_vtrkp3dipsig[hlooper]*10 << ".pdf)"; //changeline
+                //imageos << name << "_" << xi_xiflightsig[hlooper]*10 << ".pdf)"; //changeline
+                //imageos << name << "_" << xi_distancesig[hlooper]*10 << ".pdf)"; //changeline
                 cc1->Print(imageos.str().c_str(),"pdf");
             }
 
             i++; //to access correct bins
-            hbincounter++;
             imageos.str(std::string());
         }
         fileos.str(std::string());
     }
     pxicounter = 0;
+    int counter = 0;
     for( int i=0; i<mass_xi.size(  ); i++ )
     {
         cout <<  "====================" << endl;
@@ -233,6 +255,29 @@ void SigCalcXi(std::string name)// uses cut parameter name
         cout << "Fsig_xi: " << fsig_xi[i] << endl;
         cout << "std_xi: " << std_xi[i] << endl;
         cout << "covQual_xi " << covQual_xi[i] << endl;
+        cout << "Significance: " << significance_xi[i] << endl;
+
+        os.str(std::string());
+        int index = counter/mass_xi.size();
+        //os << name << ": " << xi_xi3dipsig[index]; //CHANGELINE
+        //os << name << ": " << xi_xipi3dipsig[index]; //CHANGELINE
+        os << name << ": " << xi_vtrkpi3dipsig[index]; //CHANGELINE
+        //os << name << ": " << xi_vtrkp3dipsig[index]; //CHANGELINE
+        //os << name << ": " << xi_xiflightsig[index]; //CHANGELINE
+        //os << name << ": " << xi_distancesig[index]; //CHANGELINE
+        myfile << os.str() + "\n";
+        os.str(std::string());
+        os << "Pt Bin: " << (pxi[pxicounter]-1)/10 << " - " << pxi[pxicounter+1]/10;
+        myfile << os.str() + "\n";
+        os.str(std::string());
+        os << "Significance: " << significance_xi[i];
+        myfile << os.str() + "\n";
         pxicounter+=2;
+        counter+=2;
+        if(pxicounter==14)
+        {
+            pxicounter=0;
+            myfile << "\n";
+        }
     }
 }
