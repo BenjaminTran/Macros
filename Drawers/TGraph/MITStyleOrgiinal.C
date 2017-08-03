@@ -1,5 +1,15 @@
-#include <TROOT.h>
-#include <TStyle.h>
+void MITStyle() {
+  char* author   = "\$Author: Ch.Paus $$";
+  char* modified = "\$Modified: Mon Feb  7 14:19:08 2005 by bottom $$";
+  printf(" MIT root style (%s,%s).\n",author,modified);
+  printf("\n");
+  printf(" Use: MakeCanvas(name,title)\n");
+  printf("      SaveCanvas(c,dir,filename)\n");
+  printf("      InitSubPad(pad,nPad)\n");
+  printf("      InitHist(hist,xTitle,yTitle,color)\n");
+  printf("\n");
+  SetStyle();
+}
 
 void SaveCanvas(TCanvas* c, TString dir, TString filename)
 {
@@ -41,7 +51,7 @@ void InitSubPad(TPad* pad, int i)
   //printf("Pad: %p, index: %d\n",pad,i);
 
   pad->cd(i);
-  TVirtualPad *tmpPad = pad->GetPad(i);
+  TPad *tmpPad = pad->GetPad(i);
   tmpPad->SetLeftMargin  (0.20);
   tmpPad->SetTopMargin   (0.06);
   tmpPad->SetRightMargin (0.08);
@@ -208,24 +218,12 @@ void SetStyle() {
   //  MITStyle->SetTextFont   (43);
 
   MITStyle->SetStatFont   (42);
-  //MITStyle->SetOptStat    (0);
+  MITStyle->SetOptStat    (0);
 
   MITStyle->SetLegendBorderSize(0);
   MITStyle->SetEndErrorSize(0);
   MITStyle->SetErrorX(0);
 
   MITStyle->SetPalette    (1,0);
-}
-
-void MITStyle() {
-  /*char* author   = "\$Author: Ch.Paus $$";*/
-  /*char* modified = "\$Modified: Mon Feb  7 14:19:08 2005 by bottom $$";*/
-  /*printf(" MIT root style (%s,%s).\n",author,modified);*/
-  /*printf("\n");*/
-  /*printf(" Use: MakeCanvas(name,title)\n");*/
-  /*printf("      SaveCanvas(c,dir,filename)\n");*/
-  /*printf("      InitSubPad(pad,nPad)\n");*/
-  /*printf("      InitHist(hist,xTitle,yTitle,color)\n");*/
-  /*printf("\n");*/
-  SetStyle();
+  return();
 }

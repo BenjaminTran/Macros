@@ -6,3 +6,6 @@
 *.so
 *.d
 *_Store
+*.root
+*.txt
+*.pcm

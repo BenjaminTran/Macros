@@ -1,3 +1,4 @@
+//Includes
 #include <TLatex.h>
 #include <TStyle.h>
 #include "TColor.h"
@@ -19,6 +20,7 @@
 #include <sstream>
 #include <cstring>
 #include <cstdio>
+#include <fstream>
 
 #define PI 3.1416
 
@@ -33,7 +35,11 @@ Double_t FourierHad( Double_t *x, Double_t *par )
 
 void V0PtBinv2Fit(  )
 {
-    //TLatex
+	//bool Peak = true;
+	bool Peak = false;
+	//Aesthetics
+
+    //TLatex labels
     std::ostringstream os; // stringstream for making dynamic TLatex labels
     double SNN = 8.16;
     int Lint = 35;
@@ -42,7 +48,6 @@ void V0PtBinv2Fit(  )
     int pTassMin = 1;
     int pTassMax = 3;
     int longRange = 2;
-
 
     //For Enabling TLatex labels
     //Bool_t publish = kTRUE;
@@ -60,14 +65,15 @@ void V0PtBinv2Fit(  )
     gStyle->SetTextSize( 20 );
     gStyle->SetTextFont( 42 ); //2=times-bold-r-normal, 2=precision for TLatex to work
 
-
-    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/XiAnalysisCorrelation.root " );
-    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/NoPtCut/XiAnalysisCorrelationNoPtCutTotal.root " );
-    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/NoPtCutPeakAndSide/XiAnalysisCorrelationNoPtCutPeakAndSideTotal.root " );
-    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/NoPtCutPeakAndSide/XiAnalysisSeparated.root " );
-    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/V0Corr/V0CorrelationJL3_4.root" );
+	//Files
+	//TFiles
     TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/V0Corr/V0CorrelationJL7_8.root" );
-    TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/TestRootFiles/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root" ); //For v2 of hadron
+    TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/Thesis/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root" ); //For v2 of hadron
+
+	//Txt files
+	ofstream myfile;
+	if(Peak) myfile.open("v2_v3.txt");
+	else myfile.open("v2_v3Sideband.txt");
 
     TVirtualFitter::SetMaxIterations( 300000 );
     TH1::SetDefaultSumw2(  );
@@ -91,18 +97,21 @@ void V0PtBinv2Fit(  )
     std::vector<double> PtBin_la( pla, pla+(numPtBins_la+1) );
     std::vector<double> v2values_ks;
     std::vector<double> v2error_ks;
+	std::vector<double> v3values_ks;
+	std::vector<double> v3error_ks;
+std:vector<double> v3values_h;
 
     std::vector<double> v2values_la;
     std::vector<double> v2error_la;
+	std::vector<double> v3values_la;
+	std::vector<double> v3error_la;
+	std::vector<double> v3error_h;
 
     TLatex* ltx2 = new TLatex(  );
     ltx2->SetTextSize( 0.045 );
     ltx2->SetNDC( kTRUE );
 
     //FITTING FOR V2
-    //
-    bool Peak = true;
-    //bool Peak = false;
 	//KSHORT
 	cout << "================================================================================" << endl;
 	cout << "================================================================================" << endl;
@@ -164,6 +173,8 @@ void V0PtBinv2Fit(  )
             dPhiFourierPeak_ks[i]->SetStats( kFALSE );
             v2values_ks.push_back( FourierFit_ks[i]->GetParameter( 2 ) );
             v2error_ks.push_back( FourierFit_ks[i]->GetParError( 2 ) );
+			v3values_ks.push_back(FourierFit_ks[i]->GetParameter(3));
+			v3error_ks.push_back(FourierFit_ks[i]->GetParError(3));
             cout << "---------------------------------" << endl;
             cout << "Peak V2 for xi-h is " << FourierFit_ks[i]->GetParameter( 2 ) << endl;
             cout << "---------------------------------" << endl;
@@ -179,6 +190,8 @@ void V0PtBinv2Fit(  )
             //dPhiHadFourier->Fit( "FourierFitHad","","",0,PI );
             dPhiHadFourier->Fit( "FourierFitHad");
             dPhiHadFourier->SetStats( kFALSE );
+			v3values_h.push_back(FourierFitHad->GetParameter(3));
+			v3error_h.push_back(FourierFitHad->GetParError(3));
             cout << "---------------------------------" << endl;
             cout << "The V2 for h-h is " << FourierFitHad->GetParameter( 2 ) << endl;
             cout << "---------------------------------" << endl;
@@ -398,6 +411,8 @@ void V0PtBinv2Fit(  )
             dPhiFourierSide_ks[i]->SetStats( kFALSE );
             v2values_ks.push_back( FourierFit_ks[i]->GetParameter( 2 ) );
             v2error_ks.push_back( FourierFit_ks[i]->GetParError( 2 ) );
+            v3values_ks.push_back( FourierFit_ks[i]->GetParameter( 3 ) );
+            v3error_ks.push_back( FourierFit_ks[i]->GetParError( 3 ) );
             cout << "---------------------------------" << endl;
             cout << "Side V2 for xi-h is " << FourierFit_ks[i]->GetParameter( 2 ) << endl;
             cout << "---------------------------------" << endl;
@@ -645,8 +660,10 @@ void V0PtBinv2Fit(  )
             //dPhiFourierPeak_la->Fit( "FourierFit_la","","",0,PI );
             dPhiFourierPeak_la[i]->Fit( Form( "FourierFit_la%d",i ) );
             dPhiFourierPeak_la[i]->SetStats( kFALSE );
-            v2values_la.push_back( FourierFit_la[i]->GetParameter( 2 ) );
-            v2error_la.push_back( FourierFit_la[i]->GetParError( 2 ) );
+            v2values_la.push_back(FourierFit_la[i]->GetParameter(2));
+            v2error_la.push_back(FourierFit_la[i]->GetParError(2));
+			v3values_la.push_back(FourierFit_la[i]->GetParameter(3));
+			v3error_la.push_back(FourierFit_la[i]->GetParError(3));
             cout << "---------------------------------" << endl;
             cout << "Peak V2 for xi-h is " << FourierFit_la[i]->GetParameter( 2 ) << endl;
             cout << "---------------------------------" << endl;
@@ -881,6 +898,8 @@ void V0PtBinv2Fit(  )
             dPhiFourierSide_la[i]->SetStats( kFALSE );
             v2values_la.push_back( FourierFit_la[i]->GetParameter( 2 ) );
             v2error_la.push_back( FourierFit_la[i]->GetParError( 2 ) );
+            v3values_la.push_back( FourierFit_la[i]->GetParameter( 3 ) );
+            v3error_la.push_back( FourierFit_la[i]->GetParError( 3 ) );
             cout << "---------------------------------" << endl;
             cout << "Side V2 for xi-h is " << FourierFit_la[i]->GetParameter( 2 ) << endl;
             cout << "---------------------------------" << endl;
@@ -1068,57 +1087,156 @@ void V0PtBinv2Fit(  )
             }
         }
     }
+
     // V2 values Kshort
     cout << "==========================================================" << endl;
     cout << "Kshort V2 values" << endl;
     cout << "==========================================================" << endl;
 
+	myfile << "Kshort v2 values\n";
+
     int PtBinCounter=0;
 
     for( std::vector<double>::iterator it = v2values_ks.begin(  ); it != v2values_ks.end(  ); ++it ){
         cout << PtBin_ks[PtBinCounter] << " < Pt =< " << PtBin_ks[PtBinCounter + 1] << ": " << *it << endl;
+		myfile << *it << "\n";
         PtBinCounter++;
     }
 
+    PtBinCounter=0;
 
-    // V2 errors
+    // V2 errors Kshort
     cout << "==========================================================" << endl;
     cout << "Kshort V2 errors" << endl;
     cout << "==========================================================" << endl;
 
-    PtBinCounter=0;
+	myfile << "Kshort v2 errors\n";
 
     for( std::vector<double>::iterator it = v2error_ks.begin(  ); it != v2error_ks.end(  ); ++it ){
         cout << PtBin_ks[PtBinCounter] << " < Pt =< " << PtBin_ks[PtBinCounter + 1] << ": " << *it << endl;
+		myfile << *it << "\n";
         PtBinCounter++;
     }
 
     PtBinCounter=0;
 
-	// V2 values lambda
+	// V3 values Kshort
+    cout << "==========================================================" << endl;
+    cout << "Kshort V3 values" << endl;
+    cout << "==========================================================" << endl;
+
+	myfile << "Kshort v3 values\n";
+
+    for( std::vector<double>::iterator it = v3values_ks.begin(  ); it != v3values_ks.end(  ); ++it ){
+        cout << PtBin_ks[PtBinCounter] << " < Pt =< " << PtBin_ks[PtBinCounter + 1] << ": " << *it << endl;
+		myfile << *it << "\n";
+        PtBinCounter++;
+    }
+
+    PtBinCounter=0;
+
+    // V3 errors Kshort
+    cout << "==========================================================" << endl;
+    cout << "Kshort V3 errors" << endl;
+    cout << "==========================================================" << endl;
+
+	myfile << "Kshort v3 errors\n";
+
+    for( std::vector<double>::iterator it = v3error_ks.begin(  ); it != v3error_ks.end(  ); ++it ){
+        cout << PtBin_ks[PtBinCounter] << " < Pt =< " << PtBin_ks[PtBinCounter + 1] << ": " << *it << endl;
+		myfile << *it << "\n";
+        PtBinCounter++;
+    }
+
+    PtBinCounter=0;
+
+	// V2 values Lambda
     cout << "==========================================================" << endl;
     cout << "Lambda V2 values" << endl;
     cout << "==========================================================" << endl;
 
+	myfile << "Lambda v2 values\n";
 
     for( std::vector<double>::iterator it = v2values_la.begin(  ); it != v2values_la.end(  ); ++it ){
         cout << PtBin_la[PtBinCounter] << " < Pt =< " << PtBin_la[PtBinCounter + 1] << ": " << *it << endl;
+		myfile << *it << "\n";
         PtBinCounter++;
     }
 
     PtBinCounter=0;
 
-    // V2 errors
+    // V2 errors Lambda
     cout << "==========================================================" << endl;
     cout << "Lambda V2 errors" << endl;
     cout << "==========================================================" << endl;
 
+	myfile << "Lambda v2 errors\n";
 
     for( std::vector<double>::iterator it = v2error_la.begin(  ); it != v2error_la.end(  ); ++it ){
         cout << PtBin_la[PtBinCounter] << " < Pt =< " << PtBin_la[PtBinCounter + 1] << ": " << *it << endl;
+		myfile << *it << "\n";
         PtBinCounter++;
     }
+
     PtBinCounter=0;
+
+	// V3 values Lambda
+    cout << "==========================================================" << endl;
+    cout << "Lambda V3 values" << endl;
+    cout << "==========================================================" << endl;
+
+	myfile << "Lambda v3 values\n";
+
+    for( std::vector<double>::iterator it = v3values_la.begin(  ); it != v3values_la.end(  ); ++it ){
+        cout << PtBin_la[PtBinCounter] << " < Pt =< " << PtBin_la[PtBinCounter + 1] << ": " << *it << endl;
+		myfile << *it << "\n";
+        PtBinCounter++;
+    }
+
+    PtBinCounter=0;
+
+    // V3 errors Lambda
+    cout << "==========================================================" << endl;
+    cout << "Lambda V3 errors" << endl;
+    cout << "==========================================================" << endl;
+
+	myfile << "Lambda v3 errors\n";
+
+    for( std::vector<double>::iterator it = v3error_la.begin(  ); it != v3error_la.end(  ); ++it ){
+        cout << PtBin_la[PtBinCounter] << " < Pt =< " << PtBin_la[PtBinCounter + 1] << ": " << *it << endl;
+		myfile << *it << "\n";
+        PtBinCounter++;
+    }
+
+    PtBinCounter=0;
+
+	// V3 values Hadron
+    cout << "==========================================================" << endl;
+    cout << "Hadron V3 values" << endl;
+    cout << "==========================================================" << endl;
+
+	myfile << "Hadron v3 values\n";
+
+    for( std::vector<double>::iterator it = v3values_h.begin(  ); it != v3values_h.end(  ); ++it ){
+        cout << PtBin_la[PtBinCounter] << " < Pt =< " << PtBin_la[PtBinCounter + 1] << ": " << *it << endl;
+		myfile << *it << "\n";
+        PtBinCounter++;
+    }
+
+    PtBinCounter=0;
+
+    // V3 errors Hadron
+    cout << "==========================================================" << endl;
+    cout << "Hadron V3 errors" << endl;
+    cout << "==========================================================" << endl;
+
+	myfile << "Hadron v3 errors\n";
+
+    for( std::vector<double>::iterator it = v3error_h.begin(  ); it != v3error_h.end(  ); ++it ){
+        cout << PtBin_la[PtBinCounter] << " < Pt =< " << PtBin_la[PtBinCounter + 1] << ": " << *it << endl;
+		myfile << *it << "\n";
+        PtBinCounter++;
+    }
 
     TCanvas* Fourier_ks = new TCanvas( "Fourier_ks", "Fourier_ks", 1600,800 );
     Fourier_ks->Divide( 5,2 );

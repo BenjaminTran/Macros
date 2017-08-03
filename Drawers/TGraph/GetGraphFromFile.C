@@ -1,4 +1,5 @@
 #include "TString.h"
+#include "TNtuple.h"
 #include "TGraph.h"
 #include "TGraphErrors.h"
 #include "TGraphAsymmErrors.h"
@@ -23,6 +24,7 @@ void TextToVector(TString filename, vector<vector < float > >& Data)
   }
 }
 
+/*
 void TextToArray(string filename, float &array[])
 {
   ifstream f(filename.Data());
@@ -35,6 +37,7 @@ void TextToArray(string filename, float &array[])
     while (iss >> value) {array[i] = value; i++;}
   }
 }
+*/
 
 void GetNtupleFromFile(TString txtFileName, TNtuple* ntuple, const int ndim)
 {
@@ -345,7 +348,7 @@ TGraphErrors* GraphDivide(TGraphErrors* gr, TGraphErrors* gr1, int offset = 0, i
     yerr=gr->GetErrorY(i+offset);
     yerr1=gr1->GetErrorY(i+offset1);
     gr_ratio->SetPoint(i,x,fabs(y1/y));
-    gr_ratio->SetPointError(i,0.0,fabs(sqrt((yerr/y)**2+(yerr1/y1)**2)*y1/y));
+    gr_ratio->SetPointError(i,0.0,fabs(sqrt((yerr/y)*(yerr/y)+(yerr1/y1)*(yerr1/y1))*y1/y));
   }
 
   return gr_ratio;
