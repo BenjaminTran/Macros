@@ -1,8 +1,13 @@
-#include "GetGraphFromFile.C"
-#include "MITStyle.C"
 #include "TFile.h"
 #include "TGraph.h"
+#include "TLine.h"
 #include "TCanvas.h"
+#include "TH1.h"
+#include "TLatex.h"
+#include "TLegend.h"
+#include "TH2.h"
+#include "interface/GetGraphFromFile.C"
+#include "interface/MITStyle.C"
 
 void FinalResult(  )
 {

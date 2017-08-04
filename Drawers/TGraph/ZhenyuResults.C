@@ -1,10 +1,15 @@
-#include "GetGraphFromFile.C"
-#include "MITStyle.C"
 #include "TFile.h"
 #include "TGraph.h"
+#include "TLine.h"
 #include "TCanvas.h"
+#include "TH1.h"
+#include "TLatex.h"
+#include "TLegend.h"
+#include "TH2.h"
+#include "interface/GetGraphFromFile.C"
+#include "interface/MITStyle.C"
 
-void PriorResult(  )
+void ZhenyuResults(  )
 {
 
     // Pull TGraph for Kshort and lambda
@@ -31,7 +36,7 @@ void PriorResult(  )
     ha_v2->SetMarkerStyle( 28 );
     ha_v2->SetMarkerSize( 1.3 );
 
-    MakeCanvas( "c1", "Plot" );
+    TCanvas* c1 = MakeCanvas( "c1", "Plot" );
     c1->cd(  );
     c1->SetLeftMargin( 0.12 );
 
@@ -61,14 +66,16 @@ void PriorResult(  )
     for( int j=0; j<n; j++ )
     {
         double xk,yk,xl,yl,xh,yh = 0;
+        double percent1L;
+        double percentH;
         if(la_v2->GetN()-1 >= j){
             la_v2->GetPoint(j,xl,yl);
-            double percent1L = syst_pPb;
+            percent1L = syst_pPb;
         }
         if(ha_v2->GetN()-1 >= j)
         {
             ha_v2->GetPoint(j,xh,yh);
-            double percentH = syst_pPbH;
+            percentH = syst_pPbH;
         }
         ks_v2->GetPoint(j,xk,yk);
         double percent1K = syst_pPb;
