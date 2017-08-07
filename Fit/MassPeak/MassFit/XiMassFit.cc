@@ -1,10 +1,14 @@
+//Includes
 #include <iostream>
 #include <iomanip>
 #include <stdio.h>
 #include <string>
+#include <fstream>
 #include <sstream>
 #include <cstring>
 #include <cstdio>
+#include <TROOT.h>
+#include <TStyle.h>
 
 #include "TF1.h"
 #include "TH1.h"
@@ -24,6 +28,7 @@
 #include "RooRealVar.h"
 #include "RooPlot.h"
 #include "RooDataHist.h"
+#include "RooGenericPdf.h"
 #include "RooGaussian.h"
 #include "RooChebychev.h"
 #include "RooPolynomial.h"
@@ -44,12 +49,18 @@ void XiMassFit()
     RooMsgService::instance().setStreamStatus(0,kFALSE);
     RooMsgService::instance().setStreamStatus(1,kFALSE);
 
+    std::ostringstream os;
+    ofstream myfile;
+    myfile.open("XiPeakParam.txt");
+
     //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/CasCutLoose/CasCutLooseJL40.root");
     TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/Thesis/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root");
 
     TH1D* massxi;
-
 	TH2D* MassXi;
+    //std::vector<RooPlot> xframe;
+    RooPlot* xframe[7];
+
 
 	int pTxiLength = 14; // the number of bins to be fitted is half of this number
 	double pxi[] = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60};
@@ -63,17 +74,18 @@ void XiMassFit()
     MassXi = (TH2D*)file->Get("xiCorrelation/MassPt");
 
 
-    std::ostringstream os;
 
 	int pxicounter = 0; //for correct bin counting
 	int hbincounter =1; //histogram bin counting
+    TCanvas* cc1 = new TCanvas("cc1","cc1",1200,1600);
+    cc1->Divide(3,5);
 	for( int i=0; i<pTxiLength; i++ )
 	{
+            int index = (i+2)/2;
 			massxi = ( TH1D* )MassXi->ProjectionX( "massxi", pxi[i],pxi[i+1] );
 
 			gStyle->SetOptTitle(kFALSE);
 
-			TCanvas* cc1 = new TCanvas("cc1","cc1",600,450);
 
 			TLatex* tex = new TLatex();
 			tex->SetNDC();
@@ -105,11 +117,6 @@ void XiMassFit()
 			x.setRange("cut",1.28,1.38);
 
 			RooFitResult* r_xi = sum.fitTo(data,Save(  ),Minos( kTRUE ),Range("cut"));
-			//sum.fitTo(data,Range("cut"));
-			//sum.fitTo(data,Range("cut"));
-			//sum.fitTo(data,Range("cut"));
-			//sum.fitTo(data,Range("cut"));
-			//sum.fitTo(data,Range("cut"));
 
 			double mean_xi = mean.getVal(  );
 			double rms_xi = TMath::Sqrt( 0.5*sigma1.getVal(  )*sigma1.getVal(  ) + 0.5*sigma2.getVal(  )*sigma2.getVal(  ) );
@@ -149,28 +156,27 @@ void XiMassFit()
 
 			cout << "covQual ( xi )" << r_xi->covQual(  ) << endl;
 
-			RooPlot* xframe = x.frame(270);
-			xframe->GetXaxis()->SetTitle("invariant mass (GeV/c^{2})");
-			xframe->GetYaxis()->SetTitle("Candidates / 0.001 GeV");
-			xframe->GetXaxis()->CenterTitle(1);
-			xframe->GetYaxis()->CenterTitle(1);
-			xframe->GetXaxis()->SetTitleSize(xframe->GetXaxis()->GetTitleSize()*1.4);
-			xframe->GetXaxis()->SetTitleOffset(1);
-			xframe->GetYaxis()->SetTitleSize(xframe->GetYaxis()->GetTitleSize()*1.3);
-			//xframe->GetYaxis()->SetTitleOffset(1);
-			data.plotOn(xframe,Name("data"));
-			sum.plotOn(xframe,Name("sum"),NormRange("cut"),LineWidth(1),LineColor(kBlue));
-			sum.plotOn(xframe,Components(background),NormRange("cut"),LineStyle(kDashed),LineWidth(1),LineColor(kBlue));
-			cc1->cd(1);
-			xframe->Draw();
+			//RooPlot xframe_ = x.frame(270);
+			xframe[index-1] = x.frame(270);
+			xframe[index-1]->GetXaxis()->SetTitle("invariant mass (GeV/c^{2})");
+			xframe[index-1]->GetYaxis()->SetTitle("Candidates / 0->001 GeV");
+			xframe[index-1]->GetXaxis()->CenterTitle(1);
+			xframe[index-1]->GetYaxis()->CenterTitle(1);
+			xframe[index-1]->GetXaxis()->SetTitleSize(xframe[index-1]->GetXaxis()->GetTitleSize()*1.4);
+			xframe[index-1]->GetXaxis()->SetTitleOffset(1);
+			xframe[index-1]->GetYaxis()->SetTitleSize(xframe[index-1]->GetYaxis()->GetTitleSize()*1.3);
+			//xframe[index-1].GetYaxis()->SetTitleOffset(1);
+			data.plotOn(xframe[index-1],Name("data"));
+			sum.plotOn(xframe[index-1],Name("sum"),NormRange("cut"),LineWidth(1),LineColor(kBlue));
+			sum.plotOn(xframe[index-1],Components(background),NormRange("cut"),LineStyle(kDashed),LineWidth(1),LineColor(kBlue));
+			cc1->cd(index);
+            //xframe.push_back(xframe[index-1]);
+			xframe[index-1]->Draw();
 			//tex->DrawLatex(0.59,0.87,label_mean[0]);
 			//tex->DrawLatex(0.59,0.81,label_sigma[0]);
 
-
-
-			cc1->cd(1);
 			os << "Pt Bin: " << (pxi[i]-1)/10 << " - " << pxi[i+1]/10;
-			tex->DrawLatex(0.22,0.8,os.str(  ).c_str(  ) );
+			tex->DrawLatex(0.15,0.8,os.str(  ).c_str(  ) );
 			//tex->DrawLatex(0.22,0.81,label_n);
 			//tex->DrawLatex(0.22,0.75,label_pid[0]);
 			//tex->DrawLatex(0.22,0.69,"1 < p_{T} < 3 GeV/c");
@@ -185,7 +191,7 @@ void XiMassFit()
 			hbincounter++;
 	}
 	pxicounter = 0;
-	for( int i=0; i<mass_xi.size(  ); i++ )
+	for( unsigned i=0; i<mass_xi.size(  ); i++ )
 	{
 			cout <<  "====================" << endl;
 			cout << "Pt Bin: " << (pxi[pxicounter]-1)/10 << " - " << pxi[pxicounter+1]/10 << endl;
@@ -194,6 +200,15 @@ void XiMassFit()
 			cout << "Fsig_xi: " << fsig_xi[i] << endl;
 			cout << "std_xi: " << std_xi[i] << endl;
 			cout << "covQual_xi " << covQual_xi[i] << endl;
+
+			myfile <<  "====================" << "\n";
+			myfile << "Pt Bin: " << (pxi[pxicounter]-1)/10 << " - " << pxi[pxicounter+1]/10 << "\n";
+			myfile <<  "====================" << "\n";
+			myfile << "Mass_xi: " << mass_xi[i] << "\n";
+			myfile << "Fsig_xi: " << fsig_xi[i] << "\n";
+			myfile << "std_xi: " << std_xi[i] << "\n";
+			myfile << "covQual_xi " << covQual_xi[i] << "\n";
+
 			pxicounter+=2;
 	}
 }
