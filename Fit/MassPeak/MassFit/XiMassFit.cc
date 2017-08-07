@@ -41,174 +41,166 @@
 
 void XiMassFit()
 {
+    //Initializers
     using namespace RooFit;
     const double massla = 1.115683;
     const double masspi = 0.13957018;
     gStyle->SetMarkerSize(0.8);
-
     RooMsgService::instance().setStreamStatus(0,kFALSE);
     RooMsgService::instance().setStreamStatus(1,kFALSE);
-
     std::ostringstream os;
-    ofstream myfile;
-    myfile.open("XiPeakParam.txt");
+    std::ofstream myfile;
 
+    TH1D* massxi;
+    TH2D* MassXi;
+    //MassXi = (TH2D*)file->Get("XiMassPt/MassPt");
+    MassXi = (TH2D*)file->Get("xiCorrelation/MassPt");
+    std::vector<RooPlot*> xframe;
+    std::vector<double> mass_xi;
+    std::vector<double> std_xi;
+    std::vector<double> fsig_xi;
+    std::vector<double> covQual_xi;
+
+    int pTxiLength = 14; // the number of bins to be fitted is half of this number
+    double pxi[] = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60};
+
+    TCanvas* cc1 = new TCanvas("cc1","cc1",1200,1600);
+    cc1->Divide(3,5);
+
+    //File Creation
+    myfile.open("XiPeakParam.txt");
     //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/CasCutLoose/CasCutLooseJL40.root");
     TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/Thesis/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root");
 
-    TH1D* massxi;
-	TH2D* MassXi;
-    std::vector<RooPlot*> xframe;
-    //RooPlot* xframe[7];
+    //Fit
+    int pxicounter = 0; //for correct bin counting
+    int hbincounter =1; //histogram bin counting
+    for( int i=0; i<pTxiLength; i++ )
+    {
+        int index = (i+2)/2;
+        massxi = ( TH1D* )MassXi->ProjectionX( "massxi", pxi[i],pxi[i+1] );
+
+        gStyle->SetOptTitle(kFALSE);
 
 
-	int pTxiLength = 14; // the number of bins to be fitted is half of this number
-	double pxi[] = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60};
+        TLatex* tex = new TLatex();
+        tex->SetNDC();
+        tex->SetTextFont(42);
 
-	std::vector<double> mass_xi;
-	std::vector<double> std_xi;
-	std::vector<double> fsig_xi;
-	std::vector<double> covQual_xi;
+        tex->SetTextSize(tex->GetTextSize()*0.95);
 
-    //MassXi = (TH2D*)file->Get("XiMassPt/MassPt");
-    MassXi = (TH2D*)file->Get("xiCorrelation/MassPt");
+        //kshort
+        RooDataHist data("data","dataset",x,massxi);
+        RooRealVar x("x","mass",1.26,1.4);
+        RooRealVar mean("mean","mean",1.32,1.29,1.33);
+        RooRealVar sigma1("sigma1","sigma1",0.01,0.001,0.04);
+        RooRealVar sigma2("sigma2","sigma2",0.01,0.001,0.04);
+        RooRealVar sig1("sig1","signal1",10,0,1000000000);
+        RooRealVar sig2("sig2","signal2",10,0,1000000000);
+        RooRealVar qsig( "qsig","qsig",10,0,1000000000 );
+        RooRealVar alpha( "alpha","alpha",1,0,10 );
+        RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
+        RooGaussian gaus2("gaus2","gaus2",x,mean,sigma2);
+        RooGenericPdf background( "background", "x - ( 1.115683 + 0.13957018 )^alpha", RooArgList(x,alpha ) );
+        RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,background),RooArgList(sig2,sig2,qsig));
 
+        x.setRange("cut",1.28,1.38);
 
+        RooFitResult* r_xi = sum.fitTo(data,Save(  ),Minos( kTRUE ),Range("cut"));
 
-	int pxicounter = 0; //for correct bin counting
-	int hbincounter =1; //histogram bin counting
-    TCanvas* cc1 = new TCanvas("cc1","cc1",1200,1600);
-    cc1->Divide(3,5);
-	for( int i=0; i<pTxiLength; i++ )
-	{
-            int index = (i+2)/2;
-			massxi = ( TH1D* )MassXi->ProjectionX( "massxi", pxi[i],pxi[i+1] );
+        double mean_xi = mean.getVal(  );
+        double rms_xi = TMath::Sqrt( 0.5*sigma1.getVal(  )*sigma1.getVal(  ) + 0.5*sigma2.getVal(  )*sigma2.getVal(  ) );
 
-			gStyle->SetOptTitle(kFALSE);
+        x.setRange( "peak", mean.getVal(  ) - 2*rms_xi, mean.getVal(  ) + 2*rms_xi);
 
+        double gaus1F_xi = sig1.getVal(  );
+        double gaus2F_xi = sig2.getVal(  );
+        double qsig_xi = qsig.getVal(  );
 
-			TLatex* tex = new TLatex();
-			tex->SetNDC();
-			tex->SetTextFont(42);
+        RooAbsReal* Intgaus1_xi = gaus1.createIntegral( x, x,  "peak" );
+        RooAbsReal* Intgaus2_xi = gaus2.createIntegral( x, x, "peak" );
+        RooAbsReal* Intbackground_xi = background.createIntegral( x, x, "peak" );
 
-			tex->SetTextSize(tex->GetTextSize()*0.95);
+        double Intgaus1E_xi = gaus1F_xi*Intgaus1_xi->getVal(  );
+        double Intgaus2E_xi = gaus2F_xi*Intgaus2_xi->getVal(  );
+        double IntbackgroundE_xi = qsig_xi*Intbackground_xi->getVal(  );
+        double totsig_xi = Intgaus1E_xi + Intgaus2E_xi + IntbackgroundE_xi;
+        double sig_xi = Intgaus1E_xi + Intgaus2E_xi;
 
-			//kshort
-			RooRealVar x("x","mass",1.26,1.4);
-			RooDataHist data("data","dataset",x,massxi);
-			RooRealVar mean("mean","mean",1.32,1.29,1.33);
-			RooRealVar sigma1("sigma1","sigma1",0.01,0.001,0.04);
-			RooRealVar sigma2("sigma2","sigma2",0.01,0.001,0.04);
-			RooRealVar sig1("sig1","signal1",10,0,1000000000);
-			RooRealVar sig2("sig2","signal2",10,0,1000000000);
-			RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
-			RooGaussian gaus2("gaus2","gaus2",x,mean,sigma2);
-            RooRealVar qsig( "qsig","qsig",10,0,1000000000 );
-            RooRealVar alpha( "alpha","alpha",1,0,10 );
-            RooGenericPdf background( "background", "x - ( 1.115683 + 0.13957018 )^alpha", RooArgList(x,alpha ) );
-            /*
-            RooRealVar a( "a", "a", 1.0,-1,1 );
-            RooRealVar b( "b", "b", 0.1,-1,1 );
-            RooRealVar c( "c", "c", -0.1,-1,1 );
-            RooChebychev background( "background", "background",x, RooArgList( a,b,c ) );
-            */
-			RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,background),RooArgList(sig2,sig2,qsig));
+        double Fsig_xi = sig_xi/totsig_xi;
 
-			x.setRange("cut",1.28,1.38);
+        mass_xi.push_back( mean_xi );
+        std_xi.push_back( rms_xi );
+        fsig_xi.push_back( Fsig_xi );
+        covQual_xi.push_back( r_xi->covQual(  ) );
 
-			RooFitResult* r_xi = sum.fitTo(data,Save(  ),Minos( kTRUE ),Range("cut"));
+        cout << "adjusted background integral ( xi ) " << IntbackgroundE_xi << endl;
 
-			double mean_xi = mean.getVal(  );
-			double rms_xi = TMath::Sqrt( 0.5*sigma1.getVal(  )*sigma1.getVal(  ) + 0.5*sigma2.getVal(  )*sigma2.getVal(  ) );
-
-			x.setRange( "peak", mean.getVal(  ) - 2*rms_xi, mean.getVal(  ) + 2*rms_xi);
-
-			double gaus1F_xi = sig1.getVal(  );
-			double gaus2F_xi = sig2.getVal(  );
-			double qsig_xi = qsig.getVal(  );
-
-			RooAbsReal* Intgaus1_xi = gaus1.createIntegral( x, x,  "peak" );
-			RooAbsReal* Intgaus2_xi = gaus2.createIntegral( x, x, "peak" );
-			RooAbsReal* Intbackground_xi = background.createIntegral( x, x, "peak" );
-
-			double Intgaus1E_xi = gaus1F_xi*Intgaus1_xi->getVal(  );
-			double Intgaus2E_xi = gaus2F_xi*Intgaus2_xi->getVal(  );
-			double IntbackgroundE_xi = qsig_xi*Intbackground_xi->getVal(  );
-			double totsig_xi = Intgaus1E_xi + Intgaus2E_xi + IntbackgroundE_xi;
-			double sig_xi = Intgaus1E_xi + Intgaus2E_xi;
-
-			double Fsig_xi = sig_xi/totsig_xi;
-
-			mass_xi.push_back( mean_xi );
-			std_xi.push_back( rms_xi );
-			fsig_xi.push_back( Fsig_xi );
-			covQual_xi.push_back( r_xi->covQual(  ) );
-
-			cout << "adjusted background integral ( xi ) " << IntbackgroundE_xi << endl;
-
-			cout << "Norm Int Tot peak ( xi ) " << totsig_xi << endl;
-			cout << "Norm Int background peak ( xi )" << IntbackgroundE_xi << endl;
+        cout << "Norm Int Tot peak ( xi ) " << totsig_xi << endl;
+        cout << "Norm Int background peak ( xi )" << IntbackgroundE_xi << endl;
 
 
-			cout << "Fsig ( xi ): " << Fsig_xi << endl;
-			cout << "std ( xi ): " << rms_xi << endl;
-            cout << "mass ( xi ): " << mean_xi << endl;
+        cout << "Fsig ( xi ): " << Fsig_xi << endl;
+        cout << "std ( xi ): " << rms_xi << endl;
+        cout << "mass ( xi ): " << mean_xi << endl;
 
-			cout << "covQual ( xi )" << r_xi->covQual(  ) << endl;
+        cout << "covQual ( xi )" << r_xi->covQual(  ) << endl;
 
-            RooPlot* xframe_ = x.frame(270);
-			xframe_ = x.frame(270);
-			xframe_->GetXaxis()->SetTitle("invariant mass (GeV/c^{2})");
-			xframe_->GetYaxis()->SetTitle("Candidates / 0->001 GeV");
-			xframe_->GetXaxis()->CenterTitle(1);
-			xframe_->GetYaxis()->CenterTitle(1);
-			xframe_->GetXaxis()->SetTitleSize(xframe_->GetXaxis()->GetTitleSize()*1.4);
-			xframe_->GetXaxis()->SetTitleOffset(1);
-			xframe_->GetYaxis()->SetTitleSize(xframe_->GetYaxis()->GetTitleSize()*1.3);
-			//xframe[index-1].GetYaxis()->SetTitleOffset(1);
-			data.plotOn(xframe_,Name("data"));
-			sum.plotOn(xframe_,Name("sum"),NormRange("cut"),LineWidth(1),LineColor(kBlue));
-			sum.plotOn(xframe_,Components(background),NormRange("cut"),LineStyle(kDashed),LineWidth(1),LineColor(kBlue));
-			cc1->cd(index);
-            xframe.push_back(xframe_);
-			xframe_->Draw();
-			//tex->DrawLatex(0.59,0.87,label_mean[0]);
-			//tex->DrawLatex(0.59,0.81,label_sigma[0]);
+        RooPlot* xframe_ = x.frame(270);
+        xframe_ = x.frame(270);
+        xframe_->GetXaxis()->SetTitle("invariant mass (GeV/c^{2})");
+        xframe_->GetYaxis()->SetTitle("Candidates / 0->001 GeV");
+        xframe_->GetXaxis()->CenterTitle(1);
+        xframe_->GetYaxis()->CenterTitle(1);
+        xframe_->GetXaxis()->SetTitleSize(xframe_->GetXaxis()->GetTitleSize()*1.4);
+        xframe_->GetXaxis()->SetTitleOffset(1);
+        xframe_->GetYaxis()->SetTitleSize(xframe_->GetYaxis()->GetTitleSize()*1.3);
+        //xframe[index-1].GetYaxis()->SetTitleOffset(1);
+        data.plotOn(xframe_,Name("data"));
+        sum.plotOn(xframe_,Name("sum"),NormRange("cut"),LineWidth(1),LineColor(kBlue));
+        sum.plotOn(xframe_,Components(background),NormRange("cut"),LineStyle(kDashed),LineWidth(1),LineColor(kBlue));
+        cc1->cd(index);
+        xframe.push_back(xframe_);
+        xframe_->Draw();
+        //tex->DrawLatex(0.59,0.87,label_mean[0]);
+        //tex->DrawLatex(0.59,0.81,label_sigma[0]);
 
-			os << "Pt Bin: " << (pxi[i]-1)/10 << " - " << pxi[i+1]/10;
-			tex->DrawLatex(0.15,0.8,os.str(  ).c_str(  ) );
-			//tex->DrawLatex(0.22,0.81,label_n);
-			//tex->DrawLatex(0.22,0.75,label_pid[0]);
-			//tex->DrawLatex(0.22,0.69,"1 < p_{T} < 3 GeV/c");
-			//tex->DrawLatex(0.22,0.63,"Preliminary");
-			//tex->DrawLatex(0.15,0.58,label_cms[1]);
-			os.str( std::string(  ) );
+        os << "Pt Bin: " << (pxi[i]-1)/10 << " - " << pxi[i+1]/10;
+        tex->DrawLatex(0.15,0.8,os.str(  ).c_str(  ) );
+        //tex->DrawLatex(0.22,0.81,label_n);
+        //tex->DrawLatex(0.22,0.75,label_pid[0]);
+        //tex->DrawLatex(0.22,0.69,"1 < p_{T} < 3 GeV/c");
+        //tex->DrawLatex(0.22,0.63,"Preliminary");
+        //tex->DrawLatex(0.15,0.58,label_cms[1]);
+        os.str( std::string(  ) );
 
-			//cc1->Print("massfit.pdf");
-			//cc1->Print("massfit.gif");
-			cc1->Print(Form( "massfit_%d.pdf",hbincounter ));
-			i++; //to access correct bins
-			hbincounter++;
-	}
-	pxicounter = 0;
-	for( unsigned i=0; i<mass_xi.size(  ); i++ )
-	{
-			cout <<  "====================" << endl;
-			cout << "Pt Bin: " << (pxi[pxicounter]-1)/10 << " - " << pxi[pxicounter+1]/10 << endl;
-			cout <<  "====================" << endl;
-			cout << "Mass_xi: " << mass_xi[i] << endl;
-			cout << "Fsig_xi: " << fsig_xi[i] << endl;
-			cout << "std_xi: " << std_xi[i] << endl;
-			cout << "covQual_xi " << covQual_xi[i] << endl;
+        //cc1->Print("massfit.pdf");
+        //cc1->Print("massfit.gif");
+        cc1->Print(Form( "massfit_%d.pdf",hbincounter ));
+        i++; //to access correct bins
+        hbincounter++;
+    }
 
-			myfile <<  "====================" << "\n";
-			myfile << "Pt Bin: " << (pxi[pxicounter]-1)/10 << " - " << pxi[pxicounter+1]/10 << "\n";
-			myfile <<  "====================" << "\n";
-			myfile << "Mass_xi: " << mass_xi[i] << "\n";
-			myfile << "Fsig_xi: " << fsig_xi[i] << "\n";
-			myfile << "std_xi: " << std_xi[i] << "\n";
-			myfile << "covQual_xi " << covQual_xi[i] << "\n";
+    //Output
+    pxicounter = 0;
+    for( unsigned i=0; i<mass_xi.size(  ); i++ )
+    {
+        cout <<  "====================" << endl;
+        cout << "Pt Bin: " << (pxi[pxicounter]-1)/10 << " - " << pxi[pxicounter+1]/10 << endl;
+        cout <<  "====================" << endl;
+        cout << "Mass_xi: "   << mass_xi[i]    << endl;
+        cout << "Fsig_xi: "   << fsig_xi[i]    << endl;
+        cout << "std_xi: "    << std_xi[i]     << endl;
+        cout << "covQual_xi " << covQual_xi[i] << endl;
 
-			pxicounter+=2;
-	}
+        myfile <<  "====================" << "\n";
+        myfile << "Pt Bin: " << (pxi[pxicounter]-1)/10 << " - " << pxi[pxicounter+1]/10 << "\n";
+        myfile <<  "====================" << "\n";
+        myfile << "Mass_xi: "   << mass_xi[i]    << "\n";
+        myfile << "Fsig_xi: "   << fsig_xi[i]    << "\n";
+        myfile << "std_xi: "    << std_xi[i]     << "\n";
+        myfile << "covQual_xi " << covQual_xi[i] << "\n";
+
+        pxicounter+=2;
+    }
 }
