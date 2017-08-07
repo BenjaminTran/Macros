@@ -41,7 +41,7 @@ void V0MassFit()
     RooMsgService::instance().setStreamStatus(0,kFALSE);
     RooMsgService::instance().setStreamStatus(1,kFALSE);
 
-    TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/Ksla/kslaMassPtJL1.root");
+    TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/Ksla/kslaMassPtJL1.root");
     //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/Ksla/kslaMassPtJL2.root");
 
     TH1D* massks;

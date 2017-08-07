@@ -67,8 +67,8 @@ void V0PtBinv2Fit(  )
 
 	//Files
 	//TFiles
-    TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/V0Corr/V0CorrelationJL7_8.root" );
-    TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/Thesis/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root" ); //For v2 of hadron
+    TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationJL7_8.root" );
+    TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/Thesis/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root" ); //For v2 of hadron
 
 	//Txt files
 	ofstream myfile;

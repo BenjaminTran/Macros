@@ -68,7 +68,7 @@ void XiCutOptimizer(std::string name)
     TH2D* hxi_distancesig   [numparam];
 
     //Tree setup
-    TFile* f1=TFile::Open("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/CasCutLoose/XiTree/XiOmTTree.root");
+    TFile* f1=TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/CasCutLoose/XiTree/XiOmTTree.root");
     TTree* XiTree = (TTree*)f1->Get("xiTree/XiTree");
 
     XiTree->SetBranchAddress("n",              &txi_n);
