@@ -35,8 +35,8 @@ Double_t FourierHad( Double_t *x, Double_t *par )
 
 void V0PtBinv2Fit(  )
 {
-	//bool Peak = true;
-	bool Peak = false;
+    bool Peak = true;
+	//bool Peak = false;
 	//Aesthetics
 
     //TLatex labels
@@ -72,7 +72,7 @@ void V0PtBinv2Fit(  )
 
 	//Txt files
 	ofstream myfile;
-	if(Peak) myfile.open("v2_v3.txt");
+	if(Peak) myfile.open("v2_v3Peak.txt");
 	else myfile.open("v2_v3Sideband.txt");
 
     TVirtualFitter::SetMaxIterations( 300000 );
