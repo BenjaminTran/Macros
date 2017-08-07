@@ -58,8 +58,8 @@ void XiMassFit()
 
     TH1D* massxi;
 	TH2D* MassXi;
-    //std::vector<RooPlot> xframe;
-    RooPlot* xframe[7];
+    std::vector<RooPlot*> xframe;
+    //RooPlot* xframe[7];
 
 
 	int pTxiLength = 14; // the number of bins to be fitted is half of this number
@@ -156,22 +156,22 @@ void XiMassFit()
 
 			cout << "covQual ( xi )" << r_xi->covQual(  ) << endl;
 
-			//RooPlot xframe_ = x.frame(270);
-			xframe[index-1] = x.frame(270);
-			xframe[index-1]->GetXaxis()->SetTitle("invariant mass (GeV/c^{2})");
-			xframe[index-1]->GetYaxis()->SetTitle("Candidates / 0->001 GeV");
-			xframe[index-1]->GetXaxis()->CenterTitle(1);
-			xframe[index-1]->GetYaxis()->CenterTitle(1);
-			xframe[index-1]->GetXaxis()->SetTitleSize(xframe[index-1]->GetXaxis()->GetTitleSize()*1.4);
-			xframe[index-1]->GetXaxis()->SetTitleOffset(1);
-			xframe[index-1]->GetYaxis()->SetTitleSize(xframe[index-1]->GetYaxis()->GetTitleSize()*1.3);
+            RooPlot* xframe_ = x.frame(270);
+			xframe_ = x.frame(270);
+			xframe_->GetXaxis()->SetTitle("invariant mass (GeV/c^{2})");
+			xframe_->GetYaxis()->SetTitle("Candidates / 0->001 GeV");
+			xframe_->GetXaxis()->CenterTitle(1);
+			xframe_->GetYaxis()->CenterTitle(1);
+			xframe_->GetXaxis()->SetTitleSize(xframe_->GetXaxis()->GetTitleSize()*1.4);
+			xframe_->GetXaxis()->SetTitleOffset(1);
+			xframe_->GetYaxis()->SetTitleSize(xframe_->GetYaxis()->GetTitleSize()*1.3);
 			//xframe[index-1].GetYaxis()->SetTitleOffset(1);
-			data.plotOn(xframe[index-1],Name("data"));
-			sum.plotOn(xframe[index-1],Name("sum"),NormRange("cut"),LineWidth(1),LineColor(kBlue));
-			sum.plotOn(xframe[index-1],Components(background),NormRange("cut"),LineStyle(kDashed),LineWidth(1),LineColor(kBlue));
+			data.plotOn(xframe_,Name("data"));
+			sum.plotOn(xframe_,Name("sum"),NormRange("cut"),LineWidth(1),LineColor(kBlue));
+			sum.plotOn(xframe_,Components(background),NormRange("cut"),LineStyle(kDashed),LineWidth(1),LineColor(kBlue));
 			cc1->cd(index);
-            //xframe.push_back(xframe[index-1]);
-			xframe[index-1]->Draw();
+            xframe.push_back(xframe_);
+			xframe_->Draw();
 			//tex->DrawLatex(0.59,0.87,label_mean[0]);
 			//tex->DrawLatex(0.59,0.81,label_sigma[0]);
 
