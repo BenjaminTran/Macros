@@ -45,8 +45,6 @@ void XiMassFit()
 {
     //Initializers
     using namespace RooFit;
-    const double massla = 1.115683;
-    const double masspi = 0.13957018;
     gStyle->SetMarkerSize(0.5);
     TGaxis::SetMaxDigits(2);
     RooMsgService::instance().setStreamStatus(0,kFALSE);
@@ -91,7 +89,6 @@ void XiMassFit()
         tex->SetNDC();
         tex->SetTextFont(42);
 
-        //kshort
         RooRealVar x("x","mass",1.26,1.4);
         RooDataHist data("data","dataset",x,massxi);
         RooRealVar mean("mean","mean",1.32,1.29,1.33);
