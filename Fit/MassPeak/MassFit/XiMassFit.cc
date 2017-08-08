@@ -111,23 +111,23 @@ void XiMassFit()
         double chi2_xi = chi2_xiVar.getVal();
         double covQual = r_xi->covQual();
         double mean_xi = mean.getVal();
-        double rms_xi = TMath::Sqrt(0.5*sigma1.getVal()*sigma1.getVal() + 0.5*sigma2.getVal()*sigma2.getVal());
+        double rms_xi  = TMath::Sqrt(0.5*sigma1.getVal()*sigma1.getVal() + 0.5*sigma2.getVal()*sigma2.getVal());
 
         x.setRange("peak", mean.getVal() - 2*rms_xi, mean.getVal() + 2*rms_xi);
 
         double gaus1F_xi = sig1.getVal();
         double gaus2F_xi = sig2.getVal();
-        double qsig_xi = qsig.getVal();
+        double qsig_xi   = qsig.getVal();
 
-        RooAbsReal* Intgaus1_xi = gaus1.createIntegral(x, x,  "peak");
-        RooAbsReal* Intgaus2_xi = gaus2.createIntegral(x, x, "peak");
+        RooAbsReal* Intgaus1_xi      = gaus1.createIntegral(x, x,  "peak");
+        RooAbsReal* Intgaus2_xi      = gaus2.createIntegral(x, x, "peak");
         RooAbsReal* Intbackground_xi = background.createIntegral(x, x, "peak");
 
-        double Intgaus1E_xi = gaus1F_xi*Intgaus1_xi->getVal();
-        double Intgaus2E_xi = gaus2F_xi*Intgaus2_xi->getVal();
+        double Intgaus1E_xi      = gaus1F_xi*Intgaus1_xi->getVal();
+        double Intgaus2E_xi      = gaus2F_xi*Intgaus2_xi->getVal();
         double IntbackgroundE_xi = qsig_xi*Intbackground_xi->getVal();
-        double totsig_xi = Intgaus1E_xi + Intgaus2E_xi + IntbackgroundE_xi;
-        double sig_xi = Intgaus1E_xi + Intgaus2E_xi;
+        double totsig_xi         = Intgaus1E_xi + Intgaus2E_xi + IntbackgroundE_xi;
+        double sig_xi            = Intgaus1E_xi + Intgaus2E_xi;
 
         double Fsig_xi = sig_xi/totsig_xi;
 
@@ -137,13 +137,10 @@ void XiMassFit()
         covQual_xi.push_back(covQual);
 
         cout << "adjusted background integral (xi) " << IntbackgroundE_xi << endl;
-
-        cout << "Norm Int Tot peak (xi) " << totsig_xi << endl;
-        cout << "Norm Int background peak (xi)" << IntbackgroundE_xi << endl;
-
-
+        cout << "Norm Int Tot peak (xi) "            << totsig_xi         << endl;
+        cout << "Norm Int background peak (xi)"      << IntbackgroundE_xi << endl;
         cout << "Fsig (xi): " << Fsig_xi << endl;
-        cout << "std (xi): " << rms_xi << endl;
+        cout << "std (xi): "  << rms_xi  << endl;
         cout << "mass (xi): " << mean_xi << endl;
 
         cout << "covQual (xi)" << covQual << endl;
