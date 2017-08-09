@@ -48,6 +48,7 @@ void V0MassFit()
     RooMsgService::instance().setStreamStatus(0,kFALSE);
     RooMsgService::instance().setStreamStatus(1,kFALSE);
     std::ostringstream os;
+    std::ostringstream osYield;
     std::ofstream myfile;
 
     TH1D* massks;
@@ -68,30 +69,33 @@ void V0MassFit()
     std::vector<double> fsig_la;
     std::vector<double> covQual_la;
 
-    int pTksLength = 26; // the number of bins to be fitted is half of this number
-    double pks[] = {3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,90, 91,120};
-    double pla[] = {0,0, 0,0, 0,0, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,90, 91,120};
+    //int pTksLength = 26; // the number of bins to be fitted is half of this number
+    //double pks[] = {3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,90, 91,120};
+    //double pla[] = {0,0, 0,0, 0,0, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,90, 91,120};
+    std::vector<double> pks = {3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70, 71,85, 86,100, 101,150, 151,200, 201,250, 251,300};
+    std::vector<double> pla = {0,0, 0,0, 0,0, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70, 71,85, 86,100, 101,150, 151,200, 201,250, 251,300};
 
-    TCanvas* Composite_Ks = new TCanvas("Composite_Ks","",1000,1200);
-    Composite_Ks->Divide(3,5);
+    TCanvas* Composite_Ks = new TCanvas("Composite_Ks","",1000,1600);
+    Composite_Ks->Divide(3,6);
 
     TCanvas* Composite_La = new TCanvas("Composite_La","",1000,1200);
     Composite_La->Divide(3,5);
 
     //File Creation
     myfile.open("V0PeakParam.txt");
-    TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Ksla/kslaMassPtJL1.root");
+    //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Ksla/kslaMassPtJL1.root");
+    TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Composites/V0CasMassPtPD11_16.root");
 
-    MassKs = (TH2D*)file->Get("KslaMassPt/KsMassPt");
-    MassLa = (TH2D*)file->Get("KslaMassPt/LaMassPt");
+    MassKs = (TH2D*)file->Get("MassPt/KsMassPt");
+    MassLa = (TH2D*)file->Get("MassPt/LaMassPt");
 
     //Fit
     int pkscounter  = 0; //for correct bin counting
     int placounter  = 0;
     int hbincounter = 1;
-    for(int i=0; i<pTksLength; i++)
+    for(unsigned i=0; i<pks.size(); i++)
     {
-        //i = pTksLength-2;
+        //i = pks.size()-2;
         int index = (i+2)/2;
         if(pla[i] == 0) lambda = false;
         else lambda = true;
@@ -149,25 +153,19 @@ void V0MassFit()
         double Intgaus2E_ks = gaus2F_ks*Intgaus2_ks->getVal();
         double IntpolyE_ks  = polyF_ks*Intpoly_ks->getVal();
         double totsig_ks    = Intgaus1E_ks + Intgaus2E_ks + IntpolyE_ks;
-        double sig_ks       = Intgaus1E_ks + Intgaus2E_ks;
+        double yield_ks       = Intgaus1E_ks + Intgaus2E_ks;
 
-        double Fsig_ks = sig_ks/totsig_ks;
+        double Fsig_ks = yield_ks/totsig_ks;
 
         mass_ks.push_back(mean_ks);
         std_ks.push_back(rms_ks);
         fsig_ks.push_back(Fsig_ks);
         covQual_ks.push_back(covQuality_ks);
 
-        cout << "adjusted poly integral (ks) " << IntpolyE_ks << endl;
-
-        cout << "Norm Int Tot peak (ks) " << totsig_ks << endl;
-        cout << "Norm Int poly peak (ks)" << IntpolyE_ks << endl;
-
-
+        cout << "Yield (ks): "<< yield_ks << endl;
         cout << "Fsig (ks): " << Fsig_ks << endl;
         cout << "std (ks): " << rms_ks << endl;
         cout << "mass (ks): " << mean_ks << endl;
-
         cout << "covQual (ks)" << covQuality_ks << endl;
 
         RooPlot* xframe = x.frame(270);
@@ -186,6 +184,8 @@ void V0MassFit()
         sum.plotOn(xframe,Name("sum"),NormRange("cut"),LineWidth(1),LineColor(kBlue));
         sum.plotOn(xframe,Components(poly),NormRange("cut"),LineStyle(kDashed),LineWidth(1),LineColor(kBlue));
         cc1->cd(1);
+        gPad->SetTickx();
+        gPad->SetTicky();
         Xframe_Ks.push_back(xframe);
         xframe->Draw();
 
@@ -201,11 +201,16 @@ void V0MassFit()
         os << "CovQual: " << covQuality_ks;
         tex->DrawLatex(0.15,0.65,os.str().c_str());
         os.str(std::string());
+        osYield << "Yield: " << std::setprecision(2) << yield_ks;
+        tex->DrawLatex(0.15,0.60,osYield.str().c_str());
+        osYield.str(std::string());
         //os << "#chi^{2}/ndf: " << chi2_ks;
         //tex->DrawLatex(0.15,0.60,os.str().c_str());
         //os.str(std::string());
 
         Composite_Ks->cd(index);
+        gPad->SetTickx();
+        gPad->SetTicky();
         xframe->GetXaxis()->SetNdivisions(507);
         xframe->GetXaxis()->SetTitleSize(0.05);
         xframe->GetYaxis()->SetTitleSize(0.05);
@@ -227,6 +232,9 @@ void V0MassFit()
         os << "CovQual: " << covQuality_ks;
         tex->DrawLatex(0.15,0.65,os.str().c_str());
         os.str(std::string());
+        osYield << "Yield: " << std::setprecision(2) << yield_ks;
+        tex->DrawLatex(0.15,0.60,osYield.str().c_str());
+        osYield.str(std::string());
         //os << "#chi^{2}/ndf: " << chi2_ks;
         //tex->DrawLatex(0.15,0.60,os.str().c_str());
         //os.str(std::string());
@@ -275,18 +283,16 @@ void V0MassFit()
             double Intgaus2E_la = gaus2F_la*Intgaus2_la->getVal();
             double IntpolyE_la  = polyF_la*Intpoly_la->getVal();
             double totsig_la    = Intgaus1E_la + Intgaus2E_la + IntpolyE_la;
-            double sig_la       = Intgaus1E_la + Intgaus2E_la;
+            double yield_la       = Intgaus1E_la + Intgaus2E_la;
 
-            double Fsig_la = sig_la/totsig_la;
+            double Fsig_la = yield_la/totsig_la;
 
             mass_la.push_back(mean_la);
             std_la.push_back(rms_la);
             fsig_la.push_back(Fsig_la);
             covQual_la.push_back(r_la->covQual());
 
-            cout << "adjusted poly integral (la) " << IntpolyE_la << endl;
-            cout << "Norm Int Tot peak (la) " << totsig_la << endl;
-            cout << "Norm Int poly peak (la)" << IntpolyE_la << endl;
+            cout << "Yield (la):" << yield_la << endl;
             cout << "Fsig (la): " << Fsig_la << endl;
             cout << "std (la): " << rms_la << endl;
             cout << "covQual (la)" << covQuality_la << endl;
@@ -307,6 +313,8 @@ void V0MassFit()
             sum.plotOn(xframe,Name("sum"),NormRange("cut"),LineWidth(1),LineColor(kRed));
             sum.plotOn(xframe,Components(poly),NormRange("cut"),LineStyle(kDashed),LineWidth(1),LineColor(kRed));
             cc1->cd(2);
+            gPad->SetTickx();
+            gPad->SetTicky();
             Xframe_La.push_back(xframe);
             xframe->Draw();
 
@@ -322,11 +330,16 @@ void V0MassFit()
             os << "CovQual: " << covQuality_la;
             tex->DrawLatex(0.15,0.65,os.str().c_str());
             os.str(std::string());
+            osYield << "Yield: " << std::setprecision(2) << yield_la;
+            tex->DrawLatex(0.15,0.60,osYield.str().c_str());
+            osYield.str(std::string());
             //os << "#chi^{2}/ndf: " << chi2_la;
             //tex->DrawLatex(0.15,0.60,os.str().c_str());
             //os.str(std::string());
 
             Composite_La->cd(index-3);
+            gPad->SetTickx();
+            gPad->SetTicky();
             xframe->GetXaxis()->SetNdivisions(507);
             xframe->GetXaxis()->SetTitleSize(0.05);
             xframe->GetYaxis()->SetTitleSize(0.05);
@@ -348,13 +361,16 @@ void V0MassFit()
             os << "CovQual: " << covQuality_la;
             tex->DrawLatex(0.15,0.65,os.str().c_str());
             os.str(std::string());
+            osYield << "Yield: " << std::setprecision(2) << yield_la;
+            tex->DrawLatex(0.15,0.60,osYield.str().c_str());
+            osYield.str(std::string());
             //os << "#chi^{2}/ndf: " << chi2_la;
             //tex->DrawLatex(0.15,0.60,os.str().c_str());
             //os.str(std::string());
         }
 
         if(i==0) cc1->Print("V0MassFitInd.pdf(","pdf");
-        else if(i < pTksLength - 2) cc1->Print("V0MassFitInd.pdf","pdf");
+        else if(i < pks.size() - 2) cc1->Print("V0MassFitInd.pdf","pdf");
         else cc1->Print("V0MassFitInd.pdf)","pdf");
         i++; //to access correct bins
         hbincounter++;
