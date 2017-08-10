@@ -77,8 +77,10 @@ void V0PtBinv2Fit(  )
 
     TVirtualFitter::SetMaxIterations( 300000 );
     TH1::SetDefaultSumw2(  );
-    int numPtBins_ks = 11;
-    int numPtBins_la = 8;
+    std::vector<double> PtBin_ks = {0.2, 0.4, 0.6, 0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0}; //if number of bins changes make sure you change numPtBins
+    std::vector<double> PtBin_la = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0}; //if number of bins changes make sure you change numPtBins
+    int numPtBins_ks = PtBin_ks.size() - 1;
+    int numPtBins_la = PtBin_la.size() - 1;
     TH1D* dPhiFourierPeak_ks[numPtBins_ks];
     TH1D* dPhiFourierSide_ks[numPtBins_ks];
     TH1D* dPhiFourierPeak_la[numPtBins_la];
@@ -91,21 +93,19 @@ void V0PtBinv2Fit(  )
 
     TF1* FourierFit_ks[numPtBins_ks];
     TF1* FourierFit_la[numPtBins_la];
-    double pks[] = {0.2, 0.4, 0.6, 0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0}; //if number of bins changes make sure you change numPtBins
-    double pla[] = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0}; //if number of bins changes make sure you change numPtBins
-    std::vector<double> PtBin_ks( pks, pks+(numPtBins_ks+1) );
-    std::vector<double> PtBin_la( pla, pla+(numPtBins_la+1) );
     std::vector<double> v2values_ks;
     std::vector<double> v2error_ks;
 	std::vector<double> v3values_ks;
 	std::vector<double> v3error_ks;
-std:vector<double> v3values_h;
+    double v2value_h = 0;
+    double v3value_h = 0;
 
     std::vector<double> v2values_la;
     std::vector<double> v2error_la;
 	std::vector<double> v3values_la;
 	std::vector<double> v3error_la;
-	std::vector<double> v3error_h;
+    double v2error_h = 0;
+    double v3error_h = 0;
 
     TLatex* ltx2 = new TLatex(  );
     ltx2->SetTextSize( 0.045 );
@@ -190,8 +190,10 @@ std:vector<double> v3values_h;
             //dPhiHadFourier->Fit( "FourierFitHad","","",0,PI );
             dPhiHadFourier->Fit( "FourierFitHad");
             dPhiHadFourier->SetStats( kFALSE );
-			v3values_h.push_back(FourierFitHad->GetParameter(3));
-			v3error_h.push_back(FourierFitHad->GetParError(3));
+            v2value_h = FourierFitHad->GetParameter(2);
+            v2error_h = FourierFitHad->GetParError(2);
+			v3value_h = FourierFitHad->GetParameter(3);
+			v3error_h = FourierFitHad->GetParError(3);
             cout << "---------------------------------" << endl;
             cout << "The V2 for h-h is " << FourierFitHad->GetParameter( 2 ) << endl;
             cout << "---------------------------------" << endl;
@@ -1210,33 +1212,42 @@ std:vector<double> v3values_h;
 
     PtBinCounter=0;
 
+	// V2 values Hadron
+    cout << "==========================================================" << endl;
+    cout << "Hadron V2 value" << endl;
+    cout << "==========================================================" << endl;
+
+    cout << v2value_h << endl;
+	myfile << "Hadron v2 value\n";
+    myfile << v2value_h << "\n";
+
+    // V2 errors Hadron
+    cout << "==========================================================" << endl;
+    cout << "Hadron V2 error" << endl;
+    cout << "==========================================================" << endl;
+
+    cout << v2error_h << endl;
+	myfile << "Hadron v2 errors\n";
+    myfile << v2error_h << "\n";
+
 	// V3 values Hadron
     cout << "==========================================================" << endl;
-    cout << "Hadron V3 values" << endl;
+    cout << "Hadron V3 value" << endl;
     cout << "==========================================================" << endl;
 
-	myfile << "Hadron v3 values\n";
-
-    for( std::vector<double>::iterator it = v3values_h.begin(  ); it != v3values_h.end(  ); ++it ){
-        cout << PtBin_la[PtBinCounter] << " < Pt =< " << PtBin_la[PtBinCounter + 1] << ": " << *it << endl;
-		myfile << *it << "\n";
-        PtBinCounter++;
-    }
-
-    PtBinCounter=0;
+    cout << v3value_h << endl;
+	myfile << "Hadron v3 value\n";
+    myfile << v3value_h << "\n";
 
     // V3 errors Hadron
     cout << "==========================================================" << endl;
-    cout << "Hadron V3 errors" << endl;
+    cout << "Hadron V3 error" << endl;
     cout << "==========================================================" << endl;
 
+    cout << v3error_h << endl;
 	myfile << "Hadron v3 errors\n";
+    myfile << v3error_h << "\n";
 
-    for( std::vector<double>::iterator it = v3error_h.begin(  ); it != v3error_h.end(  ); ++it ){
-        cout << PtBin_la[PtBinCounter] << " < Pt =< " << PtBin_la[PtBinCounter + 1] << ": " << *it << endl;
-		myfile << *it << "\n";
-        PtBinCounter++;
-    }
 
     TCanvas* Fourier_ks = new TCanvas( "Fourier_ks", "Fourier_ks", 1600,800 );
     Fourier_ks->Divide( 5,2 );
