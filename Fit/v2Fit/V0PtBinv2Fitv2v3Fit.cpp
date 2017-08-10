@@ -28,13 +28,14 @@ Double_t FourierHad( Double_t *x, Double_t *par )
 {
     //Double_t xx1 = par[0]/(2*PI);
     Double_t xx1 = par[0];
-    Double_t xx2 = 1 + 2*(par[1]*TMath::Cos( x[0] ) + par[2]*TMath::Cos( 2*x[0] )  + par[3]*TMath::Cos( 3*x[0] ) );
+    Double_t xx2 = 1 + 2*(par[1]*TMath::Cos( x[0] ) + par[2]*TMath::Cos( 2*x[0] )  + par[3]*TMath::Cos( 3*x[0] ) + par[4]*TMath::Cos( 4*x[0] ) + par[5]*TMath::Cos( 5*x[0] ) + par[6]*TMath::Cos( 6*x[0] ) + par[7]*TMath::Cos( 7*x[0] )  );
     return xx1*xx2;
 }
 
 
 void V0PtBinv2Fit(  )
 {
+    int numFourierParams = 8;
     bool Peak = true;
 	//bool Peak = false;
 	//Aesthetics
@@ -68,7 +69,7 @@ void V0PtBinv2Fit(  )
 	//Files
 	//TFiles
     TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationJL7_8.root" );
-    TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/Thesis/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root" ); //For v2 of hadron
+    TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/Thesis/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root" ); //For vn of hadron
 
 	//Txt files
 	ofstream myfile;
@@ -97,15 +98,39 @@ void V0PtBinv2Fit(  )
     std::vector<double> v2error_ks;
 	std::vector<double> v3values_ks;
 	std::vector<double> v3error_ks;
+    std::vector<double> v4values_ks;
+	std::vector<double> v4error_ks;
+    std::vector<double> v5values_ks;
+	std::vector<double> v5error_ks;
+    std::vector<double> v6values_ks;
+	std::vector<double> v6error_ks;
+    std::vector<double> v7values_ks;
+	std::vector<double> v7error_ks;
     double v2value_h = 0;
     double v3value_h = 0;
+    double v4value_h = 0;
+    double v5value_h = 0;
+    double v6value_h = 0;
+    double v7value_h = 0;
 
     std::vector<double> v2values_la;
     std::vector<double> v2error_la;
 	std::vector<double> v3values_la;
 	std::vector<double> v3error_la;
+    std::vector<double> v4values_la;
+	std::vector<double> v4error_la;
+    std::vector<double> v5values_la;
+	std::vector<double> v5error_la;
+    std::vector<double> v6values_la;
+	std::vector<double> v6error_la;
+    std::vector<double> v7values_la;
+	std::vector<double> v7error_la;
     double v2error_h = 0;
     double v3error_h = 0;
+    double v4error_h = 0;
+    double v5error_h = 0;
+    double v6error_h = 0;
+    double v7error_h = 0;
 
     TLatex* ltx2 = new TLatex(  );
     ltx2->SetTextSize( 0.045 );
@@ -160,7 +185,7 @@ void V0PtBinv2Fit(  )
             dPhiFourierPeak_ks[i] = ( TH1D* )dPhiPeak_ks[i]->Clone(  );
             TH1D* dPhiHadFourier = ( TH1D* )dPhiHad->Clone(  );
 
-            FourierFit_ks[i] = new TF1( Form( "FourierFit_ks%d",i ), FourierHad, -1.5, 5, 4 );
+            FourierFit_ks[i] = new TF1( Form( "FourierFit_ks%d",i ), FourierHad, -1.5, 5, numFourierParams );
             FourierFit_ks[i]->SetNpx( 250 );
             FourierFit_ks[i]->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
 
@@ -175,11 +200,8 @@ void V0PtBinv2Fit(  )
             v2error_ks.push_back( FourierFit_ks[i]->GetParError( 2 ) );
 			v3values_ks.push_back(FourierFit_ks[i]->GetParameter(3));
 			v3error_ks.push_back(FourierFit_ks[i]->GetParError(3));
-            cout << "---------------------------------" << endl;
-            cout << "Peak V2 for xi-h is " << FourierFit_ks[i]->GetParameter( 2 ) << endl;
-            cout << "---------------------------------" << endl;
 
-            TF1 *FourierFitHad = new TF1( "FourierFitHad", FourierHad, -1.5, 5, 4 );
+            TF1 *FourierFitHad = new TF1( "FourierFitHad", FourierHad, -1.5, 5, numFourierParams );
             FourierFitHad->SetNpx( 250 );
             FourierFitHad->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
 
@@ -194,9 +216,14 @@ void V0PtBinv2Fit(  )
             v2error_h = FourierFitHad->GetParError(2);
 			v3value_h = FourierFitHad->GetParameter(3);
 			v3error_h = FourierFitHad->GetParError(3);
-            cout << "---------------------------------" << endl;
-            cout << "The V2 for h-h is " << FourierFitHad->GetParameter( 2 ) << endl;
-            cout << "---------------------------------" << endl;
+            v4value_h = FourierFitHad->GetParameter(4);
+            v4error_h = FourierFitHad->GetParError(4);
+			v5value_h = FourierFitHad->GetParameter(5);
+			v5error_h = FourierFitHad->GetParError(5);
+            v6value_h = FourierFitHad->GetParameter(6);
+            v6error_h = FourierFitHad->GetParError(6);
+			v7value_h = FourierFitHad->GetParameter(7);
+			v7error_h = FourierFitHad->GetParError(7);
 
             double maxBinContent = dPhiFourierPeak_ks[i]->GetBinContent( dPhiFourierPeak_ks[i]->GetMaximumBin(  ) );
             double minBinContent = dPhiFourierPeak_ks[i]->GetBinContent( dPhiFourierPeak_ks[i]->GetMinimumBin(  ) );
@@ -400,7 +427,7 @@ void V0PtBinv2Fit(  )
             dPhiFourierSide_ks[i] = ( TH1D* )dPhiSide_ks[i]->Clone(  );
             TH1D* dPhiHadFourier = ( TH1D* )dPhiHad->Clone(  );
 
-            FourierFit_ks[i] = new TF1( Form( "FourierFit_ks%d",i ) , FourierHad, -1.5, 5, 4 );
+            FourierFit_ks[i] = new TF1( Form( "FourierFit_ks%d",i ) , FourierHad, -1.5, 5, numFourierParams );
             FourierFit_ks[i]->SetNpx( 250 );
             FourierFit_ks[i]->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
 
@@ -419,7 +446,7 @@ void V0PtBinv2Fit(  )
             cout << "Side V2 for xi-h is " << FourierFit_ks[i]->GetParameter( 2 ) << endl;
             cout << "---------------------------------" << endl;
 
-            TF1 *FourierFitHad = new TF1( "FourierFitHad", FourierHad, -1.5, 5, 4 );
+            TF1 *FourierFitHad = new TF1( "FourierFitHad", FourierHad, -1.5, 5, numFourierParams );
             FourierFitHad->SetNpx( 250 );
             FourierFitHad->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
 
@@ -651,7 +678,7 @@ void V0PtBinv2Fit(  )
             dPhiFourierPeak_la[i] = ( TH1D* )dPhiPeak_la[i]->Clone(  );
             TH1D* dPhiHadFourier = ( TH1D* )dPhiHad->Clone(  );
 
-            FourierFit_la[i] = new TF1( Form( "FourierFit_la%d",i ), FourierHad, -1.5, 5, 4 );
+            FourierFit_la[i] = new TF1( Form( "FourierFit_la%d",i ), FourierHad, -1.5, 5, numFourierParams );
             FourierFit_la[i]->SetNpx( 250 );
             FourierFit_la[i]->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
 
@@ -670,7 +697,7 @@ void V0PtBinv2Fit(  )
             cout << "Peak V2 for xi-h is " << FourierFit_la[i]->GetParameter( 2 ) << endl;
             cout << "---------------------------------" << endl;
 
-            TF1 *FourierFitHad = new TF1( "FourierFitHad", FourierHad, -1.5, 5, 4 );
+            TF1 *FourierFitHad = new TF1( "FourierFitHad", FourierHad, -1.5, 5, numFourierParams );
             FourierFitHad->SetNpx( 250 );
             FourierFitHad->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
 
@@ -887,7 +914,7 @@ void V0PtBinv2Fit(  )
             dPhiFourierSide_la[i] = ( TH1D* )dPhiSide_la[i]->Clone(  );
             TH1D* dPhiHadFourier = ( TH1D* )dPhiHad->Clone(  );
 
-            FourierFit_la[i] = new TF1( Form( "FourierFit_la%d",i ) , FourierHad, -1.5, 5, 4 );
+            FourierFit_la[i] = new TF1( Form( "FourierFit_la%d",i ) , FourierHad, -1.5, 5, numFourierParams );
             FourierFit_la[i]->SetNpx( 250 );
             FourierFit_la[i]->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
 
@@ -906,7 +933,7 @@ void V0PtBinv2Fit(  )
             cout << "Side V2 for xi-h is " << FourierFit_la[i]->GetParameter( 2 ) << endl;
             cout << "---------------------------------" << endl;
 
-            TF1 *FourierFitHad = new TF1( "FourierFitHad", FourierHad, -1.5, 5, 4 );
+            TF1 *FourierFitHad = new TF1( "FourierFitHad", FourierHad, -1.5, 5, numFourierParams );
             FourierFitHad->SetNpx( 250 );
             FourierFitHad->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
 
@@ -1213,41 +1240,88 @@ void V0PtBinv2Fit(  )
     PtBinCounter=0;
 
 	// V2 values Hadron
-    cout << "==========================================================" << endl;
     cout << "Hadron V2 value" << endl;
-    cout << "==========================================================" << endl;
 
     cout << v2value_h << endl;
 	myfile << "Hadron v2 value\n";
     myfile << v2value_h << "\n";
 
     // V2 errors Hadron
-    cout << "==========================================================" << endl;
     cout << "Hadron V2 error" << endl;
-    cout << "==========================================================" << endl;
 
     cout << v2error_h << endl;
 	myfile << "Hadron v2 errors\n";
     myfile << v2error_h << "\n";
 
 	// V3 values Hadron
-    cout << "==========================================================" << endl;
     cout << "Hadron V3 value" << endl;
-    cout << "==========================================================" << endl;
 
     cout << v3value_h << endl;
 	myfile << "Hadron v3 value\n";
     myfile << v3value_h << "\n";
 
     // V3 errors Hadron
-    cout << "==========================================================" << endl;
     cout << "Hadron V3 error" << endl;
-    cout << "==========================================================" << endl;
 
     cout << v3error_h << endl;
 	myfile << "Hadron v3 errors\n";
     myfile << v3error_h << "\n";
 
+	// V4 values Hadron
+    cout << "Hadron V4 value" << endl;
+
+    cout << v4value_h << endl;
+	myfile << "Hadron v4 value\n";
+    myfile << v4value_h << "\n";
+
+    // V4 errors Hadron
+    cout << "Hadron V4 error" << endl;
+
+    cout << v4error_h << endl;
+	myfile << "Hadron v4 errors\n";
+    myfile << v4error_h << "\n";
+
+	// V5 values Hadron
+    cout << "Hadron V5 value" << endl;
+
+    cout << v5value_h << endl;
+	myfile << "Hadron v5 value\n";
+    myfile << v5value_h << "\n";
+
+    // V5 errors Hadron
+    cout << "Hadron V5 error" << endl;
+
+    cout << v5error_h << endl;
+	myfile << "Hadron v5 errors\n";
+    myfile << v5error_h << "\n";
+    //
+	// V6 values Hadron
+    cout << "Hadron V6 value" << endl;
+
+    cout << v6value_h << endl;
+	myfile << "Hadron v6 value\n";
+    myfile << v6value_h << "\n";
+
+    // V6 errors Hadron
+    cout << "Hadron V6 error" << endl;
+
+    cout << v6error_h << endl;
+	myfile << "Hadron v6 errors\n";
+    myfile << v6error_h << "\n";
+
+	// V7 values Hadron
+    cout << "Hadron V7 value" << endl;
+
+    cout << v7value_h << endl;
+	myfile << "Hadron v7 value\n";
+    myfile << v7value_h << "\n";
+
+    // V7 errors Hadron
+    cout << "Hadron V7 error" << endl;
+
+    cout << v7error_h << endl;
+	myfile << "Hadron v7 errors\n";
+    myfile << v7error_h << "\n";
 
     TCanvas* Fourier_ks = new TCanvas( "Fourier_ks", "Fourier_ks", 1600,800 );
     Fourier_ks->Divide( 5,2 );
