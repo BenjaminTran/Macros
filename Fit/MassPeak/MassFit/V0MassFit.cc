@@ -269,21 +269,37 @@ void V0MassFit()
             double mean_la = mean.getVal();
             double rms_la  = TMath::Sqrt(0.5*sigma1.getVal()*sigma1.getVal() + 0.5*sigma2.getVal()*sigma2.getVal());
 
+            //set ranges for individual gaussian yield determination
+            x.setRange("g1", mean.getVal() - 2*sigma1.getVal(), mean.getVal() + 2*sigma1.getVal());
+            x.setRange("g2", mean.getVal() - 2*sigma2.getVal(), mean.getVal() + 2*sigma2.getVal());
+
+            RooAbsReal* Intgaus1_yield_la = gaus1.createIntegral(x, x, "g1");
+            RooAbsReal* Intgaus2_yield_la = gaus2.createIntegral(x, x, "g2");
+
+
+            double gaus1_yield_la = Intgaus1_yield_la->getVal();
+            double gaus2_yield_la = Intgaus2_yield_la->getVal();
+            double gausTot_yield_la = gaus1_yield_la + gaus2_yield_la;
+
+            double rms_gaus1_sig_la = gaus1_yield_la/gausTot_yield_la;
+            double rms_gaus2_sig_la = gaus2_yield_la/gausTot_yield_la;
+
             x.setRange("peak", mean.getVal() - 2*rms_la, mean.getVal() + 2*rms_la);
+            RooAbsReal* Intpoly_la  = poly.createIntegral(x, x, "peak");
+            RooAbsReal* Intgaus1_la = gaus1.createIntegral(x,x,"peak");
+            RooAbsReal* Intgaus2_la = gaus2.createIntegral(x,x,"peak");
 
             double gaus1F_la = sig1.getVal();
             double gaus2F_la = sig2.getVal();
             double polyF_la  = poly.getVal();
-
-            RooAbsReal* Intgaus1_la = gaus1.createIntegral(x, x,  "peak");
-            RooAbsReal* Intgaus2_la = gaus2.createIntegral(x, x, "peak");
-            RooAbsReal* Intpoly_la  = poly.createIntegral(x, x, "peak");
 
             double Intgaus1E_la = gaus1F_la*Intgaus1_la->getVal();
             double Intgaus2E_la = gaus2F_la*Intgaus2_la->getVal();
             double IntpolyE_la  = polyF_la*Intpoly_la->getVal();
             double totsig_la    = Intgaus1E_la + Intgaus2E_la + IntpolyE_la;
             double yield_la       = Intgaus1E_la + Intgaus2E_la;
+
+            double rms_true_la = TMath::Sqrt(rms_gaus1_sig_la*sigma1.getVal()*sigma1.getVal() + rms_gaus2_sig_la*sigma2.getVal()*sigma2.getVal());
 
             double Fsig_la = yield_la/totsig_la;
 
@@ -364,6 +380,15 @@ void V0MassFit()
             osYield << "Yield: " << std::setprecision(2) << yield_la;
             tex->DrawLatex(0.15,0.60,osYield.str().c_str());
             osYield.str(std::string());
+            os << "#sigma_{true} :" << rms_true_la;
+            tex->DrawLatex(0.15,0.55,os.str().c_str());
+            os.str(std::string());
+            os << "Y_{1} :" << rms_gaus1_sig_la;
+            tex->DrawLatex(0.15,0.50,os.str().c_str());
+            os.str(std::string());
+            os << "Y_{2} :" << rms_gaus2_sig_la;
+            tex->DrawLatex(0.15,0.45,os.str().c_str());
+            os.str(std::string());
             //os << "#chi^{2}/ndf: " << chi2_la;
             //tex->DrawLatex(0.15,0.60,os.str().c_str());
             //os.str(std::string());

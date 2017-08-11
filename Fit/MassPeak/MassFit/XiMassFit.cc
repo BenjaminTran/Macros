@@ -117,30 +117,49 @@ void XiMassFit()
         double mean_xi = mean.getVal();
         double rms_xi  = TMath::Sqrt(0.5*sigma1.getVal()*sigma1.getVal() + 0.5*sigma2.getVal()*sigma2.getVal());
 
-        x.setRange("peak", mean.getVal() - 2*rms_xi, mean.getVal() + 2*rms_xi);
-
         double gaus1F_xi = sig1.getVal();
         double gaus2F_xi = sig2.getVal();
         double qsig_xi   = qsig.getVal();
 
+        //set ranges for individual gaussian yield determination
+        x.setRange("g1", mean.getVal() - 2*sigma1.getVal(), mean.getVal() + 2*sigma1.getVal());
+        x.setRange("g2", mean.getVal() - 2*sigma2.getVal(), mean.getVal() + 2*sigma2.getVal());
+
+        RooAbsReal* Intgaus1_yield_xi = gaus1.createIntegral(x,x,"g1");
+        RooAbsReal* Intgaus2_yield_xi = gaus2.createIntegral(x,x,"g2");
+
+        double gaus1_yield_xi = gaus1F_xi*Intgaus1_yield_xi->getVal();
+        double gaus2_yield_xi = gaus2F_xi*Intgaus2_yield_xi->getVal();
+        double gausTot_yield_xi = gaus1_yield_xi + gaus2_yield_xi;
+
+        cout << "Yield1: " << gaus1_yield_xi << endl;
+        cout << "Yield2: " << gaus2_yield_xi << endl;
+
+        double rms_gaus1_sig_xi = gaus1_yield_xi/gausTot_yield_xi;
+        double rms_gaus2_sig_xi = gaus2_yield_xi/gausTot_yield_xi;
+
+        x.setRange("peak", mean.getVal() - 2*rms_xi, mean.getVal() + 2*rms_xi);
         RooAbsReal* Intgaus1_xi      = gaus1.createIntegral(x, x,  "peak");
         RooAbsReal* Intgaus2_xi      = gaus2.createIntegral(x, x, "peak");
         RooAbsReal* Intbackground_xi = background.createIntegral(x, x, "peak");
+
 
         double Intgaus1E_xi      = gaus1F_xi*Intgaus1_xi->getVal();
         double Intgaus2E_xi      = gaus2F_xi*Intgaus2_xi->getVal();
         double IntbackgroundE_xi = qsig_xi*Intbackground_xi->getVal();
         double totsig_xi         = Intgaus1E_xi + Intgaus2E_xi + IntbackgroundE_xi;
-        double Yield            = Intgaus1E_xi + Intgaus2E_xi;
+        double Yield_xi          = Intgaus1E_xi + Intgaus2E_xi;
 
-        double Fsig_xi = Yield/totsig_xi;
+            double rms_true_xi = TMath::Sqrt(rms_gaus1_sig_xi*sigma1.getVal()*sigma1.getVal() + rms_gaus2_sig_xi*sigma2.getVal()*sigma2.getVal());
+
+        double Fsig_xi = Yield_xi/totsig_xi;
 
         mass_xi.push_back(mean_xi);
         std_xi.push_back(rms_xi);
         fsig_xi.push_back(Fsig_xi);
         covQual_xi.push_back(covQual);
 
-        cout << "Yield (xi): " << Yield << endl;
+        cout << "Yield (xi): " << Yield_xi << endl;
         cout << "Fsig (xi): " << Fsig_xi << endl;
         cout << "std (xi): "  << rms_xi  << endl;
         cout << "mass (xi): " << mean_xi << endl;
@@ -182,9 +201,20 @@ void XiMassFit()
         os << "CovQual: " << covQual;
         tex->DrawLatex(0.15,0.65,os.str().c_str());
         os.str(std::string());
-        osYield << "Yield: " << std::setprecision(2) << Yield;
+        osYield << "Yield: " << std::setprecision(2) << Yield_xi;
         tex->DrawLatex(0.15,0.60,osYield.str().c_str());
         osYield.str(std::string());
+        os.str(std::string());
+        os << "#sigma_{true} :" << rms_true_xi;
+        tex->DrawLatex(0.15,0.55,os.str().c_str());
+        os.str(std::string());
+        //os << "Y_{1} :" << gaus1_yield_xi;
+        os << "Y_{1} :" << rms_gaus1_sig_xi;
+        tex->DrawLatex(0.15,0.50,os.str().c_str());
+        os.str(std::string());
+        //os << "Y_{2} :" << gaus2_yield_xi;
+        os << "Y_{2} :" << rms_gaus2_sig_xi;
+        tex->DrawLatex(0.15,0.45,os.str().c_str());
         os.str(std::string());
         //os << "#chi^{2}/ndf: " << chi2_xi;
         //tex->DrawLatex(0.15,0.60,os.str().c_str());
@@ -214,7 +244,7 @@ void XiMassFit()
         os << "CovQual: " << covQual;
         tex->DrawLatex(0.15,0.65,os.str().c_str());
         os.str(std::string());
-        osYield << "Yield: " << std::setprecision(2) << Yield;
+        osYield << "Yield: " << std::setprecision(2) << Yield_xi;
         tex->DrawLatex(0.15,0.60,osYield.str().c_str());
         osYield.str(std::string());
         //os << "#chi^{2}/ndf: " << chi2_xi;
