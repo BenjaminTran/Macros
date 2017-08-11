@@ -67,7 +67,8 @@ void V0PtBinv2Fit(  )
 
 	//Files
 	//TFiles
-    TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationJL7_8.root" );
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationJL7_8.root" );
+    TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationPD1JL1inc.root" );
     TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/Thesis/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root" ); //For v2 of hadron
 
 	//Txt files
@@ -127,8 +128,8 @@ std:vector<double> v3values_h;
                         1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
             TH1D *dPhiHad = new TH1D( "dPhiHad", "h^{#pm}- h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI );
             //Pull 2D Histograms
-            TH2D *hbackgroundPeak = (TH2D*) f->Get( Form( "v0Correlation/backgroundkshort_pt%d",i ) );
-            TH2D *hsignalPeak     = (TH2D*) f->Get( Form( "v0Correlation/signalkshort_pt%d",i ) );
+            TH2D *hbackgroundPeak = (TH2D*) f->Get( Form( "v0CorrelationRapidity/backgroundkshort_pt%d",i ) );
+            TH2D *hsignalPeak     = (TH2D*) f->Get( Form( "v0CorrelationRapidity/signalkshort_pt%d",i ) );
             TH2D *hBackgroundHad  = (TH2D*) fhad->Get( "xiCorrelation/BackgroundHad" );
             TH2D *hSignalHad      = (TH2D*) fhad->Get( "xiCorrelation/SignalHad" );
 
@@ -366,8 +367,8 @@ std:vector<double> v3values_h;
         else{
             dPhiSide_ks[i] = new TH1D( Form( "dPhiSide_ks%d",i ), "K_{S}^{0} - h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
             TH1D *dPhiHad = new TH1D( "dPhiHad", "h^{#pm}- h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI );
-            TH2D *hbackgroundSide = (TH2D*) f->Get( Form( "v0Correlation/backgroundkshort_bkg_pt%d",i ) );
-            TH2D *hsignalSide     = (TH2D*) f->Get( Form( "v0Correlation/signalkshort_bkg_pt%d",i ) );
+            TH2D *hbackgroundSide = (TH2D*) f->Get( Form( "v0CorrelationRapidity/backgroundkshort_bkg_pt%d",i ) );
+            TH2D *hsignalSide     = (TH2D*) f->Get( Form( "v0CorrelationRapidity/signalkshort_bkg_pt%d",i ) );
             TH2D *hBackgroundHad  = (TH2D*) fhad->Get( "xiCorrelation/BackgroundHad" );
             TH2D *hSignalHad      = (TH2D*) fhad->Get( "xiCorrelation/SignalHad" );
 
@@ -616,8 +617,8 @@ std:vector<double> v3values_h;
                         1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
             TH1D *dPhiHad = new TH1D( "dPhiHad", "h^{#pm}- h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI );
             //Pull 2D Histograms
-            TH2D *hbackgroundPeak = (TH2D*) f->Get( Form( "v0Correlation/backgroundlambda_pt%d",i ) );
-            TH2D *hsignalPeak     = (TH2D*) f->Get( Form( "v0Correlation/signallambda_pt%d",i ) );
+            TH2D *hbackgroundPeak = (TH2D*) f->Get( Form( "v0CorrelationRapidity/backgroundlambda_pt%d",i ) );
+            TH2D *hsignalPeak     = (TH2D*) f->Get( Form( "v0CorrelationRapidity/signallambda_pt%d",i ) );
             TH2D *hBackgroundHad  = (TH2D*) fhad->Get( "xiCorrelation/BackgroundHad" );
             TH2D *hSignalHad      = (TH2D*) fhad->Get( "xiCorrelation/SignalHad" );
 
@@ -853,8 +854,8 @@ std:vector<double> v3values_h;
         else{
             dPhiSide_la[i] = new TH1D( Form( "dPhiSide_la%d",i ), "#Xi - h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
             TH1D *dPhiHad = new TH1D( "dPhiHad", "h^{#pm}- h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI );
-            TH2D *hbackgroundSide = (TH2D*) f->Get( Form( "v0Correlation/backgroundlambda_bkg_pt%d",i ) );
-            TH2D *hsignalSide     = (TH2D*) f->Get( Form( "v0Correlation/signallambda_bkg_pt%d",i ) );
+            TH2D *hbackgroundSide = (TH2D*) f->Get( Form( "v0CorrelationRapidity/backgroundlambda_bkg_pt%d",i ) );
+            TH2D *hsignalSide     = (TH2D*) f->Get( Form( "v0CorrelationRapidity/signallambda_bkg_pt%d",i ) );
             TH2D *hBackgroundHad  = (TH2D*) fhad->Get( "xiCorrelation/BackgroundHad" );
             TH2D *hSignalHad      = (TH2D*) fhad->Get( "xiCorrelation/SignalHad" );
 
@@ -1395,8 +1396,8 @@ std:vector<double> v3values_h;
     TCanvas* TwoDCorrelation_ks = new TCanvas( "TwoDCorrelation_ks", "", 1000, 1000 );
     TwoDCorrelation_ks->SetLeftMargin( 0.2 );
 
-    TH2D* Signal_ks = ( TH2D* )f->Get( "v0Correlation/signalkshort_pt2" );
-    TH2D* Background_ks = ( TH2D* )f->Get( "v0Correlation/backgroundkshort_pt2" );
+    TH2D* Signal_ks = ( TH2D* )f->Get( "v0CorrelationRapidity/signalkshort_pt2" );
+    TH2D* Background_ks = ( TH2D* )f->Get( "v0CorrelationRapidity/backgroundkshort_pt2" );
 
     TGaxis::SetMaxDigits( 1 );
 
@@ -1446,8 +1447,8 @@ std:vector<double> v3values_h;
     TCanvas* TwoDCorrelation_la = new TCanvas( "TwoDCorrelation_la", "", 1000, 1000 );
     TwoDCorrelation_la->SetLeftMargin( 0.2 );
 
-    TH2D* Signal_la = ( TH2D* )f->Get( "v0Correlation/signallambda_pt2" );
-    TH2D* Background_la = ( TH2D* )f->Get( "v0Correlation/backgroundlambda_pt2" );
+    TH2D* Signal_la = ( TH2D* )f->Get( "v0CorrelationRapidity/signallambda_pt2" );
+    TH2D* Background_la = ( TH2D* )f->Get( "v0CorrelationRapidity/backgroundlambda_pt2" );
 
     TGaxis::SetMaxDigits( 1 );
 
