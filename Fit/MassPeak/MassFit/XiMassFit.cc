@@ -63,7 +63,8 @@ void XiMassFit()
 
     //int pTxiLength = 24; // the number of bins to be fitted is half of this number
     //double pxi[] = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,72, 73,85, 86,100, 101,200, 201,300};
-    std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,72, 73,85, 86,100, 101,200, 201,300};
+    //std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,72, 73,85, 86,100, 101,200, 201,300};
+    std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,100, 101,200, 201,300};
 
     TCanvas* cc1 = new TCanvas("cc1","cc1",1000,1200);
     cc1->Divide(3,4);
@@ -115,14 +116,30 @@ void XiMassFit()
         double chi2_xi = chi2_xiVar.getVal();
         double covQual = r_xi->covQual();
         double mean_xi = mean.getVal();
-        double rms_xi  = TMath::Sqrt(0.5*sigma1.getVal()*sigma1.getVal() + 0.5*sigma2.getVal()*sigma2.getVal());
-
-        x.setRange("peak", mean.getVal() - 2*rms_xi, mean.getVal() + 2*rms_xi);
 
         double gaus1F_xi = sig1.getVal();
         double gaus2F_xi = sig2.getVal();
         double qsig_xi   = qsig.getVal();
 
+        //set ranges for individual gaussian yield determination
+        x.setRange("g1", mean.getVal() - 2*sigma1.getVal(), mean.getVal() + 2*sigma1.getVal());
+        x.setRange("g2", mean.getVal() - 2*sigma2.getVal(), mean.getVal() + 2*sigma2.getVal());
+
+        RooAbsReal* Intgaus1_yield_xi = gaus1.createIntegral(x,x,"g1");
+        RooAbsReal* Intgaus2_yield_xi = gaus2.createIntegral(x,x,"g2");
+
+        double gaus1_yield_xi = gaus1F_xi*Intgaus1_yield_xi->getVal();
+        double gaus2_yield_xi = gaus2F_xi*Intgaus2_yield_xi->getVal();
+        double gausTot_yield_xi = gaus1_yield_xi + gaus2_yield_xi;
+
+        cout << "Yield1: " << gaus1_yield_xi << endl;
+        cout << "Yield2: " << gaus2_yield_xi << endl;
+
+        double rms_gaus1_sig_xi = gaus1_yield_xi/gausTot_yield_xi;
+        double rms_gaus2_sig_xi = gaus2_yield_xi/gausTot_yield_xi;
+        double rms_true_xi = TMath::Sqrt(rms_gaus1_sig_xi*sigma1.getVal()*sigma1.getVal() + rms_gaus2_sig_xi*sigma2.getVal()*sigma2.getVal());
+
+        x.setRange("peak", mean.getVal() - 2*rms_true_xi, mean.getVal() + 2*rms_true_xi);
         RooAbsReal* Intgaus1_xi      = gaus1.createIntegral(x, x,  "peak");
         RooAbsReal* Intgaus2_xi      = gaus2.createIntegral(x, x, "peak");
         RooAbsReal* Intbackground_xi = background.createIntegral(x, x, "peak");
@@ -131,18 +148,19 @@ void XiMassFit()
         double Intgaus2E_xi      = gaus2F_xi*Intgaus2_xi->getVal();
         double IntbackgroundE_xi = qsig_xi*Intbackground_xi->getVal();
         double totsig_xi         = Intgaus1E_xi + Intgaus2E_xi + IntbackgroundE_xi;
-        double Yield            = Intgaus1E_xi + Intgaus2E_xi;
+        double Yield_xi          = Intgaus1E_xi + Intgaus2E_xi;
 
-        double Fsig_xi = Yield/totsig_xi;
+
+        double Fsig_xi = Yield_xi/totsig_xi;
 
         mass_xi.push_back(mean_xi);
-        std_xi.push_back(rms_xi);
+        std_xi.push_back(rms_true_xi);
         fsig_xi.push_back(Fsig_xi);
         covQual_xi.push_back(covQual);
 
-        cout << "Yield (xi): " << Yield << endl;
+        cout << "Yield (xi): " << Yield_xi << endl;
         cout << "Fsig (xi): " << Fsig_xi << endl;
-        cout << "std (xi): "  << rms_xi  << endl;
+        cout << "std (xi): "  << rms_true_xi  << endl;
         cout << "mass (xi): " << mean_xi << endl;
 
         cout << "covQual (xi)" << covQual << endl;
@@ -169,20 +187,29 @@ void XiMassFit()
         gPad->SetTicky(  );
         xframe.push_back(xframe_);
         xframe_->Draw();
+        cc1->Update();
 
+        TLine* t1 = new TLine(mean.getVal() - 2*rms_true_xi, 0, mean.getVal() - 2*rms_true_xi, gPad->GetUymax());
+        TLine* t2 = new TLine(mean.getVal() + 2*rms_true_xi, 0, mean.getVal() + 2*rms_true_xi, gPad->GetUymax());
+        t1->SetLineStyle(2);
+        t1->SetLineColor(kGreen);
+        t2->SetLineStyle(2);
+        t2->SetLineColor(kGreen);
+        t1->Draw("same");
+        t2->Draw("same");
         os << "P_{t} Bin: " << (pxi[i]-1)/10 << " - " << pxi[i+1]/10;
         tex->DrawLatex(0.15,0.8,os.str().c_str());
         os.str(std::string());
         os << "Mean: " << mean_xi;
         tex->DrawLatex(0.15,0.75,os.str().c_str());
         os.str(std::string());
-        os << "#sigma :" << rms_xi;
+        os << "#sigma :" << rms_true_xi;
         tex->DrawLatex(0.15,0.70,os.str().c_str());
         os.str(std::string());
         os << "CovQual: " << covQual;
         tex->DrawLatex(0.15,0.65,os.str().c_str());
         os.str(std::string());
-        osYield << "Yield: " << std::setprecision(2) << Yield;
+        osYield << "Yield: " << std::setprecision(2) << Yield_xi;
         tex->DrawLatex(0.15,0.60,osYield.str().c_str());
         osYield.str(std::string());
         os.str(std::string());
@@ -202,19 +229,23 @@ void XiMassFit()
         xframe_->GetXaxis()->SetLabelSize(xframe_->GetXaxis()->GetLabelSize()*0.5);
         xframe_->GetYaxis()->SetLabelSize(xframe_->GetYaxis()->GetLabelSize()*0.5);
         xframe_->Draw();
+        cc2->Update();
+
+        t1->Draw("same");
+        t2->Draw("same");
         os << "P_{t} Bin: " << (pxi[i]-1)/10 << " - " << pxi[i+1]/10;
         tex->DrawLatex(0.15,0.8,os.str().c_str());
         os.str(std::string());
         os << "Mean: " << mean_xi;
         tex->DrawLatex(0.15,0.75,os.str().c_str());
         os.str(std::string());
-        os << "#sigma :" << rms_xi;
+        os << "#sigma :" << rms_true_xi;
         tex->DrawLatex(0.15,0.70,os.str().c_str());
         os.str(std::string());
         os << "CovQual: " << covQual;
         tex->DrawLatex(0.15,0.65,os.str().c_str());
         os.str(std::string());
-        osYield << "Yield: " << std::setprecision(2) << Yield;
+        osYield << "Yield: " << std::setprecision(2) << Yield_xi;
         tex->DrawLatex(0.15,0.60,osYield.str().c_str());
         osYield.str(std::string());
         //os << "#chi^{2}/ndf: " << chi2_xi;
