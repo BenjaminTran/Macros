@@ -137,13 +137,29 @@ void V0MassFit()
         double chi2_ks = chi2_ksVar.getVal();
         double covQuality_ks = r_ks->covQual();
         double mean_ks = mean.getVal();
-        double rms_ks  = TMath::Sqrt(0.5*sigma1.getVal()*sigma1.getVal() + 0.5*sigma2.getVal()*sigma2.getVal());
-
-        x.setRange("peak", mean.getVal() - 2*rms_ks, mean.getVal() + 2*rms_ks);
 
         double gaus1F_ks = sig1.getVal();
         double gaus2F_ks = sig2.getVal();
         double polyF_ks  = poly.getVal();
+
+        //set ranges for individual gaussian yield determination
+        x.setRange("g1", mean.getVal() - 2*sigma1.getVal(), mean.getVal() + 2*sigma1.getVal());
+        x.setRange("g2", mean.getVal() - 2*sigma2.getVal(), mean.getVal() + 2*sigma2.getVal());
+
+        RooAbsReal* Intgaus1_yield_ks = gaus1.createIntegral(x, x, "g1");
+        RooAbsReal* Intgaus2_yield_ks = gaus2.createIntegral(x, x, "g2");
+
+        double gaus1_yield_ks = gaus1F_ks*Intgaus1_yield_ks->getVal();
+        double gaus2_yield_ks = gaus2F_ks*Intgaus2_yield_ks->getVal();
+        double gausTot_yield_ks = gaus1_yield_ks + gaus2_yield_ks;
+
+        double rms_gaus1_sig_ks = gaus1_yield_ks/gausTot_yield_ks;
+        double rms_gaus2_sig_ks = gaus2_yield_ks/gausTot_yield_ks;
+
+        double rms_true_ks = TMath::Sqrt(rms_gaus1_sig_ks*sigma1.getVal()*sigma1.getVal() + rms_gaus2_sig_ks*sigma2.getVal()*sigma2.getVal());
+
+        x.setRange("peak", mean.getVal() - 2*rms_true_ks, mean.getVal() + 2*rms_true_ks);
+
 
         RooAbsReal* Intgaus1_ks = gaus1.createIntegral(x, x, "peak");
         RooAbsReal* Intgaus2_ks = gaus2.createIntegral(x, x, "peak");
@@ -158,13 +174,13 @@ void V0MassFit()
         double Fsig_ks = yield_ks/totsig_ks;
 
         mass_ks.push_back(mean_ks);
-        std_ks.push_back(rms_ks);
+        std_ks.push_back(rms_true_ks);
         fsig_ks.push_back(Fsig_ks);
         covQual_ks.push_back(covQuality_ks);
 
         cout << "Yield (ks): "<< yield_ks << endl;
         cout << "Fsig (ks): " << Fsig_ks << endl;
-        cout << "std (ks): " << rms_ks << endl;
+        cout << "std (ks): " << rms_true_ks << endl;
         cout << "mass (ks): " << mean_ks << endl;
         cout << "covQual (ks)" << covQuality_ks << endl;
 
@@ -188,14 +204,23 @@ void V0MassFit()
         gPad->SetTicky();
         Xframe_Ks.push_back(xframe);
         xframe->Draw();
+        cc1->Update();
 
+        TLine* t1_ks = new TLine(mean.getVal() - 2*rms_true_ks, 0, mean.getVal() - 2*rms_true_ks, gPad->GetUymax());
+        TLine* t2_ks = new TLine(mean.getVal() + 2*rms_true_ks, 0, mean.getVal() + 2*rms_true_ks, gPad->GetUymax());
+        t1_ks->SetLineStyle(2);
+        t1_ks->SetLineColor(kGreen);
+        t2_ks->SetLineStyle(2);
+        t2_ks->SetLineColor(kGreen);
+        t1_ks->Draw("same");
+        t2_ks->Draw("same");
         os << "Pt Bin: " << (pks[i]-1)/10 << " - " << pks[i+1]/10;
         tex->DrawLatex(0.15,0.8,os.str().c_str());
         os.str(std::string());
         os << "Mean: " << mean_ks;
         tex->DrawLatex(0.15,0.75,os.str().c_str());
         os.str(std::string());
-        os << "#sigma :" << rms_ks;
+        os << "#sigma :" << rms_true_ks;
         tex->DrawLatex(0.15,0.70,os.str().c_str());
         os.str(std::string());
         os << "CovQual: " << covQuality_ks;
@@ -219,14 +244,17 @@ void V0MassFit()
         xframe->GetYaxis()->SetLabelSize(0.045);
         xframe->GetXaxis()->SetLabelSize(0.045);
         xframe->Draw();
+        Composite_Ks->Update();
 
+        t1_ks->Draw("same");
+        t2_ks->Draw("same");
         os << "Pt Bin: " << (pks[i]-1)/10 << " - " << pks[i+1]/10;
         tex->DrawLatex(0.15,0.8,os.str().c_str());
         os.str(std::string());
         os << "Mean: " << mean_ks;
         tex->DrawLatex(0.15,0.75,os.str().c_str());
         os.str(std::string());
-        os << "#sigma :" << rms_ks;
+        os << "#sigma :" << rms_true_ks;
         tex->DrawLatex(0.15,0.70,os.str().c_str());
         os.str(std::string());
         os << "CovQual: " << covQuality_ks;
@@ -267,7 +295,10 @@ void V0MassFit()
             double chi2_la = chi2_laVar.getVal();
             double covQuality_la = r_la->covQual();
             double mean_la = mean.getVal();
-            double rms_la  = TMath::Sqrt(0.5*sigma1.getVal()*sigma1.getVal() + 0.5*sigma2.getVal()*sigma2.getVal());
+
+            double gaus1F_la = sig1.getVal();
+            double gaus2F_la = sig2.getVal();
+            double polyF_la  = poly.getVal();
 
             //set ranges for individual gaussian yield determination
             x.setRange("g1", mean.getVal() - 2*sigma1.getVal(), mean.getVal() + 2*sigma1.getVal());
@@ -276,22 +307,20 @@ void V0MassFit()
             RooAbsReal* Intgaus1_yield_la = gaus1.createIntegral(x, x, "g1");
             RooAbsReal* Intgaus2_yield_la = gaus2.createIntegral(x, x, "g2");
 
-
-            double gaus1_yield_la = Intgaus1_yield_la->getVal();
-            double gaus2_yield_la = Intgaus2_yield_la->getVal();
+            double gaus1_yield_la = gaus1F_la*Intgaus1_yield_la->getVal();
+            double gaus2_yield_la = gaus2F_la*Intgaus2_yield_la->getVal();
             double gausTot_yield_la = gaus1_yield_la + gaus2_yield_la;
 
             double rms_gaus1_sig_la = gaus1_yield_la/gausTot_yield_la;
             double rms_gaus2_sig_la = gaus2_yield_la/gausTot_yield_la;
 
-            x.setRange("peak", mean.getVal() - 2*rms_la, mean.getVal() + 2*rms_la);
-            RooAbsReal* Intpoly_la  = poly.createIntegral(x, x, "peak");
+            double rms_true_la = TMath::Sqrt(rms_gaus1_sig_la*sigma1.getVal()*sigma1.getVal() + rms_gaus2_sig_la*sigma2.getVal()*sigma2.getVal());
+
+            x.setRange("peak", mean.getVal() - 2*rms_true_la, mean.getVal() + 2*rms_true_la);
+            RooAbsReal* Intpoly_la  = poly.createIntegral(x, x,"peak");
             RooAbsReal* Intgaus1_la = gaus1.createIntegral(x,x,"peak");
             RooAbsReal* Intgaus2_la = gaus2.createIntegral(x,x,"peak");
 
-            double gaus1F_la = sig1.getVal();
-            double gaus2F_la = sig2.getVal();
-            double polyF_la  = poly.getVal();
 
             double Intgaus1E_la = gaus1F_la*Intgaus1_la->getVal();
             double Intgaus2E_la = gaus2F_la*Intgaus2_la->getVal();
@@ -299,19 +328,17 @@ void V0MassFit()
             double totsig_la    = Intgaus1E_la + Intgaus2E_la + IntpolyE_la;
             double yield_la       = Intgaus1E_la + Intgaus2E_la;
 
-            double rms_true_la = TMath::Sqrt(rms_gaus1_sig_la*sigma1.getVal()*sigma1.getVal() + rms_gaus2_sig_la*sigma2.getVal()*sigma2.getVal());
-
             double Fsig_la = yield_la/totsig_la;
 
             mass_la.push_back(mean_la);
-            std_la.push_back(rms_la);
+            std_la.push_back(rms_true_la);
             fsig_la.push_back(Fsig_la);
             covQual_la.push_back(r_la->covQual());
 
             cout << "Yield (la):" << yield_la << endl;
             cout << "Fsig (la): " << Fsig_la << endl;
-            cout << "std (la): " << rms_la << endl;
-            cout << "covQual (la)" << covQuality_la << endl;
+            cout << "std (la): " << rms_true_la << endl;
+            cout << "covQual (la): " << covQuality_la << endl;
 
             RooPlot* xframe = x.frame(160);
             xframe->GetXaxis()->SetTitle("invariant mass (GeV/c^{2})");
@@ -333,14 +360,23 @@ void V0MassFit()
             gPad->SetTicky();
             Xframe_La.push_back(xframe);
             xframe->Draw();
+            cc1->Update();
 
+            TLine* t1_la = new TLine(mean.getVal() - 2*rms_true_la, 0, mean.getVal() - 2*rms_true_la, gPad->GetUymax());
+            TLine* t2_la = new TLine(mean.getVal() + 2*rms_true_la, 0, mean.getVal() + 2*rms_true_la, gPad->GetUymax());
+            t1_la->SetLineStyle(2);
+            t1_la->SetLineColor(kGreen);
+            t2_la->SetLineStyle(2);
+            t2_la->SetLineColor(kGreen);
+            t1_la->Draw("same");
+            t2_la->Draw("same");
             os << "Pt Bin: " << (pla[i]-1)/10 << " - " << pla[i+1]/10;
             tex->DrawLatex(0.15,0.8,os.str().c_str());
             os.str(std::string());
             os << "Mean: " << mean_la;
             tex->DrawLatex(0.15,0.75,os.str().c_str());
             os.str(std::string());
-            os << "#sigma :" << rms_la;
+            os << "#sigma :" << rms_true_la;
             tex->DrawLatex(0.15,0.70,os.str().c_str());
             os.str(std::string());
             os << "CovQual: " << covQuality_la;
@@ -364,14 +400,17 @@ void V0MassFit()
             xframe->GetYaxis()->SetLabelSize(0.05);
             xframe->GetXaxis()->SetLabelSize(0.05);
             xframe->Draw();
+            Composite_La->Update();
 
+            t1_la->Draw("same");
+            t2_la->Draw("same");
             os << "Pt Bin: " << (pks[i]-1)/10 << " - " << pks[i+1]/10;
             tex->DrawLatex(0.15,0.8,os.str().c_str());
             os.str(std::string());
             os << "Mean: " << mean_la;
             tex->DrawLatex(0.15,0.75,os.str().c_str());
             os.str(std::string());
-            os << "#sigma :" << rms_la;
+            os << "#sigma :" << rms_true_la;
             tex->DrawLatex(0.15,0.70,os.str().c_str());
             os.str(std::string());
             os << "CovQual: " << covQuality_la;
@@ -380,14 +419,8 @@ void V0MassFit()
             osYield << "Yield: " << std::setprecision(2) << yield_la;
             tex->DrawLatex(0.15,0.60,osYield.str().c_str());
             osYield.str(std::string());
-            os << "#sigma_{true} :" << rms_true_la;
+            os << "chi2 :" << chi2_la;
             tex->DrawLatex(0.15,0.55,os.str().c_str());
-            os.str(std::string());
-            os << "Y_{1} :" << rms_gaus1_sig_la;
-            tex->DrawLatex(0.15,0.50,os.str().c_str());
-            os.str(std::string());
-            os << "Y_{2} :" << rms_gaus2_sig_la;
-            tex->DrawLatex(0.15,0.45,os.str().c_str());
             os.str(std::string());
             //os << "#chi^{2}/ndf: " << chi2_la;
             //tex->DrawLatex(0.15,0.60,os.str().c_str());
