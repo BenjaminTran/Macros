@@ -84,10 +84,13 @@ void V0MassFit()
     //File Creation
     myfile.open("V0PeakParam.txt");
     //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Ksla/kslaMassPtJL1.root");
-    TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Composites/V0CasMassPtPD11_16.root");
+    TFile* file_ks = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Composites/V0CasMassPtPD11_16.root");
+    //MassKs = (TH2D*)file->Get("MassPt/KsMassPt");
+    //MassLa = (TH2D*)file->Get("MassPt/LaMassPt");
+    TFile* file_la = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/La/LaMassPtPD1_6JL17_22.root");
 
-    MassKs = (TH2D*)file->Get("MassPt/KsMassPt");
-    MassLa = (TH2D*)file->Get("MassPt/LaMassPt");
+    MassKs = (TH2D*)file_ks->Get("MassPt/KsMassPt");
+    MassLa = (TH2D*)file_la->Get("LaMassPt/LaMassPt");
 
     //Fit
     int pkscounter  = 0; //for correct bin counting
@@ -287,7 +290,7 @@ void V0MassFit()
             RooRealVar polysig("polysig","polysig",10,0,10000000);
             RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,poly),RooArgList(sig1,sig2,polysig));
 
-            x.setRange("cut",1.09,1.14);
+            x.setRange("cut",1.1,1.14);
 
             RooFitResult* r_la = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
             RooChi2Var chi2_laVar("chi2_laVar","chi2",sum,data);
