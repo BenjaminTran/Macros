@@ -160,19 +160,15 @@ void V0vnFit()
     TF1* FourierFit_ks[numPtBins_ks];
     TF1* FourierFit_la[numPtBins_la];
     std::map<int, std::vector<double> > vnValues_ks_peak;
-
     std::map<int, std::vector<double> > vnErrors_ks_peak;
 
     std::map<int,std::vector<double> > vnValues_ks_side;
-
     std::map<int,std::vector<double> > vnErrors_ks_side;
 
     std::map<int, std::vector<double> > vnValues_la_peak;
-
     std::map<int, std::vector<double> > vnValues_la_side;
 
     std::map<int, std::vector<double> > vnErrors_la_peak;
-
     std::map<int, std::vector<double> > vnErrors_la_side;
 
     /**
@@ -1224,12 +1220,3 @@ void V0vnFit()
 
 
 }
-
-/*
- *
-            TH2D *hbackgroundPeak = (TH2D*) f->Get(Form("v0Correlation/backgroundlambda_pt%d",i));
-            TH2D *hsignalPeak     = (TH2D*) f->Get(Form("v0Correlation/signallambda_pt%d",i));
-
-            TH2D *hbackgroundSide = (TH2D*) f->Get(Form("v0Correlation/backgroundlambda_bkg_pt%d",i));
-            TH2D *hsignalSide     = (TH2D*) f->Get(Form("v0Correlation/signallambda_bkg_pt%d",i));
- * */
