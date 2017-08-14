@@ -94,6 +94,47 @@ void OutputVnH(int degree, std::vector<double> vnvalues, std::vector<double> vne
     myfile << vnerrors[degree] << "\n";
 }
 
+void vnCalculate(int degree, std::string V0IDname, std::vector<double> vnvalues_peak, std::vector<double> vnerrors_peak, std::vector<double> vnvalues_side, std::vector<double> vnerrors_side, std::vector<double> vnvalues_h, std::vector<double> vnerrors_h, std::vector<double> fsig, std::string file)
+{
+    std::ostringstream output;
+    std::ofstream myfile;
+    myfile.open(file.c_str(),std::ios_base::app);
+
+    std::vector<double> sigvalues;
+    std::vector<double> sigerrors;
+
+    output << V0IDname << " signal v" << degree << " values\n";
+    cout << output.str();
+
+    for(unsigned i=0; i<fsig.size(); i++)
+    {
+        cout << "Pt Bin " << i+1 << endl;
+        double vnObs = vnvalues_peak[i]/TMath::Sqrt(vnvalues_h[degree]);
+        double vnBkg = vnvalues_side[i]/TMath::Sqrt(vnvalues_h[degree]);
+        double sig = (vnObs - (1 - fsig[i])*vnBkg)/fsig[i];
+
+        //double vnObsError = vnerrors_peak*vnerrors_peak/vnvalues_h[degree] + vnerrors_h*vnerrors_h*0.25*vnvalues_peak*vnvalues_peak/vnvalues
+        double vnObsError = vnObs*TMath::Sqrt(TMath::Power(vnerrors_peak[i]/vnvalues_peak[i],2) + TMath::Power(0.5*vnerrors_h[degree]/vnvalues_h[degree],2));
+        double vnBkgError = vnBkg*TMath::Sqrt(TMath::Power(vnerrors_side[i]/vnvalues_side[i],2) + TMath::Power(0.5*vnerrors_h[degree]/vnvalues_h[degree],2));
+        double sigError = TMath::Sqrt(vnObsError*vnObsError + TMath::Power(vnBkgError*(1-fsig[i]),2))/fsig[i];
+
+        cout << "Sig: " << sig << endl;
+        cout << "Error:" << sigError << endl;
+
+        sigvalues.push_back(sig);
+        sigerrors.push_back(sigError);
+    }
+
+    myfile << output.str();
+    output.str(std::string());
+    for(unsigned i=0; i<sigvalues.size(); i++) myfile << sigvalues[i] << "\n";
+
+    output << V0IDname << " signal v" << degree << " errors\n";
+    myfile << output.str();
+    output.str(std::string());
+    for(unsigned i=0; i<sigerrors.size(); i++) myfile << sigerrors[i] << "\n";
+}
+
 
 void V0vnFit()
 {
@@ -137,9 +178,11 @@ void V0vnFit()
 	ofstream vnPeak;
 	ofstream vnSide;
     ofstream vnH;
+    ofstream vnCalculator;
 	vnPeak.open("vnPeak.txt");
 	vnSide.open("vnSide.txt");
     vnH.open("vnHadron.txt");
+    vnCalculator.open("vnSignal.txt");
 
     TVirtualFitter::SetMaxIterations(300000);
     TH1::SetDefaultSumw2();
@@ -176,6 +219,16 @@ void V0vnFit()
      **/
     std::vector<double> vnValues_h = {-999,-999};
     std::vector<double> vnErrors_h = {-999,-999};
+
+    //Fsig for vn calculations
+    std::vector<double> fsig_ks = {0.999666 ,0.999977 ,0.999972 ,0.999988 ,0.999998 ,0.999999 ,0.999999 ,0.999992 ,0.999994 ,0.999955, 0.999975};
+    std::vector<double> fsig_la = {0.988877 ,0.9967 ,0.99754 ,0.998939 ,0.999954 ,0.999951 ,0.999992 ,0.999842};
+
+    if((PtBin_ks.size()-1 != fsig_ks.size()) || (PtBin_la.size()-1 != fsig_la.size()))
+    {
+        cout << "something is wrong with number of pt bins or number of fsig" << endl;
+        return;
+    }
 
     TLatex* ltx2 = new TLatex();
     ltx2->SetTextSize(0.045);
@@ -239,10 +292,11 @@ void V0vnFit()
         gPad->SetTicky();
         dPhiFourierPeak_ks[i]->Fit(Form("FourierFit_ks%d",i));
         dPhiFourierPeak_ks[i]->SetStats(kFALSE);
-        vnValues_ks_peak[2].push_back(FourierFit_ks[i]->GetParameter(2));
-        vnErrors_ks_peak[2].push_back(FourierFit_ks[i]->GetParError(2));
-        vnValues_ks_peak[3].push_back(FourierFit_ks[i]->GetParameter(3));
-        vnErrors_ks_peak[3].push_back(FourierFit_ks[i]->GetParError(3));
+        for(int j=2; j<numFourierParams; j++)
+        {
+            vnValues_ks_peak[j].push_back(FourierFit_ks[i]->GetParameter(j));
+            vnErrors_ks_peak[j].push_back(FourierFit_ks[i]->GetParError(j));
+        }
 
         TF1 *FourierFitHad = new TF1("FourierFitHad", FourierHad, -1.5, 5, numFourierParams);
         FourierFitHad->SetNpx(250);
@@ -455,10 +509,11 @@ void V0vnFit()
         //dPhiFourierSide_ks->Fit("FourierFit_ks","","",0,PI);
         dPhiFourierSide_ks[i]->Fit(Form("FourierFit_ks%d",i));
         dPhiFourierSide_ks[i]->SetStats(kFALSE);
-        vnValues_ks_side[2].push_back(FourierFit_ks[i]->GetParameter(2));
-        vnErrors_ks_side[2].push_back(FourierFit_ks[i]->GetParError(2));
-        vnValues_ks_side[3].push_back(FourierFit_ks[i]->GetParameter(3));
-        vnErrors_ks_side[3].push_back(FourierFit_ks[i]->GetParError(3));
+        for(int j=2; j<numFourierParams; j++)
+        {
+            vnValues_ks_side[j].push_back(FourierFit_ks[i]->GetParameter(j));
+            vnErrors_ks_side[j].push_back(FourierFit_ks[i]->GetParError(j));
+        }
 
         maxBinContent = dPhiFourierSide_ks[i]->GetBinContent(dPhiFourierSide_ks[i]->GetMaximumBin());
         minBinContent = dPhiFourierSide_ks[i]->GetBinContent(dPhiFourierSide_ks[i]->GetMinimumBin());
@@ -602,10 +657,11 @@ void V0vnFit()
         gPad->SetTicky();
         dPhiFourierPeak_la[i]->Fit(Form("FourierFit_la%d",i));
         dPhiFourierPeak_la[i]->SetStats(kFALSE);
-        vnValues_la_peak[2].push_back(FourierFit_la[i]->GetParameter(2));
-        vnErrors_la_peak[2].push_back(FourierFit_la[i]->GetParError(2));
-        vnValues_la_peak[3].push_back(FourierFit_la[i]->GetParameter(3));
-        vnErrors_la_peak[3].push_back(FourierFit_la[i]->GetParError(3));
+        for(int j=2; j<numFourierParams; j++)
+        {
+            vnValues_la_peak[j].push_back(FourierFit_la[i]->GetParameter(j));
+            vnErrors_la_peak[j].push_back(FourierFit_la[i]->GetParError(j));
+        }
 
         TF1 *FourierFitHad = new TF1("FourierFitHadinthelambdapart", FourierHad, -1.5, 5, numFourierParams);
         FourierFitHad->SetNpx(250);
@@ -810,10 +866,11 @@ void V0vnFit()
         //dPhiFourierSide_la->Fit("FourierFit_la","","",0,PI);
         dPhiFourierSide_la[i]->Fit(Form("FourierFit_la%d",i));
         dPhiFourierSide_la[i]->SetStats(kFALSE);
-        vnValues_la_side[2].push_back(FourierFit_la[i]->GetParameter(2));
-        vnErrors_la_side[2].push_back(FourierFit_la[i]->GetParError(2));
-        vnValues_la_side[3].push_back(FourierFit_la[i]->GetParameter(3));
-        vnErrors_la_side[3].push_back(FourierFit_la[i]->GetParError(3));
+        for(int j=2; j<numFourierParams; j++)
+        {
+            vnValues_la_side[j].push_back(FourierFit_la[i]->GetParameter(j));
+            vnErrors_la_side[j].push_back(FourierFit_la[i]->GetParError(j));
+        }
 
         maxBinContent = dPhiFourierSide_la[i]->GetBinContent(dPhiFourierSide_la[i]->GetMaximumBin());
         minBinContent = dPhiFourierSide_la[i]->GetBinContent(dPhiFourierSide_la[i]->GetMinimumBin());
@@ -901,14 +958,13 @@ void V0vnFit()
     }
 
     //Output peak values and errors Kshort
-    //for(int i=2; i<numFourierParams; i++)
-    for(int i=2; i<4; i++)
+    for(int i=2; i<numFourierParams; i++)
     {
         OutputVnValues(i,"Peak","Kshort",vnValues_ks_peak[i],PtBin_ks,"vnPeak.txt");
         OutputVnErrors(i,"Peak","Kshort",vnErrors_ks_peak[i],PtBin_ks,"vnPeak.txt");
     }
     //Output side values and errors Kshort
-    for(int i=2; i<4; i++)
+    for(int i=2; i<numFourierParams; i++)
     {
         OutputVnValues(i,"Side","Kshort",vnValues_ks_side[i],PtBin_ks,"vnSide.txt");
         OutputVnErrors(i,"Side","Kshort",vnErrors_ks_side[i],PtBin_ks,"vnSide.txt");
@@ -916,13 +972,13 @@ void V0vnFit()
 
     //Output peak values and errors Lambda
     //for(int i=2; i<numFourierParams; i++)
-    for(int i=2; i<4; i++)
+    for(int i=2; i<numFourierParams; i++)
     {
         OutputVnValues(i,"Peak","Lambda",vnValues_la_peak[i],PtBin_la,"vnPeak.txt");
         OutputVnErrors(i,"Peak","Lambda",vnErrors_la_peak[i],PtBin_la,"vnPeak.txt");
     }
     //Output side values and errors Lambda
-    for(int i=2; i<4; i++)
+    for(int i=2; i<numFourierParams; i++)
     {
         OutputVnValues(i,"Side","Lambda",vnValues_la_side[i],PtBin_la,"vnSide.txt");
         OutputVnErrors(i,"Side","Lambda",vnErrors_la_side[i],PtBin_la,"vnSide.txt");
@@ -967,6 +1023,10 @@ void V0vnFit()
         gPad->SetTicky();
         dPhiFourierSide_la[i]->Draw("E1");
     }
+
+    //Calculate flow
+    for(int i=2; i<numFourierParams; i++) vnCalculate(i,"Kshort",vnValues_ks_peak[i],vnErrors_ks_peak[i],vnValues_ks_side[i],vnErrors_ks_side[i],vnValues_h,vnErrors_h,fsig_ks,"vnSignal.txt");
+    for(int i=2; i<numFourierParams; i++) vnCalculate(i,"Lambda",vnValues_la_peak[i],vnErrors_la_peak[i],vnValues_la_side[i],vnErrors_la_side[i],vnValues_h,vnErrors_h,fsig_la,"vnSignal.txt");
 
     //Output Publication plots
 	if(publish)
@@ -1172,51 +1232,4 @@ void V0vnFit()
     ltx0->DrawLatex(0.05, 0.75, "1 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{trig}}} < 3 GeV");
     ltx0->SetTextSize(0.04);
     ltx0->DrawLatex(0.85, 0.88, "#Lambda#kern[-0.3]{#lower[0.02]{{}^{#pm}}}- h^{#pm}");
-
-
-	/*
-    TCanvas* SigAndBkg = new TCanvas("SigAndBkg", "", 1600, 800);
-    SigAndBkg->Divide(2,1);
-    SigAndBkg->SetLeftMargin(0.2);
-
-    SigAndBkg->cd(1);
-    Signal->GetXaxis()->SetRangeUser(-4.0,4.0);
-    Signal->GetYaxis()->SetRangeUser(-PI/2.0,4.5);
-    Signal->GetXaxis()->SetTitle("#Delta#eta");
-    Signal->GetXaxis()->SetTitleOffset(1.4);
-    Signal->GetXaxis()->CenterTitle(true);
-    Signal->GetYaxis()->SetTitle("#Delta#phi (radians)");
-    Signal->GetYaxis()->SetTitleOffset(1.4);
-    Signal->GetYaxis()->CenterTitle(true);
-    Signal->GetZaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{d^{2}N^{pair}}{d#Delta#eta d#Delta#phi}");
-    Signal->GetZaxis()->SetTitleOffset(2.5);
-    Signal->GetZaxis()->CenterTitle(true);
-    Signal->GetXaxis()->SetNdivisions(405);
-    Signal->GetYaxis()->SetNdivisions(405);
-    Signal->GetZaxis()->SetNdivisions(4);
-    Signal->SetTitle("");
-    Signal->SetStats(kFALSE);
-    Signal->Draw("Surf1 FB");
-
-    SigAndBkg->cd(2);
-    Background->GetXaxis()->SetRangeUser(-4.0,4.0);
-    Background->GetYaxis()->SetRangeUser(-PI/2.0,4.5);
-    Background->GetXaxis()->SetTitle("#Delta#eta");
-    Background->GetXaxis()->SetTitleOffset(1.4);
-    Background->GetXaxis()->CenterTitle(true);
-    Background->GetYaxis()->SetTitle("#Delta#phi (radians)");
-    Background->GetYaxis()->SetTitleOffset(1.4);
-    Background->GetYaxis()->CenterTitle(true);
-    Background->GetZaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{d^{2}N^{pair}}{d#Delta#eta d#Delta#phi}");
-    Background->GetZaxis()->SetTitleOffset(2.5);
-    Background->GetZaxis()->CenterTitle(true);
-    Background->GetXaxis()->SetNdivisions(405);
-    Background->GetYaxis()->SetNdivisions(405);
-    Background->GetZaxis()->SetNdivisions(4);
-    Background->SetTitle("");
-    Background->SetStats(kFALSE);
-    Background->Draw("Surf1 FB");
-	*/
-
-
 }
