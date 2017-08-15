@@ -128,7 +128,6 @@ void Xiv2Fit(  )
     int pTassMax = 3;
     int longRange = 2;
 
-
     //For Enabling TLatex labels
     //Bool_t publish = kTRUE;
     Bool_t publish = kFALSE; 
@@ -145,6 +144,12 @@ void Xiv2Fit(  )
     gStyle->SetTextSize( 20 );
     gStyle->SetTextFont( 42 ); //2=times-bold-r-normal, 2=precision for TLatex to work
 
+    std::ofstream Xiv2Peak;
+    std::ofstream Xiv2Side;
+    std::ofstream Xiv2Calculator;
+    Xiv2Peak.open("Xiv2Peak.txt");
+    Xiv2Side.open("Xiv2Side.txt");
+    Xiv2Calculator.open("Xiv2Signal.txt");
 
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/XiAnalysisCorrelation.root " );
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/NoPtCut/XiAnalysisCorrelationNoPtCutTotal.root " );
@@ -155,6 +160,7 @@ void Xiv2Fit(  )
     TVirtualFitter::SetMaxIterations( 300000 );
     TH1::SetDefaultSumw2(  );
     std::vector<double> PtBin = {1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 10.0, 20.0};
+    std::vector<double> fsig_xi = {0.954019 ,0.973881 ,0.976705 ,0.97829 ,0.978074 ,0.978057 ,0.978603 ,0.974693 ,0.976012};
     int numPtBins = PtBin.size()-1;
     TH1D* dPhiFourierPeak[numPtBins];
     TH1D* dPhiFourierSide[numPtBins];
@@ -167,6 +173,9 @@ void Xiv2Fit(  )
     std::vector<double> v2values_side;
     std::vector<double> v2error_peak;
     std::vector<double> v2error_side;
+    std::vector<double> v2value_h; //Need to use vector for vnCalculate function
+    std::vector<double> v2error_h;
+
 
     TLatex* ltx2 = new TLatex(  );
     ltx2->SetTextSize( 0.045 );
@@ -244,9 +253,8 @@ void Xiv2Fit(  )
             //dPhiHadFourier->Fit( "FourierFitHad","","",0,PI );
             dPhiHadFourier->Fit( "FourierFitHad");
             dPhiHadFourier->SetStats( kFALSE );
-            cout << "---------------------------------" << endl;
-            cout << "The V2 for h-h is " << FourierFitHad->GetParameter( 2 ) << endl;
-            cout << "---------------------------------" << endl;
+            v2value_h.push_back(FourierFitHad->GetParameter(2));
+            v2error_h.push_back(FourierFitHad->GetParError(2));
 
             double maxBinContent = dPhiFourierPeak[i]->GetBinContent( dPhiFourierPeak[i]->GetMaximumBin(  ) );
             double minBinContent = dPhiFourierPeak[i]->GetBinContent( dPhiFourierPeak[i]->GetMinimumBin(  ) );
@@ -600,6 +608,9 @@ void Xiv2Fit(  )
         cout << PtBin[PtBinCounter] << " < Pt =< " << PtBin[PtBinCounter + 1] << ": " << *it << endl;
         PtBinCounter++;
     }
+
+    //Calculate Flow
+    vnCalculate(2,"Xi",v2values_peak,v2error_peak,v2values_side,v2error_side,v2value_h,v2error_h,fsig_xi,"Xiv2Signal.txt");
 
     TCanvas* FourierPeakComp = new TCanvas( "FourierPeakComp", "Fourier Peak Composite", 1200,1000 );
     FourierPeakComp->Divide( 3,3 );
