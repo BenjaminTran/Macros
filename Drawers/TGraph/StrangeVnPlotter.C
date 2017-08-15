@@ -436,3 +436,166 @@ void Cascade_v2()
     line->SetLineStyle(8);
     line->Draw();
 }
+
+void V0_v4()
+{
+    MITStyle();
+	const int ks_npoints = 11;
+    double v2Ks8[ks_npoints]  = {0.00699898 ,0.00109379 ,0.00927869 ,0.00427604 ,0.0139798 ,0.0270377 ,0.0247767 ,0.033899 ,0.0343803 ,0.0364174 ,0.0397623};
+    double pTKs8[ks_npoints]  = {0.3401, 0.5213, 0.7084, 0.9036, 1.201, 1.591, 1.986, 2.465, 3.136, 4.008, 5.071};
+    double v2Ks8E[ks_npoints] = {0.0240717 ,0.00749964 ,0.00449023 ,0.00362903 ,0.00238665 ,0.00263102 ,0.00321623 ,0.00353347 ,0.00471759 ,0.00720811 ,0.0113695};
+
+	const int la_npoints = 8;
+    double v2La8[la_npoints]  = {-0.0199048 ,0.00945889 ,0.0146571 ,0.00929574 ,0.0102335 ,0.0408502 ,0.0596036 ,0.0702546};
+    double pTLa8[la_npoints]  = {0.9145, 1.221, 1.605, 1.997, 2.481, 3.149, 4.004, 5.041};
+    double v2La8E[la_npoints] = {0.016915 ,0.00708958 ,0.00586441 ,0.005723 ,0.00527798 ,0.00619893 ,0.00917289 ,0.015673};
+
+    // Pull TGraph for Kshort and lambda
+
+
+    TGraphErrors* ks8_v2 = new TGraphErrors(ks_npoints,pTKs8,v2Ks8,0,v2Ks8E);
+	TGraphErrors* la8_v2 = new TGraphErrors(la_npoints,pTLa8,v2La8,0,v2La8E);
+
+    ks8_v2->SetMarkerColor(kRed);
+    ks8_v2->SetMarkerStyle(20);
+    ks8_v2->SetMarkerSize(1.5);
+    ks8_v2->SetLineColor(kRed);
+
+    /*la8_v2->SetMarkerColor(kGreen+2);*/
+    la8_v2->SetMarkerColor(kBlue-4);
+    la8_v2->SetMarkerStyle(22);
+    la8_v2->SetMarkerSize(1.5);
+    la8_v2->SetLineColor(kBlue-4);
+
+    TCanvas* c1 = MakeCanvas("c1", "Plot");
+    c1->cd();
+    //c1->SetLogy();
+    c1->SetLeftMargin(0.12);
+
+    // draw the frame using a histogram frame
+
+    TH1F* frame = c1->DrawFrame(0,-0.01,6,0.1);
+    gPad->SetTickx();
+    gPad->SetTicky();
+    frame->GetXaxis()->CenterTitle(1);
+    frame->GetYaxis()->CenterTitle(1);
+    frame->GetXaxis()->SetTitleSize(0.05);
+    frame->GetXaxis()->SetTitle("p_{T} (GeV)");
+    frame->GetYaxis()->SetTitle("v#kern[-0.3]{_{4}}");
+    frame->GetYaxis()->SetTitleSize(0.05);
+    frame->SetTitleOffset(1.2,"Y");
+    frame->SetTitleOffset(1.2,"X");
+
+    //
+    // draw the graph with axis, continuous line, and put
+    ks8_v2->Draw("P");
+    la8_v2->Draw("P");
+    Int_t oldColor = 38;
+    Int_t newColor = 46;
+
+    TLegend* leg = new TLegend(0.15,0.65,0.61,0.78);
+    leg->SetFillColor(10);
+    leg->SetFillStyle(0);
+    leg->SetBorderSize(0.035);
+    leg->SetTextFont(42);
+    leg->SetTextSize(0.05);
+    leg->AddEntry(ks8_v2, "#color[46]{K_{#lower[-0.3]{S}}#kern[-1.05]{#lower[0.1]{{}^{0}}}}", "P");
+    leg->AddEntry(la8_v2, "#color[46]{#Lambda / #lower[0.1]{#bar{  }}#kern[-1.2]{#Lambda}}", "P");
+    leg->Draw();
+
+    TLatex *tex = new TLatex();
+    tex->SetNDC();
+    tex->SetTextFont(42);
+    tex->SetTextSize(0.05);
+    tex->DrawLatex(0.15,0.8,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = #color[46]{8.16} TeV");
+    tex->SetTextSize(0.045);
+    //tex->DrawLatex(0.15,0.72, "L_{#lower[-0.25]{int}} = #color[38]{35} nb^{#font[122]{\55}1}, #color[46]{62} nb^{#font[122]{\55}1}");
+    // tex->DrawLatex(0.23,0.72, "L_{#lower[-0.25]{int}} = #color[kOrange+8]{35} nb^{#font[122]{\55}1}, 62 nb^{#font[122]{\55}1}");
+    tex->DrawLatex(0.45,0.73,"185 #leq N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 220");
+    //tex->DrawLatex(0.4,0.7, "L_{#lower[-0.25]{int}} = 35 nb^{#font[122]{\55}1}, 185 nb^{#font[122]{\55}1}");
+    TLine* line = new TLine(0,0,6,0);
+    line->SetLineStyle(8);
+    line->Draw();
+}
+
+void V0_v5()
+{
+    MITStyle();
+	const int ks_npoints = 11;
+    double v2Ks8[ks_npoints]  = {0.0158506 ,-0.00552973 ,0.00581856 ,0.0114181 ,0.0174554 ,-0.00281132 ,0.0152802 ,0.00859869 ,0.00261752 ,0.0231879 ,0.00377595};
+    double pTKs8[ks_npoints]  = {0.3401, 0.5213, 0.7084, 0.9036, 1.201, 1.591, 1.986, 2.465, 3.136, 4.008, 5.071};
+    double v2Ks8E[ks_npoints] = {0.0653367 ,0.0203568 ,0.0121898 ,0.00985446 ,0.00648768 ,0.00714284 ,0.00873752 ,0.00959518 ,0.012811 ,0.0195802 ,0.0308744};
+
+
+	const int la_npoints = 8;
+    double v2La8[la_npoints]  = {-0.0139506 ,-0.0214405 ,0.0102338 ,-0.012811 ,0.0264369 ,0.0301995 ,0.0309084 ,0.0818709};
+    double pTLa8[la_npoints]  = {0.9145, 1.221, 1.605, 1.997, 2.481, 3.149, 4.004, 5.041};
+    double v2La8E[la_npoints] = {0.0459104 ,0.0192491 ,0.0159232 ,0.0155425 ,0.0143434 ,0.0168456 ,0.0249281 ,0.0425993};
+
+    // Pull TGraph for Kshort and lambda
+
+
+    TGraphErrors* ks8_v2 = new TGraphErrors(ks_npoints,pTKs8,v2Ks8,0,v2Ks8E);
+	TGraphErrors* la8_v2 = new TGraphErrors(la_npoints,pTLa8,v2La8,0,v2La8E);
+
+    ks8_v2->SetMarkerColor(kRed);
+    ks8_v2->SetMarkerStyle(20);
+    ks8_v2->SetMarkerSize(1.5);
+    ks8_v2->SetLineColor(kRed);
+
+    /*la8_v2->SetMarkerColor(kGreen+2);*/
+    la8_v2->SetMarkerColor(kBlue-4);
+    la8_v2->SetMarkerStyle(22);
+    la8_v2->SetMarkerSize(1.5);
+    la8_v2->SetLineColor(kBlue-4);
+
+    TCanvas* c1 = MakeCanvas("c1", "Plot");
+    c1->cd();
+    //c1->SetLogy();
+    c1->SetLeftMargin(0.12);
+
+    // draw the frame using a histogram frame
+
+    TH1F* frame = c1->DrawFrame(0,-0.05,6,0.15);
+    gPad->SetTickx();
+    gPad->SetTicky();
+    frame->GetXaxis()->CenterTitle(1);
+    frame->GetYaxis()->CenterTitle(1);
+    frame->GetXaxis()->SetTitleSize(0.05);
+    frame->GetXaxis()->SetTitle("p_{T} (GeV)");
+    frame->GetYaxis()->SetTitle("v#kern[-0.3]{_{5}}");
+    frame->GetYaxis()->SetTitleSize(0.05);
+    frame->SetTitleOffset(1.2,"Y");
+    frame->SetTitleOffset(1.2,"X");
+
+    //
+    // draw the graph with axis, continuous line, and put
+    ks8_v2->Draw("P");
+    la8_v2->Draw("P");
+    Int_t oldColor = 38;
+    Int_t newColor = 46;
+
+    TLegend* leg = new TLegend(0.15,0.65,0.61,0.78);
+    leg->SetFillColor(10);
+    leg->SetFillStyle(0);
+    leg->SetBorderSize(0.035);
+    leg->SetTextFont(42);
+    leg->SetTextSize(0.05);
+    leg->AddEntry(ks8_v2, "#color[46]{K_{#lower[-0.3]{S}}#kern[-1.05]{#lower[0.1]{{}^{0}}}}", "P");
+    leg->AddEntry(la8_v2, "#color[46]{#Lambda / #lower[0.1]{#bar{  }}#kern[-1.2]{#Lambda}}", "P");
+    leg->Draw();
+
+    TLatex *tex = new TLatex();
+    tex->SetNDC();
+    tex->SetTextFont(42);
+    tex->SetTextSize(0.05);
+    tex->DrawLatex(0.15,0.8,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = #color[46]{8.16} TeV");
+    tex->SetTextSize(0.045);
+    //tex->DrawLatex(0.15,0.72, "L_{#lower[-0.25]{int}} = #color[38]{35} nb^{#font[122]{\55}1}, #color[46]{62} nb^{#font[122]{\55}1}");
+    // tex->DrawLatex(0.23,0.72, "L_{#lower[-0.25]{int}} = #color[kOrange+8]{35} nb^{#font[122]{\55}1}, 62 nb^{#font[122]{\55}1}");
+    tex->DrawLatex(0.45,0.73,"185 #leq N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 220");
+    //tex->DrawLatex(0.4,0.7, "L_{#lower[-0.25]{int}} = 35 nb^{#font[122]{\55}1}, 185 nb^{#font[122]{\55}1}");
+    TLine* line = new TLine(0,0,6,0);
+    line->SetLineStyle(8);
+    line->Draw();
+}
