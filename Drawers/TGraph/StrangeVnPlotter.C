@@ -437,6 +437,120 @@ void Cascade_v2()
     line->Draw();
 }
 
+void Rap_Cascade_v2()
+{
+    MITStyle();
+
+	const int xi_npoints = 9;
+    double v2Xi8[xi_npoints]  = {0.0485332 ,0.0602203 ,0.0815388 ,0.126116 ,0.161428 ,0.184352 ,0.208616 ,0.168331 ,0.281171};
+    double pTXi8[xi_npoints]  = {1.267, 1.62, 2.008, 2.501, 3.173, 4.029, 5.055, 6.938, 11.31};
+    double v2Xi8E[xi_npoints] = {0.0117314 ,0.00614764 ,0.00530833 ,0.00418641 ,0.0039623 ,0.00462749 ,0.00664224 ,0.0123018 ,0.0657875};
+
+	const int ks_npoints = 16;
+    double v2Ks8[ks_npoints]  = {0.0165183 ,0.0256269 ,0.0427305 ,0.0592655 ,0.0817776 ,0.105675 ,0.124798 ,0.138062 ,0.146527 ,0.14193 ,0.138978 ,0.124995 ,0.131851 ,0.12689 ,0.149737 ,0.1126};
+    double pTKs8[ks_npoints]  = {0.3666, 0.5309, 0.711, 0.9046, 1.202, 1.591, 1.986, 2.465, 3.136, 4.008, 5.142, 6.431, 7.619, 9.142, 11.64, 16.86};
+    double v2Ks8E[ks_npoints] = {0.00664835 ,0.00160315 ,0.000940095 ,0.000767227 ,0.000500488 ,0.000537786 ,0.000645228 ,0.000699308 ,0.000924693 ,0.00138942 ,0.00218948 ,0.00454549 ,0.00597703 ,0.00975685 ,0.0131384 ,0.0957745};
+
+	const int la_npoints = 13;
+    double v2La8[la_npoints]  = {0.031126 ,0.0516416 ,0.0770812 ,0.107901 ,0.136777 ,0.170426 ,0.194357 ,0.197845 ,0.205666 ,0.184392 ,0.150626 ,0.176849 ,0.0713852};
+    double pTLa8[la_npoints]  = {0.9252, 1.224, 1.603, 1.995, 2.485, 3.156, 4.007, 5.116, 6.414, 7.588, 9.117, 11.56, 16.89};
+    double v2La8E[la_npoints] = {0.00329462 ,0.00134879 ,0.00119965 ,0.00122695 ,0.0011159 ,0.00123679 ,0.00174121 ,0.0029136 ,0.00695908 ,0.00996631 ,0.0198574 ,0.0229987 ,0.19794};
+
+
+    // Pull TGraph for Kshort and lambda
+
+    TFile* file_pPbv2 = TFile::Open("lrgraphv2_v3_pPb_185-220.root");
+    TFile* file_hadv2 = TFile::Open("lrgraphv2_v3_pPb_hadron_185-above.root");
+
+    TGraphErrors* ks_v2 = (TGraphErrors*)file_pPbv2->Get("kshortv2true");
+    TGraphErrors* la_v2 = (TGraphErrors*)file_pPbv2->Get("lambdav2true");
+    //TGraphErrors* ha_v2 = (TGraphErrors*)file_hadv2->Get("hadronv2");
+    TGraphErrors* ha_v2 = (TGraphErrors*)GetGraphWithSymmYErrorsFromFile(Form("data/%s","n185_220_ptass033pPb_v2.txt"),1,28,1.2);
+
+    TGraphErrors* xi8_v2 = new TGraphErrors(xi_npoints,pTXi8,v2Xi8,0,v2Xi8E);
+    TGraphErrors* ks8_v2 = new TGraphErrors(ks_npoints,pTKs8,v2Ks8,0,v2Ks8E);
+	TGraphErrors* la8_v2 = new TGraphErrors(la_npoints,pTLa8,v2La8,0,v2La8E);
+
+    ha_v2->SetMarkerStyle(28);
+    ha_v2->SetMarkerSize(1.3);
+
+    ks8_v2->SetMarkerColor(kRed);
+    ks8_v2->SetMarkerStyle(20);
+    ks8_v2->SetMarkerSize(1.5);
+    ks8_v2->SetLineColor(kRed);
+
+    xi8_v2->SetMarkerColor(kMagenta-4);
+    xi8_v2->SetMarkerStyle(21);
+    xi8_v2->SetMarkerSize(1.5);
+    xi8_v2->SetLineColor(kMagenta-4);
+
+    la8_v2->SetMarkerColor(kGreen+2);
+    la8_v2->SetMarkerStyle(22);
+    la8_v2->SetMarkerSize(1.5);
+    la8_v2->SetLineColor(kGreen+2);
+
+    TCanvas* c1 = MakeCanvas("c1", "Plot");
+    c1->cd();
+    /*c1->SetLogy();*/
+    c1->SetLeftMargin(0.12);
+
+    // draw the frame using a histogram frame
+
+    TH1F* frame = c1->DrawFrame(0,-0.01,20,0.41);
+    /*TH1F* frame = c1->DrawFrame(0,0.01,20,1);*/
+    gPad->SetTickx();
+    gPad->SetTicky();
+    frame->GetXaxis()->CenterTitle(1);
+    frame->GetYaxis()->CenterTitle(1);
+    frame->GetXaxis()->SetTitleSize(0.05);
+    frame->GetXaxis()->SetTitle("p_{T} (GeV)");
+    frame->GetYaxis()->SetTitle("v#kern[-0.3]{_{2}}");
+    frame->GetYaxis()->SetTitleSize(0.05);
+    frame->SetTitleOffset(1.2,"Y");
+    frame->SetTitleOffset(1.2,"X");
+
+    //ha_v2->Draw("PESAME");
+    ks8_v2->Draw("P");
+    la8_v2->Draw("P");
+    xi8_v2->Draw("P");
+
+    // Write points into rootfile
+    TFile out("8TeVgraphv2_pPb185-220.root","RECREATE");
+    ks8_v2->Write("kshortv2");
+    la8_v2->Write("lambdav2");
+    xi8_v2->Write("cascadev2");
+
+    TLegend* leg = new TLegend(0.6532847,0.6084211,0.8540146,0.8589474);
+    leg->SetFillColor(10);
+    leg->SetFillStyle(0);
+    leg->SetBorderSize(0.035);
+    leg->SetTextFont(42);
+    leg->SetTextSize(0.05);
+    //leg->AddEntry(ha_v2, "h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}", "P");
+    leg->AddEntry(ks8_v2, "K_{S}^{0}", "P");
+    leg->AddEntry(la8_v2, "#Lambda / #bar{#Lambda}", "P");
+    leg->AddEntry(xi8_v2, "#Xi#kern[-0.3]{#lower[0.1]{{}^{+}}}/ #Xi#kern[-0.3]{#lower[0.1]{{}^{-}}}", "P");
+    leg->Draw();
+
+    TLatex *tex = new TLatex();
+    tex->SetNDC();
+    tex->SetTextFont(42);
+    tex->SetTextSize(0.05);
+    tex->DrawLatex(0.15,0.8,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
+    tex->SetTextSize(0.045);
+    //tex->DrawLatex(0.15,0.72, "L_{#lower[-0.25]{int}} = #color[38]{35} nb^{#font[122]{\55}1}, #color[46]{62} nb^{#font[122]{\55}1}");
+    // tex->DrawLatex(0.23,0.72, "L_{#lower[-0.25]{int}} = #color[kOrange+8]{35} nb^{#font[122]{\55}1}, 62 nb^{#font[122]{\55}1}");
+    tex->DrawLatex(0.1441606,0.6673684,"185 #leq N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 250");
+    tex->DrawLatex(0.15,0.74,"|y| < 1");
+    //tex->DrawLatex(0.4,0.7, "L_{#lower[-0.25]{int}} = 35 nb^{#font[122]{\55}1}, 185 nb^{#font[122]{\55}1}");
+    TLine* line = new TLine(0,0,6,0);
+    line->SetLineStyle(8);
+    line->Draw();
+
+    c1->Print("v2Rapidity.pdf");
+
+}
+
 void V0_v4()
 {
     MITStyle();
