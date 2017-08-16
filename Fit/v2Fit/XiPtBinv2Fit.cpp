@@ -16,6 +16,7 @@
 #include <iomanip>
 #include <stdio.h>
 #include <string>
+#include <fstream>
 #include <sstream>
 #include <cstring>
 #include <cstdio>
@@ -30,8 +31,92 @@ Double_t FourierHad( Double_t *x, Double_t *par )
     return xx1*xx2;
 }
 
+void OutputVnValues(int degree, std::string region, std::string V0IDname, std::vector<double> vnvalues, std::vector<double> ptbin, std::string file)
+{
+    std::ostringstream output;
+    std::ofstream myfile;
+    myfile.open(file.c_str(),std::ios_base::app);
 
-void PtBinv2Fit(  )
+    output << V0IDname << " V" << degree << " values " << region << "\n";
+    cout << "==========================================================" << endl;
+    cout << output.str();
+    cout << "==========================================================" << endl;
+
+    myfile << output.str();
+
+    int PtBinCounter=0;
+    for(std::vector<double>::iterator it = vnvalues.begin(); it != vnvalues.end(); ++it)
+    {
+        cout << ptbin[PtBinCounter] << " < Pt =< " << ptbin[PtBinCounter + 1] << ": " << *it << endl;
+        myfile << *it << "\n";
+        PtBinCounter++;
+    }
+    //myfile.close();
+}
+
+void OutputVnErrors(int degree, std::string region, std::string V0IDname, std::vector<double> vnerrors, std::vector<double> ptbin, std::string file)
+{
+    std::ostringstream output;
+    std::ofstream myfile;
+    myfile.open(file.c_str(),std::ios_base::app);
+
+    output << V0IDname << " V" << degree << " errors " << region << "\n";
+    cout << "==========================================================" << endl;
+    cout << output.str();
+    cout << "==========================================================" << endl;
+
+    myfile << output.str();
+
+    int PtBinCounter=0;
+    for(std::vector<double>::iterator it = vnerrors.begin(); it != vnerrors.end(); ++it)
+    {
+        cout << ptbin[PtBinCounter] << " < Pt =< " << ptbin[PtBinCounter + 1] << ": " << *it << endl;
+        myfile << *it << "\n";
+        PtBinCounter++;
+    }
+}
+
+void vnCalculate(int degree, std::string V0IDname, std::vector<double> vnvalues_peak, std::vector<double> vnerrors_peak, std::vector<double> vnvalues_side, std::vector<double> vnerrors_side, std::vector<double> vnvalues_h, std::vector<double> vnerrors_h, std::vector<double> fsig, std::string file)
+{
+    std::ostringstream output;
+    std::ofstream myfile;
+    myfile.open(file.c_str(),std::ios_base::app);
+
+    std::vector<double> sigvalues;
+    std::vector<double> sigerrors;
+
+    output << V0IDname << " signal v" << degree << " values\n";
+    cout << output.str();
+
+    for(unsigned i=0; i<fsig.size(); i++)
+    {
+        cout << "Pt Bin " << i+1 << endl;
+        double vnObs = vnvalues_peak[i]/TMath::Sqrt(vnvalues_h[degree]);
+        double vnBkg = vnvalues_side[i]/TMath::Sqrt(vnvalues_h[degree]);
+        double sig = (vnObs - (1 - fsig[i])*vnBkg)/fsig[i];
+
+        double vnObsError = vnObs*TMath::Sqrt(TMath::Power(vnerrors_peak[i]/vnvalues_peak[i],2) + TMath::Power(0.5*vnerrors_h[degree]/vnvalues_h[degree],2));
+        double vnBkgError = vnBkg*TMath::Sqrt(TMath::Power(vnerrors_side[i]/vnvalues_side[i],2) + TMath::Power(0.5*vnerrors_h[degree]/vnvalues_h[degree],2));
+        double sigError = TMath::Sqrt(vnObsError*vnObsError + TMath::Power(vnBkgError*(1-fsig[i]),2))/fsig[i];
+
+        cout << "Sig: " << sig << endl;
+        cout << "Error:" << sigError << endl;
+
+        sigvalues.push_back(sig);
+        sigerrors.push_back(sigError);
+    }
+
+    myfile << output.str();
+    output.str(std::string());
+    for(unsigned i=0; i<sigvalues.size(); i++) myfile << sigvalues[i] << "\n";
+
+    output << V0IDname << " signal v" << degree << " errors\n";
+    myfile << output.str();
+    output.str(std::string());
+    for(unsigned i=0; i<sigerrors.size(); i++) myfile << sigerrors[i] << "\n";
+}
+
+void Xiv2Fit(  )
 {
     //TLatex
     std::ostringstream os; // stringstream for making dynamic TLatex labels
@@ -42,7 +127,6 @@ void PtBinv2Fit(  )
     int pTassMin = 1;
     int pTassMax = 3;
     int longRange = 2;
-
 
     //For Enabling TLatex labels
     //Bool_t publish = kTRUE;
@@ -60,16 +144,24 @@ void PtBinv2Fit(  )
     gStyle->SetTextSize( 20 );
     gStyle->SetTextFont( 42 ); //2=times-bold-r-normal, 2=precision for TLatex to work
 
+    std::ofstream Xiv2Peak;
+    std::ofstream Xiv2Side;
+    std::ofstream Xiv2Calculator;
+    Xiv2Peak.open("Xiv2Peak.txt");
+    Xiv2Side.open("Xiv2Side.txt");
+    Xiv2Calculator.open("Xiv2Signal.txt");
 
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/XiAnalysisCorrelation.root " );
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/NoPtCut/XiAnalysisCorrelationNoPtCutTotal.root " );
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/NoPtCutPeakAndSide/XiAnalysisCorrelationNoPtCutPeakAndSideTotal.root " );
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/NoPtCutPeakAndSide/XiAnalysisSeparated.root " );
-    TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/TestRootFiles/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root" );
+    TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationPD1-6reverseJL10-15_08_15_2017.root" );
 
     TVirtualFitter::SetMaxIterations( 300000 );
     TH1::SetDefaultSumw2(  );
-    int numPtBins = 7;
+    std::vector<double> PtBin = {1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 10.0, 20.0};
+    std::vector<double> fsig_xi = {0.954019 ,0.973881 ,0.976705 ,0.97829 ,0.978074 ,0.978057 ,0.978603 ,0.974693 ,0.976012};
+    int numPtBins = PtBin.size()-1;
     TH1D* dPhiFourierPeak[numPtBins];
     TH1D* dPhiFourierSide[numPtBins];
 
@@ -77,33 +169,33 @@ void PtBinv2Fit(  )
     TH1D* dPhiSide[numPtBins];
 
     TF1* FourierFitXi[numPtBins];
-    double p[] = {1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0}; //if number of bins changes make sure you change numPtBins
-    std::vector<double> PtBin( p, p+8 );
-    int PtBinSize = PtBin.size(  ) - 1;
-    std::vector<double> v2values;
-    std::vector<double> v2error;
+    std::vector<double> v2values_peak;
+    std::vector<double> v2values_side;
+    std::vector<double> v2error_peak;
+    std::vector<double> v2error_side;
+    std::vector<double> v2value_h; //Need to use vector for vnCalculate function
+    std::vector<double> v2error_h;
+
 
     TLatex* ltx2 = new TLatex(  );
     ltx2->SetTextSize( 0.045 );
     ltx2->SetNDC( kTRUE );
-    
 
     //FITTING FOR V2
     //
     //Define divided hist
-    //bool Peak = true;
-    bool Peak = false;
-    for( int i=0; i<PtBinSize; i++ )
+    bool Peak = true;
+    //bool Peak = false;
+    for( int i=0; i<numPtBins; i++ )
     {
-        if( Peak ){
             dPhiPeak[i] = new TH1D( Form( "dPhiPeak%d",i ), "#Xi - h^{#pm} ", 31, -( 0.5 -
                         1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
             TH1D *dPhiHad = new TH1D( "dPhiHad", "h^{#pm}- h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI );
             //Pull 2D Histograms
-            TH2D *hbackgroundPeak = (TH2D*) f->Get( Form( "xiCorrelation/BackgroundPeak_pt%d",i ) );
-            TH2D *hsignalPeak     = (TH2D*) f->Get( Form( "xiCorrelation/SignalPeak_pt%d",i ) );
-            TH2D *hBackgroundHad  = (TH2D*) f->Get( "xiCorrelation/BackgroundHad" );
-            TH2D *hSignalHad      = (TH2D*) f->Get( "xiCorrelation/SignalHad" );
+            TH2D *hbackgroundPeak = (TH2D*) f->Get( Form( "xiCorrelationRapidity/BackgroundPeak_pt%d",i ) );
+            TH2D *hsignalPeak     = (TH2D*) f->Get( Form( "xiCorrelationRapidity/SignalPeak_pt%d",i ) );
+            TH2D *hBackgroundHad  = (TH2D*) f->Get( "xiCorrelationRapidity/BackgroundHad" );
+            TH2D *hSignalHad      = (TH2D*) f->Get( "xiCorrelationRapidity/SignalHad" );
 
             TH1::SetDefaultSumw2(  );
             //Project Phi
@@ -137,15 +229,15 @@ void PtBinv2Fit(  )
             FourierFitXi[i]->SetNpx( 250 );
             FourierFitXi[i]->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
 
-            TCanvas *c4 = new TCanvas( "c4", "", 800,800 );
-            c4->cd(  );
+            TCanvas *FourierPeak = new TCanvas( "FourierPeak", "Fourier Peak", 800,800 );
+            FourierPeak->cd(  );
             gPad->SetTickx(  );
             gPad->SetTicky(  );
             //dPhiFourierPeak->Fit( "FourierFitXi","","",0,PI );
             dPhiFourierPeak[i]->Fit( Form( "FourierFitXi%d",i ) );
             dPhiFourierPeak[i]->SetStats( kFALSE );
-            v2values.push_back( FourierFitXi[i]->GetParameter( 2 ) );
-            v2error.push_back( FourierFitXi[i]->GetParError( 2 ) );
+            v2values_peak.push_back( FourierFitXi[i]->GetParameter( 2 ) );
+            v2error_peak.push_back( FourierFitXi[i]->GetParError( 2 ) );
             cout << "---------------------------------" << endl;
             cout << "Peak V2 for xi-h is " << FourierFitXi[i]->GetParameter( 2 ) << endl;
             cout << "---------------------------------" << endl;
@@ -154,16 +246,15 @@ void PtBinv2Fit(  )
             FourierFitHad->SetNpx( 250 );
             FourierFitHad->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
 
-            TCanvas *c5 = new TCanvas( "c5", "", 800,800 );
-            c5->cd(  );
+            TCanvas *FourierHadron = new TCanvas( "FourierHadron", "Fourier Hadron", 800,800 );
+            FourierHadron->cd(  );
             gPad->SetTickx(  );
             gPad->SetTicky(  );
             //dPhiHadFourier->Fit( "FourierFitHad","","",0,PI );
             dPhiHadFourier->Fit( "FourierFitHad");
             dPhiHadFourier->SetStats( kFALSE );
-            cout << "---------------------------------" << endl;
-            cout << "The V2 for h-h is " << FourierFitHad->GetParameter( 2 ) << endl;
-            cout << "---------------------------------" << endl;
+            v2value_h.push_back(FourierFitHad->GetParameter(2));
+            v2error_h.push_back(FourierFitHad->GetParError(2));
 
             double maxBinContent = dPhiFourierPeak[i]->GetBinContent( dPhiFourierPeak[i]->GetMaximumBin(  ) );
             double minBinContent = dPhiFourierPeak[i]->GetBinContent( dPhiFourierPeak[i]->GetMinimumBin(  ) );
@@ -171,8 +262,8 @@ void PtBinv2Fit(  )
             double maxRange = minRange + 2*( maxBinContent - minBinContent );
 
             //ZYAM FITS
-            TCanvas *c2 = new TCanvas( "c2", "", 800,800 );
-            c2->cd(  );
+            TCanvas *ZYAMFitPeak = new TCanvas( "ZYAMFitPeak", "ZYAM Fit Peak", 800,800 );
+            ZYAMFitPeak->cd(  );
 
             gPad->SetTickx(  );
             gPad->SetTicky(  );
@@ -275,7 +366,7 @@ void PtBinv2Fit(  )
                 dPhiHadFourier->AddBinContent( j, -dPhiHadFitMin );
             }
 
-            c4->cd(  );
+            FourierPeak->cd(  );
             dPhiFourierPeak[i]->SetMarkerStyle( 21 );
             dPhiFourierPeak[i]->SetMarkerColor( 4 );
             //dPhiFourierPeak[i]->Draw( "E1" );
@@ -305,7 +396,7 @@ void PtBinv2Fit(  )
                 ltx2->DrawLatex( 0.7, 0.74, "#Xi#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}" );
             }
 
-            c5->cd(  );
+            FourierHadron->cd(  );
             dPhiHadFourier->SetMarkerStyle( 34 );
             dPhiHadFourier->SetMarkerSize( 1.5 );
             dPhiHadFourier->Draw( "E1" );
@@ -331,14 +422,10 @@ void PtBinv2Fit(  )
                 ltx3->DrawLatex( 0.2, 0.53, "Long range (|#Delta#eta| > 2)" );
                 ltx2->DrawLatex( 0.7, 0.74, "h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}" );
             }
-        }
-        else{
+            //side
             dPhiSide[i] = new TH1D( Form( "dPhiSide%d",i ), "#Xi - h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
-            TH1D *dPhiHad = new TH1D( "dPhiHad", "h^{#pm}- h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI );
-            TH2D *hbackgroundSide = (TH2D*) f->Get( Form( "xiCorrelation/BackgroundSide_pt%d",i ) );
-            TH2D *hsignalSide     = (TH2D*) f->Get( Form( "xiCorrelation/SignalSide_pt%d",i ) );
-            TH2D *hBackgroundHad  = (TH2D*) f->Get( "xiCorrelation/BackgroundHad" );
-            TH2D *hSignalHad      = (TH2D*) f->Get( "xiCorrelation/SignalHad" );
+            TH2D *hbackgroundSide = (TH2D*) f->Get( Form( "xiCorrelationRapidity/BackgroundSide_pt%d",i ) );
+            TH2D *hsignalSide     = (TH2D*) f->Get( Form( "xiCorrelationRapidity/SignalSide_pt%d",i ) );
 
             TH1::SetDefaultSumw2(  );
 
@@ -347,11 +434,6 @@ void PtBinv2Fit(  )
             TH1D* hbPhiOthSide = hbackgroundSide->ProjectionY( "PhiBkgOthPeak", 23, -1 );
             TH1D* hsPhiTotSide = hsignalSide->ProjectionY( "PhiSigTot", 0, 10 );
             TH1D* hsPhiOthSide = hsignalSide->ProjectionY( "PhiSigOthPeak", 23, -1 );
-            TH1D* hbHadPhiTot = hBackgroundHad->ProjectionY( "PhiBkgHadTot", 0, 10 );
-            TH1D* hbHadPhiOth = hBackgroundHad->ProjectionY( "PhiBkgHadOth", 23, -1 );
-            TH1D* hsHadPhiTot = hSignalHad->ProjectionY( "PhiSigHadTot", 0, 10 );
-            TH1D* hsHadPhiOth = hSignalHad->ProjectionY( "PhiSigHadOth", 23, -1 );
-
 
             hbPhiTotSide->Add( hbPhiOthSide );
             hsPhiTotSide->Add( hsPhiOthSide );
@@ -361,53 +443,35 @@ void PtBinv2Fit(  )
 
             //Divide
             dPhiSide[i]->Divide( hsPhiTotSide, hbPhiTotSide );
-            dPhiHad->Divide( hsHadPhiTot, hbHadPhiTot );
 
             //Clone histograms for display without fit functions
             dPhiFourierSide[i] = ( TH1D* )dPhiSide[i]->Clone(  );
-            TH1D* dPhiHadFourier = ( TH1D* )dPhiHad->Clone(  );
 
             FourierFitXi[i] = new TF1( Form( "FourierFitXi%d",i ) , FourierHad, -1.5, 5, 4 );
             FourierFitXi[i]->SetNpx( 250 );
             FourierFitXi[i]->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
 
-            TCanvas *c4 = new TCanvas( "c4", "", 800,800 );
-            c4->cd(  );
+            TCanvas *FourierSide = new TCanvas( "FourierSide", "Fourier Side", 800,800 );
+            FourierSide->cd(  );
             gPad->SetTickx(  );
             gPad->SetTicky(  );
-            //dPhiFourierSide->Fit( "FourierFitXi","","",0,PI );
             dPhiFourierSide[i]->Fit( Form( "FourierFitXi%d",i ) );
             dPhiFourierSide[i]->SetStats( kFALSE );
-            v2values.push_back( FourierFitXi[i]->GetParameter( 2 ) );
-            v2error.push_back( FourierFitXi[i]->GetParError( 2 ) );
+            v2values_side.push_back( FourierFitXi[i]->GetParameter( 2 ) );
+            v2error_side.push_back( FourierFitXi[i]->GetParError( 2 ) );
             cout << "---------------------------------" << endl;
             cout << "Side V2 for xi-h is " << FourierFitXi[i]->GetParameter( 2 ) << endl;
             cout << "---------------------------------" << endl;
 
-            TF1 *FourierFitHad = new TF1( "FourierFitHad", FourierHad, -1.5, 5, 4 );
-            FourierFitHad->SetNpx( 250 );
-            FourierFitHad->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
-
-            TCanvas *c5 = new TCanvas( "c5", "", 800,800 );
-            c5->cd(  );
-            gPad->SetTickx(  );
-            gPad->SetTicky(  );
-            //dPhiHadFourier->Fit( "FourierFitHad","","",0,PI );
-            dPhiHadFourier->Fit( "FourierFitHad");
-            dPhiHadFourier->SetStats( kFALSE );
-            cout << "---------------------------------" << endl;
-            cout << "The V2 for h-h is " << FourierFitHad->GetParameter( 2 ) << endl;
-            cout << "---------------------------------" << endl;
-
-            double maxBinContent = dPhiFourierSide[i]->GetBinContent( dPhiFourierSide[i]->GetMaximumBin(  ) );
-            double minBinContent = dPhiFourierSide[i]->GetBinContent( dPhiFourierSide[i]->GetMinimumBin(  ) );
-            double minRange = minBinContent - 0.005*minBinContent;
-            double maxRange = minRange + 2*( maxBinContent - minBinContent );
+            maxBinContent = dPhiFourierSide[i]->GetBinContent( dPhiFourierSide[i]->GetMaximumBin(  ) );
+            minBinContent = dPhiFourierSide[i]->GetBinContent( dPhiFourierSide[i]->GetMinimumBin(  ) );
+            minRange = minBinContent - 0.005*minBinContent;
+            maxRange = minRange + 2*( maxBinContent - minBinContent );
 
 
             //ZYAM FITS
-            TCanvas *c2 = new TCanvas( "c2", "", 800,800 );
-            c2->cd(  );
+            TCanvas *ZYAMFitSide = new TCanvas( "ZYAMFitSide", "ZYAM Fit Side", 800,800 );
+            ZYAMFitSide->cd(  );
 
             gPad->SetTickx(  );
             gPad->SetTicky(  );
@@ -426,11 +490,6 @@ void PtBinv2Fit(  )
             //dPhiSide[i]->Draw( "E1" );
             dPhiSide[i]->Fit( "pol2","","", 0.4,2.4 );
             dPhiSide[i]->SetStats( !publish );
-
-            TLatex *ltx3 = new TLatex(  );
-            ltx3->SetTextSize( 0.035 );
-            ltx3->SetNDC( kTRUE );
-            ltx3->SetTextFont( 42 );
 
             if( publish )
             {
@@ -459,59 +518,17 @@ void PtBinv2Fit(  )
                 //ltx2->DrawLatex( 0.7, 0.74, "#Xi#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}" );
             }
 
-
-            maxBinContent = dPhiHadFourier->GetBinContent( dPhiHadFourier->GetMaximumBin(  ) );
-            minBinContent = dPhiHadFourier->GetBinContent( dPhiHadFourier->GetMinimumBin(  ) );
-            minRange = minBinContent - 0.005*minBinContent;
-            maxRange = minRange + 2*( maxBinContent - minBinContent );
-
-            TCanvas *c3 = new TCanvas( "c3", "", 800,800 );
-            c3->cd(  );
-            gPad->SetTickx(  );
-            gPad->SetTicky(  );
-            dPhiHad->SetMarkerStyle( 34 );
-            dPhiHad->SetMarkerSize( 1.5 );
-            dPhiHad->SetTitleOffset( 2, "Y" );
-            dPhiHad->SetTitle( "" );
-            dPhiHad->GetYaxis(  )->SetRangeUser( minRange , maxRange );
-            dPhiHad->GetYaxis(  )->SetTitleSize( 0.03 );
-            dPhiHad->GetYaxis(  )->CenterTitle( true );
-            dPhiHad->GetYaxis(  )->SetTitle( "#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi}" );
-            dPhiHad->SetTitleOffset( 1.5, "X" );
-            dPhiHad->GetXaxis(  )->SetTitleSize( 0.035 );
-            dPhiHad->GetXaxis(  )->CenterTitle( true );
-            dPhiHad->GetXaxis(  )->SetTitle( "#Delta#phi (radians)" );
-            dPhiHad->Draw( "hist E1" );
-            dPhiHad->Fit( "pol2","","", 0.4,2 );
-            dPhiHad->SetStats( !publish );
-
-            if( publish )
-            {
-                ltx3->DrawLatex( 0.2, 0.82, "CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 5.02 TeV" );
-                ltx3->DrawLatex( 0.2, 0.74, "L_{#lower[-0.25]{int}} = 35 nb^{-1}" );
-                ltx3->DrawLatex( 0.2, 0.67,"185  #leq  N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 220" );
-                ltx3->DrawLatex( 0.2, 0.60, "1 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{assoc}}} < 3 GeV" );
-                ltx3->DrawLatex( 0.2, 0.53, "Long range (|#Delta#eta| > 2)" );
-                ltx2->DrawLatex( 0.7, 0.74, "h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}" );
-            }
-
             TF1 *dPhiFitSide = dPhiSide[i]->GetFunction( "pol2" );
-            TF1 *dPhiHadFit = dPhiHad->GetFunction( "pol2" );
 
             double dPhiFitMinSide = dPhiFitSide->GetMinimum(  );
-            double dPhiHadFitMin = dPhiHadFit->GetMinimum(  );
 
             for( int j = 1; j < 32; j++ )
             {
                 dPhiFourierSide[i]->AddBinContent( j, -dPhiFitMinSide );
             }
 
-            for( int j = 1; j < 32; j++ )
-            {
-                dPhiHadFourier->AddBinContent( j, -dPhiHadFitMin );
-            }
 
-            c4->cd(  );
+            FourierSide->cd(  );
             dPhiFourierSide[i]->SetMarkerStyle( 21 );
             dPhiFourierSide[i]->SetMarkerColor( 4 );
             //dPhiFourierSide[i]->Draw( "E1" );
@@ -540,42 +557,16 @@ void PtBinv2Fit(  )
                 ltx2->DrawLatex( 0.7, 0.74, "#Xi#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}" );
             }
 
-            c5->cd(  );
-            dPhiHadFourier->SetMarkerStyle( 34 );
-            dPhiHadFourier->SetMarkerSize( 1.5 );
-            dPhiHadFourier->Draw( "E1" );
-            dPhiHadFourier->SetStats( kFALSE );
-            dPhiHadFourier->Fit( "FourierFitHad" );
-            dPhiHadFourier->SetTitle( "h^{#pm} Pairing" );
-            dPhiHadFourier->SetTitleOffset( 2, "Y" );
-            dPhiHadFourier->GetYaxis(  )->CenterTitle( true );
-            dPhiHadFourier->GetYaxis(  )->SetTitleSize( 0.03 );
-            dPhiHadFourier->GetYaxis(  )->SetTitle( "#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} - C_{#lower[-0.3]{ZYAM}}" );
-            dPhiHadFourier->GetYaxis(  )->SetRangeUser( -0.0004 , 0.008);
-            dPhiHadFourier->SetTitleOffset( 1.5, "X" );
-            dPhiHadFourier->GetXaxis(  )->SetTitleSize( 0.035 );
-            dPhiHadFourier->GetXaxis(  )->CenterTitle( true );
-            dPhiHadFourier->GetXaxis(  )->SetTitle( "#Delta#phi (radians)" );
-
-            if( publish )
-            {
-                ltx3->DrawLatex( 0.2, 0.82, "CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV, L_{#lower[-0.25]{int}} = 62 nb^{-1}" );
-                ltx3->DrawLatex( 0.2, 0.74,"185  #leq  N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 220" );
-                ltx3->DrawLatex( 0.2, 0.67, "0.3 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{h}}} < 3 GeV" );
-                ltx3->DrawLatex( 0.2, 0.60, "Long range (|#Delta#eta| > 2)" );
-                ltx2->DrawLatex( 0.7, 0.53, "h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}" );
-            }
-        }
     }
 
-    // V2 values
+    // V2 values Peak
     cout << "==========================================================" << endl;
-    cout << "V2 values" << endl;
+    cout << "V2 values peak" << endl;
     cout << "==========================================================" << endl;
 
     int PtBinCounter=0;
 
-    for( std::vector<double>::iterator it = v2values.begin(  ); it != v2values.end(  ); ++it ){
+    for( std::vector<double>::iterator it = v2values_peak.begin(  ); it != v2values_peak.end(  ); ++it ){
         cout << PtBin[PtBinCounter] << " < Pt =< " << PtBin[PtBinCounter + 1] << ": " << *it << endl;
         PtBinCounter++;
     }
@@ -583,33 +574,59 @@ void PtBinv2Fit(  )
 
     // V2 errors
     cout << "==========================================================" << endl;
-    cout << "V2 errors" << endl;
+    cout << "V2 errors peak" << endl;
     cout << "==========================================================" << endl;
 
     PtBinCounter=0;
 
-    for( std::vector<double>::iterator it = v2error.begin(  ); it != v2error.end(  ); ++it ){
+    for( std::vector<double>::iterator it = v2error_peak.begin(  ); it != v2error_peak.end(  ); ++it ){
         cout << PtBin[PtBinCounter] << " < Pt =< " << PtBin[PtBinCounter + 1] << ": " << *it << endl;
         PtBinCounter++;
     }
 
-    TCanvas* Fourier = new TCanvas( "Fourier", "Fourier", 1600,800 );
-    Fourier->Divide( 4,2 );
-    if( Peak ){
-        for( int i=0; i<numPtBins; i++ ){
-            Fourier->cd( i+1 );
-            gPad->SetTickx(  );
-            gPad->SetTicky(  );
-            dPhiFourierPeak[i]->Draw( "E1" );
-        }
+    // V2 values Side
+    cout << "==========================================================" << endl;
+    cout << "V2 values side" << endl;
+    cout << "==========================================================" << endl;
+
+    PtBinCounter = 0;
+
+    for( std::vector<double>::iterator it = v2values_side.begin(  ); it != v2values_side.end(  ); ++it ){
+        cout << PtBin[PtBinCounter] << " < Pt =< " << PtBin[PtBinCounter + 1] << ": " << *it << endl;
+        PtBinCounter++;
     }
-    else{
-        for( int i=0; i<numPtBins; i++ ){
-            Fourier->cd( i+1 );
-            gPad->SetTickx(  );
-            gPad->SetTicky(  );
-            dPhiFourierSide[i]->Draw( "E1" );
-        }
+
+
+    // V2 errors
+    cout << "==========================================================" << endl;
+    cout << "V2 errors side" << endl;
+    cout << "==========================================================" << endl;
+
+    PtBinCounter=0;
+
+    for( std::vector<double>::iterator it = v2error_side.begin(  ); it != v2error_side.end(  ); ++it ){
+        cout << PtBin[PtBinCounter] << " < Pt =< " << PtBin[PtBinCounter + 1] << ": " << *it << endl;
+        PtBinCounter++;
+    }
+
+    //Calculate Flow
+    vnCalculate(2,"Xi",v2values_peak,v2error_peak,v2values_side,v2error_side,v2value_h,v2error_h,fsig_xi,"Xiv2Signal.txt");
+
+    TCanvas* FourierPeakComp = new TCanvas( "FourierPeakComp", "Fourier Peak Composite", 1200,1000 );
+    FourierPeakComp->Divide( 3,3 );
+    for( int i=0; i<numPtBins; i++ ){
+        FourierPeakComp->cd( i+1 );
+        gPad->SetTickx(  );
+        gPad->SetTicky(  );
+        dPhiFourierPeak[i]->Draw( "E1" );
+    }
+    TCanvas* FourierSideComp = new TCanvas( "FourierSideComp", "Fourier Side Composite", 1200,1000 );
+    FourierSideComp->Divide( 3,3 );
+    for( int i=0; i<numPtBins; i++ ){
+        FourierSideComp->cd( i+1 );
+        gPad->SetTickx(  );
+        gPad->SetTicky(  );
+        dPhiFourierSide[i]->Draw( "E1" );
     }
 
     //Output Publication plots
@@ -668,8 +685,8 @@ void PtBinv2Fit(  )
     TCanvas* TwoDCorrelation = new TCanvas( "TwoDCorrelation", "", 1000, 1000 );
     TwoDCorrelation->SetLeftMargin( 0.2 );
 
-    TH2D* Signal = ( TH2D* )f->Get( "xiCorrelation/SignalXiHad" );
-    TH2D* Background = ( TH2D* )f->Get( "xiCorrelation/BackgroundXiHad" );
+    TH2D* Signal = ( TH2D* )f->Get( "xiCorrelationRapidity/SignalXiHad" );
+    TH2D* Background = ( TH2D* )f->Get( "xiCorrelationRapidity/BackgroundXiHad" );
 
     TGaxis::SetMaxDigits( 1 );
     
