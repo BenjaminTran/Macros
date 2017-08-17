@@ -28,7 +28,7 @@ Double_t FourierHad(Double_t *x, Double_t *par)
 {
     //Double_t xx1 = par[0]/(2*PI);
     Double_t xx1 = par[0];
-    Double_t xx2 = 1 + 2*(par[1]*TMath::Cos(x[0]) + par[2]*TMath::Cos(2*x[0])  + par[3]*TMath::Cos(3*x[0]) + par[4]*TMath::Cos(4*x[0]) + par[5]*TMath::Cos(5*x[0]) + par[6]*TMath::Cos(6*x[0]) + par[7]*TMath::Cos(7*x[0]));
+    Double_t xx2 = 1 + 2*(par[1]*TMath::Cos(x[0]) + par[2]*TMath::Cos(2*x[0])  + par[3]*TMath::Cos(3*x[0]));// + par[4]*TMath::Cos(4*x[0]) + par[5]*TMath::Cos(5*x[0]) + par[6]*TMath::Cos(6*x[0]) + par[7]*TMath::Cos(7*x[0]));
     return xx1*xx2;
 }
 
@@ -138,7 +138,7 @@ void vnCalculate(int degree, std::string V0IDname, std::vector<double> vnvalues_
 
 void V0vnFit()
 {
-    int numFourierParams = 8;
+    int numFourierParams = 4;
     bool Peak = true;
 	//bool Peak = false;
 	//Aesthetics
@@ -172,7 +172,7 @@ void V0vnFit()
 	//Files
 	//TFiles
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationJL7_8.root");
-    TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationPD2JL10_08_15_2017.root");
+    TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationSamplePD1-2_2-3reverse_08_16_2017.root");
     TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationPD1-6reverseJL10-15_08_15_2017.root"); //For vn of hadron
 
 	//Txt files
