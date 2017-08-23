@@ -13,6 +13,7 @@
 #include "TF1.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "TH3.h"
 #include "TMath.h"
 #include "TFile.h"
 #include "TGraph.h"
@@ -38,9 +39,11 @@
 
 #include <vector>
 
-void V0MassFit()
+void Efficiency()
 {
     //Initializers
+    std::string FileName = "";
+    FileName = "V0Efficiency.txt";
     using namespace RooFit;
     gStyle->SetOptTitle(kFALSE);
     gStyle->SetMarkerSize(0.5);
@@ -53,44 +56,75 @@ void V0MassFit()
 
     TH1D* massks;
     TH1D* massla;
+    TH1D* massks_gen[16];
+    TH1D* massla_gen[16];
     TH2D* MassKs;
     TH2D* MassLa;
+    TH2D* MassKs_gen;
+    TH2D* MassLa_gen;
+
+    TCanvas* Composite_Ks[6];
+    TCanvas* Composite_La[6];
+    TCanvas* Composite_Ks_Gen[6];
+    TCanvas* Composite_La_Gen[6];
     bool lambda;
 
     std::vector<RooPlot*> Xframe_Ks;
-    std::vector<double> mass_ks;
-    std::vector<double> std_ks;
-    std::vector<double> fsig_ks;
-    std::vector<double> covQual_ks;
+    std::vector<double> mass_ks_;
+    std::vector<double> std_ks_;
+    std::vector<double> fsig_ks_;
+    std::vector<double> covQual_ks_;
+    std::vector<double> yield_ks_;
+    std::vector<double> yield_ks_gen;
 
     std::vector<RooPlot*> Xframe_La;
-    std::vector<double> mass_la;
-    std::vector<double> std_la;
-    std::vector<double> fsig_la;
-    std::vector<double> covQual_la;
+    std::vector<double> mass_la_;
+    std::vector<double> std_la_;
+    std::vector<double> fsig_la_;
+    std::vector<double> covQual_la_;
+    std::vector<double> yield_la_;
+    std::vector<double> yield_la_gen;
+
+    std::vector<double> efficiency_ks;
+    std::vector<double> efficiency_la;
 
     //int pTksLength = 26; // the number of bins to be fitted is half of this number
     //double pks[] = {3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,90, 91,120};
     //double pla[] = {0,0, 0,0, 0,0, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,90, 91,120};
-    std::vector<double> pks = {3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70, 71,85, 86,100, 101,150, 151,200};//, 201,250, 251,300};
-    std::vector<double> pla = {0,0, 0,0, 0,0, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70, 71,85, 86,100, 101,150, 151,200};//, 201,250, 251,300};
+    std::vector<double> pks = {1,2, 3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70, 71,85, 86,100, 101,150};//, 151,200};//, 201,250, 251,300};
+    std::vector<double> pla = {1,2, 3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70, 71,85, 86,100, 101,150};//, 151,200};//, 201,250, 251,300};
+    std::vector<double> rap_bin = {2,4, 5,7, 8,10, 11,12, 13,15, 16,18, 19,21};
 
-    TCanvas* Composite_Ks = new TCanvas("Composite_Ks","",1000,1200);
-    Composite_Ks->Divide(3,6);
+    for(int i=0; i<6; i++)
+    {
+        TCanvas* Composite_Ks = new TCanvas("Composite_Ks","",1000,1200);
+        Composite_Ks->Divide(4,4);
 
-    TCanvas* Composite_La = new TCanvas("Composite_La","",1000,1200);
-    Composite_La->Divide(3,5);
+        TCanvas* Composite_La = new TCanvas("Composite_La","",1000,1200);
+        Composite_La->Divide(4,4);
+
+        TCanvas* Composite_Ks_Gen = new TCanvas("Composite_Ks_Gen","",1000,1200);
+        Composite_Ks_Gen->Divide(4,4);
+
+        TCanvas* Composite_La_Gen = new TCanvas("Composite_La_Gen","",1000,1200);
+        Composite_La_Gen->Divide(4,4);
+    }
 
     //File Creation
-    myfile.open("V0PeakParam.txt");
-    //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Ksla/kslaMassPtJL1.root");
-    TFile* file_ks = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Composites/V0CasMassPtPD11_16.root");
-    //MassKs = (TH2D*)file->Get("MassPt/KsMassPt");
-    //MassLa = (TH2D*)file->Get("MassPt/LaMassPt");
-    TFile* file_la = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/La/LaMassPtPD1_6JL17_22.root");
+    myfile.open(FileName.c_str());
+    TFile* f1 = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/MCMassPtTotal_08_23_2017.root");
 
-    MassKs = (TH2D*)file_ks->Get("MassPt/KsMassPt");
-    MassLa = (TH2D*)file_la->Get("LaMassPt/LaMassPt");
+    TH3D* LaMassPtRap = (TH3D*)f1->Get("MassPtRapidityMC/LaMassPtRap");
+    TH3D* KsMassPtRap = (TH3D*)f1->Get("MassPtRapidityMC/KsMassPtRap");
+
+    MassKs = (TH2D*)KsMassPtRap->Project3D("yx");
+    MassLa = (TH2D*)LaMassPtRap->Project3D("yx");
+
+    TH3D* LaMassPtRap_Gen = (TH3D*)f1->Get("MassPtRapidityMC/LaMassPtRap_Gen");
+    TH3D* KsMassPtRap_Gen = (TH3D*)f1->Get("MassPtRapidityMC/KsMassPtRap_Gen");
+
+    MassKs_gen = (TH2D*)KsMassPtRap_Gen->Project3D("yx");
+    MassLa_gen = (TH2D*)LaMassPtRap_Gen->Project3D("yx");
 
     //Fit
     int pkscounter  = 0; //for correct bin counting
@@ -101,10 +135,11 @@ void V0MassFit()
     {
         //i = pks.size()-2;
         int index = (i+2)/2;
-        if(pla[i] == 0) lambda = false;
-        else lambda = true;
-        massks = (TH1D*)MassKs->ProjectionX("massks", pks[i],pks[i+1]);
-        massla = (TH1D*)MassLa->ProjectionX("massla", pla[i],pla[i+1]);
+        lambda=true;
+        //if(pla[i] == 0) lambda = false;
+        //else lambda = true;
+        massks = (TH1D*)KsMassPtRap->ProjectionX("massks", pks[i],pks[i+1],rap_bin[i],rap_bin[i+1]);
+        massla = (TH1D*)MassLa->ProjectionX("massla", pla[i],pla[i+1],rap_bin[i],rap_bin[i+1]);
 
         TCanvas* cc1 = new TCanvas("cc1","cc1",1000,450);
         cc1->Divide(2,1);
@@ -176,10 +211,11 @@ void V0MassFit()
 
         double Fsig_ks = yield_ks/totsig_ks;
 
-        mass_ks.push_back(mean_ks);
-        std_ks.push_back(rms_true_ks);
-        fsig_ks.push_back(Fsig_ks);
-        covQual_ks.push_back(covQuality_ks);
+        mass_ks_.push_back(mean_ks);
+        std_ks_.push_back(rms_true_ks);
+        fsig_ks_.push_back(Fsig_ks);
+        covQual_ks_.push_back(covQuality_ks);
+        yield_ks_.push_back(yield_ks);
 
         cout << "Yield (ks): "<< yield_ks << endl;
         cout << "Fsig (ks): " << Fsig_ks << endl;
@@ -334,15 +370,15 @@ void V0MassFit()
             x.setRange("g1", mean.getVal() - 2*sigma1.getVal(), mean.getVal() + 2*sigma1.getVal());
             x.setRange("g2", mean.getVal() - 2*sigma2.getVal(), mean.getVal() + 2*sigma2.getVal());
 
-            RooAbsReal* Intgaus1_yield_la = gaus1.createIntegral(x, x, "g1");
-            RooAbsReal* Intgaus2_yield_la = gaus2.createIntegral(x, x, "g2");
+            RooAbsReal* Intgaus1_yield_la_ = gaus1.createIntegral(x, x, "g1");
+            RooAbsReal* Intgaus2_yield_la_ = gaus2.createIntegral(x, x, "g2");
 
-            double gaus1_yield_la = gaus1F_la*Intgaus1_yield_la->getVal();
-            double gaus2_yield_la = gaus2F_la*Intgaus2_yield_la->getVal();
-            double gausTot_yield_la = gaus1_yield_la + gaus2_yield_la;
+            double gaus1_yield_la_ = gaus1F_la*Intgaus1_yield_la_->getVal();
+            double gaus2_yield_la_ = gaus2F_la*Intgaus2_yield_la_->getVal();
+            double gausTot_yield_la_ = gaus1_yield_la_ + gaus2_yield_la_;
 
-            double rms_gaus1_sig_la = gaus1_yield_la/gausTot_yield_la;
-            double rms_gaus2_sig_la = gaus2_yield_la/gausTot_yield_la;
+            double rms_gaus1_sig_la = gaus1_yield_la_/gausTot_yield_la_;
+            double rms_gaus2_sig_la = gaus2_yield_la_/gausTot_yield_la_;
 
             double rms_true_la = TMath::Sqrt(rms_gaus1_sig_la*sigma1.getVal()*sigma1.getVal() + rms_gaus2_sig_la*sigma2.getVal()*sigma2.getVal());
 
@@ -360,10 +396,11 @@ void V0MassFit()
 
             double Fsig_la = yield_la/totsig_la;
 
-            mass_la.push_back(mean_la);
-            std_la.push_back(rms_true_la);
-            fsig_la.push_back(Fsig_la);
-            covQual_la.push_back(r_la->covQual());
+            mass_la_.push_back(mean_la);
+            std_la_.push_back(rms_true_la);
+            fsig_la_.push_back(Fsig_la);
+            covQual_la_.push_back(r_la->covQual());
+            yield_la_.push_back(yield_la);
 
             cout << "Yield (la):" << yield_la << endl;
             cout << "Fsig (la): " << Fsig_la << endl;
@@ -429,7 +466,7 @@ void V0MassFit()
             tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
             osYield.str(std::string());
 
-            Composite_La->cd(index-3);
+            Composite_La->cd(index);
             gPad->SetBottomMargin(0.15);
             gPad->SetLeftMargin(0.15);
             gPad->SetTickx();
@@ -484,57 +521,104 @@ void V0MassFit()
             osYield.str(std::string());
         }
 
-        if(i==0) cc1->Print("V0MassFitInd.pdf(","pdf");
-        else if(i < pks.size() - 2) cc1->Print("V0MassFitInd.pdf","pdf");
-        else cc1->Print("V0MassFitInd.pdf)","pdf");
+        if(i==0) cc1->Print("RECOV0MassFitInd.pdf(","pdf");
+        else if(i < pks.size() - 2) cc1->Print("RECOV0MassFitInd.pdf","pdf");
+        else cc1->Print("RECOV0MassFitInd.pdf)","pdf");
+        Composite_Ks->Print("RECOKsMassFitComposite.pdf");
+        Composite_La->Print("RECOLaMassFitComposite.pdf");
+
         i++; //to access correct bins
         hbincounter++;
     }
-    Composite_Ks->Print("KsMassFitComposite.pdf");
-    Composite_La->Print("LaMassFitComposite.pdf");
+
+    for(unsigned i=0; i<pks.size(); i++)
+    {
+        //if(pla[i] == 0) lambda = false;
+        //else lambda = true;
+        massks_gen[i/2] = (TH1D*)MassKs_gen->ProjectionX(Form("massks_gen_%d",i), pks[i],pks[i+1]);
+        massla_gen[i/2] = (TH1D*)MassLa_gen->ProjectionX(Form("massla_gen_%d",i), pla[i],pla[i+1]);
+        yield_ks_gen.push_back(massks_gen[i/2]->GetBinContent(massks_gen[i/2]->GetMaximumBin()));
+        yield_la_gen.push_back(massla_gen[i/2]->GetBinContent(massla_gen[i/2]->GetMaximumBin()));
+
+        Composite_Ks_Gen->cd((i+2)/2);
+        massks_gen[i/2]->Draw();
+
+        Composite_La_Gen->cd((i+2)/2);
+        massla_gen[i/2]->Draw();
+
+        i++;
+    }
+    Composite_Ks_Gen->Print("Composite_Ks_Gen.pdf");
+    Composite_La_Gen->Print("Composite_La_Gen.pdf");
+
+    //Calculate efficiency
+    for(unsigned i=0; i<yield_ks_.size(); i++)
+    {
+        efficiency_ks.push_back(yield_ks_[i]/yield_ks_gen[i]);
+        efficiency_la.push_back(yield_la_[i]/yield_la_gen[i]);
+    }
 
     //Output
     pkscounter = 0;
     myfile << "KSHORT KSHORT KSHORT\n";
-    for(unsigned i=0; i<mass_ks.size(); i++)
+    for(unsigned i=0; i<mass_ks_.size(); i++)
     {
         cout <<  "====================" << endl;
         cout << "Pt Bin: " << (pks[pkscounter]-1)/10 << " - " << pks[pkscounter+1]/10 << endl;
         cout <<  "====================" << endl;
-        cout << "Mass_ks: "   << mass_ks[i]    << endl;
-        cout << "Fsig_ks: "   << fsig_ks[i]    << endl;
-        cout << "std_ks: "    << std_ks[i]     << endl;
-        cout << "covQual_ks " << covQual_ks[i] << endl;
+        cout << "Mass_ks: "   << mass_ks_[i]    << endl;
+        cout << "Fsig_ks: "   << fsig_ks_[i]    << endl;
+        cout << "std_ks_: "    << std_ks_[i]     << endl;
+        cout << "covQual_ks_: " << covQual_ks_[i] << endl;
 
         myfile <<  "====================" << "\n";
         myfile << "Pt Bin: " << (pks[pkscounter]-1)/10 << " - " << pks[pkscounter+1]/10 << "\n";
         myfile <<  "====================" << "\n";
-        myfile << "Mass_ks: "   << mass_ks[i]    << "\n";
-        myfile << "Fsig_ks: "   << fsig_ks[i]    << "\n";
-        myfile << "std_ks: "    << std_ks[i]     << "\n";
-        myfile << "covQual_ks " << covQual_ks[i] << "\n";
+        myfile << "Mass_ks: "   << mass_ks_[i]    << "\n";
+        myfile << "Fsig_ks: "   << fsig_ks_[i]    << "\n";
+        myfile << "std_ks_: "    << std_ks_[i]     << "\n";
+        myfile << "covQual_ks_: " << covQual_ks_[i] << "\n";
+        myfile << "Yield:" << yield_ks_[i] << "\n";
         pkscounter+=2;
     }
 
-    placounter=6;
+    placounter=0;
     myfile << "LAMBDA LAMBDA LAMBDA\n";
-    for(unsigned i=0; i<mass_la.size(); i++)
+    for(unsigned i=0; i<mass_la_.size(); i++)
     {
         cout <<  "====================" << endl;
         cout << "Pt Bin: " << (pla[placounter]-1)/10 << " - " << pla[placounter+1]/10 << endl;
         cout <<  "====================" << endl;
-        cout << "Mass_la: "   << mass_la[i]    << endl;
-        cout << "Fsig_la: "   << fsig_la[i]    << endl;
-        cout << "std_la: "    << std_la[i]     << endl;
-        cout << "covQual_la " << covQual_la[i] << endl;
+        cout << "Mass_la: "   << mass_la_[i]    << endl;
+        cout << "Fsig_la: "   << fsig_la_[i]    << endl;
+        cout << "std_la_: "    << std_la_[i]     << endl;
+        cout << "covQual_la_ " << covQual_la_[i] << endl;
 
         myfile <<  "====================" << "\n";
         myfile << "Pt Bin: " << (pla[placounter]-1)/10 << " - " << pla[placounter+1]/10 << "\n";
         myfile <<  "====================" << "\n";
-        myfile << "Mass_la: "   << mass_la[i]    << "\n";
-        myfile << "Fsig_la: "   << fsig_la[i]    << "\n";
-        myfile << "std_la: "    << std_la[i]     << "\n";
-        myfile << "covQual_la " << covQual_la[i] << "\n";
+        myfile << "Mass_la: "   << mass_la_[i]    << "\n";
+        myfile << "Fsig_la: "   << fsig_la_[i]    << "\n";
+        myfile << "std_la_: "    << std_la_[i]     << "\n";
+        myfile << "covQual_la_ " << covQual_la_[i] << "\n";
+        myfile << "Yield:" << yield_la_[i] << "\n";
         placounter+=2;
     }
+
+    myfile << "Yield Gen Kshort\n";
+    for(unsigned i=0; i<yield_ks_gen.size(); i++)
+        myfile << yield_ks_gen[i] << "\n";
+
+    myfile << "Yield Gen Lambda\n";
+    for(unsigned i=0; i<yield_la_gen.size(); i++)
+        myfile << yield_la_gen[i] << "\n";
+
+
+    myfile << "Efficiency Lambda\n";
+    for(unsigned i=0; i<efficiency_la.size(); i++)
+        myfile << efficiency_la[i] << "\n";
+
+    myfile << "Efficiency Kshort\n";
+    for(unsigned i=0; i<efficiency_ks.size(); i++)
+        myfile << efficiency_ks[i] << "\n";
 }

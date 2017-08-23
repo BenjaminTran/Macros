@@ -41,7 +41,7 @@
 
 #include <vector>
 
-void XiMassFit()
+void OmMassFit()
 {
     //Initializers
     using namespace RooFit;
@@ -63,21 +63,22 @@ void XiMassFit()
 
     //std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,72, 73,85, 86,100, 101,200, 201,300};
     //std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,100, 101,200};//, 201,300};
-    std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,72, 73,100, 101,200};//, 201,300};
+    //std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,72, 73,100, 101,200};//, 201,300};
+    std::vector<double> pxi = {16,19, 20,23, 24,27, 28,33, 34,41, 42,50 ,51,60, 61,80};//, 81,100, 101,200};//, 201,300};
 
     TCanvas* cc1 = new TCanvas("cc1","cc1",1200,1200);
     cc1->Divide(3,3);
 
     //File Creation
-    myfile.open("XiPeakParam.txt");
+    myfile.open("OmPeakParam.txt");
     //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/CasCutLoose/CasCutLooseJL40.root");
     //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/Thesis/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root");
-    TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Composites/V0CasMassPtPD11_16.root");
+    TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/TestRootFiles/OmegaMassPtSample_08_23_2017.root");
     //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Composites/V0CasMassPtPD5JL12.root"); //only one PD
 
     //MassXi = (TH2D*)file->Get("XiMassPt/MassPt");
     //MassXi = (TH2D*)file->Get("xiCorrelation/MassPt");
-    MassXi = (TH2D*)file->Get("MassPt/MassPt");
+    MassXi = (TH2D*)file->Get("OmMassPt/OmMassPt");
 
     //Fit
     int pxicounter = 0; //for correct bin counting
@@ -87,7 +88,7 @@ void XiMassFit()
     {
         TCanvas* cc2 = new TCanvas("cc2","",600,450);
         int index = (i+2)/2;
-        massxi = (TH1D*)MassXi->ProjectionX("massxi", pxi[i],pxi[i+1]);
+        massxi = (TH1D*)MassXi->ProjectionX("massxi", pxi[i],pxi[i+1])->Rebin(2);
 
         gStyle->SetOptTitle(kFALSE);
 
@@ -97,10 +98,10 @@ void XiMassFit()
         tex->SetTextSize(0.04);
         //tex->SetTextAlign(10);
 
-        RooRealVar x("x","mass",1.26,1.4);
-        RooPlot* xframe_ = x.frame(150);
-        xframe_->GetXaxis()->SetTitle("Invariant mass (GeV)");
-        xframe_->GetYaxis()->SetTitle("Candidates / 0.001 GeV");
+        RooRealVar x("x","mass",1.62,1.73);
+        RooPlot* xframe_ = x.frame(50);
+        xframe_->GetXaxis()->SetTitle("#Lambda K Invariant mass (GeV)");
+        xframe_->GetYaxis()->SetTitle("Candidates / 0.002 GeV");
         xframe_->GetXaxis()->CenterTitle(1);
         xframe_->GetYaxis()->CenterTitle(1);
         xframe_->GetXaxis()->SetTickSize(0.02);
@@ -117,19 +118,26 @@ void XiMassFit()
         //xframe_->GetYaxis()->SetLabelSize(xframe_->GetYaxis()->GetLabelSize()*2.0);
         RooDataHist data("data","dataset",x,massxi);
         data.plotOn(xframe_,Name("data"));
-        RooRealVar mean("mean","mean",1.32,1.29,1.33);
+        RooRealVar mean("mean","mean",1.67,1.29,1.99);
         RooRealVar sigma1("sigma1","sigma1",0.004,0.001,0.04);
         RooRealVar sigma2("sigma2","sigma2",0.006,0.001,0.04);
-        RooRealVar sig1("sig1","signal1",1200,0,1000000000);
-        RooRealVar sig2("sig2","signal2",1000,0,1000000000);
-        RooRealVar qsig("qsig","qsig",600,0,1000000000);
-        RooRealVar alpha("alpha","alpha",1,0,10);
+        RooRealVar sig1("sig1","signal1",12,0,1000000000);
+        RooRealVar sig2("sig2","signal2",10,0,1000000000);
+        //RooRealVar qsig("qsig","qsig",60,0,1000000000);
+        //RooRealVar alpha("alpha","alpha",1,0,10);
         RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
         RooGaussian gaus2("gaus2","gaus2",x,mean,sigma2);
-        RooGenericPdf background("background", "x - (1.115683 + 0.13957018)^alpha", RooArgList(x,alpha));
+        RooRealVar a("a","a",0,-100000,100000);
+        RooRealVar b("b","b",0,-100000,100000);
+        RooRealVar cp("cp","cp",0,-100000,100000);
+        RooRealVar d("d","d",0,-100000,100000);
+        RooPolynomial background("poly","poly",x,RooArgList(a,b,cp,d));
+        //RooPolynomial background("poly","poly",x,RooArgList(a,b,cp));
+        RooRealVar qsig("polysig","polysig",10,0,1000000000);
+        //RooGenericPdf background("background", "x - (1.115683 + 0.493677)^alpha", RooArgList(x,alpha));
         RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,background),RooArgList(sig1,sig2,qsig));
 
-        x.setRange("cut",1.285,1.375);
+        x.setRange("cut",1.65,1.70);
 
         RooFitResult* r_xi = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
         //RooChi2Var chi2_xiVar("chi2_xi","chi2",sum,data);
@@ -205,7 +213,7 @@ void XiMassFit()
         t2->SetLineColor(kGreen);
         t1->Draw("same");
         t2->Draw("same");
-        double xpos = 0.55;
+        double xpos = 0.60;
         double ypos = 0.85;
         double increment = 0.07;
         if(i==0)
@@ -215,7 +223,7 @@ void XiMassFit()
             tex->DrawLatex(0.17,ypos-increment,os.str().c_str());
             tex->SetTextSize(0.04);
             os.str(std::string());
-            os << "185 #leq N_{trk}^{offline} < 250";
+            os << "185 #leq N_{trk}^{offline} < 220";
             tex->DrawLatex(0.17,ypos-2*increment,os.str().c_str());
             os.str(std::string());
         }
@@ -275,13 +283,13 @@ void XiMassFit()
         //os.str(std::string());
 
         hbincounter++;
-        if(i==0) cc2->Print("XiMassFitInd.pdf(","pdf");
-        else if(i < pxi.size() - 2) cc2->Print("XiMassFitInd.pdf","pdf");
-        else cc2->Print("XiMassFitInd.pdf)","pdf");
+        if(i==0) cc2->Print("OmMassFitInd.pdf(","pdf");
+        else if(i < pxi.size() - 2) cc2->Print("OmMassFitInd.pdf","pdf");
+        else cc2->Print("OmMassFitInd.pdf)","pdf");
         i++; //to access correct bins
     }
-    cc1->Print("XiMassFitComposite.pdf");
-    cc1->Print("XiMassFitComposite.png");
+    cc1->Print("OmMassFitComposite.pdf");
+    cc1->Print("OmMassFitComposite.png");
 
     //Output
     pxicounter = 0;

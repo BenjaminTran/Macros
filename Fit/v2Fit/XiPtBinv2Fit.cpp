@@ -84,6 +84,9 @@ void vnCalculate(int degree, std::string V0IDname, std::vector<double> vnvalues_
 
     std::vector<double> sigvalues;
     std::vector<double> sigerrors;
+    std::vector<double> vnObs;
+    std::vector<double> vnBkg;
+    std::vector<double> vnRefError;
 
     output << V0IDname << " signal v" << degree << " values\n";
     cout << output.str();
@@ -91,16 +94,20 @@ void vnCalculate(int degree, std::string V0IDname, std::vector<double> vnvalues_
     for(unsigned i=0; i<fsig.size(); i++)
     {
         cout << "Pt Bin " << i+1 << endl;
-        double vnObs = vnvalues_peak[i]/TMath::Sqrt(vnvalues_h[degree]);
-        double vnBkg = vnvalues_side[i]/TMath::Sqrt(vnvalues_h[degree]);
-        double sig = (vnObs - (1 - fsig[i])*vnBkg)/fsig[i];
+        double vnObs_ = vnvalues_peak[i]/TMath::Sqrt(vnvalues_h[degree]);
+        double vnBkg_ = vnvalues_side[i]/TMath::Sqrt(vnvalues_h[degree]);
+        vnObs.push_back(vnObs_);
+        vnBkg.push_back(vnBkg_);
+        double sig = (vnObs_ - (1 - fsig[i])*vnBkg_)/fsig[i];
 
-        double vnObsError = vnObs*TMath::Sqrt(TMath::Power(vnerrors_peak[i]/vnvalues_peak[i],2) + TMath::Power(0.5*vnerrors_h[degree]/vnvalues_h[degree],2));
-        double vnBkgError = vnBkg*TMath::Sqrt(TMath::Power(vnerrors_side[i]/vnvalues_side[i],2) + TMath::Power(0.5*vnerrors_h[degree]/vnvalues_h[degree],2));
+        double vnObsError = vnObs_*TMath::Sqrt(TMath::Power(vnerrors_peak[i]/vnvalues_peak[i],2) + TMath::Power(0.5*vnerrors_h[degree]/vnvalues_h[degree],2));
+        double vnBkgError = vnBkg_*TMath::Sqrt(TMath::Power(vnerrors_side[i]/vnvalues_side[i],2) + TMath::Power(0.5*vnerrors_h[degree]/vnvalues_h[degree],2));
         double sigError = TMath::Sqrt(vnObsError*vnObsError + TMath::Power(vnBkgError*(1-fsig[i]),2))/fsig[i];
 
         cout << "Sig: " << sig << endl;
         cout << "Error:" << sigError << endl;
+
+        vnRefError.push_back(0.5*vnerrors_h[degree]/TMath::Sqrt(vnvalues_h[degree]));
 
         sigvalues.push_back(sig);
         sigerrors.push_back(sigError);
@@ -114,6 +121,26 @@ void vnCalculate(int degree, std::string V0IDname, std::vector<double> vnvalues_
     myfile << output.str();
     output.str(std::string());
     for(unsigned i=0; i<sigerrors.size(); i++) myfile << sigerrors[i] << "\n";
+
+    output << V0IDname << " observed v" << degree << " values\n";
+    myfile << output.str();
+    output.str(std::string());
+    for(unsigned i=0; i<vnvalues_peak.size(); i++) myfile << vnvalues_peak[i]/TMath::Sqrt(vnvalues_h[degree]) << "\n";
+
+    output << V0IDname << " observed v" << degree << " errors\n";
+    myfile << output.str();
+    output.str(std::string());
+    for(unsigned i=0; i<vnvalues_peak.size(); i++) myfile << vnObs[i]*TMath::Sqrt(TMath::Power(vnerrors_peak[i]/vnvalues_peak[i],2) + TMath::Power(vnRefError[i]/vnvalues_h[degree],2)) << "\n";
+
+    output << V0IDname << " background v" << degree << " values\n";
+    myfile << output.str();
+    output.str(std::string());
+    for(unsigned i=0; i<vnvalues_side.size(); i++) myfile << vnvalues_side[i]/TMath::Sqrt(vnvalues_h[degree]) << "\n";
+
+    output << V0IDname << " background v" << degree << " errors\n";
+    myfile << output.str();
+    output.str(std::string());
+    for(unsigned i=0; i<vnvalues_side.size(); i++) myfile << vnObs[i]*TMath::Sqrt(TMath::Power(vnerrors_side[i]/vnvalues_side[i],2) + TMath::Power(vnRefError[i]/vnvalues_h[degree],2)) << "\n";
 }
 
 void Xiv2Fit(  )
@@ -152,7 +179,8 @@ void Xiv2Fit(  )
     Xiv2Calculator.open("Xiv2Signal.txt");
 
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationPD1-6reverseJL10-15_08_15_2017.root" );
-    TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationpPbPD1-6_08_15_2017.root" );
+    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationpPbPD1-6_08_15_2017.root" );
+    TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root" );
 
     TVirtualFitter::SetMaxIterations( 300000 );
     TH1::SetDefaultSumw2(  );
@@ -173,8 +201,8 @@ void Xiv2Fit(  )
     TF1* FourierFitXi[numPtBins];
     std::vector<double> v2values_peak;
     std::vector<double> v2values_side;
-    std::vector<double> v2error_peak;
-    std::vector<double> v2error_side;
+    std::vector<double> v2errors_peak;
+    std::vector<double> v2errors_side;
     std::vector<double> v2value_h; //Need to use vector for vnCalculate function
     std::vector<double> v2error_h;
 
@@ -239,7 +267,7 @@ void Xiv2Fit(  )
             dPhiFourierPeak[i]->Fit( Form( "FourierFitXi%d",i ) );
             dPhiFourierPeak[i]->SetStats( kFALSE );
             v2values_peak.push_back( FourierFitXi[i]->GetParameter( 2 ) );
-            v2error_peak.push_back( FourierFitXi[i]->GetParError( 2 ) );
+            v2errors_peak.push_back( FourierFitXi[i]->GetParError( 2 ) );
             cout << "---------------------------------" << endl;
             cout << "Peak V2 for xi-h is " << FourierFitXi[i]->GetParameter( 2 ) << endl;
             cout << "---------------------------------" << endl;
@@ -460,7 +488,7 @@ void Xiv2Fit(  )
             dPhiFourierSide[i]->Fit( Form( "FourierFitXi%d",i ) );
             dPhiFourierSide[i]->SetStats( kFALSE );
             v2values_side.push_back( FourierFitXi[i]->GetParameter( 2 ) );
-            v2error_side.push_back( FourierFitXi[i]->GetParError( 2 ) );
+            v2errors_side.push_back( FourierFitXi[i]->GetParError( 2 ) );
             cout << "---------------------------------" << endl;
             cout << "Side V2 for xi-h is " << FourierFitXi[i]->GetParameter( 2 ) << endl;
             cout << "---------------------------------" << endl;
@@ -561,58 +589,14 @@ void Xiv2Fit(  )
 
     }
 
-    // V2 values Peak
-    cout << "==========================================================" << endl;
-    cout << "V2 values peak" << endl;
-    cout << "==========================================================" << endl;
+    OutputVnValues(2,"Peak","Xi",v2values_peak,PtBin,"Xiv2Peak.txt");
+    OutputVnErrors(2,"Peak","Xi",v2errors_peak,PtBin,"Xiv2Peak.txt");
 
-    int PtBinCounter=0;
-
-    for( std::vector<double>::iterator it = v2values_peak.begin(  ); it != v2values_peak.end(  ); ++it ){
-        cout << PtBin[PtBinCounter] << " < Pt =< " << PtBin[PtBinCounter + 1] << ": " << *it << endl;
-        PtBinCounter++;
-    }
-
-
-    // V2 errors
-    cout << "==========================================================" << endl;
-    cout << "V2 errors peak" << endl;
-    cout << "==========================================================" << endl;
-
-    PtBinCounter=0;
-
-    for( std::vector<double>::iterator it = v2error_peak.begin(  ); it != v2error_peak.end(  ); ++it ){
-        cout << PtBin[PtBinCounter] << " < Pt =< " << PtBin[PtBinCounter + 1] << ": " << *it << endl;
-        PtBinCounter++;
-    }
-
-    // V2 values Side
-    cout << "==========================================================" << endl;
-    cout << "V2 values side" << endl;
-    cout << "==========================================================" << endl;
-
-    PtBinCounter = 0;
-
-    for( std::vector<double>::iterator it = v2values_side.begin(  ); it != v2values_side.end(  ); ++it ){
-        cout << PtBin[PtBinCounter] << " < Pt =< " << PtBin[PtBinCounter + 1] << ": " << *it << endl;
-        PtBinCounter++;
-    }
-
-
-    // V2 errors
-    cout << "==========================================================" << endl;
-    cout << "V2 errors side" << endl;
-    cout << "==========================================================" << endl;
-
-    PtBinCounter=0;
-
-    for( std::vector<double>::iterator it = v2error_side.begin(  ); it != v2error_side.end(  ); ++it ){
-        cout << PtBin[PtBinCounter] << " < Pt =< " << PtBin[PtBinCounter + 1] << ": " << *it << endl;
-        PtBinCounter++;
-    }
+    OutputVnValues(2,"Side","Xi",v2values_side,PtBin,"Xiv2Side.txt");
+    OutputVnErrors(2,"Side","Xi",v2errors_side,PtBin,"Xiv2Side.txt");
 
     //Calculate Flow
-    vnCalculate(2,"Xi",v2values_peak,v2error_peak,v2values_side,v2error_side,v2value_h,v2error_h,fsig_xi,"Xiv2Signal.txt");
+    vnCalculate(2,"Xi",v2values_peak,v2errors_peak,v2values_side,v2errors_side,v2value_h,v2error_h,fsig_xi,"Xiv2Signal.txt");
 
     TCanvas* FourierPeakComp = new TCanvas( "FourierPeakComp", "Fourier Peak Composite", 1200,1000 );
     FourierPeakComp->Divide( 3,3 );

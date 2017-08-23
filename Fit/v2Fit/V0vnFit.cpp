@@ -102,6 +102,9 @@ void vnCalculate(int degree, std::string V0IDname, std::vector<double> vnvalues_
 
     std::vector<double> sigvalues;
     std::vector<double> sigerrors;
+    std::vector<double> vnObs;
+    std::vector<double> vnBkg;
+    std::vector<double> vnRefError;
 
     output << V0IDname << " signal v" << degree << " values\n";
     cout << output.str();
@@ -109,17 +112,20 @@ void vnCalculate(int degree, std::string V0IDname, std::vector<double> vnvalues_
     for(unsigned i=0; i<fsig.size(); i++)
     {
         cout << "Pt Bin " << i+1 << endl;
-        double vnObs = vnvalues_peak[i]/TMath::Sqrt(vnvalues_h[degree]);
-        double vnBkg = vnvalues_side[i]/TMath::Sqrt(vnvalues_h[degree]);
-        double sig = (vnObs - (1 - fsig[i])*vnBkg)/fsig[i];
+        double vnObs_ = vnvalues_peak[i]/TMath::Sqrt(vnvalues_h[degree]);
+        double vnBkg_ = vnvalues_side[i]/TMath::Sqrt(vnvalues_h[degree]);
+        vnObs.push_back(vnObs_);
+        vnBkg.push_back(vnBkg_);
+        double sig = (vnObs_ - (1 - fsig[i])*vnBkg_)/fsig[i];
 
-        //double vnObsError = vnerrors_peak*vnerrors_peak/vnvalues_h[degree] + vnerrors_h*vnerrors_h*0.25*vnvalues_peak*vnvalues_peak/vnvalues
-        double vnObsError = vnObs*TMath::Sqrt(TMath::Power(vnerrors_peak[i]/vnvalues_peak[i],2) + TMath::Power(0.5*vnerrors_h[degree]/vnvalues_h[degree],2));
-        double vnBkgError = vnBkg*TMath::Sqrt(TMath::Power(vnerrors_side[i]/vnvalues_side[i],2) + TMath::Power(0.5*vnerrors_h[degree]/vnvalues_h[degree],2));
+        double vnObsError = vnObs_*TMath::Sqrt(TMath::Power(vnerrors_peak[i]/vnvalues_peak[i],2) + TMath::Power(0.5*vnerrors_h[degree]/vnvalues_h[degree],2));
+        double vnBkgError = vnBkg_*TMath::Sqrt(TMath::Power(vnerrors_side[i]/vnvalues_side[i],2) + TMath::Power(0.5*vnerrors_h[degree]/vnvalues_h[degree],2));
         double sigError = TMath::Sqrt(vnObsError*vnObsError + TMath::Power(vnBkgError*(1-fsig[i]),2))/fsig[i];
 
         cout << "Sig: " << sig << endl;
         cout << "Error:" << sigError << endl;
+
+        vnRefError.push_back(0.5*vnerrors_h[degree]/TMath::Sqrt(vnvalues_h[degree]));
 
         sigvalues.push_back(sig);
         sigerrors.push_back(sigError);
@@ -133,6 +139,26 @@ void vnCalculate(int degree, std::string V0IDname, std::vector<double> vnvalues_
     myfile << output.str();
     output.str(std::string());
     for(unsigned i=0; i<sigerrors.size(); i++) myfile << sigerrors[i] << "\n";
+
+    output << V0IDname << " observed v" << degree << " values\n";
+    myfile << output.str();
+    output.str(std::string());
+    for(unsigned i=0; i<vnvalues_peak.size(); i++) myfile << vnvalues_peak[i]/TMath::Sqrt(vnvalues_h[degree]) << "\n";
+
+    output << V0IDname << " observed v" << degree << " errors\n";
+    myfile << output.str();
+    output.str(std::string());
+    for(unsigned i=0; i<vnvalues_peak.size(); i++) myfile << vnObs[i]*TMath::Sqrt(TMath::Power(vnerrors_peak[i]/vnvalues_peak[i],2) + TMath::Power(vnRefError[i]/vnvalues_h[degree],2)) << "\n";
+
+    output << V0IDname << " background v" << degree << " values\n";
+    myfile << output.str();
+    output.str(std::string());
+    for(unsigned i=0; i<vnvalues_side.size(); i++) myfile << vnvalues_side[i]/TMath::Sqrt(vnvalues_h[degree]) << "\n";
+
+    output << V0IDname << " background v" << degree << " errors\n";
+    myfile << output.str();
+    output.str(std::string());
+    for(unsigned i=0; i<vnvalues_side.size(); i++) myfile << vnObs[i]*TMath::Sqrt(TMath::Power(vnerrors_side[i]/vnvalues_side[i],2) + TMath::Power(vnRefError[i]/vnvalues_h[degree],2)) << "\n";
 }
 
 
@@ -172,7 +198,8 @@ void V0vnFit()
 	//Files
 	//TFiles
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationJL7_8.root");
-    TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationSamplePD1-2_2-3reverse_08_16_2017.root");
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationTotal_08_20_2017.root");
+    TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityTotal_08_21_2017.root");
     TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationPD1-6reverseJL10-15_08_15_2017.root"); //For vn of hadron
 
 	//Txt files
@@ -187,8 +214,8 @@ void V0vnFit()
 
     TVirtualFitter::SetMaxIterations(300000);
     TH1::SetDefaultSumw2();
-    std::vector<double> PtBin_ks = {0.2, 0.4, 0.6, 0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.2, 8.0, 10.0, 15.0, 20.0}; //if number of bins changes make sure you change numPtBins
-    std::vector<double> PtBin_la = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.2, 8.0, 10.0, 15.0, 20.0}; //if number of bins changes make sure you change numPtBins
+    std::vector<double> PtBin_ks = {0.2, 0.4, 0.6, 0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.0, 10.0, 15.0, 20.0}; //if number of bins changes make sure you change numPtBins
+    std::vector<double> PtBin_la = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.0, 10.0, 15.0, 20.0}; //if number of bins changes make sure you change numPtBins
     int numPtBins_ks = PtBin_ks.size() - 1;
     int numPtBins_la = PtBin_la.size() - 1;
     TH1D* dPhiFourierPeak_ks[numPtBins_ks];
