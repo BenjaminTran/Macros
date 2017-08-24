@@ -63,10 +63,12 @@ void Efficiency()
     TH2D* MassKs_gen;
     TH2D* MassLa_gen;
 
-    TCanvas* Composite_Ks[7];
-    TCanvas* Composite_La[7];
+    TCanvas* Composite_Ks[31];
+    TCanvas* Composite_La[31];
     //TCanvas* Composite_Ks_Gen[7];
     //TCanvas* Composite_La_Gen[7];
+    TCanvas* cc1 = new TCanvas("cc1","cc1",1000,450);
+    cc1->Divide(2,1);
     bool lambda;
 
     std::vector<RooPlot*> Xframe_Ks;
@@ -92,12 +94,16 @@ void Efficiency()
     //int pTksLength = 26; // the number of bins to be fitted is half of this number
     //double pks[] = {3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,90, 91,120};
     //double pla[] = {0,0, 0,0, 0,0, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,90, 91,120};
-    std::vector<double> pks = {1,2, 3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70};//, 71,85, 86,100, 101,150};//, 151,200};//, 201,250, 251,300};
-    std::vector<double> pla = {1,2, 3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70};//, 71,85, 86,100, 101,150};//, 151,200};//, 201,250, 251,300};
-    std::vector<double> rap_bin = {2,4, 5,7, 8,10, 11,12, 13,15, 16,18, 19,21};
+    //std::vector<double> pks = {1,2, 3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70};//, 71,85, 86,100, 101,150};//, 151,200};//, 201,250, 251,300};
+    //std::vector<double> pla = {1,2, 3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70};//, 71,85, 86,100, 101,150};//, 151,200};//, 201,250, 251,300};
+    std::vector<double> pks = {1,1, 2,2, 3,3, 4,4, 5,5, 6,6, 7,7, 8,8, 9,9, 10,11, 12,13, 14,15, 16,17, 18,19, 20,22, 23,25, 26,28, 29,31, 32,34, 35,37, 38,40, 41,44, 45,50, 51,60, 61,70, 71,100};// 68,72, 73,77, 78,83, 83,90, 91,100};
+    std::vector<double> pla = {1,5, 6,8, 9,11, 12,14, 15,17, 18,20, 21,23, 24,26, 27,29, 30,32, 33,36, 37,40, 41,44, 45,48, 49,52, 53,56, 57,60, 61,64, 65,68, 69,72, 73,77, 78,83, 83,90, 91,100};
+    //std::vector<double> rap_bin = {2,4, 5,7, 8,10, 11,12, 13,15, 16,18, 19,21};
+    std::vector<double> rap_bin = {2,6, 7,10, 11,14, 15,21};//, 19,21, 16,18, 19,21};
     int numRapBins = rap_bin.size()/2;
+    int pages=31;
 
-    for(int i=0; i<numRapBins; i++)
+    for(int i=0; i<pages; i++)
     {
         Composite_Ks[i] = new TCanvas(Form("Composite_Ks_%d",i),Form("Composite_Ks_RapBin_%d",i),1000,1200);
         Composite_Ks[i]->Divide(3,5);
@@ -131,20 +137,26 @@ void Efficiency()
     //Fit
     int pkscounter  = 0; //for correct bin counting
     int placounter  = 0;
-    for(unsigned j=0; j<rap_bin.size(); j+=2)
+    int hcounter = 1;
+    int index = 1;
+    //for(unsigned j=0; j<rap_bin.size(); j+=2)
+    for(unsigned j=0; j<2; j+=2)
     {
-        for(unsigned i=0; i<pks.size(); i+=2)
-        //for(unsigned i=0; i<6; i+=2)
+        //for(unsigned i=0; i<pks.size(); i+=2)
+        for(unsigned i=0; i<60; i+=2)
         {
-            int index = (i+2)/2;
+            cout << i << endl;
+            if((double)i/30 == hcounter) 
+            {
+                hcounter++;
+                index = 1;
+            }
             lambda=true;
             //if(pla[i] == 0) lambda = false;
             //else lambda = true;
             massks = (TH1D*)KsMassPtRap->ProjectionX(Form("massks_%d",(j*pks.size()+i)/2), pks[i],pks[i+1],rap_bin[j],rap_bin[j+1]);
             massla = (TH1D*)LaMassPtRap->ProjectionX(Form("massla_%d",(j*pks.size()+i)/2), pla[i],pla[i+1],rap_bin[j],rap_bin[j+1]);
 
-            TCanvas* cc1 = new TCanvas("cc1","cc1",1000,450);
-            cc1->Divide(2,1);
 
             TLatex* tex = new TLatex();
             tex->SetNDC();
@@ -175,7 +187,8 @@ void Efficiency()
 
             //RooFitResult* r_ks = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
 
-            double covQuality_ks = 1;//r_ks->covQual();
+            //double covQuality_ks = r_ks->covQual();
+            double covQuality_ks = 1;
             double mean_ks = mean.getVal();
 
             double gaus1F_ks = sig1.getVal();
@@ -285,7 +298,7 @@ void Efficiency()
             tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
             osYield.str(std::string());
 
-            Composite_Ks[j/2]->cd(index);
+            Composite_Ks[hcounter]->cd(index);
             gPad->SetBottomMargin(0.15);
             gPad->SetLeftMargin(0.15);
             gPad->SetTickx();
@@ -298,7 +311,7 @@ void Efficiency()
             xframe_ks->GetYaxis()->SetLabelSize(0.07);
             xframe_ks->GetXaxis()->SetLabelSize(0.07);
             xframe_ks->Draw();
-            Composite_Ks[j/2]->Update();
+            Composite_Ks[hcounter]->Update();
 
             t1_ks->Draw("same");
             t2_ks->Draw("same");
@@ -361,10 +374,10 @@ void Efficiency()
 
                 x.setRange("cut",1.1,1.14);
 
-                //RooFitResult* r_la = sum._itTo(data,Save(),Minos(kTRUE),Range("cut"));
-                //RooChi2Var chi2_laVar("chi2_laVar","chi2",sum,data);
+                //RooFitResult* r_la = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
 
-                double covQuality_la = 1; //r_la->covQual();
+                //double covQuality_la = r_la->covQual();
+                double covQuality_la = 1;
                 double mean_la = mean.getVal();
 
                 double gaus1F_la = sig1.getVal();
@@ -404,7 +417,7 @@ void Efficiency()
                 mass_la_[j/2].push_back(mean_la);
                 std_la_[j/2].push_back(rms_true_la);
                 fsig_la_[j/2].push_back(Fsig_la);
-                //covQual_la_[j/2].push_back(r_la->covQual());
+                covQual_la_[j/2].push_back(covQuality_la);
                 covQual_la_[j/2].push_back(1);
                 yield_la_[j/2].push_back(yield_la);
 
@@ -473,7 +486,7 @@ void Efficiency()
                 tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
                 osYield.str(std::string());
 
-                Composite_La[j/2]->cd(index);
+                Composite_La[hcounter]->cd(index);
                 gPad->SetBottomMargin(0.15);
                 gPad->SetLeftMargin(0.15);
                 gPad->SetTickx();
@@ -486,7 +499,7 @@ void Efficiency()
                 xframe_la->GetYaxis()->SetLabelSize(0.06);
                 xframe_la->GetXaxis()->SetLabelSize(0.06);
                 xframe_la->Draw();
-                Composite_La[j/2]->Update();
+                Composite_La[hcounter]->Update();
 
                 t1_la->Draw("same");
                 t2_la->Draw("same");
@@ -536,6 +549,7 @@ void Efficiency()
             else cc1->Print("RECOV0MassFitInd.pdf)","pdf");
 
             //i++; //to access correct bins
+            index++;
         }
     }
 
@@ -649,5 +663,7 @@ void Efficiency()
         for(unsigned i=0; i<efficiency_la[j].size(); i++)
             myfile << efficiency_la[j][i] << "\n";
     }
+
+//TH2D* Effhisto = new TH2D("EffHisto","EffHisto",)
 
 }
