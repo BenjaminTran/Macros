@@ -63,8 +63,8 @@ void Efficiency()
     TH2D* MassKs_gen;
     TH2D* MassLa_gen;
 
-    TCanvas* Composite_Ks[31];
-    TCanvas* Composite_La[31];
+    TCanvas* Composite_Ks[10];
+    TCanvas* Composite_La[10];
     //TCanvas* Composite_Ks_Gen[7];
     //TCanvas* Composite_La_Gen[7];
     TCanvas* cc1 = new TCanvas("cc1","cc1",1000,450);
@@ -96,12 +96,12 @@ void Efficiency()
     //double pla[] = {0,0, 0,0, 0,0, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,90, 91,120};
     //std::vector<double> pks = {1,2, 3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70};//, 71,85, 86,100, 101,150};//, 151,200};//, 201,250, 251,300};
     //std::vector<double> pla = {1,2, 3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70};//, 71,85, 86,100, 101,150};//, 151,200};//, 201,250, 251,300};
-    std::vector<double> pks = {1,1, 2,2, 3,3, 4,4, 5,5, 6,6, 7,7, 8,8, 9,9, 10,11, 12,13, 14,15, 16,17, 18,19, 20,22, 23,25, 26,28, 29,31, 32,34, 35,37, 38,40, 41,44, 45,50, 51,60, 61,70, 71,100};// 68,72, 73,77, 78,83, 83,90, 91,100};
-    std::vector<double> pla = {1,5, 6,8, 9,11, 12,14, 15,17, 18,20, 21,23, 24,26, 27,29, 30,32, 33,36, 37,40, 41,44, 45,48, 49,52, 53,56, 57,60, 61,64, 65,68, 69,72, 73,77, 78,83, 83,90, 91,100};
+    std::vector<double> pks = {1,1, 2,2, 3,3, 4,4, 5,5, 6,6, 7,7, 8,8, 9,9, 10,11, 12,13, 14,15, 16,17, 18,19, 20,22, 23,25, 26,28, 29,31, 32,34, 35,37, 38,40, 41,44, 45,50, 51,60, 61,70, 71,100};
+    std::vector<double> pla = {1,5, 6,8, 9,11, 12,14, 15,17, 18,20, 21,23, 24,26, 27,29, 30,32, 33,36, 37,40, 41,44, 45,48, 49,52, 53,56, 57,64, 65,80, 81,100};
     //std::vector<double> rap_bin = {2,4, 5,7, 8,10, 11,12, 13,15, 16,18, 19,21};
     std::vector<double> rap_bin = {2,6, 7,10, 11,14, 15,21};//, 19,21, 16,18, 19,21};
     int numRapBins = rap_bin.size()/2;
-    int pages=31;
+    int pages=10;
 
     for(int i=0; i<pages; i++)
     {
@@ -137,31 +137,36 @@ void Efficiency()
     //Fit
     int pkscounter  = 0; //for correct bin counting
     int placounter  = 0;
-    int hcounter = 1;
+    int hcounter_ks = -1;
+    int hcounter_la = -1;
     int index = 1;
+    double xstart_ks = 0.65;
+    double ystart_ks = 0.85;
+    double xstart_la = 0.60;
+    double ystart_la = 0.85;
+    double xpos = xstart_ks;
+    double ypos = ystart_ks;
+    double increment = 0.07;
+    TLatex* tex = new TLatex();
+    tex->SetNDC();
+    tex->SetTextFont(62);
+    tex->SetTextSize(0.05);
     //for(unsigned j=0; j<rap_bin.size(); j+=2)
-    for(unsigned j=0; j<2; j+=2)
+    for(unsigned j=0; j<8; j+=2)
     {
-        //for(unsigned i=0; i<pks.size(); i+=2)
-        for(unsigned i=0; i<60; i+=2)
+        for(unsigned i=0; i<pks.size(); i+=2)
+        //for(unsigned i=0; i<60; i+=2)
         {
             cout << i << endl;
-            if((double)i/30 == hcounter) 
+            if((double)i/30 == 1 || i==0) 
             {
-                hcounter++;
+                hcounter_ks++;
                 index = 1;
             }
             lambda=true;
-            //if(pla[i] == 0) lambda = false;
-            //else lambda = true;
+
             massks = (TH1D*)KsMassPtRap->ProjectionX(Form("massks_%d",(j*pks.size()+i)/2), pks[i],pks[i+1],rap_bin[j],rap_bin[j+1]);
-            massla = (TH1D*)LaMassPtRap->ProjectionX(Form("massla_%d",(j*pks.size()+i)/2), pla[i],pla[i+1],rap_bin[j],rap_bin[j+1]);
 
-
-            TLatex* tex = new TLatex();
-            tex->SetNDC();
-            tex->SetTextFont(62);
-            tex->SetTextSize(0.05);
 
             //tex->SetTextSize(tex->GetTextSize()*0.95);
 
@@ -185,7 +190,7 @@ void Efficiency()
 
             x.setRange("cut",0.44,0.56);
 
-            //RooFitResult* r_ks = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
+            RooFitResult* r_ks = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
 
             //double covQuality_ks = r_ks->covQual();
             double covQuality_ks = 1;
@@ -226,10 +231,10 @@ void Efficiency()
 
             double Fsig_ks = yield_ks/totsig_ks;
 
-            mass_ks_[j/2].push_back(mean_ks);
-            std_ks_[j/2].push_back(rms_true_ks);
-            fsig_ks_[j/2].push_back(Fsig_ks);
-            covQual_ks_[j/2].push_back(covQuality_ks);
+            //mass_ks_[j/2].push_back(mean_ks);
+            //std_ks_[j/2].push_back(rms_true_ks);
+            //fsig_ks_[j/2].push_back(Fsig_ks);
+            //covQual_ks_[j/2].push_back(covQuality_ks);
             yield_ks_[j/2].push_back(yield_ks);
 
             cout << "Yield (ks): "<< yield_ks << endl;
@@ -274,11 +279,9 @@ void Efficiency()
             t2_ks->SetLineColor(kGreen);
             t1_ks->Draw("same");
             t2_ks->Draw("same");
-            double xstart_ks = 0.65;
-            double ystart_ks = 0.85;
-            double xpos = xstart_ks;
-            double ypos = ystart_ks;
-            double increment = 0.07;
+            xpos = xstart_ks;
+            ypos = ystart_ks;
+            increment = 0.07;
             os << (pks[i]-1)/10 << " < P_{t} < " << pks[i+1]/10  << " GeV";
             tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
             os.str(std::string());
@@ -298,7 +301,7 @@ void Efficiency()
             tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
             osYield.str(std::string());
 
-            Composite_Ks[hcounter]->cd(index);
+            Composite_Ks[hcounter_ks]->cd(index);
             gPad->SetBottomMargin(0.15);
             gPad->SetLeftMargin(0.15);
             gPad->SetTickx();
@@ -311,7 +314,7 @@ void Efficiency()
             xframe_ks->GetYaxis()->SetLabelSize(0.07);
             xframe_ks->GetXaxis()->SetLabelSize(0.07);
             xframe_ks->Draw();
-            Composite_Ks[hcounter]->Update();
+            Composite_Ks[hcounter_ks]->Update();
 
             t1_ks->Draw("same");
             t2_ks->Draw("same");
@@ -350,207 +353,213 @@ void Efficiency()
             osYield << "Yield: " << std::setprecision(2) << yield_ks;
             tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
             osYield.str(std::string());
-
-            if(lambda)
-            {
-                //lambda
-                RooRealVar x("x","mass",1.08,1.155);
-                RooPlot* xframe_la = x.frame(160);
-                RooDataHist data("data","dataset",x,massla);
-                RooRealVar mean("mean","mean",1.115,1.11,1.12);
-                RooRealVar sigma1("sigma1","sigma1",0.005,0.001,0.01);
-                RooRealVar sigma2("sigma2","sigma2",0.005,0.001,0.01);
-                RooRealVar sig1("sig1","signal1",10,0,10000000);
-                RooRealVar sig2("sig2","signal2",10,0,10000000);
-                RooRealVar a("a","a",0,-100000,100000);
-                RooRealVar b("b","b",0,-100000,100000);
-                RooRealVar cp("cp","cp",0,-100000,100000);
-                RooRealVar d("d","d",0,-100000,100000);
-                RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
-                RooGaussian gaus2("gaus2","gaus2",x,mean,sigma2);
-                RooPolynomial poly("poly","poly",x,RooArgList(a,b,cp,d));
-                RooRealVar polysig("polysig","polysig",10,0,10000000);
-                RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,poly),RooArgList(sig1,sig2,polysig));
-
-                x.setRange("cut",1.1,1.14);
-
-                //RooFitResult* r_la = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
-
-                //double covQuality_la = r_la->covQual();
-                double covQuality_la = 1;
-                double mean_la = mean.getVal();
-
-                double gaus1F_la = sig1.getVal();
-                double gaus2F_la = sig2.getVal();
-                double polyF_la  = poly.getVal();
-
-                //set ranges for individual gaussian yield determination
-                x.setRange("g1", mean.getVal() - 2*sigma1.getVal(), mean.getVal() + 2*sigma1.getVal());
-                x.setRange("g2", mean.getVal() - 2*sigma2.getVal(), mean.getVal() + 2*sigma2.getVal());
-
-                RooAbsReal* Intgaus1_yield_la_ = gaus1.createIntegral(x, x, "g1");
-                RooAbsReal* Intgaus2_yield_la_ = gaus2.createIntegral(x, x, "g2");
-
-                double gaus1_yield_la_ = gaus1F_la*Intgaus1_yield_la_->getVal();
-                double gaus2_yield_la_ = gaus2F_la*Intgaus2_yield_la_->getVal();
-                double gausTot_yield_la_ = gaus1_yield_la_ + gaus2_yield_la_;
-
-                double rms_gaus1_sig_la = gaus1_yield_la_/gausTot_yield_la_;
-                double rms_gaus2_sig_la = gaus2_yield_la_/gausTot_yield_la_;
-
-                double rms_true_la = TMath::Sqrt(rms_gaus1_sig_la*sigma1.getVal()*sigma1.getVal() + rms_gaus2_sig_la*sigma2.getVal()*sigma2.getVal());
-
-                x.setRange("peak", mean.getVal() - 2*rms_true_la, mean.getVal() + 2*rms_true_la);
-                RooAbsReal* Intpoly_la  = poly.createIntegral(x, x,"peak");
-                RooAbsReal* Intgaus1_la = gaus1.createIntegral(x,x,"peak");
-                RooAbsReal* Intgaus2_la = gaus2.createIntegral(x,x,"peak");
-
-
-                double Intgaus1E_la = gaus1F_la*Intgaus1_la->getVal();
-                double Intgaus2E_la = gaus2F_la*Intgaus2_la->getVal();
-                double IntpolyE_la  = polyF_la*Intpoly_la->getVal();
-                double totsig_la    = Intgaus1E_la + Intgaus2E_la + IntpolyE_la;
-                double yield_la       = Intgaus1E_la + Intgaus2E_la;
-
-                double Fsig_la = yield_la/totsig_la;
-
-                mass_la_[j/2].push_back(mean_la);
-                std_la_[j/2].push_back(rms_true_la);
-                fsig_la_[j/2].push_back(Fsig_la);
-                covQual_la_[j/2].push_back(covQuality_la);
-                covQual_la_[j/2].push_back(1);
-                yield_la_[j/2].push_back(yield_la);
-
-                cout << "Yield (la):" << yield_la << endl;
-                cout << "Fsig (la): " << Fsig_la << endl;
-                cout << "std (la): " << rms_true_la << endl;
-                cout << "covQual (la): " << covQuality_la << endl;
-                cout << (j*pks.size() + i)/2 << endl;
-
-                xframe_la->GetXaxis()->SetTitle("Invariant mass (GeV)");
-                xframe_la->GetYaxis()->SetTitle("Candidates / 0.0005 GeV");
-                xframe_la->GetXaxis()->CenterTitle(1);
-                xframe_la->GetYaxis()->CenterTitle(1);
-                xframe_la->GetXaxis()->SetTickSize(0.02);
-                xframe_la->GetYaxis()->SetTickSize(0.02);
-                xframe_la->GetXaxis()->SetNdivisions(407);
-                xframe_la->GetYaxis()->SetNdivisions(410);
-                xframe_la->GetXaxis()->SetTitleSize(0.07);
-                xframe_la->GetYaxis()->SetTitleSize(0.06);
-                xframe_la->GetYaxis()->SetTitleOffset(0.95);
-                xframe_la->GetXaxis()->SetTitleOffset(0.5);
-                //xframe_la->GetXaxis()->SetLabelSize(xframe_la_->GetXaxis()->GetLabelSize()*2.0);
-                xframe_la->GetYaxis()->SetLabelSize(0.08);
-                xframe_la->GetXaxis()->SetLabelSize(0.08);
-                //xframe_la->GetYaxis()->SetLabelSize(xframe_la_->GetYaxis()->GetLabelSize()*2.0);
-                data.plotOn(xframe_la,Name("data"));
-                sum.plotOn(xframe_la,Name("sum"),NormRange("cut"),LineWidth(1),LineColor(kRed));
-                sum.plotOn(xframe_la,Components(poly),NormRange("cut"),LineStyle(kDashed),LineWidth(1),LineColor(kRed));
-                cc1->cd(2);
-                gPad->SetTickx();
-                gPad->SetTicky();
-                Xframe_La.push_back(xframe_la);
-                xframe_la->Draw();
-                cc1->Update();
-                //double chi2_la = xframe_la->chiSquare("sum","data",7);
-
-                TLine* t1_la = new TLine(mean.getVal() - 2*rms_true_la, 0, mean.getVal() - 2*rms_true_la, gPad->GetUymax());
-                TLine* t2_la = new TLine(mean.getVal() + 2*rms_true_la, 0, mean.getVal() + 2*rms_true_la, gPad->GetUymax());
-                t1_la->SetLineStyle(2);
-                t1_la->SetLineColor(kGreen);
-                t2_la->SetLineStyle(2);
-                t2_la->SetLineColor(kGreen);
-                t1_la->Draw("same");
-                t2_la->Draw("same");
-                double xstart_la = 0.60;
-                double ystart_la = 0.85;
-                xpos = xstart_la;
-                ypos = ystart_la;
-                increment = 0.07;
-                os << (pks[i]-1)/10 << " < P_{t} < " << pks[i+1]/10 << " GeV";
-                tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                os.str(std::string());
-                os << "Mean: " << std::setprecision(4) << mean_la << " GeV" << std::setprecision(6);
-                tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                os.str(std::string());
-                os << "#sigma :" << std::setprecision(2) << rms_true_la << " GeV" << std::setprecision(6);
-                tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                os.str(std::string());
-                os << "CovQual: " << covQuality_la;
-                tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                os.str(std::string());
-                //os << "#chi^{2}/ndf: " << std::setprecision(3) << chi2_la << std::setprecision(6);
-                //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                //os.str(std::string());
-                osYield << "Yield: " << std::setprecision(2) << yield_la;
-                tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
-                osYield.str(std::string());
-
-                Composite_La[hcounter]->cd(index);
-                gPad->SetBottomMargin(0.15);
-                gPad->SetLeftMargin(0.15);
-                gPad->SetTickx();
-                gPad->SetTicky();
-                xframe_la->GetXaxis()->SetNdivisions(507);
-                xframe_la->GetXaxis()->SetTitleSize(0.06);
-                xframe_la->GetYaxis()->SetTitleSize(0.06);
-                xframe_la->GetYaxis()->SetTitleOffset(1.1);
-                xframe_la->GetXaxis()->SetTitleOffset(1.1);
-                xframe_la->GetYaxis()->SetLabelSize(0.06);
-                xframe_la->GetXaxis()->SetLabelSize(0.06);
-                xframe_la->Draw();
-                Composite_La[hcounter]->Update();
-
-                t1_la->Draw("same");
-                t2_la->Draw("same");
-                xpos = xstart_la;
-                ypos = ystart_la;
-                increment = 0.07;
-                if(i==pks.size()-2)
-                {
-                    xpos = 0.65;
-                }
-                if(i==2)
-                {
-                    os << "CMS pPb";
-                    tex->SetTextSize(0.06);
-                    tex->DrawLatex(0.18,ypos-increment,os.str().c_str());
-                    tex->SetTextSize(0.05);
-                    os.str(std::string());
-                    os << "185 #leq N_{trk}^{offline} < 250";
-                    tex->DrawLatex(0.18,ypos-2*increment,os.str().c_str());
-                    os.str(std::string());
-                    os << (-1.1 + (rap_bin[j]-1)/10) << " < y < " << (-1.1 + (rap_bin[j+1])/10);
-                    tex->DrawLatex(0.18,ypos-3*increment,os.str().c_str());
-                    os.str(std::string());
-                }
-                os << (pks[i]-1)/10 << " < P_{t} < " << pks[i+1]/10 << " GeV";
-                tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                os.str(std::string());
-                os << "Mean: " << std::setprecision(4) << mean_la << " GeV" << std::setprecision(6);
-                tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                os.str(std::string());
-                os << "#sigma :" << std::setprecision(2) << rms_true_la << " GeV" << std::setprecision(6);
-                tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                os.str(std::string());
-                os << "CovQual: " << covQuality_la;
-                tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                os.str(std::string());
-                //os << "#chi^{2}/ndf: " << std::setprecision(3) << chi2_la << std::setprecision(6);
-                //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                //os.str(std::string());
-                osYield << "Yield: " << std::setprecision(2) << yield_la;
-                tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
-                osYield.str(std::string());
-            }
-
-            if(i==0) cc1->Print("RECOV0MassFitInd.pdf(","pdf");
-            else if(i < pks.size() - 2) cc1->Print("RECOV0MassFitInd.pdf","pdf");
-            else cc1->Print("RECOV0MassFitInd.pdf)","pdf");
-
-            //i++; //to access correct bins
             index++;
         }
+
+        for(unsigned i=0; i<pla.size(); i+=2)
+        {
+            if((double)i/30 == 1 || i==0) 
+            {
+                hcounter_la++;
+                index = 1;
+            }
+
+            massla = (TH1D*)LaMassPtRap->ProjectionX(Form("massla_%d",(j*pla.size()+i)/2), pla[i],pla[i+1],rap_bin[j],rap_bin[j+1]);
+
+            //lambda
+            RooRealVar x("x","mass",1.08,1.155);
+            RooPlot* xframe_la = x.frame(160);
+            RooDataHist data("data","dataset",x,massla);
+            RooRealVar mean("mean","mean",1.115,1.11,1.12);
+            RooRealVar sigma1("sigma1","sigma1",0.005,0.001,0.01);
+            RooRealVar sigma2("sigma2","sigma2",0.005,0.001,0.01);
+            RooRealVar sig1("sig1","signal1",10,0,10000000);
+            RooRealVar sig2("sig2","signal2",10,0,10000000);
+            RooRealVar a("a","a",0,-100000,100000);
+            RooRealVar b("b","b",0,-100000,100000);
+            RooRealVar cp("cp","cp",0,-100000,100000);
+            RooRealVar d("d","d",0,-100000,100000);
+            RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
+            RooGaussian gaus2("gaus2","gaus2",x,mean,sigma2);
+            RooPolynomial poly("poly","poly",x,RooArgList(a,b,cp,d));
+            RooRealVar polysig("polysig","polysig",10,0,10000000);
+            RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,poly),RooArgList(sig1,sig2,polysig));
+
+            x.setRange("cut",1.1,1.14);
+
+            RooFitResult* r_la = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
+
+            //double covQuality_la = r_la->covQual();
+            double covQuality_la = 1;
+            double mean_la = mean.getVal();
+
+            double gaus1F_la = sig1.getVal();
+            double gaus2F_la = sig2.getVal();
+            double polyF_la  = poly.getVal();
+
+            //set ranges for individual gaussian yield determination
+            x.setRange("g1", mean.getVal() - 2*sigma1.getVal(), mean.getVal() + 2*sigma1.getVal());
+            x.setRange("g2", mean.getVal() - 2*sigma2.getVal(), mean.getVal() + 2*sigma2.getVal());
+
+            RooAbsReal* Intgaus1_yield_la_ = gaus1.createIntegral(x, x, "g1");
+            RooAbsReal* Intgaus2_yield_la_ = gaus2.createIntegral(x, x, "g2");
+
+            double gaus1_yield_la_ = gaus1F_la*Intgaus1_yield_la_->getVal();
+            double gaus2_yield_la_ = gaus2F_la*Intgaus2_yield_la_->getVal();
+            double gausTot_yield_la_ = gaus1_yield_la_ + gaus2_yield_la_;
+
+            double rms_gaus1_sig_la = gaus1_yield_la_/gausTot_yield_la_;
+            double rms_gaus2_sig_la = gaus2_yield_la_/gausTot_yield_la_;
+
+            double rms_true_la = TMath::Sqrt(rms_gaus1_sig_la*sigma1.getVal()*sigma1.getVal() + rms_gaus2_sig_la*sigma2.getVal()*sigma2.getVal());
+
+            x.setRange("peak", mean.getVal() - 2*rms_true_la, mean.getVal() + 2*rms_true_la);
+            RooAbsReal* Intpoly_la  = poly.createIntegral(x, x,"peak");
+            RooAbsReal* Intgaus1_la = gaus1.createIntegral(x,x,"peak");
+            RooAbsReal* Intgaus2_la = gaus2.createIntegral(x,x,"peak");
+
+
+            double Intgaus1E_la = gaus1F_la*Intgaus1_la->getVal();
+            double Intgaus2E_la = gaus2F_la*Intgaus2_la->getVal();
+            double IntpolyE_la  = polyF_la*Intpoly_la->getVal();
+            double totsig_la    = Intgaus1E_la + Intgaus2E_la + IntpolyE_la;
+            double yield_la       = Intgaus1E_la + Intgaus2E_la;
+
+            double Fsig_la = yield_la/totsig_la;
+
+            //mass_la_[j/2].push_back(mean_la);
+            //std_la_[j/2].push_back(rms_true_la);
+            //fsig_la_[j/2].push_back(Fsig_la);
+            //covQual_la_[j/2].push_back(covQuality_la);
+            //covQual_la_[j/2].push_back(1);
+            yield_la_[j/2].push_back(yield_la);
+
+            cout << "Yield (la):" << yield_la << endl;
+            cout << "Fsig (la): " << Fsig_la << endl;
+            cout << "std (la): " << rms_true_la << endl;
+            cout << "covQual (la): " << covQuality_la << endl;
+            cout << (j*pks.size() + i)/2 << endl;
+
+            xframe_la->GetXaxis()->SetTitle("Invariant mass (GeV)");
+            xframe_la->GetYaxis()->SetTitle("Candidates / 0.0005 GeV");
+            xframe_la->GetXaxis()->CenterTitle(1);
+            xframe_la->GetYaxis()->CenterTitle(1);
+            xframe_la->GetXaxis()->SetTickSize(0.02);
+            xframe_la->GetYaxis()->SetTickSize(0.02);
+            xframe_la->GetXaxis()->SetNdivisions(407);
+            xframe_la->GetYaxis()->SetNdivisions(410);
+            xframe_la->GetXaxis()->SetTitleSize(0.07);
+            xframe_la->GetYaxis()->SetTitleSize(0.06);
+            xframe_la->GetYaxis()->SetTitleOffset(0.95);
+            xframe_la->GetXaxis()->SetTitleOffset(0.5);
+            //xframe_la->GetXaxis()->SetLabelSize(xframe_la_->GetXaxis()->GetLabelSize()*2.0);
+            xframe_la->GetYaxis()->SetLabelSize(0.08);
+            xframe_la->GetXaxis()->SetLabelSize(0.08);
+            //xframe_la->GetYaxis()->SetLabelSize(xframe_la_->GetYaxis()->GetLabelSize()*2.0);
+            data.plotOn(xframe_la,Name("data"));
+            sum.plotOn(xframe_la,Name("sum"),NormRange("cut"),LineWidth(1),LineColor(kRed));
+            sum.plotOn(xframe_la,Components(poly),NormRange("cut"),LineStyle(kDashed),LineWidth(1),LineColor(kRed));
+            cc1->cd(2);
+            gPad->SetTickx();
+            gPad->SetTicky();
+            Xframe_La.push_back(xframe_la);
+            xframe_la->Draw();
+            cc1->Update();
+            //double chi2_la = xframe_la->chiSquare("sum","data",7);
+
+            TLine* t1_la = new TLine(mean.getVal() - 2*rms_true_la, 0, mean.getVal() - 2*rms_true_la, gPad->GetUymax());
+            TLine* t2_la = new TLine(mean.getVal() + 2*rms_true_la, 0, mean.getVal() + 2*rms_true_la, gPad->GetUymax());
+            t1_la->SetLineStyle(2);
+            t1_la->SetLineColor(kGreen);
+            t2_la->SetLineStyle(2);
+            t2_la->SetLineColor(kGreen);
+            t1_la->Draw("same");
+            t2_la->Draw("same");
+            xpos = xstart_la;
+            ypos = ystart_la;
+            increment = 0.07;
+            os << (pla[i]-1)/10 << " < P_{t} < " << pla[i+1]/10 << " GeV";
+            tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+            os.str(std::string());
+            os << "Mean: " << std::setprecision(4) << mean_la << " GeV" << std::setprecision(6);
+            tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+            os.str(std::string());
+            os << "#sigma :" << std::setprecision(2) << rms_true_la << " GeV" << std::setprecision(6);
+            tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+            os.str(std::string());
+            os << "CovQual: " << covQuality_la;
+            tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+            os.str(std::string());
+            //os << "#chi^{2}/ndf: " << std::setprecision(3) << chi2_la << std::setprecision(6);
+            //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+            //os.str(std::string());
+            osYield << "Yield: " << std::setprecision(2) << yield_la;
+            tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
+            osYield.str(std::string());
+
+            Composite_La[hcounter_la]->cd(index);
+            gPad->SetBottomMargin(0.15);
+            gPad->SetLeftMargin(0.15);
+            gPad->SetTickx();
+            gPad->SetTicky();
+            xframe_la->GetXaxis()->SetNdivisions(507);
+            xframe_la->GetXaxis()->SetTitleSize(0.06);
+            xframe_la->GetYaxis()->SetTitleSize(0.06);
+            xframe_la->GetYaxis()->SetTitleOffset(1.1);
+            xframe_la->GetXaxis()->SetTitleOffset(1.1);
+            xframe_la->GetYaxis()->SetLabelSize(0.06);
+            xframe_la->GetXaxis()->SetLabelSize(0.06);
+            xframe_la->Draw();
+            Composite_La[hcounter_la]->Update();
+
+            t1_la->Draw("same");
+            t2_la->Draw("same");
+            xpos = xstart_la;
+            ypos = ystart_la;
+            increment = 0.07;
+            if(i==pla.size()-2)
+            {
+                xpos = 0.65;
+            }
+            if(i==2)
+            {
+                os << "CMS pPb";
+                tex->SetTextSize(0.06);
+                tex->DrawLatex(0.18,ypos-increment,os.str().c_str());
+                tex->SetTextSize(0.05);
+                os.str(std::string());
+                os << "185 #leq N_{trk}^{offline} < 250";
+                tex->DrawLatex(0.18,ypos-2*increment,os.str().c_str());
+                os.str(std::string());
+                os << (-1.1 + (rap_bin[j]-1)/10) << " < y < " << (-1.1 + (rap_bin[j+1])/10);
+                tex->DrawLatex(0.18,ypos-3*increment,os.str().c_str());
+                os.str(std::string());
+            }
+            os << (pla[i]-1)/10 << " < P_{t} < " << pla[i+1]/10 << " GeV";
+            tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+            os.str(std::string());
+            os << "Mean: " << std::setprecision(4) << mean_la << " GeV" << std::setprecision(6);
+            tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+            os.str(std::string());
+            os << "#sigma :" << std::setprecision(2) << rms_true_la << " GeV" << std::setprecision(6);
+            tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+            os.str(std::string());
+            os << "CovQual: " << covQuality_la;
+            tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+            os.str(std::string());
+            //os << "#chi^{2}/ndf: " << std::setprecision(3) << chi2_la << std::setprecision(6);
+            //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+            //os.str(std::string());
+            osYield << "Yield: " << std::setprecision(2) << yield_la;
+            tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
+            osYield.str(std::string());
+            index++;
+        }
+
+        //if(i==0) cc1->Print("RECOV0MassFitInd.pdf(","pdf");
+        //else if(i < pks.size() - 2) cc1->Print("RECOV0MassFitInd.pdf","pdf");
+        //else cc1->Print("RECOV0MassFitInd.pdf)","pdf");
+
     }
 
     for(int j=0; j<numRapBins; j++)
@@ -564,17 +573,12 @@ void Efficiency()
         for(unsigned i=0; i<pks.size(); i+=2)
         {
             TH1D* massks_gen = (TH1D*)KsMassPtRap_Gen->ProjectionX(Form("massks_gen_%d",(int)(j*pks.size()+i)/2), pks[i],pks[i+1],rap_bin[j],rap_bin[j+1]);
-            TH1D* massla_gen = (TH1D*)LaMassPtRap_Gen->ProjectionX(Form("massla_gen_%d",(int)(j*pks.size()+i)/2), pla[i],pla[i+1],rap_bin[j],rap_bin[j+1]);
             yield_ks_gen[j/2].push_back(massks_gen->GetBinContent(massks_gen->GetMaximumBin()));
+        }
+        for(unsigned i=0; i<pla.size(); i+=2)
+        {
+            TH1D* massla_gen = (TH1D*)LaMassPtRap_Gen->ProjectionX(Form("massla_gen_%d",(int)(j*pla.size()+i)/2), pla[i],pla[i+1],rap_bin[j],rap_bin[j+1]);
             yield_la_gen[j/2].push_back(massla_gen->GetBinContent(massla_gen->GetMaximumBin()));
-
-            //Composite_Ks_Gen->cd((i+2)/2);
-            //massks_gen[i/2]->Draw();
-
-            //Composite_La_Gen->cd((i+2)/2);
-            //massla_gen[i/2]->Draw();
-
-            //i++;
         }
     }
     //Composite_Ks_Gen->Print("Composite_Ks_Gen.pdf");
@@ -586,6 +590,9 @@ void Efficiency()
         for(unsigned i=0; i<yield_ks_[j].size(); i++)
         {
             efficiency_ks[j].push_back(yield_ks_[j][i]/yield_ks_gen[j][i]);
+        }
+        for(unsigned i=0; i<yield_la_[j].size(); i++)
+        {
             efficiency_la[j].push_back(yield_la_[j][i]/yield_la_gen[j][i]);
         }
     }
@@ -664,6 +671,113 @@ void Efficiency()
             myfile << efficiency_la[j][i] << "\n";
     }
 
-//TH2D* Effhisto = new TH2D("EffHisto","EffHisto",)
+    const int rbinks = 26; // This is the number of BINS
+    const int rbinla = 19;
+    const int rbinrap = 4;
 
+    std::vector<double> vRebin_ks = {0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.3,1.5,1.7,1.9,2.2,2.5,2.8,3.1,3.4,3.7,4.0,4.4,5.0,6.0,7.0,10.0};
+    double Rebin_ks[] = {0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.1,1.3,1.5,1.7,1.9,2.2,2.5,2.8,3.1,3.4,3.7,4.0,4.4,5.0,6.0,7.0,10.0};
+    std::vector<double> vRebin_la = {0.0,0.5,0.8,1.1,1.4,1.7,2.0,2.3,2.6,2.9,3.2,3.6,4.0,4.4,4.8,5.2,5.6,6.4,8.0,10.0};
+    double Rebin_la[] = {0.0,0.5,0.8,1.1,1.4,1.7,2.0,2.3,2.6,2.9,3.2,3.6,4.0,4.4,4.8,5.2,5.6,6.4,8.0,10.0};
+    std::vector<double> vRebin_rap = {-1.0,-0.5,-0.1,0.3,1.0};
+    double Rebin_rap[] = {-1.0,-0.5,-0.1,0.3,1.0};
+
+    std::vector<double> ptValues_ks;
+    std::vector<double> ptValues_la;
+    std::vector<double> RapValues;
+    for(unsigned i=0; i<vRebin_ks.size(); i++)
+    {
+        ptValues_ks.push_back(Rebin_ks[i]+0.01);
+    }
+
+    for(unsigned i=0; i<vRebin_la.size(); i++)
+    {
+        ptValues_la.push_back(Rebin_la[i]+0.01);
+    }
+
+    for(int i=0; i<vRebin_rap.size(); i++)
+    {
+        RapValues.push_back(Rebin_rap[i]);
+    }
+    TH2D* Effhisto_ks = new TH2D("EffHistoKs","EffHistoKs",rbinrap,Rebin_rap,rbinks,Rebin_ks);
+    TH2D* Effhisto_la = new TH2D("EffHistoLa","EffHistoLa",rbinrap,Rebin_rap,rbinla,Rebin_la);
+
+    for(int j=0; j<4; j++)
+    {
+        for(unsigned i=0; i<efficiency_ks[j].size(); i++)
+            Effhisto_ks->Fill(RapValues[j],ptValues_ks[i],efficiency_ks[j][i]);
+    }
+
+    for(int j=0; j<4; j++)
+    {
+        for(unsigned i=0; i<efficiency_la[j].size(); i++)
+            Effhisto_la->Fill(RapValues[j],ptValues_la[i],efficiency_la[j][i]);
+    }
+    TCanvas* Eff = new TCanvas("Eff","",1200,800);
+    Eff->Divide(2,1);
+    Eff->cd(1);
+    Effhisto_ks->Draw("Lego2");
+    Eff->cd(2);
+    Effhisto_la->Draw("Lego2");
+
+    TFile histos("Effhisto.root","RECREATE");
+    Effhisto_ks->Write();
+    Effhisto_la->Write();
+
+    std::vector<double> eta_trg = {-0.9,-0.8,-0.4,-0.2,-0.1,0.2,0.5,0.9};
+    std::vector<double> pt_trg = {0.5,1.2, 3.4, 4.0, 6.7, 8.6, 1.5, 2.0};
+    for(unsigned i=0; i<eta_trg.size(); i++)
+    {
+        cout << Effhisto_ks->GetBinContent(Effhisto_ks->FindBin(eta_trg[i],pt_trg[i])) << endl;
+    }
+}
+
+void Plotter()
+{
+    const Int_t NRGBs = 5;
+    const Int_t NCont = 25;
+
+    Double_t stops[NRGBs] = { 0.00, 0.34, 0.61, 0.84, 1.00 };
+    Double_t red[NRGBs]   = { 0.00, 0.00, 0.87, 1.00, 0.51 };
+    Double_t green[NRGBs] = { 0.00, 0.81, 1.00, 0.20, 0.00 };
+    Double_t blue[NRGBs]  = { 0.51, 1.00, 0.12, 0.00, 0.00 };
+    TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
+
+    TFile* f = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/Efficiency/Effhisto.root");
+
+    TH2D* effhistks = (TH2D*)f->Get("EffHistoKs");
+    TH2D* effhistla = (TH2D*)f->Get("EffHistoLa");
+
+    effhistks->SetTitle("Efficiency of K_{S}^{0}");
+    effhistks->GetZaxis()->SetRangeUser(0,0.3);
+    effhistks->GetZaxis()->SetNdivisions(404);
+    effhistks->GetYaxis()->SetNdivisions(505);
+    effhistks->GetXaxis()->SetNdivisions(505);
+    effhistks->GetYaxis()->SetTitle("P_{T} (GeV/c)");
+    effhistks->GetXaxis()->SetTitle("y");
+    effhistks->GetYaxis()->CenterTitle(1);
+    effhistks->GetXaxis()->CenterTitle(1);
+    effhistks->GetXaxis()->SetTitleOffset(1.5);
+    effhistks->SetStats(kFALSE);
+
+    effhistla->SetTitle("Efficiency of #Lambda");
+    effhistla->GetZaxis()->SetRangeUser(0,0.15);
+    effhistla->GetZaxis()->SetNdivisions(404);
+    effhistla->GetYaxis()->SetNdivisions(505);
+    effhistla->GetXaxis()->SetNdivisions(505);
+    effhistla->GetYaxis()->SetTitle("P_{T} (GeV/c)");
+    effhistla->GetXaxis()->SetTitle("y");
+    effhistla->GetYaxis()->CenterTitle(1);
+    effhistla->GetXaxis()->CenterTitle(1);
+    effhistla->GetXaxis()->SetTitleOffset(1.5);
+    effhistla->SetStats(kFALSE);
+
+    TCanvas* cc1 = new TCanvas("cc1","Efficiency", 1600,800);
+    cc1->Divide(2,1);
+    cc1->cd(1);
+    effhistks->Draw("Lego2 FB");
+    cc1->cd(2);
+    effhistla->Draw("Lego2 FB");
+
+    cc1->Print("Effhistos.pdf");
 }

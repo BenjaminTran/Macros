@@ -116,11 +116,19 @@ void vnCalculate(int degree, std::string V0IDname, std::vector<double> vnvalues_
     myfile << output.str();
     output.str(std::string());
     for(unsigned i=0; i<sigvalues.size(); i++) myfile << sigvalues[i] << "\n";
+    
+    myfile << "v2/nq values\n";
+    for(unsigned i=0; i<sigvalues.size(); i++) myfile << sigvalues[i]/3 << "\n";
 
     output << V0IDname << " signal v" << degree << " errors\n";
     myfile << output.str();
     output.str(std::string());
     for(unsigned i=0; i<sigerrors.size(); i++) myfile << sigerrors[i] << "\n";
+
+    output << V0IDname << " signal v" << degree << "/nq errors\n";
+    myfile << output.str();
+    output.str(std::string());
+    for(unsigned i=0; i<sigerrors.size(); i++) myfile << sigerrors[i]/3 << "\n";
 
     output << V0IDname << " observed v" << degree << " values\n";
     myfile << output.str();
@@ -141,6 +149,7 @@ void vnCalculate(int degree, std::string V0IDname, std::vector<double> vnvalues_
     myfile << output.str();
     output.str(std::string());
     for(unsigned i=0; i<vnvalues_side.size(); i++) myfile << vnObs[i]*TMath::Sqrt(TMath::Power(vnerrors_side[i]/vnvalues_side[i],2) + TMath::Power(vnRefError[i]/vnvalues_h[degree],2)) << "\n";
+
 }
 
 void Xiv2Fit(  )
@@ -205,6 +214,7 @@ void Xiv2Fit(  )
     std::vector<double> v2errors_side;
     std::vector<double> v2value_h; //Need to use vector for vnCalculate function
     std::vector<double> v2error_h;
+    std::vector<double> AvgKetXi;
 
 
     TLatex* ltx2 = new TLatex(  );
@@ -218,6 +228,30 @@ void Xiv2Fit(  )
     //bool Peak = false;
     for( int i=0; i<numPtBins; i++ )
     {
+        //================================================================================
+        //KET Calculations
+        //================================================================================
+        TH1D* hKetXi = (TH1D*)f->Get(Form("xiCorrelationRapidity/KET_xi_pt%d",i));
+        TH1D* hKetXi_bkg = (TH1D*)f->Get(Form("xiCorrelationRapidity/KET_xi_bkg_pt%d",i));
+
+        int nEntries = 0;
+        double KetTotal = 0;
+        for(int j=hKetXi->FindFirstBinAbove(0,1); j<=hKetXi->FindLastBinAbove(0,1); j++)
+        {
+            double nKet = hKetXi->GetBinContent(j);
+            double Ket = nKet*(hKetXi->GetBinCenter(j));
+            nEntries+=nKet;
+            KetTotal += Ket;
+        }
+        for(int j=hKetXi_bkg->FindFirstBinAbove(0,1); j<=hKetXi_bkg->FindLastBinAbove(0,1); j++)
+        {
+            double nKet_bkg = hKetXi_bkg->GetBinContent(j);
+            double Ket_bkg = nKet_bkg*(hKetXi_bkg->GetBinCenter(j));
+            nEntries += nKet_bkg;
+            KetTotal += Ket_bkg;
+        }
+        AvgKetXi.push_back(KetTotal/nEntries);
+
             dPhiPeak[i] = new TH1D( Form( "dPhiPeak%d",i ), "#Xi - h^{#pm} ", 31, -( 0.5 -
                         1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
             TH1D *dPhiHad = new TH1D( "dPhiHad", "h^{#pm}- h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI );
@@ -597,6 +631,16 @@ void Xiv2Fit(  )
 
     //Calculate Flow
     vnCalculate(2,"Xi",v2values_peak,v2errors_peak,v2values_side,v2errors_side,v2value_h,v2error_h,fsig_xi,"Xiv2Signal.txt");
+
+    std::ofstream XiKET;
+    XiKET.open("XiAvgKET.txt");
+    XiKET << "Avg Ket values\n";
+    for(unsigned i=0; i<AvgKetXi.size(); i++)
+        XiKET << AvgKetXi[i] << "\n";
+
+    XiKET << "Avg Ket/nq values\n";
+    for(unsigned i=0; i<AvgKetXi.size(); i++)
+        XiKET << AvgKetXi[i]/3 << "\n";
 
     TCanvas* FourierPeakComp = new TCanvas( "FourierPeakComp", "Fourier Peak Composite", 1200,1000 );
     FourierPeakComp->Divide( 3,3 );

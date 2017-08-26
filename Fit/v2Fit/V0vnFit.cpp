@@ -131,14 +131,26 @@ void vnCalculate(int degree, std::string V0IDname, std::vector<double> vnvalues_
         sigerrors.push_back(sigError);
     }
 
+    int divFactor = 1;
+    if(V0IDname == "Kshort") divFactor = 2;
+    if(V0IDname == "Lambda") divFactor = 3;
+
     myfile << output.str();
     output.str(std::string());
     for(unsigned i=0; i<sigvalues.size(); i++) myfile << sigvalues[i] << "\n";
+
+    myfile << " signal v2/nq\n";
+    for(unsigned i=0; i<sigvalues.size(); i++) myfile << sigvalues[i]/divFactor << "\n";
 
     output << V0IDname << " signal v" << degree << " errors\n";
     myfile << output.str();
     output.str(std::string());
     for(unsigned i=0; i<sigerrors.size(); i++) myfile << sigerrors[i] << "\n";
+
+    output << V0IDname << " signal v" << degree << "/nq errors\n";
+    myfile << output.str();
+    output.str(std::string());
+    for(unsigned i=0; i<sigerrors.size(); i++) myfile << sigerrors[i]/divFactor << "\n";
 
     output << V0IDname << " observed v" << degree << " values\n";
     myfile << output.str();
@@ -200,6 +212,8 @@ void V0vnFit()
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationJL7_8.root");
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationTotal_08_20_2017.root");
     TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityTotal_08_21_2017.root");
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/LooseAndTight/V0CorrelationTightMCTotal_08_23_2017.root");
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureReco_08_25_2017.root");
     TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationPD1-6reverseJL10-15_08_15_2017.root"); //For vn of hadron
 
 	//Txt files
@@ -214,8 +228,8 @@ void V0vnFit()
 
     TVirtualFitter::SetMaxIterations(300000);
     TH1::SetDefaultSumw2();
-    std::vector<double> PtBin_ks = {0.2, 0.4, 0.6, 0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.0, 10.0, 15.0, 20.0}; //if number of bins changes make sure you change numPtBins
-    std::vector<double> PtBin_la = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.0, 10.0, 15.0, 20.0}; //if number of bins changes make sure you change numPtBins
+    std::vector<double> PtBin_ks = {0.2, 0.4, 0.6, 0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.0};//, 10.0, 15.0, 20.0}; //if number of bins changes make sure you change numPtBins
+    std::vector<double> PtBin_la = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.0};//, 10.0, 15.0, 20.0}; //if number of bins changes make sure you change numPtBins
     int numPtBins_ks = PtBin_ks.size() - 1;
     int numPtBins_la = PtBin_la.size() - 1;
     TH1D* dPhiFourierPeak_ks[numPtBins_ks];
@@ -248,11 +262,14 @@ void V0vnFit()
     std::vector<double> vnValues_h = {-999,-999};
     std::vector<double> vnErrors_h = {-999,-999};
 
+    std::vector<double> AvgKetKs;
+    std::vector<double> AvgKetLa;
+
     //Fsig for vn calculations
     //std::vector<double> fsig_ks = {0.999666 ,0.999977 ,0.999972 ,0.999988 ,0.999998 ,0.999999 ,0.999999 ,0.999992 ,0.999994 ,0.999955, 0.999975};
     //std::vector<double> fsig_la = {0.988877 ,0.9967 ,0.99754 ,0.998939 ,0.999954 ,0.999951 ,0.999992 ,0.999842};
-    std::vector<double> fsig_ks = {0.999476 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,0.999999 ,0.999999 ,0.999988 ,0.999997 ,0.992327 ,0.99836 ,0.890106 ,0.481433};
-    std::vector<double> fsig_la = {0.99882 ,0.999987 ,1 ,0.999524 ,0.999632 ,0.999855 ,0.999698 ,0.998783 ,0.999771 ,0.997088 ,0.92718 ,0.990913 ,0.421011};
+    std::vector<double> fsig_ks = {0.999476 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,0.999999 ,0.999999 ,0.999988 ,0.999997 ,0.992327};// ,0.99836};// ,0.890106 ,0.481433};
+    std::vector<double> fsig_la = {0.99882 ,0.999987 ,1 ,0.999524 ,0.999632 ,0.999855 ,0.999698 ,0.998783 ,0.999771 ,0.997088};// ,0.92718};// ,0.990913 ,0.421011};
 
 
     if((PtBin_ks.size()-1 != fsig_ks.size()) || (PtBin_la.size()-1 != fsig_la.size()))
@@ -276,6 +293,36 @@ void V0vnFit()
 	cout << "================================================================================" << endl;
     for(int i=0; i<numPtBins_ks; i++)
     {
+        //================================================================================
+        //KET Calculations
+        //================================================================================
+        TH1D* hKetKs = (TH1D*)f->Get(Form("v0CorrelationRapidity/KETkshort_pt%d",i));
+            cout<< 1 << endl;
+        TH1D* hKetKs_bkg = (TH1D*)f->Get(Form("v0CorrelationRapidity/KETkshort_bkg_pt%d",i));
+            cout<< 2 << endl;
+
+        int nEntries = 0;
+        double KetTotal = 0;
+        for(int j=hKetKs->FindFirstBinAbove(0,1); j<=hKetKs->FindLastBinAbove(0,1); j++)
+        {
+            cout<< j << endl;
+            double nKet = hKetKs->GetBinContent(j);
+            double Ket = nKet*(hKetKs->GetBinCenter(j));
+            nEntries+=nKet;
+            KetTotal += Ket;
+        }
+        for(int j=hKetKs_bkg->FindFirstBinAbove(0,1); j<=hKetKs_bkg->FindLastBinAbove(0,1); j++)
+        {
+            cout <<j << endl;
+            double nKet_bkg = hKetKs_bkg->GetBinContent(j);
+            double Ket_bkg = nKet_bkg*(hKetKs_bkg->GetBinCenter(j));
+            nEntries += nKet_bkg;
+            KetTotal += Ket_bkg;
+        }
+        cout << "finished" << endl;
+        AvgKetKs.push_back(KetTotal/nEntries);
+
+
         //================================================================================
         //Peak Calculations
         //================================================================================
@@ -641,6 +688,27 @@ void V0vnFit()
 	cout << "================================================================================" << endl;
     for(int i=0; i<numPtBins_la; i++)
     {
+        TH1D* hKetLa = (TH1D*)f->Get(Form("v0CorrelationRapidity/KETlambda_pt%d",i));
+        TH1D* hKetLa_bkg = (TH1D*)f->Get(Form("v0CorrelationRapidity/KETlambda_bkg_pt%d",i));
+
+        int nEntries = 0;
+        double KetTotal = 0;
+        for(int j=hKetLa->FindFirstBinAbove(0,1); j<=hKetLa->FindLastBinAbove(0,1); j++)
+        {
+            double nKet = hKetLa->GetBinContent(j);
+            double Ket = nKet*(hKetLa->GetBinCenter(j));
+            nEntries+=nKet;
+            KetTotal += Ket;
+        }
+        for(int j=hKetLa_bkg->FindFirstBinAbove(0,1); j<=hKetLa_bkg->FindLastBinAbove(0,1); j++)
+        {
+            double nKet_bkg = hKetLa_bkg->GetBinContent(j);
+            double Ket_bkg = nKet_bkg*(hKetLa_bkg->GetBinCenter(j));
+            nEntries += nKet_bkg;
+            KetTotal += Ket_bkg;
+        }
+        AvgKetLa.push_back(KetTotal/nEntries);
+
         //================================================================================
         //Peak Calculations
         //================================================================================
@@ -1058,6 +1126,26 @@ void V0vnFit()
     //Calculate flow
     for(int i=2; i<numFourierParams; i++) vnCalculate(i,"Kshort",vnValues_ks_peak[i],vnErrors_ks_peak[i],vnValues_ks_side[i],vnErrors_ks_side[i],vnValues_h,vnErrors_h,fsig_ks,"vnSignal.txt");
     for(int i=2; i<numFourierParams; i++) vnCalculate(i,"Lambda",vnValues_la_peak[i],vnErrors_la_peak[i],vnValues_la_side[i],vnErrors_la_side[i],vnValues_h,vnErrors_h,fsig_la,"vnSignal.txt");
+
+    std::ofstream theFile;
+    theFile.open("vnSignal.txt",std::ios_base::app);
+    theFile << "Avg Ket Ks\n";
+
+    for(unsigned i=0; i<AvgKetKs.size(); i++)
+        theFile << AvgKetKs[i] << "\n";
+
+    theFile << "Avg Ket La\n";
+    for(unsigned i=0; i<AvgKetLa.size(); i++)
+        theFile << AvgKetLa[i] << "\n";
+
+    theFile << "Avg Ket/nq Ks\n";
+
+    for(unsigned i=0; i<AvgKetKs.size(); i++)
+        theFile << AvgKetKs[i]/2 << "\n";
+
+    theFile << "Avg Ket/nq La\n";
+    for(unsigned i=0; i<AvgKetLa.size(); i++)
+        theFile << AvgKetLa[i]/3 << "\n";
 
     //Output Publication plots
 	if(publish)

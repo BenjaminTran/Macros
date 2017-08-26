@@ -13,8 +13,7 @@ void Divider(  )
 {
     TH1::SetDefaultSumw2(  );
 
-    //TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/CascadeV2pPb/results/NoPtCutPeakAndSide/XiAnalysisSeparated.root" );
-    TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/Thesis/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root");
+    TFile* f = new TFile( "/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/MCMassPtTotal_08_23_2017.root");
 
     TH1D* InvMass = ( TH1D* )f->Get( "xiCorrelation/InvMassXi" );
     TH2D* SignalPeak = ( TH2D* )f->Get( "xiCorrelation/SignalPeak" );
