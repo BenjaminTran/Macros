@@ -91,17 +91,21 @@ void Efficiency()
     std::map<int,std::vector<double> > efficiency_ks;
     std::map<int,std::vector<double> > efficiency_la;
 
-    //int pTksLength = 26; // the number of bins to be fitted is half of this number
     //double pks[] = {3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,90, 91,120};
     //double pla[] = {0,0, 0,0, 0,0, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,90, 91,120};
     //std::vector<double> pks = {1,2, 3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70};//, 71,85, 86,100, 101,150};//, 151,200};//, 201,250, 251,300};
     //std::vector<double> pla = {1,2, 3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70};//, 71,85, 86,100, 101,150};//, 151,200};//, 201,250, 251,300};
-    std::vector<double> pks = {1,1, 2,2, 3,3, 4,4, 5,5, 6,6, 7,7, 8,8, 9,9, 10,11, 12,13, 14,15, 16,17, 18,19, 20,22, 23,25, 26,28, 29,31, 32,34, 35,37, 38,40, 41,44, 45,50, 51,60, 61,70, 71,100};
-    std::vector<double> pla = {1,5, 6,8, 9,11, 12,14, 15,17, 18,20, 21,23, 24,26, 27,29, 30,32, 33,36, 37,40, 41,44, 45,48, 49,52, 53,56, 57,64, 65,80, 81,100};
+    //std::vector<double> pks = {1,1, 2,2, 3,3, 4,4, 5,5, 6,6, 7,7, 8,8, 9,9, 10,11, 12,13, 14,15, 16,17, 18,19, 20,22, 23,25, 26,28, 29,31, 32,34, 35,37, 38,40, 41,44, 45,50, 51,60, 61,70, 71,100};
+    //std::vector<double> pla = {1,5, 6,8, 9,11, 12,14, 15,17, 18,20, 21,23, 24,26, 27,29, 30,32, 33,36, 37,40, 41,44, 45,48, 49,52, 53,56, 57,64, 65,80, 81,100};
     //std::vector<double> rap_bin = {2,4, 5,7, 8,10, 11,12, 13,15, 16,18, 19,21};
+    std::vector<double> pks = {0,5,6,7,8,9,11,13,15,17,19,22,25,28,31,34,37,40,44,50,60,70,100};
+    std::vector<double> pla = {0,8,11,14,17,20,23,26,29,32,36,40,44,48,52,56,64,80,100};
     std::vector<double> rap_bin = {2,6, 7,10, 11,14, 15,21};//, 19,21, 16,18, 19,21};
+    int numKsBins = pks.size()-1;
+    int numLaBins = pla.size()-1;
     int numRapBins = rap_bin.size()/2;
-    int pages=10;
+    //int numRapBins = 1;
+    int pages=8;
 
     for(int i=0; i<pages; i++)
     {
@@ -120,7 +124,7 @@ void Efficiency()
 
     //File Creation
     myfile.open(FileName.c_str());
-    TFile* f1 = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/MCMassPtTotal_08_23_2017.root");
+    TFile* f1 = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/MCMassPtTotal_08_23_2017.root");
 
     TH3D* LaMassPtRap = (TH3D*)f1->Get("MassPtRapidityMC/LaMassPtRap");
     TH3D* KsMassPtRap = (TH3D*)f1->Get("MassPtRapidityMC/KsMassPtRap");
@@ -135,8 +139,6 @@ void Efficiency()
     MassLa_gen = (TH2D*)LaMassPtRap_Gen->Project3D("yx");
 
     //Fit
-    int pkscounter  = 0; //for correct bin counting
-    int placounter  = 0;
     int hcounter_ks = -1;
     int hcounter_la = -1;
     int index = 1;
@@ -152,21 +154,20 @@ void Efficiency()
     tex->SetTextFont(62);
     tex->SetTextSize(0.05);
     //for(unsigned j=0; j<rap_bin.size(); j+=2)
-    for(unsigned j=0; j<8; j+=2)
+    for(int j=0; j<numRapBins*2; j+=2)
     {
-        for(unsigned i=0; i<pks.size(); i+=2)
+        for(int i=0; i<numKsBins; i++)
         //for(unsigned i=0; i<60; i+=2)
         {
             cout << i << endl;
-            if((double)i/30 == 1 || i==0) 
+            if((double)i/15 == 1 || i==0)
             {
                 hcounter_ks++;
                 index = 1;
             }
             lambda=true;
 
-            massks = (TH1D*)KsMassPtRap->ProjectionX(Form("massks_%d",(j*pks.size()+i)/2), pks[i],pks[i+1],rap_bin[j],rap_bin[j+1]);
-
+            massks = (TH1D*)KsMassPtRap->ProjectionX(Form("massks_%d",(int)(j*pks.size()+i)/2), pks[i]+1,pks[i+1],rap_bin[j],rap_bin[j+1]);
 
             //tex->SetTextSize(tex->GetTextSize()*0.95);
 
@@ -192,8 +193,8 @@ void Efficiency()
 
             RooFitResult* r_ks = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
 
-            //double covQuality_ks = r_ks->covQual();
-            double covQuality_ks = 1;
+            double covQuality_ks = r_ks->covQual();
+            //double covQuality_ks = 1;
             double mean_ks = mean.getVal();
 
             double gaus1F_ks = sig1.getVal();
@@ -282,7 +283,7 @@ void Efficiency()
             xpos = xstart_ks;
             ypos = ystart_ks;
             increment = 0.07;
-            os << (pks[i]-1)/10 << " < P_{t} < " << pks[i+1]/10  << " GeV";
+            os << (pks[i])/10 << " < P_{t} < " << pks[i+1]/10  << " GeV";
             tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
             os.str(std::string());
             os << "Mean: " << std::setprecision(4) << mean_ks << " GeV" << std::setprecision(6);
@@ -335,7 +336,7 @@ void Efficiency()
                 tex->DrawLatex(0.18,ypos-3*increment,os.str().c_str());
                 os.str(std::string());
             }
-            os << (pks[i]-1)/10 << " < P_{t} < " << pks[i+1]/10 << " GeV";
+            os << (pks[i])/10 << " < P_{t} < " << pks[i+1]/10 << " GeV";
             tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
             os.str(std::string());
             os << "Mean: " << std::setprecision(4) << mean_ks << " GeV" << std::setprecision(6);
@@ -356,15 +357,15 @@ void Efficiency()
             index++;
         }
 
-        for(unsigned i=0; i<pla.size(); i+=2)
+        for(int i=0; i<numLaBins; i++)
         {
-            if((double)i/30 == 1 || i==0) 
+            if((double)i/15 == 1 || i==0)
             {
                 hcounter_la++;
                 index = 1;
             }
 
-            massla = (TH1D*)LaMassPtRap->ProjectionX(Form("massla_%d",(j*pla.size()+i)/2), pla[i],pla[i+1],rap_bin[j],rap_bin[j+1]);
+            massla = (TH1D*)LaMassPtRap->ProjectionX(Form("massla_%d",(int)(j*pla.size()+i)/2), pla[i]+1,pla[i+1],rap_bin[j],rap_bin[j+1]);
 
             //lambda
             RooRealVar x("x","mass",1.08,1.155);
@@ -389,8 +390,8 @@ void Efficiency()
 
             RooFitResult* r_la = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
 
-            //double covQuality_la = r_la->covQual();
-            double covQuality_la = 1;
+            double covQuality_la = r_la->covQual();
+            //double covQuality_la = 1;
             double mean_la = mean.getVal();
 
             double gaus1F_la = sig1.getVal();
@@ -478,7 +479,7 @@ void Efficiency()
             xpos = xstart_la;
             ypos = ystart_la;
             increment = 0.07;
-            os << (pla[i]-1)/10 << " < P_{t} < " << pla[i+1]/10 << " GeV";
+            os << (pla[i])/10 << " < P_{t} < " << pla[i+1]/10 << " GeV";
             tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
             os.str(std::string());
             os << "Mean: " << std::setprecision(4) << mean_la << " GeV" << std::setprecision(6);
@@ -517,7 +518,7 @@ void Efficiency()
             xpos = xstart_la;
             ypos = ystart_la;
             increment = 0.07;
-            if(i==pla.size()-2)
+            if(i==numLaBins)
             {
                 xpos = 0.65;
             }
@@ -535,7 +536,7 @@ void Efficiency()
                 tex->DrawLatex(0.18,ypos-3*increment,os.str().c_str());
                 os.str(std::string());
             }
-            os << (pla[i]-1)/10 << " < P_{t} < " << pla[i+1]/10 << " GeV";
+            os << (pla[i])/10 << " < P_{t} < " << pla[i+1]/10 << " GeV";
             tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
             os.str(std::string());
             os << "Mean: " << std::setprecision(4) << mean_la << " GeV" << std::setprecision(6);
@@ -570,14 +571,14 @@ void Efficiency()
 
     for(unsigned j=0; j<rap_bin.size(); j+=2)
     {
-        for(unsigned i=0; i<pks.size(); i+=2)
+        for(unsigned i=0; i<numKsBins; i++)
         {
-            TH1D* massks_gen = (TH1D*)KsMassPtRap_Gen->ProjectionX(Form("massks_gen_%d",(int)(j*pks.size()+i)/2), pks[i],pks[i+1],rap_bin[j],rap_bin[j+1]);
+            TH1D* massks_gen = (TH1D*)KsMassPtRap_Gen->ProjectionX(Form("massks_gen_%d",(int)(j*pks.size()+i)/2), pks[i]+1,pks[i+1],rap_bin[j],rap_bin[j+1]);
             yield_ks_gen[j/2].push_back(massks_gen->GetBinContent(massks_gen->GetMaximumBin()));
         }
-        for(unsigned i=0; i<pla.size(); i+=2)
+        for(unsigned i=0; i<numLaBins; i++)
         {
-            TH1D* massla_gen = (TH1D*)LaMassPtRap_Gen->ProjectionX(Form("massla_gen_%d",(int)(j*pla.size()+i)/2), pla[i],pla[i+1],rap_bin[j],rap_bin[j+1]);
+            TH1D* massla_gen = (TH1D*)LaMassPtRap_Gen->ProjectionX(Form("massla_gen_%d",(int)(j*pla.size()+i)/2), pla[i]+1,pla[i+1],rap_bin[j],rap_bin[j+1]);
             yield_la_gen[j/2].push_back(massla_gen->GetBinContent(massla_gen->GetMaximumBin()));
         }
     }
@@ -585,7 +586,7 @@ void Efficiency()
     //Composite_La_Gen->Print("Composite_La_Gen.pdf");
 
     //Calculate efficiency
-    for(unsigned j=0; j<numRapBins; j++)
+    for(int j=0; j<numRapBins; j++)
     {
         for(unsigned i=0; i<yield_ks_[j].size(); i++)
         {
@@ -599,7 +600,7 @@ void Efficiency()
 
     //Output
 /*
-    pkscounter = 0;
+    int pkscounter = 0;
     myfile << "KSHORT KSHORT KSHORT\n";
     for(unsigned i=0; i<mass_ks_[j].size(); i++)
     {
@@ -622,7 +623,7 @@ void Efficiency()
         pkscounter+=2;
     }
 
-    placounter=0;
+    int placounter=0;
     myfile << "LAMBDA LAMBDA LAMBDA\n";
     for(unsigned i=0; i<mass_la_[j].size(); i++)
     {
@@ -671,48 +672,40 @@ void Efficiency()
             myfile << efficiency_la[j][i] << "\n";
     }
 
-    const int rbinks = 26; // This is the number of BINS
-    const int rbinla = 19;
     const int rbinrap = 4;
 
-    std::vector<double> vRebin_ks = {0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.3,1.5,1.7,1.9,2.2,2.5,2.8,3.1,3.4,3.7,4.0,4.4,5.0,6.0,7.0,10.0};
-    double Rebin_ks[] = {0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.1,1.3,1.5,1.7,1.9,2.2,2.5,2.8,3.1,3.4,3.7,4.0,4.4,5.0,6.0,7.0,10.0};
-    std::vector<double> vRebin_la = {0.0,0.5,0.8,1.1,1.4,1.7,2.0,2.3,2.6,2.9,3.2,3.6,4.0,4.4,4.8,5.2,5.6,6.4,8.0,10.0};
-    double Rebin_la[] = {0.0,0.5,0.8,1.1,1.4,1.7,2.0,2.3,2.6,2.9,3.2,3.6,4.0,4.4,4.8,5.2,5.6,6.4,8.0,10.0};
-    std::vector<double> vRebin_rap = {-1.0,-0.5,-0.1,0.3,1.0};
+    double Rebin_ks[pks.size()];
+    double Rebin_la[pla.size()];
     double Rebin_rap[] = {-1.0,-0.5,-0.1,0.3,1.0};
 
-    std::vector<double> ptValues_ks;
-    std::vector<double> ptValues_la;
-    std::vector<double> RapValues;
-    for(unsigned i=0; i<vRebin_ks.size(); i++)
+    for(unsigned i=0; i<pks.size(); i++)
     {
-        ptValues_ks.push_back(Rebin_ks[i]+0.01);
+        Rebin_ks[i] = pks[i]/10;
+        cout << Rebin_ks[i] << ", ";
     }
-
-    for(unsigned i=0; i<vRebin_la.size(); i++)
+    cout << endl;
+    for(unsigned i=0; i<pla.size(); i++)
     {
-        ptValues_la.push_back(Rebin_la[i]+0.01);
+        Rebin_la[i] = pla[i]/10;
+        cout << Rebin_la[i] << ", ";
     }
+    cout << endl;
 
-    for(int i=0; i<vRebin_rap.size(); i++)
-    {
-        RapValues.push_back(Rebin_rap[i]);
-    }
-    TH2D* Effhisto_ks = new TH2D("EffHistoKs","EffHistoKs",rbinrap,Rebin_rap,rbinks,Rebin_ks);
-    TH2D* Effhisto_la = new TH2D("EffHistoLa","EffHistoLa",rbinrap,Rebin_rap,rbinla,Rebin_la);
+    TH2D* Effhisto_ks = new TH2D("EffHistoKs","EffHistoKs",rbinrap,Rebin_rap,numKsBins,Rebin_ks);
+    TH2D* Effhisto_la = new TH2D("EffHistoLa","EffHistoLa",rbinrap,Rebin_rap,numLaBins,Rebin_la);
 
-    for(int j=0; j<4; j++)
+    for(int j=0; j<numRapBins; j++)
     {
         for(unsigned i=0; i<efficiency_ks[j].size(); i++)
-            Effhisto_ks->Fill(RapValues[j],ptValues_ks[i],efficiency_ks[j][i]);
+            Effhisto_ks->Fill(Rebin_rap[j],Rebin_ks[i]+0.01,efficiency_ks[j][i]);
     }
 
-    for(int j=0; j<4; j++)
+    for(int j=0; j<numRapBins; j++)
     {
         for(unsigned i=0; i<efficiency_la[j].size(); i++)
-            Effhisto_la->Fill(RapValues[j],ptValues_la[i],efficiency_la[j][i]);
+            Effhisto_la->Fill(Rebin_rap[j],Rebin_la[i]+0.01,efficiency_la[j][i]);
     }
+
     TCanvas* Eff = new TCanvas("Eff","",1200,800);
     Eff->Divide(2,1);
     Eff->cd(1);
@@ -725,10 +718,11 @@ void Efficiency()
     Effhisto_la->Write();
 
     std::vector<double> eta_trg = {-0.9,-0.8,-0.4,-0.2,-0.1,0.2,0.5,0.9};
-    std::vector<double> pt_trg = {0.5,1.2, 3.4, 4.0, 6.7, 8.6, 1.5, 2.0};
+    std::vector<double> pt_trg = {0.1,1.2, 3.4, 4.0, 6.7, 8.6, 1.5, 2.0};
     for(unsigned i=0; i<eta_trg.size(); i++)
     {
         cout << Effhisto_ks->GetBinContent(Effhisto_ks->FindBin(eta_trg[i],pt_trg[i])) << endl;
+        cout << Effhisto_la->GetBinContent(Effhisto_la->FindBin(eta_trg[i],pt_trg[i])) << endl;
     }
 }
 
