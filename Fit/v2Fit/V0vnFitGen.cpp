@@ -203,7 +203,8 @@ void V0vnFit()
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureReco_08_25_2017.root");
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/TestRootFiles/MCClosurePbpSample.root");
     TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureGenTotal_08_28_2017.root");
-    TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationPD1-6reverseJL10-15_08_15_2017.root"); //For vn of hadron
+    //TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationPD1-6reverseJL10-15_08_15_2017.root"); //For vn of hadron
+    TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureHadron_08_29_2017.root"); //For vn of hadron
 
 	//Txt files
 	ofstream vnPeak;
@@ -320,8 +321,8 @@ void V0vnFit()
         //Pull 2D Histograms
         TH2D *hbackgroundPeak = (TH2D*) f->Get(Form("v0CorrelationMCRapidity/backgroundkshort_pt%d",i));
         TH2D *hsignalPeak     = (TH2D*) f->Get(Form("v0CorrelationMCRapidity/signalkshort_pt%d",i));
-        TH2D *hBackgroundHad  = (TH2D*) fhad->Get("xiCorrelationRapidity/BackgroundHad");
-        TH2D *hSignalHad      = (TH2D*) fhad->Get("xiCorrelationRapidity/SignalHad");
+        TH2D *hBackgroundHad  = (TH2D*) fhad->Get("HadronCorrelation/BackgroundHad");
+        TH2D *hSignalHad      = (TH2D*) fhad->Get("HadronCorrelation/SignalHad");
 
         //Project Phi
 
@@ -584,8 +585,8 @@ void V0vnFit()
         //Pull 2D Histograms
         TH2D *hbackgroundPeak = (TH2D*) f->Get(Form("v0CorrelationMCRapidity/backgroundlambda_pt%d",i));
         TH2D *hsignalPeak     = (TH2D*) f->Get(Form("v0CorrelationMCRapidity/signallambda_pt%d",i));
-        TH2D *hBackgroundHad  = (TH2D*) fhad->Get("xiCorrelationRapidity/BackgroundHad");
-        TH2D *hSignalHad      = (TH2D*) fhad->Get("xiCorrelationRapidity/SignalHad");
+        TH2D *hBackgroundHad  = (TH2D*) fhad->Get("HadronCorrelation/BackgroundHad");
+        TH2D *hSignalHad      = (TH2D*) fhad->Get("HadronCorrelation/SignalHad");
 
         //Project Phi
 

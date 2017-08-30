@@ -211,10 +211,13 @@ void V0vnFit()
 	//TFiles
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationJL7_8.root");
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationTotal_08_20_2017.root");
-    TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityTotal_08_21_2017.root");
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityTotal_08_21_2017.root");
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/LooseAndTight/V0CorrelationTightMCTotal_08_23_2017.root");
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureReco_08_25_2017.root");
-    TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationPD1-6reverseJL10-15_08_15_2017.root"); //For vn of hadron
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/TestRootFiles/MCClosurePbpSample.root");
+    TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureTotal_08_28_2017.root");
+    //TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationPD1-6reverseJL10-15_08_15_2017.root"); //For vn of hadron
+    TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureHadron_08_29_2017.root"); //For vn of hadron
 
 	//Txt files
 	ofstream vnPeak;
@@ -296,9 +299,9 @@ void V0vnFit()
         //================================================================================
         //KET Calculations
         //================================================================================
-        TH1D* hKetKs = (TH1D*)f->Get(Form("v0CorrelationRapidity/KETkshort_pt%d",i));
+        TH1D* hKetKs = (TH1D*)f->Get(Form("v0CorrelationRapidityMC/KETkshort_pt%d",i));
             cout<< 1 << endl;
-        TH1D* hKetKs_bkg = (TH1D*)f->Get(Form("v0CorrelationRapidity/KETkshort_bkg_pt%d",i));
+        TH1D* hKetKs_bkg = (TH1D*)f->Get(Form("v0CorrelationRapidityMC/KETkshort_bkg_pt%d",i));
             cout<< 2 << endl;
 
         int nEntries = 0;
@@ -329,10 +332,10 @@ void V0vnFit()
         dPhiPeak_ks[i] = new TH1D(Form("dPhiPeak_ks%d",i), "K_{S}^{0} - h^{#pm} ", 31, -(0.5 -1.0/32)*PI, (1.5 - 1.0/32)*PI);
         TH1D *dPhiHad = new TH1D("dPhiHad", "h^{#pm}- h^{#pm} ", 31, -(0.5 - 1.0/32)*PI, (1.5 - 1.0/32)*PI);
         //Pull 2D Histograms
-        TH2D *hbackgroundPeak = (TH2D*) f->Get(Form("v0CorrelationRapidity/backgroundkshort_pt%d",i));
-        TH2D *hsignalPeak     = (TH2D*) f->Get(Form("v0CorrelationRapidity/signalkshort_pt%d",i));
-        TH2D *hBackgroundHad  = (TH2D*) fhad->Get("xiCorrelationRapidity/BackgroundHad");
-        TH2D *hSignalHad      = (TH2D*) fhad->Get("xiCorrelationRapidity/SignalHad");
+        TH2D *hbackgroundPeak = (TH2D*) f->Get(Form("v0CorrelationRapidityMC/backgroundkshort_pt%d",i));
+        TH2D *hsignalPeak     = (TH2D*) f->Get(Form("v0CorrelationRapidityMC/signalkshort_pt%d",i));
+        TH2D *hBackgroundHad  = (TH2D*) fhad->Get("HadronCorrelation/BackgroundHadReco");
+        TH2D *hSignalHad      = (TH2D*) fhad->Get("HadronCorrelation/SignalHadReco");
 
         //Project Phi
 
@@ -558,8 +561,8 @@ void V0vnFit()
         //Sideband Calculations
         //================================================================================
         dPhiSide_ks[i] = new TH1D(Form("dPhiSide_ks%d",i), "K_{S}^{0} - h^{#pm} ", 31, -(0.5 - 1.0/32)*PI, (1.5 - 1.0/32)*PI);
-        TH2D *hbackgroundSide = (TH2D*) f->Get(Form("v0CorrelationRapidity/backgroundkshort_bkg_pt%d",i));
-        TH2D *hsignalSide     = (TH2D*) f->Get(Form("v0CorrelationRapidity/signalkshort_bkg_pt%d",i));
+        TH2D *hbackgroundSide = (TH2D*) f->Get(Form("v0CorrelationRapidityMC/backgroundkshort_bkg_pt%d",i));
+        TH2D *hsignalSide     = (TH2D*) f->Get(Form("v0CorrelationRapidityMC/signalkshort_bkg_pt%d",i));
 
         //Project Phi
         TH1D* hbPhiTotSide = hbackgroundSide->ProjectionY("PhiBkgTot", 0, 10);
@@ -688,8 +691,8 @@ void V0vnFit()
 	cout << "================================================================================" << endl;
     for(int i=0; i<numPtBins_la; i++)
     {
-        TH1D* hKetLa = (TH1D*)f->Get(Form("v0CorrelationRapidity/KETlambda_pt%d",i));
-        TH1D* hKetLa_bkg = (TH1D*)f->Get(Form("v0CorrelationRapidity/KETlambda_bkg_pt%d",i));
+        TH1D* hKetLa = (TH1D*)f->Get(Form("v0CorrelationRapidityMC/KETlambda_pt%d",i));
+        TH1D* hKetLa_bkg = (TH1D*)f->Get(Form("v0CorrelationRapidityMC/KETlambda_bkg_pt%d",i));
 
         int nEntries = 0;
         double KetTotal = 0;
@@ -715,10 +718,10 @@ void V0vnFit()
         dPhiPeak_la[i] = new TH1D(Form("dPhiPeak_la%d",i), "K_{S}^{0} - h^{#pm} ", 31, -(0.5 -1.0/32)*PI, (1.5 - 1.0/32)*PI);
         TH1D *dPhiHad = new TH1D("dPhiHad", "h^{#pm}- h^{#pm} ", 31, -(0.5 - 1.0/32)*PI, (1.5 - 1.0/32)*PI);
         //Pull 2D Histograms
-        TH2D *hbackgroundPeak = (TH2D*) f->Get(Form("v0CorrelationRapidity/backgroundlambda_pt%d",i));
-        TH2D *hsignalPeak     = (TH2D*) f->Get(Form("v0CorrelationRapidity/signallambda_pt%d",i));
-        TH2D *hBackgroundHad  = (TH2D*) fhad->Get("xiCorrelationRapidity/BackgroundHad");
-        TH2D *hSignalHad      = (TH2D*) fhad->Get("xiCorrelationRapidity/SignalHad");
+        TH2D *hbackgroundPeak = (TH2D*) f->Get(Form("v0CorrelationRapidityMC/backgroundlambda_pt%d",i));
+        TH2D *hsignalPeak     = (TH2D*) f->Get(Form("v0CorrelationRapidityMC/signallambda_pt%d",i));
+        TH2D *hBackgroundHad  = (TH2D*) fhad->Get("HadronCorrelation/BackgroundHadReco");
+        TH2D *hSignalHad      = (TH2D*) fhad->Get("HadronCorrelation/SignalHadReco");
 
         //Project Phi
 
@@ -936,8 +939,8 @@ void V0vnFit()
         //Sideband Calculations
         //================================================================================
         dPhiSide_la[i] = new TH1D(Form("dPhiSide_la%d",i), "K_{S}^{0} - h^{#pm} ", 31, -(0.5 - 1.0/32)*PI, (1.5 - 1.0/32)*PI);
-        TH2D *hbackgroundSide = (TH2D*) f->Get(Form("v0CorrelationRapidity/backgroundlambda_bkg_pt%d",i));
-        TH2D *hsignalSide     = (TH2D*) f->Get(Form("v0CorrelationRapidity/signallambda_bkg_pt%d",i));
+        TH2D *hbackgroundSide = (TH2D*) f->Get(Form("v0CorrelationRapidityMC/backgroundlambda_bkg_pt%d",i));
+        TH2D *hsignalSide     = (TH2D*) f->Get(Form("v0CorrelationRapidityMC/signallambda_bkg_pt%d",i));
 
         //Project Phi
         TH1D* hbPhiTotSide = hbackgroundSide->ProjectionY("PhiBkgTot", 0, 10);
@@ -1265,8 +1268,8 @@ void V0vnFit()
     TCanvas* TwoDCorrelation_ks = new TCanvas("TwoDCorrelation_ks", "", 1000, 1000);
     TwoDCorrelation_ks->SetLeftMargin(0.2);
 
-    TH2D* Signal_ks = (TH2D*)f->Get("v0CorrelationRapidity/signalkshort_pt2");
-    TH2D* Background_ks = (TH2D*)f->Get("v0CorrelationRapidity/backgroundkshort_pt2");
+    TH2D* Signal_ks = (TH2D*)f->Get("v0CorrelationRapidityMC/signalkshort_pt2");
+    TH2D* Background_ks = (TH2D*)f->Get("v0CorrelationRapidityMC/backgroundkshort_pt2");
 
     TGaxis::SetMaxDigits(1);
 
@@ -1316,8 +1319,8 @@ void V0vnFit()
     TCanvas* TwoDCorrelation_la = new TCanvas("TwoDCorrelation_la", "", 1000, 1000);
     TwoDCorrelation_la->SetLeftMargin(0.2);
 
-    TH2D* Signal_la = (TH2D*)f->Get("v0CorrelationRapidity/signallambda_pt2");
-    TH2D* Background_la = (TH2D*)f->Get("v0CorrelationRapidity/backgroundlambda_pt2");
+    TH2D* Signal_la = (TH2D*)f->Get("v0CorrelationRapidityMC/signallambda_pt2");
+    TH2D* Background_la = (TH2D*)f->Get("v0CorrelationRapidityMC/backgroundlambda_pt2");
 
     TGaxis::SetMaxDigits(1);
 
