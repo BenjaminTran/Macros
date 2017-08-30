@@ -116,11 +116,19 @@ void vnCalculate(int degree, std::string V0IDname, std::vector<double> vnvalues_
     myfile << output.str();
     output.str(std::string());
     for(unsigned i=0; i<sigvalues.size(); i++) myfile << sigvalues[i] << "\n";
+    
+    myfile << "v2/nq values\n";
+    for(unsigned i=0; i<sigvalues.size(); i++) myfile << sigvalues[i]/3 << "\n";
 
     output << V0IDname << " signal v" << degree << " errors\n";
     myfile << output.str();
     output.str(std::string());
     for(unsigned i=0; i<sigerrors.size(); i++) myfile << sigerrors[i] << "\n";
+
+    output << V0IDname << " signal v" << degree << "/nq errors\n";
+    myfile << output.str();
+    output.str(std::string());
+    for(unsigned i=0; i<sigerrors.size(); i++) myfile << sigerrors[i]/3 << "\n";
 
     output << V0IDname << " observed v" << degree << " values\n";
     myfile << output.str();
@@ -157,8 +165,8 @@ void Xiv2Fit(  )
 
     //For Enabling TLatex labels
     //Bool_t publish = kTRUE;
-    Bool_t publish = kFALSE; 
-    
+    Bool_t publish = kFALSE;
+
     gStyle->SetOptFit( 1111 );
     gStyle->SetErrorX( 0 ); //removes horizontal error bars
 
@@ -171,16 +179,23 @@ void Xiv2Fit(  )
     gStyle->SetTextSize( 20 );
     gStyle->SetTextFont( 42 ); //2=times-bold-r-normal, 2=precision for TLatex to work
 
+    std::string Xiv2PeakName = "Xiv2PeakLoose.txt";
+    std::string Xiv2SideName = "Xiv2SideLoose.txt";
+    std::string Xiv2CalculatorName = "Xiv2SignalLoose.txt";
+
     std::ofstream Xiv2Peak;
     std::ofstream Xiv2Side;
     std::ofstream Xiv2Calculator;
-    Xiv2Peak.open("Xiv2Peak.txt");
-    Xiv2Side.open("Xiv2Side.txt");
-    Xiv2Calculator.open("Xiv2Signal.txt");
+    Xiv2Peak.open(Xiv2PeakName.c_str());
+    Xiv2Side.open(Xiv2SideName.c_str());
+    Xiv2Calculator.open(Xiv2CalculatorName.c_str());
 
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationPD1-6reverseJL10-15_08_15_2017.root" );
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationpPbPD1-6_08_15_2017.root" );
-    TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root" );
+    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root" );
+    TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityLoose_08_30_2017.root" );
+    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTight_08_30_2017.root" );
+    TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root" );
 
     TVirtualFitter::SetMaxIterations( 300000 );
     TH1::SetDefaultSumw2(  );
@@ -205,6 +220,7 @@ void Xiv2Fit(  )
     std::vector<double> v2errors_side;
     std::vector<double> v2value_h; //Need to use vector for vnCalculate function
     std::vector<double> v2error_h;
+    std::vector<double> AvgKetXi;
 
 
     TLatex* ltx2 = new TLatex(  );
@@ -218,14 +234,38 @@ void Xiv2Fit(  )
     //bool Peak = false;
     for( int i=0; i<numPtBins; i++ )
     {
+        //================================================================================
+        //KET Calculations
+        //================================================================================
+        TH1D* hKetXi = (TH1D*)f->Get(Form("xiCorrelationRapidityLoose/KET_xi_pt%d",i));
+        TH1D* hKetXi_bkg = (TH1D*)f->Get(Form("xiCorrelationRapidityLoose/KET_xi_bkg_pt%d",i));
+
+        int nEntries = 0;
+        double KetTotal = 0;
+        for(int j=hKetXi->FindFirstBinAbove(0,1); j<=hKetXi->FindLastBinAbove(0,1); j++)
+        {
+            double nKet = hKetXi->GetBinContent(j);
+            double Ket = nKet*(hKetXi->GetBinCenter(j));
+            nEntries+=nKet;
+            KetTotal += Ket;
+        }
+        for(int j=hKetXi_bkg->FindFirstBinAbove(0,1); j<=hKetXi_bkg->FindLastBinAbove(0,1); j++)
+        {
+            double nKet_bkg = hKetXi_bkg->GetBinContent(j);
+            double Ket_bkg = nKet_bkg*(hKetXi_bkg->GetBinCenter(j));
+            nEntries += nKet_bkg;
+            KetTotal += Ket_bkg;
+        }
+        AvgKetXi.push_back(KetTotal/nEntries);
+
             dPhiPeak[i] = new TH1D( Form( "dPhiPeak%d",i ), "#Xi - h^{#pm} ", 31, -( 0.5 -
                         1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
             TH1D *dPhiHad = new TH1D( "dPhiHad", "h^{#pm}- h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI );
             //Pull 2D Histograms
-            TH2D *hbackgroundPeak = (TH2D*) f->Get( Form( "xiCorrelationRapidity/BackgroundPeak_pt%d",i ) );
-            TH2D *hsignalPeak     = (TH2D*) f->Get( Form( "xiCorrelationRapidity/SignalPeak_pt%d",i ) );
-            TH2D *hBackgroundHad  = (TH2D*) f->Get( "xiCorrelationRapidity/BackgroundHad" );
-            TH2D *hSignalHad      = (TH2D*) f->Get( "xiCorrelationRapidity/SignalHad" );
+            TH2D *hbackgroundPeak = (TH2D*) f->Get( Form( "xiCorrelationRapidityLoose/BackgroundPeak_pt%d",i ) );
+            TH2D *hsignalPeak     = (TH2D*) f->Get( Form( "xiCorrelationRapidityLoose/SignalPeak_pt%d",i ) );
+            TH2D *hBackgroundHad  = (TH2D*) fhad->Get( "xiCorrelationRapidity/BackgroundHad" );
+            TH2D *hSignalHad      = (TH2D*) fhad->Get( "xiCorrelationRapidity/SignalHad" );
 
             TH1::SetDefaultSumw2(  );
             //Project Phi
@@ -454,8 +494,8 @@ void Xiv2Fit(  )
             }
             //side
             dPhiSide[i] = new TH1D( Form( "dPhiSide%d",i ), "#Xi - h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
-            TH2D *hbackgroundSide = (TH2D*) f->Get( Form( "xiCorrelationRapidity/BackgroundSide_pt%d",i ) );
-            TH2D *hsignalSide     = (TH2D*) f->Get( Form( "xiCorrelationRapidity/SignalSide_pt%d",i ) );
+            TH2D *hbackgroundSide = (TH2D*) f->Get( Form( "xiCorrelationRapidityLoose/BackgroundSide_pt%d",i ) );
+            TH2D *hsignalSide     = (TH2D*) f->Get( Form( "xiCorrelationRapidityLoose/SignalSide_pt%d",i ) );
 
             TH1::SetDefaultSumw2(  );
 
@@ -589,14 +629,24 @@ void Xiv2Fit(  )
 
     }
 
-    OutputVnValues(2,"Peak","Xi",v2values_peak,PtBin,"Xiv2Peak.txt");
-    OutputVnErrors(2,"Peak","Xi",v2errors_peak,PtBin,"Xiv2Peak.txt");
+    OutputVnValues(2,"Peak","Xi",v2values_peak,PtBin,Xiv2PeakName);
+    OutputVnErrors(2,"Peak","Xi",v2errors_peak,PtBin,Xiv2PeakName);
 
-    OutputVnValues(2,"Side","Xi",v2values_side,PtBin,"Xiv2Side.txt");
-    OutputVnErrors(2,"Side","Xi",v2errors_side,PtBin,"Xiv2Side.txt");
+    OutputVnValues(2,"Side","Xi",v2values_side,PtBin,Xiv2SideName);
+    OutputVnErrors(2,"Side","Xi",v2errors_side,PtBin,Xiv2SideName);
 
     //Calculate Flow
-    vnCalculate(2,"Xi",v2values_peak,v2errors_peak,v2values_side,v2errors_side,v2value_h,v2error_h,fsig_xi,"Xiv2Signal.txt");
+    vnCalculate(2,"Xi",v2values_peak,v2errors_peak,v2values_side,v2errors_side,v2value_h,v2error_h,fsig_xi,Xiv2CalculatorName);
+
+    std::ofstream XiKET;
+    XiKET.open("XiAvgKET.txt");
+    XiKET << "Avg Ket values\n";
+    for(unsigned i=0; i<AvgKetXi.size(); i++)
+        XiKET << AvgKetXi[i] << "\n";
+
+    XiKET << "Avg Ket/nq values\n";
+    for(unsigned i=0; i<AvgKetXi.size(); i++)
+        XiKET << AvgKetXi[i]/3 << "\n";
 
     TCanvas* FourierPeakComp = new TCanvas( "FourierPeakComp", "Fourier Peak Composite", 1200,1000 );
     FourierPeakComp->Divide( 3,3 );
@@ -668,100 +718,99 @@ void Xiv2Fit(  )
     }
 
     //2D Correlation function 1-3 GeV associated
-    TCanvas* TwoDCorrelation = new TCanvas( "TwoDCorrelation", "", 1000, 1000 );
-    TwoDCorrelation->SetLeftMargin( 0.2 );
+    //TCanvas* TwoDCorrelation = new TCanvas( "TwoDCorrelation", "", 1000, 1000 );
+    //TwoDCorrelation->SetLeftMargin( 0.2 );
 
-    TH2D* Signal = ( TH2D* )f->Get( "xiCorrelationRapidity/SignalXiHad" );
-    TH2D* Background = ( TH2D* )f->Get( "xiCorrelationRapidity/BackgroundXiHad" );
+    //TH2D* Signal = ( TH2D* )f->Get( "xiCorrelationRapidityLoose/SignalXiHad" );
+    //TH2D* Background = ( TH2D* )f->Get( "xiCorrelationRapidityLoose/BackgroundXiHad" );
 
-    TGaxis::SetMaxDigits( 1 );
+    //TGaxis::SetMaxDigits( 1 );
     
-    TH2D* Correlation = ( TH2D* )Signal->Clone(  );
-    Correlation->Divide( Background );
-    Correlation->GetXaxis(  )->SetRangeUser( -4.0,4.0 );
-    Correlation->GetYaxis(  )->SetRangeUser( -PI/2.0,4.5 );
-    Correlation->GetXaxis(  )->SetTitle( "#Delta#eta" );
-    Correlation->GetXaxis(  )->SetTitleOffset( 1.4 );
-    Correlation->GetXaxis(  )->CenterTitle( true );
-    Correlation->GetYaxis(  )->SetTitle( "#Delta#phi (radians)" );
-    Correlation->GetYaxis(  )->SetTitleOffset( 1.4 );
-    Correlation->GetYaxis(  )->CenterTitle( true );
-    Correlation->GetZaxis(  )->SetTitle( "#frac{1}{N_{#lower[-0.3]{trig}}} #frac{d^{2}N^{pair}}{d#Delta#eta d#Delta#phi}" );
-    Correlation->GetZaxis(  )->SetTitleOffset( 2.3 );
-    Correlation->GetZaxis(  )->CenterTitle( true );
-    Correlation->GetXaxis(  )->SetNdivisions( 405 );
-    Correlation->GetYaxis(  )->SetNdivisions( 405 );
-    Correlation->GetZaxis(  )->SetNdivisions( 4 );
-    Correlation->SetTitle( "" );
-    Correlation->SetStats( kFALSE );
-    Correlation->Scale( 10 );
+    //TH2D* Correlation = ( TH2D* )Signal->Clone(  );
+    //Correlation->Divide( Background );
+    //Correlation->GetXaxis(  )->SetRangeUser( -4.0,4.0 );
+    //Correlation->GetYaxis(  )->SetRangeUser( -PI/2.0,4.5 );
+    //Correlation->GetXaxis(  )->SetTitle( "#Delta#eta" );
+    //Correlation->GetXaxis(  )->SetTitleOffset( 1.4 );
+    //Correlation->GetXaxis(  )->CenterTitle( true );
+    //Correlation->GetYaxis(  )->SetTitle( "#Delta#phi (radians)" );
+    //Correlation->GetYaxis(  )->SetTitleOffset( 1.4 );
+    //Correlation->GetYaxis(  )->CenterTitle( true );
+    //Correlation->GetZaxis(  )->SetTitle( "#frac{1}{N_{#lower[-0.3]{trig}}} #frac{d^{2}N^{pair}}{d#Delta#eta d#Delta#phi}" );
+    //Correlation->GetZaxis(  )->SetTitleOffset( 2.3 );
+    //Correlation->GetZaxis(  )->CenterTitle( true );
+    //Correlation->GetXaxis(  )->SetNdivisions( 405 );
+    //Correlation->GetYaxis(  )->SetNdivisions( 405 );
+    //Correlation->GetZaxis(  )->SetNdivisions( 4 );
+    //Correlation->SetTitle( "" );
+    //Correlation->SetStats( kFALSE );
+    //Correlation->Scale( 10 );
 
-    const Int_t NRGBs = 5;
-    const Int_t NCont = 20;
+    //const Int_t NRGBs = 5;
+    //const Int_t NCont = 20;
 
-    Double_t stops[NRGBs] = { 0.00, 0.34, 0.61, 0.84, 1.00 };
-    Double_t red[NRGBs]   = { 0.00, 0.00, 0.87, 1.00, 0.51 };
-    Double_t green[NRGBs] = { 0.00, 0.81, 1.00, 0.20, 0.00 };
-    Double_t blue[NRGBs]  = { 0.51, 1.00, 0.12, 0.00, 0.00 };
-    TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
-    //gStyle->SetNumberContours( 90 );
+    //Double_t stops[NRGBs] = { 0.00, 0.34, 0.61, 0.84, 1.00 };
+    //Double_t red[NRGBs]   = { 0.00, 0.00, 0.87, 1.00, 0.51 };
+    //Double_t green[NRGBs] = { 0.00, 0.81, 1.00, 0.20, 0.00 };
+    //Double_t blue[NRGBs]  = { 0.51, 1.00, 0.12, 0.00, 0.00 };
+    //TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
     
-    TwoDCorrelation->cd(  );
-    Correlation->Draw( "SURF1 FB " );
+    //TwoDCorrelation->cd(  );
+    //Correlation->Draw( "SURF1 FB " );
 
-    TLatex *ltx0 = new TLatex(  );
-    ltx0->SetTextSize( 0.031 );
-    ltx0->SetNDC( kTRUE );
-    ltx0->SetTextFont( 42 );
+    //TLatex *ltx0 = new TLatex(  );
+    //ltx0->SetTextSize( 0.031 );
+    //ltx0->SetNDC( kTRUE );
+    //ltx0->SetTextFont( 42 );
 
-    ltx0->DrawLatex( 0.05, 0.95, "CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV, L_{#lower[-0.25]{int}} = 62 nb^{-1}" );
-    ltx0->DrawLatex( 0.05, 0.88, "185 #leq N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 220" );
-    ltx0->DrawLatex( 0.05, 0.81, "1 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{assoc}}} < 3 GeV" );
-    ltx0->DrawLatex( 0.05, 0.75, "1 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{trig}}} < 3 GeV" );
-    ltx0->SetTextSize( 0.04 );
-    ltx0->DrawLatex( 0.85, 0.88, "#Xi#kern[-0.3]{#lower[0.02]{{}^{#pm}}}- h^{#pm}" );
+    //ltx0->DrawLatex( 0.05, 0.95, "CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV, L_{#lower[-0.25]{int}} = 62 nb^{-1}" );
+    //ltx0->DrawLatex( 0.05, 0.88, "185 #leq N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 220" );
+    //ltx0->DrawLatex( 0.05, 0.81, "1 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{assoc}}} < 3 GeV" );
+    //ltx0->DrawLatex( 0.05, 0.75, "1 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{trig}}} < 3 GeV" );
+    //ltx0->SetTextSize( 0.04 );
+    //ltx0->DrawLatex( 0.85, 0.88, "#Xi#kern[-0.3]{#lower[0.02]{{}^{#pm}}}- h^{#pm}" );
 
-    TCanvas* SigAndBkg = new TCanvas( "SigAndBkg", "", 1600, 800 );
-    SigAndBkg->Divide( 2,1 );
-    SigAndBkg->SetLeftMargin( 0.2 );
+    //TCanvas* SigAndBkg = new TCanvas( "SigAndBkg", "", 1600, 800 );
+    //SigAndBkg->Divide( 2,1 );
+    //SigAndBkg->SetLeftMargin( 0.2 );
 
-    SigAndBkg->cd( 1 );
-    Signal->GetXaxis(  )->SetRangeUser( -4.0,4.0 );
-    Signal->GetYaxis(  )->SetRangeUser( -PI/2.0,4.5 );
-    Signal->GetXaxis(  )->SetTitle( "#Delta#eta" );
-    Signal->GetXaxis(  )->SetTitleOffset( 1.4 );
-    Signal->GetXaxis(  )->CenterTitle( true );
-    Signal->GetYaxis(  )->SetTitle( "#Delta#phi (radians)" );
-    Signal->GetYaxis(  )->SetTitleOffset( 1.4 );
-    Signal->GetYaxis(  )->CenterTitle( true );
-    Signal->GetZaxis(  )->SetTitle( "#frac{1}{N_{#lower[-0.3]{trig}}} #frac{d^{2}N^{pair}}{d#Delta#eta d#Delta#phi}" );
-    Signal->GetZaxis(  )->SetTitleOffset( 2.5 );
-    Signal->GetZaxis(  )->CenterTitle( true );
-    Signal->GetXaxis(  )->SetNdivisions( 405 );
-    Signal->GetYaxis(  )->SetNdivisions( 405 );
-    Signal->GetZaxis(  )->SetNdivisions( 4 );
-    Signal->SetTitle( "" );
-    Signal->SetStats( kFALSE );
-    Signal->Draw( "Surf1 FB" );
+    //SigAndBkg->cd( 1 );
+    //Signal->GetXaxis(  )->SetRangeUser( -4.0,4.0 );
+    //Signal->GetYaxis(  )->SetRangeUser( -PI/2.0,4.5 );
+    //Signal->GetXaxis(  )->SetTitle( "#Delta#eta" );
+    //Signal->GetXaxis(  )->SetTitleOffset( 1.4 );
+    //Signal->GetXaxis(  )->CenterTitle( true );
+    //Signal->GetYaxis(  )->SetTitle( "#Delta#phi (radians)" );
+    //Signal->GetYaxis(  )->SetTitleOffset( 1.4 );
+    //Signal->GetYaxis(  )->CenterTitle( true );
+    //Signal->GetZaxis(  )->SetTitle( "#frac{1}{N_{#lower[-0.3]{trig}}} #frac{d^{2}N^{pair}}{d#Delta#eta d#Delta#phi}" );
+    //Signal->GetZaxis(  )->SetTitleOffset( 2.5 );
+    //Signal->GetZaxis(  )->CenterTitle( true );
+    //Signal->GetXaxis(  )->SetNdivisions( 405 );
+    //Signal->GetYaxis(  )->SetNdivisions( 405 );
+    //Signal->GetZaxis(  )->SetNdivisions( 4 );
+    //Signal->SetTitle( "" );
+    //Signal->SetStats( kFALSE );
+    //Signal->Draw( "Surf1 FB" );
 
-    SigAndBkg->cd( 2 );
-    Background->GetXaxis(  )->SetRangeUser( -4.0,4.0 );
-    Background->GetYaxis(  )->SetRangeUser( -PI/2.0,4.5 );
-    Background->GetXaxis(  )->SetTitle( "#Delta#eta" );
-    Background->GetXaxis(  )->SetTitleOffset( 1.4 );
-    Background->GetXaxis(  )->CenterTitle( true );
-    Background->GetYaxis(  )->SetTitle( "#Delta#phi (radians)" );
-    Background->GetYaxis(  )->SetTitleOffset( 1.4 );
-    Background->GetYaxis(  )->CenterTitle( true );
-    Background->GetZaxis(  )->SetTitle( "#frac{1}{N_{#lower[-0.3]{trig}}} #frac{d^{2}N^{pair}}{d#Delta#eta d#Delta#phi}" );
-    Background->GetZaxis(  )->SetTitleOffset( 2.5 );
-    Background->GetZaxis(  )->CenterTitle( true );
-    Background->GetXaxis(  )->SetNdivisions( 405 );
-    Background->GetYaxis(  )->SetNdivisions( 405 );
-    Background->GetZaxis(  )->SetNdivisions( 4 );
-    Background->SetTitle( "" );
-    Background->SetStats( kFALSE );
-    Background->Draw( "Surf1 FB" );
+    //SigAndBkg->cd( 2 );
+    //Background->GetXaxis(  )->SetRangeUser( -4.0,4.0 );
+    //Background->GetYaxis(  )->SetRangeUser( -PI/2.0,4.5 );
+    //Background->GetXaxis(  )->SetTitle( "#Delta#eta" );
+    //Background->GetXaxis(  )->SetTitleOffset( 1.4 );
+    //Background->GetXaxis(  )->CenterTitle( true );
+    //Background->GetYaxis(  )->SetTitle( "#Delta#phi (radians)" );
+    //Background->GetYaxis(  )->SetTitleOffset( 1.4 );
+    //Background->GetYaxis(  )->CenterTitle( true );
+    //Background->GetZaxis(  )->SetTitle( "#frac{1}{N_{#lower[-0.3]{trig}}} #frac{d^{2}N^{pair}}{d#Delta#eta d#Delta#phi}" );
+    //Background->GetZaxis(  )->SetTitleOffset( 2.5 );
+    //Background->GetZaxis(  )->CenterTitle( true );
+    //Background->GetXaxis(  )->SetNdivisions( 405 );
+    //Background->GetYaxis(  )->SetNdivisions( 405 );
+    //Background->GetZaxis(  )->SetNdivisions( 4 );
+    //Background->SetTitle( "" );
+    //Background->SetStats( kFALSE );
+    //Background->Draw( "Surf1 FB" );
 
     
 
