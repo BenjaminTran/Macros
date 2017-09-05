@@ -31,6 +31,7 @@
 #include "RooPlot.h"
 #include "RooDataHist.h"
 #include "RooGaussian.h"
+#include "RooGenericPdf.h"
 #include "RooPolynomial.h"
 #include "RooAddPdf.h"
 #include "RooFitResult.h"
@@ -43,7 +44,7 @@ void Efficiency()
 {
     //Initializers
     std::string FileName = "";
-    FileName = "V0Efficiency.txt";
+    FileName = "V0XiEfficiency.txt";
     using namespace RooFit;
     gStyle->SetOptTitle(kFALSE);
     gStyle->SetMarkerSize(0.5);
@@ -103,7 +104,7 @@ void Efficiency()
 
     std::vector<double> pks = {0,5,6,7,8,9,11,13,15,17,19,22,25,28,31,34,37,40,44,50,60,70,100};
     std::vector<double> pla = {0,8,11,14,17,20,23,26,29,32,36,40,44,48,52,56,64,80,100};
-    std::vector<double> pxi = {11,13, 14,15, 16,17, 18,19, 20,21, 22,23, 24,25, 26,27, 28,29, 30,32, 33,34, 35,37, 38,40, 41,44, 45,60, 61,100};
+    std::vector<double> pxi = {10,13,15,17,19,21,23,25,27,29,32,34,37,40,44,60,100};
     std::vector<double> rap_bin_v0 = {2,6, 7,10, 11,14, 15,21};//, 19,21, 16,18, 19,21};
     std::vector<double> rap_bin_xi = {2,11, 12,21};//, 19,21, 16,18, 19,21};
     int numKsBins = pks.size()-1;
@@ -158,6 +159,8 @@ void Efficiency()
     double ystart_ks = 0.85;
     double xstart_la = 0.60;
     double ystart_la = 0.85;
+    double xstart_xi = 0.65;
+    double ystart_xi = 0.85;
     double xpos = xstart_ks;
     double ypos = ystart_ks;
     double increment = 0.07;
@@ -165,6 +168,7 @@ void Efficiency()
     tex->SetNDC();
     tex->SetTextFont(62);
     tex->SetTextSize(0.05);
+    /*
     //for(unsigned j=0; j<rap_bin_v0.size(); j+=2)
     for(int j=0; j<numRapBins_v0*2; j+=2)
     {
@@ -574,8 +578,9 @@ void Efficiency()
         //else cc1->Print("RECOV0MassFitInd.pdf)","pdf");
 
     }
+*/
 
-    for(int j=0; j<numRapBins_xi; j++){
+    for(int j=0; j<numRapBins_xi*2; j+=2){
         for(int i=0; i<numXiBins; i++){
             cout << i << endl;
             if((double)i/15 == 1 || i==0)
@@ -587,25 +592,7 @@ void Efficiency()
             massxi = (TH1D*)XiMassPtRap->ProjectionX(Form("massxi_%d",(int)(j*pxi.size()+i)/2), pxi[i]+1,pxi[i+1],rap_bin_xi[j],rap_bin_xi[j+1]);
 
             RooRealVar x("x","mass",1.26,1.4);
-            RooPlot* xframe_xi = x.frame(150);
-            xframe_xi->GetXaxis()->SetTitle("Invariant mass (GeV)");
-            xframe_xi->GetYaxis()->SetTitle("Candidates / 0.001 GeV");
-            xframe_xi->GetXaxis()->CenterTitle(1);
-            xframe_xi->GetYaxis()->CenterTitle(1);
-            xframe_xi->GetXaxis()->SetTickSize(0.02);
-            xframe_xi->GetYaxis()->SetTickSize(0.02);
-            xframe_xi->GetXaxis()->SetNdivisions(407);
-            xframe_xi->GetYaxis()->SetNdivisions(410);
-            xframe_xi->GetXaxis()->SetTitleSize(0.06);
-            xframe_xi->GetYaxis()->SetTitleSize(0.06);
-            xframe_xi->GetYaxis()->SetTitleOffset(1.05);
-            xframe_xi->GetXaxis()->SetTitleOffset(0.5);
-            //xframe_xi->GetXaxis()->SetLabelSize(xframe_xi->GetXaxis()->GetLabelSize()*2.0);
-            xframe_xi->GetYaxis()->SetLabelSize(0.1);
-            xframe_xi->GetXaxis()->SetLabelSize(0.1);
-            //xframe_xi->GetYaxis()->SetLabelSize(xframe_xi->GetYaxis()->GetLabelSize()*2.0);
             RooDataHist data("data","dataset",x,massxi);
-            data.plotOn(xframe_xi,Name("data"));
             RooRealVar mean("mean","mean",1.32,1.29,1.33);
             RooRealVar sigma1("sigma1","sigma1",0.004,0.001,0.04);
             RooRealVar sigma2("sigma2","sigma2",0.006,0.001,0.04);
@@ -623,7 +610,8 @@ void Efficiency()
             RooFitResult* r_xi = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
             //RooChi2Var chi2_xiVar("chi2_xi","chi2",sum,data);
 
-            //double covQual = r_xi->covQual();
+            double covQuality_xi = r_xi->covQual();
+            //double covQuality_xi = 1;
             double mean_xi = mean.getVal();
 
             double gaus1F_xi = sig1.getVal();
@@ -641,11 +629,9 @@ void Efficiency()
             double gaus2_yield_xi = gaus2F_xi*Intgaus2_yield_xi->getVal();
             double gausTot_yield_xi = gaus1_yield_xi + gaus2_yield_xi;
 
-            cout << "Yield1: " << gaus1_yield_xi << endl;
-            cout << "Yield2: " << gaus2_yield_xi << endl;
-
             double rms_gaus1_sig_xi = gaus1_yield_xi/gausTot_yield_xi;
             double rms_gaus2_sig_xi = gaus2_yield_xi/gausTot_yield_xi;
+
             double rms_true_xi = TMath::Sqrt(rms_gaus1_sig_xi*sigma1.getVal()*sigma1.getVal() + rms_gaus2_sig_xi*sigma2.getVal()*sigma2.getVal());
 
             x.setRange("peak", mean.getVal() - 2*rms_true_xi, mean.getVal() + 2*rms_true_xi);
@@ -664,43 +650,70 @@ void Efficiency()
 
             yield_xi_[j/2].push_back(yield_xi);
 
+            RooPlot* xframe_xi = x.frame(150);
+            xframe_xi->GetXaxis()->SetTitle("Invariant mass (GeV)");
+            xframe_xi->GetYaxis()->SetTitle("Candidates / 0.001 GeV");
+            xframe_xi->GetXaxis()->CenterTitle(1);
+            xframe_xi->GetYaxis()->CenterTitle(1);
+            xframe_xi->GetXaxis()->SetTickSize(0.02);
+            xframe_xi->GetYaxis()->SetTickSize(0.02);
+            xframe_xi->GetXaxis()->SetNdivisions(407);
+            xframe_xi->GetYaxis()->SetNdivisions(410);
+            xframe_xi->GetXaxis()->SetTitleSize(0.06);
+            xframe_xi->GetYaxis()->SetTitleSize(0.06);
+            xframe_xi->GetYaxis()->SetTitleOffset(1.05);
+            xframe_xi->GetXaxis()->SetTitleOffset(0.5);
+            //xframe_xi->GetXaxis()->SetLabelSize(xframe_xi->GetXaxis()->GetLabelSize()*2.0);
+            xframe_xi->GetYaxis()->SetLabelSize(0.1);
+            xframe_xi->GetXaxis()->SetLabelSize(0.1);
+            //xframe_xi->GetYaxis()->SetLabelSize(xframe_xi->GetYaxis()->GetLabelSize()*2.0);
+            data.plotOn(xframe_xi,Name("data"));
             sum.plotOn(xframe_xi,Name("sum"),NormRange("cut"),LineWidth(1),LineColor(kBlue));
             sum.plotOn(xframe_xi,Components(background),NormRange("cut"),LineStyle(kDashed),LineWidth(1),LineColor(kBlue));
             Composite_Xi[hcounter_xi]->cd(index);
-            gPad->SetBottomMargin(0.15); //gives more space for titles
-            gPad->SetLeftMargin(0.15);
-            gPad->SetTickx(  );
-            gPad->SetTicky(  );
+            //gPad->SetBottomMargin(0.15); //gives more space for titles
+            //gPad->SetLeftMargin(0.15);
+            //gPad->SetTickx(  );
+            //gPad->SetTicky(  );
             Xframe_Xi.push_back(xframe_xi);
             xframe_xi->Draw();
             Composite_Xi[hcounter_xi]->Update();
 
-            TLine* t1 = new TLine(mean.getVal() - 2*rms_true_xi, 0, mean.getVal() - 2*rms_true_xi, gPad->GetUymax());
-            TLine* t2 = new TLine(mean.getVal() + 2*rms_true_xi, 0, mean.getVal() + 2*rms_true_xi, gPad->GetUymax());
-            t1->SetLineStyle(2);
-            t1->SetLineColor(kGreen);
-            t2->SetLineStyle(2);
-            t2->SetLineColor(kGreen);
-            t1->Draw("same");
-            t2->Draw("same");
-            double xpos = 0.55;
-            double ypos = 0.85;
-            double increment = 0.07;
+            TLine* t1_xi = new TLine(mean.getVal() - 2*rms_true_xi, 0, mean.getVal() - 2*rms_true_xi, gPad->GetUymax());
+            TLine* t2_xi = new TLine(mean.getVal() + 2*rms_true_xi, 0, mean.getVal() + 2*rms_true_xi, gPad->GetUymax());
+            t1_xi->SetLineStyle(2);
+            t1_xi->SetLineColor(kGreen);
+            t2_xi->SetLineStyle(2);
+            t2_xi->SetLineColor(kGreen);
+            t1_xi->Draw("same");
+            t2_xi->Draw("same");
+            xpos = xstart_xi;
+            ypos = ystart_xi;
+            increment = 0.07;
             if(i==0)
             {
                 os << "CMS pPb";
-                tex->SetTextSize(0.06);
+                tex->SetTextSize(0.08);
                 tex->DrawLatex(0.17,ypos-increment,os.str().c_str());
-                tex->SetTextSize(0.04);
+                tex->SetTextSize(0.06);
                 os.str(std::string());
                 os << "185 #leq N_{trk}^{offline} < 250";
                 tex->DrawLatex(0.17,ypos-2*increment,os.str().c_str());
                 os.str(std::string());
-                os << (-1.1 + (rap_bin[j]-1)/10) << " < y < " << (-1.1 + (rap_bin[j+1])/10);
+                os << (-1.1 + (rap_bin_xi[j]-1)/10) << " < y < " << (-1.1 + (rap_bin_xi[j+1])/10);
                 tex->DrawLatex(0.18,ypos-3*increment,os.str().c_str());
                 os.str(std::string());
             }
             os  << (pxi[i]-1)/10 << " < P_{t} < "  << pxi[i+1]/10 << " GeV";
+            tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+            os.str(std::string());
+            os << "Mean: " << std::setprecision(4) << mean_xi << " GeV" << std::setprecision(6);
+            tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+            os.str(std::string());
+            os << "#sigma :" << std::setprecision(2) << rms_true_xi << " GeV" << std::setprecision(6);
+            tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+            os.str(std::string());
+            os << "CovQual: " << covQuality_xi;
             tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
             os.str(std::string());
             osYield << "Yield: " << std::setprecision(2) << yield_xi;
@@ -717,14 +730,20 @@ void Efficiency()
         Composite_La[j]->Print(Form("RECOLaMassFitComposite_%d.pdf",j));
     }
 
+    for(int j=0; j<numRapBins_xi; j++)
+    {
+        Composite_Xi[j]->Print(Form("RECOXiMassFitComposite_%d.pdf",j));
+    }
+
+
     for(unsigned j=0; j<rap_bin_v0.size(); j+=2)
     {
-        for(unsigned i=0; i<numKsBins; i++)
+        for(int i=0; i<numKsBins; i++)
         {
             TH1D* massks_gen = (TH1D*)KsMassPtRap_Gen->ProjectionX(Form("massks_gen_%d",(int)(j*pks.size()+i)/2), pks[i]+1,pks[i+1],rap_bin_v0[j],rap_bin_v0[j+1]);
             yield_ks_gen[j/2].push_back(massks_gen->GetBinContent(massks_gen->GetMaximumBin()));
         }
-        for(unsigned i=0; i<numLaBins; i++)
+        for(int i=0; i<numLaBins; i++)
         {
             TH1D* massla_gen = (TH1D*)LaMassPtRap_Gen->ProjectionX(Form("massla_gen_%d",(int)(j*pla.size()+i)/2), pla[i]+1,pla[i+1],rap_bin_v0[j],rap_bin_v0[j+1]);
             yield_la_gen[j/2].push_back(massla_gen->GetBinContent(massla_gen->GetMaximumBin()));
@@ -732,6 +751,15 @@ void Efficiency()
     }
     //Composite_Ks_Gen->Print("Composite_Ks_Gen.pdf");
     //Composite_La_Gen->Print("Composite_La_Gen.pdf");
+
+    for(unsigned j=0; j<rap_bin_xi.size(); j+=2)
+    {
+        for(int i=0; i<numXiBins; i++)
+        {
+            TH1D* massxi_gen = (TH1D*)KsMassPtRap_Gen->ProjectionX(Form("massxi_gen_%d",(int)(j*pxi.size()+i)/2), pxi[i]+1,pxi[i+1],rap_bin_v0[j],rap_bin_v0[j+1]);
+            yield_xi_gen[j/2].push_back(massxi_gen->GetBinContent(massxi_gen->GetMaximumBin()));
+        }
+    }
 
     //Calculate efficiency
     for(int j=0; j<numRapBins_v0; j++)
@@ -745,10 +773,17 @@ void Efficiency()
             efficiency_la[j].push_back(yield_la_[j][i]/yield_la_gen[j][i]);
         }
     }
+
+    for(int j=0; j<numRapBins_xi; j++)
+    {
+        for(unsigned i=0; i<yield_xi_[j].size(); i++)
+        {
+            efficiency_xi[j].push_back(yield_xi_[j][i]/yield_xi_gen[j][i]);
+        }
+    }
 /*
 
     //Output
-/*
     int pkscounter = 0;
     myfile << "KSHORT KSHORT KSHORT\n";
     for(unsigned i=0; i<mass_ks_[j].size(); i++)
@@ -821,11 +856,22 @@ void Efficiency()
             myfile << efficiency_la[j][i] << "\n";
     }
 
-    const int rbinrap = 4;
+    myfile << "Efficiency Xi\n";
+    for(int j=0; j<numRapBins_xi; j++)
+    {
+        myfile << "Rap_bin " << j << "\n";
+        for(unsigned i=0; i<efficiency_xi[j].size(); i++)
+            myfile << efficiency_xi[j][i] << "\n";
+    }
+
+    const int rbinrap_v0 = 4;
+    const int rbinrap_xi = 2;
 
     double Rebin_ks[pks.size()];
     double Rebin_la[pla.size()];
-    double Rebin_rap[] = {-1.0,-0.5,-0.1,0.3,1.0};
+    double Rebin_xi[pxi.size()];
+    double Rebin_rap_v0[] = {-1.0,-0.5,-0.1,0.3,1.0};
+    double Rebin_rap_xi[] = {-1.0,0,1.0};
 
     for(unsigned i=0; i<pks.size(); i++)
     {
@@ -839,32 +885,56 @@ void Efficiency()
         cout << Rebin_la[i] << ", ";
     }
     cout << endl;
+    for(unsigned i=0; i<pxi.size(); i++)
+    {
+        Rebin_xi[i] = pxi[i]/10;
+        cout << Rebin_xi[i] << ", ";
+    }
+    cout << endl;
 
-    TH2D* Effhisto_ks = new TH2D("EffHistoKs","EffHistoKs",rbinrap,Rebin_rap,numKsBins,Rebin_ks);
-    TH2D* Effhisto_la = new TH2D("EffHistoLa","EffHistoLa",rbinrap,Rebin_rap,numLaBins,Rebin_la);
+    TH2D* Effhisto_ks = new TH2D("EffHistoKs","EffHistoKs",rbinrap_v0,Rebin_rap_v0,numKsBins,Rebin_ks);
+    TH2D* Effhisto_la = new TH2D("EffHistoLa","EffHistoLa",rbinrap_v0,Rebin_rap_v0,numLaBins,Rebin_la);
+    TH2D* Effhisto_xi = new TH2D("EffHistoXi","EffHistoXi",rbinrap_xi,Rebin_rap_xi,numXiBins,Rebin_xi);
 
     for(int j=0; j<numRapBins_v0; j++)
     {
         for(unsigned i=0; i<efficiency_ks[j].size(); i++)
-            Effhisto_ks->Fill(Rebin_rap[j],Rebin_ks[i]+0.01,efficiency_ks[j][i]);
+            Effhisto_ks->Fill(Rebin_rap_v0[j],Rebin_ks[i]+0.01,efficiency_ks[j][i]);
     }
 
     for(int j=0; j<numRapBins_v0; j++)
     {
         for(unsigned i=0; i<efficiency_la[j].size(); i++)
-            Effhisto_la->Fill(Rebin_rap[j],Rebin_la[i]+0.01,efficiency_la[j][i]);
+            Effhisto_la->Fill(Rebin_rap_v0[j],Rebin_la[i]+0.01,efficiency_la[j][i]);
     }
 
-    TCanvas* Eff = new TCanvas("Eff","",1200,800);
-    Eff->Divide(2,1);
-    Eff->cd(1);
+    for(int j=0; j<numRapBins_xi; j++)
+    {
+        for(unsigned i=0; i<efficiency_xi[j].size(); i++)
+            Effhisto_xi->Fill(Rebin_rap_xi[j],Rebin_xi[i]+0.01,efficiency_xi[j][i]);
+    }
+
+    TCanvas* Eff_v0 = new TCanvas("Eff_v0","",1200,800);
+    Eff_v0->Divide(2,1);
+    Eff_v0->cd(1);
     Effhisto_ks->Draw("Lego2");
-    Eff->cd(2);
+    Eff_v0->cd(2);
     Effhisto_la->Draw("Lego2");
 
-    TFile histos("Effhisto.root","RECREATE");
+    TFile histos_v0("EffhistoV0.root","RECREATE");
     Effhisto_ks->Write();
     Effhisto_la->Write();
+    histos_v0.Close();
+
+    TCanvas* Eff_xi = new TCanvas("Eff_xi","",800,800);
+    Eff_xi->cd(1);
+    Effhisto_xi->Draw("Lego2");
+    Eff_xi->cd(2);
+    Effhisto_xi->Draw("Lego2");
+
+    TFile histos_xi("EffhistoXi.root","RECREATE");
+    Effhisto_xi->Write();
+    histos_xi.Close();
 
     std::vector<double> eta_trg = {-0.9,-0.8,-0.4,-0.2,-0.1,0.2,0.5,0.9};
     std::vector<double> pt_trg = {0.1,1.2, 3.4, 4.0, 6.7, 8.6, 1.5, 2.0};
@@ -886,7 +956,7 @@ void Plotter()
     Double_t blue[NRGBs]  = { 0.51, 1.00, 0.12, 0.00, 0.00 };
     TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
 
-    TFile* f = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/Efficiency/Effhisto.root");
+    TFile* f = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/Efficiency/EffhistoV0.root");
 
     TH2D* effhistks = (TH2D*)f->Get("EffHistoKs");
     TH2D* effhistla = (TH2D*)f->Get("EffHistoLa");
@@ -915,12 +985,35 @@ void Plotter()
     effhistla->GetXaxis()->SetTitleOffset(1.5);
     effhistla->SetStats(kFALSE);
 
-    TCanvas* cc1 = new TCanvas("cc1","Efficiency", 1600,800);
+    TCanvas* cc1 = new TCanvas("cc1","Efficiency V0", 1600,800);
     cc1->Divide(2,1);
     cc1->cd(1);
     effhistks->Draw("Lego2 FB");
     cc1->cd(2);
     effhistla->Draw("Lego2 FB");
 
-    cc1->Print("Effhistos.pdf");
+    cc1->Print("EffhistosV0.pdf");
+
+    f->Close();
+
+    f = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/Efficiency/EffhistoXi.root");
+
+    TH2D* effhistxi = (TH2D*)f->Get("EffHistoXi");
+
+    effhistxi->SetTitle("Efficiency of #Xi^{#pm}");
+    effhistxi->GetZaxis()->SetRangeUser(0,0.03);
+    effhistxi->GetZaxis()->SetNdivisions(404);
+    effhistxi->GetYaxis()->SetNdivisions(505);
+    effhistxi->GetXaxis()->SetNdivisions(505);
+    effhistxi->GetYaxis()->SetTitle("P_{T} (GeV/c)");
+    effhistxi->GetXaxis()->SetTitle("y");
+    effhistxi->GetYaxis()->CenterTitle(1);
+    effhistxi->GetXaxis()->CenterTitle(1);
+    effhistxi->GetXaxis()->SetTitleOffset(1.5);
+    effhistxi->SetStats(kFALSE);
+
+    TCanvas* c2 = new TCanvas("c2","EfficiencyXi",800,800);
+    effhistxi->Draw("Lego2 FB");
+
+    c2->Print("EffhistosXi.pdf");
 }
