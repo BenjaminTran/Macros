@@ -5,6 +5,7 @@
 #include "TCanvas.h"
 #include "TF1.h"
 #include "TH1.h"
+#include "THStack.h"
 #include "TLatex.h"
 #include "TLegend.h"
 #include "TH2.h"
@@ -12,10 +13,7 @@
 #include "interface/GetGraphFromFile.C"
 #include "interface/MITStyle.C"
 
-/*double Gen_ks_Fit(double *x, double *par)*/
-/*{*/
-    /*return par[0] + par[1]*x[0] + par[2]*TMath::Power(x[0],2) + par[3]*TMath::Power(x[0],3);*/
-/*}*/
+std::string v2RootFileName = "v2V0sGraphs185_250D0Ana.root";
 
 void V0CrossCheck_v2()
 {
@@ -633,28 +631,32 @@ void Rap_v2sig()
         std::string cascadev2 = "";
 
         // Draw Legend and write points into rootfile
+        TFile* out = NULL;
         if(i==0)
         {
             kshortv2 = "kshortv2";
             lambdav2 = "lambdav2";
             cascadev2 = "cascadev2";
+            out = new TFile(v2RootFileName.c_str(),"RECREATE");
         }
         else if(i==1)
         {
             kshortv2 = "kshortv2KET";
             lambdav2 = "lambdav2KET";
             cascadev2 = "cascadev2KET";
+            out = new TFile(v2RootFileName.c_str(),"UPDATE");
         }
         else
         {
             kshortv2 = "kshortv2nq";
             lambdav2 = "lambdav2nq";
             cascadev2 = "cascadev2nq";
+            out = new TFile(v2RootFileName.c_str(),"UPDATE");
         }
-        TFile out("8TeVv2sigGraphv2_pPb185-250FullStats.root","RECREATE");
         ks8_v2->Write(kshortv2.c_str());
         la8_v2->Write(lambdav2.c_str());
         xi8_v2->Write(cascadev2.c_str());
+        out->Close();
 
 
         TLatex *tex = new TLatex();
@@ -669,9 +671,6 @@ void Rap_v2sig()
         tex->DrawLatex(0.40,0.24,"185 #leq N_{trk}^{offline} < 250");
         /*tex->DrawLatex(0.15,0.74,"|y| < 1");*/
         //tex->DrawLatex(0.4,0.7, "L_{#lower[-0.25]{int}} = 35 nb^{#font[122]{\55}1}, 185 nb^{#font[122]{\55}1}");
-        TLine* line = new TLine(0,0,6,0);
-        line->SetLineStyle(2);
-        line->Draw("same");
 
         if(i==0)
         {
@@ -691,164 +690,258 @@ void Rap_v2sig()
 void Rap_v2obs()
 {
     MITStyle();
-
-    const int xi_npoints = 9;
-    double v2Xi8[xi_npoints]  = {0.028288 ,0.0734096 ,0.109459 ,0.119556 ,0.166368 ,0.187297 ,0.21356 ,0.192063 ,0.16625};
-    double pTXi8[xi_npoints]  = {1.267, 1.62, 2.008, 2.501, 3.173, 4.029, 5.055, 6.938, 11.31};
-    double v2Xi8E[xi_npoints] = {0.0145154 ,0.00762373 ,0.00651275 ,0.00512493 ,0.00481561 ,0.00563771 ,0.00803405 ,0.0175756 ,0.0315233};
-
-	/*const int xi_npoints = 11;*/
-    /*double v2Xi8[xi_npoints]  = {0.0272316 ,0.0735904 ,0.108707 ,0.119905 ,0.166593 ,0.186789 ,0.213248 ,0.190285 ,0.165164 ,0.288952 ,0.25353};*/
-    /*double pTXi8[xi_npoints]  = {1.267, 1.62, 2.008, 2.501, 3.173, 4.029, 5.055, 6.275, 7.726, 9.098, 11.59};*/
-    /*double v2Xi8E[xi_npoints] = {0.0152834 ,0.00784469 ,0.00667958 ,0.00524615 ,0.00493004 ,0.00577176 ,0.00822074 ,0.018064 ,0.0323931 ,0.0626886 ,0.0868749};*/
-
-
-	const int ks_npoints = 16;
-    double v2Ks8[ks_npoints]  = {0.0183679 ,0.0289959 ,0.0428532 ,0.0598327 ,0.082664 ,0.10635 ,0.124404 ,0.138096 ,0.146914 ,0.143748 ,0.135454 ,0.120565 ,0.12986 ,0.11892 ,0.134655 ,0.129064};
-    double pTKs8[ks_npoints]  = {0.3666, 0.5309, 0.711, 0.9046, 1.202, 1.591, 1.986, 2.465, 3.136, 4.008, 5.142, 6.431, 7.619, 9.142, 11.64, 16.86};
-    double v2Ks8E[ks_npoints] = {0.00375874 ,0.000902538 ,0.000527948 ,0.000430599 ,0.000281917 ,0.000303551 ,0.000363822 ,0.00039436 ,0.000519449 ,0.000777174 ,0.00122037 ,0.00253245 ,0.00329789 ,0.00543151 ,0.00622973 ,0.017103};
-
-	const int la_npoints = 13;
-    double v2La8[la_npoints]  = {0.0354139 ,0.0516292 ,0.077228 ,0.107637 ,0.138136 ,0.171592 ,0.193789 ,0.200912 ,0.200429 ,0.176394 ,0.180825 ,0.169005 ,0.202348};
-    double pTLa8[la_npoints]  = {0.9252, 1.224, 1.603, 1.995, 2.485, 3.156, 4.007, 5.116, 6.414, 7.588, 9.117, 11.56, 16.89};
-    double v2La8E[la_npoints] = {0.00184566 ,0.000756422 ,0.000671435 ,0.000686081 ,0.000624802 ,0.000692926 ,0.000974103 ,0.00162467 ,0.00386568 ,0.00554866 ,0.0101038 ,0.0126748 ,0.0355234};
-
-
-
-    // Pull TGraph for Kshort and lambda
-
-    //TGraphErrors* ha_v2 = (TGraphErrors*)file_hadv2->Get("hadronv2");
-    TGraphErrors* ha_v2 = (TGraphErrors*)GetGraphWithSymmYErrorsFromFile(Form("data/%s","n185_220_ptass033pPb_v2.txt"),1,28,1.2);
-
-    TGraphErrors* xi8_v2 = new TGraphErrors(xi_npoints,pTXi8,v2Xi8,0,v2Xi8E);
-    TGraphErrors* ks8_v2 = new TGraphErrors(ks_npoints,pTKs8,v2Ks8,0,v2Ks8E);
-	TGraphErrors* la8_v2 = new TGraphErrors(la_npoints,pTLa8,v2La8,0,v2La8E);
-
-    ha_v2->SetMarkerStyle(28);
-    ha_v2->SetMarkerSize(1.3);
-
-    ks8_v2->SetMarkerColor(kRed);
-    ks8_v2->SetMarkerStyle(20);
-    ks8_v2->SetMarkerSize(1.5);
-    ks8_v2->SetLineColor(kRed);
-
-    xi8_v2->SetMarkerColor(kGreen+2);
-    xi8_v2->SetMarkerStyle(21);
-    xi8_v2->SetMarkerSize(1.5);
-    xi8_v2->SetLineColor(kGreen+2);
-
-    la8_v2->SetMarkerColor(kBlue-4);
-    la8_v2->SetMarkerStyle(22);
-    la8_v2->SetMarkerSize(1.5);
-    la8_v2->SetLineColor(kBlue-4);
-
-    TCanvas* c1 = MakeCanvas("c1", "Plot");
-    c1->cd();
-    /*c1->SetLogy();*/
+    TCanvas* c1 = MakeCanvas("c1", "Individual");
     c1->SetLeftMargin(0.12);
 
-    // draw the frame using a histogram frame
+    TCanvas* c2 = MakeCanvas("c2", "Combined");
+    c2->cd();
+    c2->SetLeftMargin(0.12);
 
-    TH1F* frame = c1->DrawFrame(0,-0.01,20,0.45);
-    /*TH1F* frame = c1->DrawFrame(0,0.01,20,1);*/
+    // draw the frame using a histogram frame
+    TH1F* frame_co = c2->DrawFrame(0,-0.05,9,0.45);
     gPad->SetTickx();
     gPad->SetTicky();
-    frame->GetXaxis()->CenterTitle(1);
-    frame->GetYaxis()->CenterTitle(1);
-    frame->GetXaxis()->SetTitleSize(0.05);
-    frame->GetXaxis()->SetTitle("p_{T} (GeV)");
-    frame->GetYaxis()->SetTitle("v_{2}^{obs}");
-    frame->GetYaxis()->SetTitleSize(0.05);
-    frame->SetTitleOffset(1.1,"Y");
-    frame->SetTitleOffset(1.2,"X");
+    frame_co->GetXaxis()->CenterTitle(1);
+    frame_co->GetYaxis()->CenterTitle(1);
+    frame_co->GetXaxis()->SetTitleSize(0.05);
+    frame_co->GetXaxis()->SetTitle("p_{T} (GeV)");
+    frame_co->GetYaxis()->SetTitle("v_{2}^{Obs,Bkg}");
+    frame_co->GetYaxis()->SetTitleSize(0.05);
+    frame_co->SetTitleOffset(1.1,"Y");
+    frame_co->SetTitleOffset(1.2,"X");
 
-    //ha_v2->Draw("PESAME");
-    ks8_v2->Draw("P");
-    la8_v2->Draw("P");
-    xi8_v2->Draw("P");
-
-    // Write points into rootfile
-    TFile out("8TeVv2obsGraphv2_pPb185-250.root","RECREATE");
-    ks8_v2->Write("kshortv2");
-    la8_v2->Write("lambdav2");
-    xi8_v2->Write("cascadev2");
-
-    TLegend* leg = new TLegend(0.15,0.55,0.27,0.75);
-    leg->SetFillColor(10);
-    leg->SetFillStyle(0);
-    leg->SetBorderSize(0);
-    leg->SetTextFont(42);
-    leg->SetTextSize(0.05);
-    //leg->AddEntry(ha_v2, "h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}", "P");
-    leg->AddEntry(ks8_v2, "K_{S}^{0}", "P");
-    leg->AddEntry(la8_v2, "#Lambda / #bar{#Lambda}", "P");
-    /*leg->AddEntry(xi8_v2, "#Xi#kern[-0.3]{#lower[0.1]{{}^{+}}}/ #Xi#kern[-0.3]{#lower[0.1]{{}^{-}}}", "P");*/
-    leg->AddEntry(xi8_v2, "#Xi^{+}/ #Xi^{-}", "P");
-    leg->Draw();
+    TLegend* leg_co_spec = new TLegend(0.15,0.55,0.27,0.75);
+    leg_co_spec->SetFillColor(10);
+    leg_co_spec->SetFillStyle(0);
+    leg_co_spec->SetBorderSize(0);
+    leg_co_spec->SetTextFont(42);
+    leg_co_spec->SetTextSize(0.05);
 
     TLatex *tex = new TLatex();
     tex->SetNDC();
     tex->SetTextFont(62);
     tex->SetTextSize(0.05);
-    tex->DrawLatex(0.15,0.8,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
-    tex->SetTextSize(0.045);
-    //tex->DrawLatex(0.15,0.72, "L_{#lower[-0.25]{int}} = #color[38]{35} nb^{#font[122]{\55}1}, #color[46]{62} nb^{#font[122]{\55}1}");
-    // tex->DrawLatex(0.23,0.72, "L_{#lower[-0.25]{int}} = #color[kOrange+8]{35} nb^{#font[122]{\55}1}, 62 nb^{#font[122]{\55}1}");
-    tex->SetTextFont(42);
-    tex->DrawLatex(0.40,0.24,"185 #leq N_{trk}^{offline} < 250");
-    /*tex->DrawLatex(0.15,0.74,"|y| < 1");*/
-    //tex->DrawLatex(0.4,0.7, "L_{#lower[-0.25]{int}} = 35 nb^{#font[122]{\55}1}, 185 nb^{#font[122]{\55}1}");
-    TLine* line = new TLine(0,0,6,0);
-    line->SetLineStyle(2);
-    line->Draw("same");
 
-    c1->Print("v2ObsRapidity.pdf");
+    std::string legendLabel = "";
+    TLegend* leg_co_Label = new TLegend(0.75,0.75,0.85,0.85);
+    leg_co_Label->SetFillColor(10);
+    leg_co_Label->SetFillStyle(0);
+    leg_co_Label->SetBorderSize(0);
+    leg_co_Label->SetTextFont(42);
+    leg_co_Label->SetTextSize(0.05);
 
+    c1->cd();
+
+    const int xi_npoints = 8;
+    const int ks_npoints = 13;
+    const int la_npoints = 10;
+
+    std::string kshortv2 = "";
+    std::string lambdav2 = "";
+    std::string cascadev2 = "";
+    std::string yaxis = "";
+
+    std::vector<double> v2Xi8;
+    std::vector<double> pTXi8;
+    std::vector<double> v2Xi8E;
+
+    std::vector<double> v2Ks8;
+    std::vector<double> pTKs8;
+    std::vector<double> v2Ks8E;
+
+    std::vector<double> v2La8;
+    std::vector<double> pTLa8;
+    std::vector<double> v2La8E;
+
+    for(int i=0; i<2; i++)
+    {
+        if(i==0)
+        {
+            kshortv2 = "kshortv2Obs";
+            lambdav2 = "lambdav2Obs";
+            cascadev2 = "cascadev2Obs";
+            yaxis = "v_{2}^{obs}";
+            v2Xi8.insert(v2Xi8.end(),{0.0397521 ,0.0672835 ,0.0879851 ,0.123906 ,0.163679 ,0.184638 ,0.210454 ,0.177214});
+            pTXi8.insert(pTXi8.end(),{1.267, 1.62, 2.008, 2.501, 3.173, 4.029, 5.055, 6.938});
+            v2Xi8E.insert(v2Xi8E.end(),{0.00885641 ,0.00470611 ,0.0040499 ,0.00319483 ,0.0030202 ,0.0035308 ,0.00505887 ,0.0110131});
+
+            v2Ks8.insert(v2Ks8.end(),{0.0135496 ,0.0293041 ,0.0433881 ,0.0594498 ,0.082389 ,0.106184 ,0.124363 ,0.137749 ,0.146475 ,0.145182 ,0.135266 ,0.125505 ,0.12497});
+            pTKs8.insert(pTKs8.end(),{0.3666, 0.5309, 0.711, 0.9046, 1.202, 1.591, 1.986, 2.465, 3.136, 4.008, 5.142, 6.431, 7.619});
+            v2Ks8E.insert(v2Ks8E.end(),{0.00217605 ,0.000522193 ,0.000305651 ,0.000249826 ,0.000165266 ,0.000178936 ,0.000214314 ,0.000232438 ,0.000304168 ,0.000452022 ,0.000707061 ,0.00146546 ,0.00190789});
+
+            v2La8.insert(v2La8.end(),{0.0346226 ,0.0510097 ,0.0771498 ,0.106527 ,0.13851 ,0.171976 ,0.19385 ,0.202711 ,0.197155 ,0.178511});
+            pTLa8.insert(pTLa8.end(),{0.9252, 1.224, 1.603, 1.995, 2.485, 3.156, 4.007, 5.116, 6.414, 7.588});
+            v2La8E.insert(v2La8E.end(),{0.00106781 ,0.000437847 ,0.000389104 ,0.00039822 ,0.000364256 ,0.000404734 ,0.000567087 ,0.000942798 ,0.00223597 ,0.00321154});
+        }
+        else
+        {
+            v2Xi8.clear();
+            pTXi8.clear();
+            v2Xi8E.clear();
+
+            v2Ks8.clear();
+            pTKs8.clear();
+            v2Ks8E.clear();
+
+            v2La8.clear();
+            pTLa8.clear();
+            v2La8E.clear();
+
+            kshortv2 = "kshortv2Bkg";
+            lambdav2 = "lambdav2Bkg";
+            cascadev2 = "cascadev2Bkg";
+            yaxis = "v_{2}^{bkg}";
+
+            v2Xi8.insert(v2Xi8.end(),{0.0936965 ,0.0782133 ,0.0985179 ,0.121518 ,0.173158 ,0.216723 ,0.232391 ,0.230779});
+            pTXi8.insert(pTXi8.end(),{1.267, 1.62, 2.008, 2.501, 3.173, 4.029, 5.055, 6.938});
+            v2Xi8E.insert(v2Xi8E.end(),{0.00749852 ,0.00950025 ,0.00868329 ,0.00770257 ,0.00664219 ,0.00701412 ,0.010755 ,0.0195874});
+
+            v2Ks8.insert(v2Ks8.end(),{0.00449492 ,0.0473127 ,0.0585964 ,0.0687393 ,0.0931208 ,0.114931 ,0.132041 ,0.149003 ,0.166686 ,0.172154 ,0.171293 ,0.158914 ,0.158798});
+            pTKs8.insert(pTKs8.end(),{0.3666, 0.5309, 0.711, 0.9046, 1.202, 1.591, 1.986, 2.465, 3.136, 4.008, 5.142, 6.431, 7.619});
+            v2Ks8E.insert(v2Ks8E.end(),{0.0390969 ,0.00255086 ,0.00181359 ,0.00163701 ,0.000986848 ,0.000960547 ,0.0010765 ,0.00101774 ,0.00108115 ,0.00148885 ,0.00198329 ,0.00404482 ,0.00497703});
+
+            v2La8.insert(v2La8.end(),{0.0817952 ,0.0973297 ,0.117934 ,0.136615 ,0.156659 ,0.178532 ,0.193261 ,0.191957 ,0.177981 ,0.168276});
+            pTLa8.insert(pTLa8.end(),{0.9252, 1.224, 1.603, 1.995, 2.485, 3.156, 4.007, 5.116, 6.414, 7.588});
+            v2La8E.insert(v2La8E.end(),{0.000541466 ,0.000463843 ,0.000595759 ,0.00077596 ,0.000850846 ,0.00108663 ,0.00159224 ,0.00261702 ,0.00559253 ,0.00709033});
+
+            c2->cd();
+
+            leg_co_spec->Draw();
+            leg_co_Label->Draw();
+            tex->SetTextFont(62);
+            tex->DrawLatex(0.15,0.8,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
+            tex->SetTextSize(0.045);
+            tex->SetTextFont(42);
+            tex->DrawLatex(0.40,0.24,"185 #leq N_{trk}^{offline} < 250");
+            c1->cd();
+        }
+
+        TGraphErrors* xi8_v2 = new TGraphErrors(xi_npoints,&pTXi8[0],&v2Xi8[0],0,&v2Xi8E[0]);
+        TGraphErrors* ks8_v2 = new TGraphErrors(ks_npoints,&pTKs8[0],&v2Ks8[0],0,&v2Ks8E[0]);
+        TGraphErrors* la8_v2 = new TGraphErrors(la_npoints,&pTLa8[0],&v2La8[0],0,&v2La8E[0]);
+
+        ks8_v2->SetMarkerColor(kRed);
+        ks8_v2->SetMarkerStyle(20);
+        ks8_v2->SetMarkerSize(1.5);
+        ks8_v2->SetLineColor(kRed);
+
+        xi8_v2->SetMarkerColor(kGreen+2);
+        xi8_v2->SetMarkerStyle(21);
+        xi8_v2->SetMarkerSize(1.5);
+        xi8_v2->SetLineColor(kGreen+2);
+
+        la8_v2->SetMarkerColor(kBlue-4);
+        la8_v2->SetMarkerStyle(22);
+        la8_v2->SetMarkerSize(1.5);
+        la8_v2->SetLineColor(kBlue-4);
+
+        // draw the frame using a histogram frame
+        TH1F* frame = c1->DrawFrame(0,-0.05,9,0.45);
+        /*TH1F* frame = c1->DrawFrame(0,0.01,20,1);*/
+        gPad->SetTickx();
+        gPad->SetTicky();
+        frame->GetXaxis()->CenterTitle(1);
+        frame->GetYaxis()->CenterTitle(1);
+        frame->GetXaxis()->SetTitleSize(0.05);
+        frame->GetXaxis()->SetTitle("p_{T} (GeV)");
+        frame->GetYaxis()->SetTitle(yaxis.c_str());
+        frame->GetYaxis()->SetTitleSize(0.05);
+        frame->SetTitleOffset(1.1,"Y");
+        frame->SetTitleOffset(1.2,"X");
+
+        //ha_v2->Draw("PESAME");
+        ks8_v2->Draw("P");
+        la8_v2->Draw("P");
+        xi8_v2->Draw("P");
+
+        TLegend* leg = new TLegend(0.15,0.55,0.27,0.75);
+        leg->SetFillColor(10);
+        leg->SetFillStyle(0);
+        leg->SetBorderSize(0);
+        leg->SetTextFont(42);
+        leg->SetTextSize(0.05);
+        //leg->AddEntry(ha_v2, "h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}", "P");
+        leg->AddEntry(ks8_v2, "K_{S}^{0}", "P");
+        leg->AddEntry(la8_v2, "#Lambda / #bar{#Lambda}", "P");
+        /*leg->AddEntry(xi8_v2, "#Xi#kern[-0.3]{#lower[0.1]{{}^{+}}}/ #Xi#kern[-0.3]{#lower[0.1]{{}^{-}}}", "P");*/
+        leg->AddEntry(xi8_v2, "#Xi^{+}/#Xi^{-}", "P");
+        leg->Draw();
+
+        tex->SetTextFont(62);
+        tex->DrawLatex(0.15,0.8,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
+        tex->SetTextSize(0.045);
+        //tex->DrawLatex(0.15,0.72, "L_{#lower[-0.25]{int}} = #color[38]{35} nb^{#font[122]{\55}1}, #color[46]{62} nb^{#font[122]{\55}1}");
+        // tex->DrawLatex(0.23,0.72, "L_{#lower[-0.25]{int}} = #color[kOrange+8]{35} nb^{#font[122]{\55}1}, 62 nb^{#font[122]{\55}1}");
+        tex->SetTextFont(42);
+        tex->DrawLatex(0.40,0.24,"185 #leq N_{trk}^{offline} < 250");
+        /*tex->DrawLatex(0.15,0.74,"|y| < 1");*/
+        //tex->DrawLatex(0.4,0.7, "L_{#lower[-0.25]{int}} = 35 nb^{#font[122]{\55}1}, 185 nb^{#font[122]{\55}1}");
+
+        if(i==0) c1->Print("v2ObsRapidity.pdf");
+        if(i==1) c1->Print("v2BkgRapidity.pdf");
+
+        c2->cd();
+        if(i==1)
+        {
+            ks8_v2->SetMarkerStyle(24);
+            xi8_v2->SetMarkerStyle(25);
+            la8_v2->SetMarkerStyle(26);
+        }
+        ks8_v2->Draw("P");
+        la8_v2->Draw("P");
+        xi8_v2->Draw("P");
+
+        if(i==0)
+        {
+            leg_co_spec->AddEntry(ks8_v2, "K_{S}^{0}", "P");
+            leg_co_spec->AddEntry(la8_v2, "#Lambda/#bar{#Lambda}", "P");
+            leg_co_spec->AddEntry(xi8_v2, "#Xi^{+}/#Xi^{-}", "P");
+            legendLabel = "Obs";
+            leg_co_Label->AddEntry(ks8_v2,legendLabel.c_str(), "P");
+        }
+        else
+        {
+            legendLabel = "Bkg";
+            TGraphErrors* ks_clone = (TGraphErrors*)ks8_v2->Clone("ks8_v2_bkg");
+            ks_clone->SetMarkerStyle(24);
+            leg_co_Label->AddEntry(ks_clone,legendLabel.c_str(), "P");
+        }
+
+        c1->cd();
+
+        // Write points into rootfile
+        TFile out(v2RootFileName.c_str(),"UPDATE");
+        ks8_v2->Write(kshortv2.c_str(),TObject::kOverwrite);
+        la8_v2->Write(lambdav2.c_str(),TObject::kOverwrite);
+        xi8_v2->Write(cascadev2.c_str(),TObject::kOverwrite);
+        out.Close();
+    }
+
+    c2->Print("v2ObsBkgRapidity.pdf");
 }
 
 void Rap_v2bkg()
 {
     MITStyle();
 
-    const int xi_npoints = 9;
-    double v2Xi8[xi_npoints]  = {0.0502074 ,0.0666694 ,0.140997 ,0.103829 ,0.156365 ,0.209947 ,0.227812 ,0.260397 ,0.2087};
-    double pTXi8[xi_npoints]  = {1.267, 1.62, 2.008, 2.501, 3.173, 4.029, 5.055, 6.938, 11.31};
-    double v2Xi8E[xi_npoints] = {0.0168844 ,0.0209328 ,0.0128893 ,0.014907 ,0.0126887 ,0.0123909 ,0.0188829 ,0.030211 ,0.0632523};
+    const int xi_npoints = 8;
+    double v2Xi8[xi_npoints]  = {0.0936965 ,0.0782133 ,0.0985179 ,0.121518 ,0.173158 ,0.216723 ,0.232391 ,0.230779};
+    double pTXi8[xi_npoints]  = {1.267, 1.62, 2.008, 2.501, 3.173, 4.029, 5.055, 6.938};
+    double v2Xi8E[xi_npoints] = {0.00749852 ,0.00950025 ,0.00868329 ,0.00770257 ,0.00664219 ,0.00701412 ,0.010755 ,0.0195874};
 
-	/*const int xi_npoints = 11;*/
-    /*double v2Xi8[xi_npoints]  = {0.0272316 ,0.0735904 ,0.108707 ,0.119905 ,0.166593 ,0.186789 ,0.213248 ,0.190285 ,0.165164 ,0.288952 ,0.25353};*/
-    /*double pTXi8[xi_npoints]  = {1.267, 1.62, 2.008, 2.501, 3.173, 4.029, 5.055, 6.275, 7.726, 9.098, 11.59};*/
-    /*double v2Xi8E[xi_npoints] = {0.0152834 ,0.00784469 ,0.00667958 ,0.00524615 ,0.00493004 ,0.00577176 ,0.00822074 ,0.018064 ,0.0323931 ,0.0626886 ,0.0868749};*/
+	const int ks_npoints = 13;
+    double v2Ks8[ks_npoints]  = {0.00449492 ,0.0473127 ,0.0585964 ,0.0687393 ,0.0931208 ,0.114931 ,0.132041 ,0.149003 ,0.166686 ,0.172154 ,0.171293 ,0.158914 ,0.158798};
+    double pTKs8[ks_npoints]  = {0.3666, 0.5309, 0.711, 0.9046, 1.202, 1.591, 1.986, 2.465, 3.136, 4.008, 5.142, 6.431, 7.619};
+    double v2Ks8E[ks_npoints] = {0.0390969 ,0.00255086 ,0.00181359 ,0.00163701 ,0.000986848 ,0.000960547 ,0.0010765 ,0.00101774 ,0.00108115 ,0.00148885 ,0.00198329 ,0.00404482 ,0.00497703};
 
-
-	const int ks_npoints = 16;
-    double v2Ks8[ks_npoints]  = {-0.0276159 ,0.0505831 ,0.0633616 ,0.0659727 ,0.0935834 ,0.116099 ,0.132347 ,0.148838 ,0.163849 ,0.169637 ,0.176803 ,0.158785 ,0.167225 ,0.129859 ,0.155915 ,0.21973};
-    double pTKs8[ks_npoints]  = {0.3666, 0.5309, 0.711, 0.9046, 1.202, 1.591, 1.986, 2.465, 3.136, 4.008, 5.142, 6.431, 7.619, 9.142, 11.64, 16.86};
-    double v2Ks8E[ks_npoints] = {0.0148551 ,0.00407726 ,0.00286001 ,0.00296167 ,0.00170357 ,0.00164754 ,0.00185762 ,0.00176369 ,0.00190469 ,0.00258989 ,0.0033231 ,0.00672046 ,0.00846984 ,0.0149719 ,0.0140114 ,0.021461};
-
-	const int la_npoints = 13;
-    double v2La8[la_npoints]  = {0.0837146 ,0.0974558 ,0.118958 ,0.13642 ,0.1587 ,0.176193 ,0.189751 ,0.192593 ,0.17456 ,0.15699 ,0.188704 ,0.207833 ,0.217665};
-    double pTLa8[la_npoints]  = {0.9252, 1.224, 1.603, 1.995, 2.485, 3.156, 4.007, 5.116, 6.414, 7.588, 9.117, 11.56, 16.89};
-    double v2La8E[la_npoints] = {0.000934595 ,0.000809648 ,0.00102125 ,0.00135576 ,0.00144641 ,0.00189797 ,0.00280107 ,0.00447446 ,0.010036 ,0.0129962 ,0.0179161 ,0.0155427 ,0.0443472};
-
-
-
-    // Pull TGraph for Kshort and lambda
-
-    TFile* file_pPbv2 = TFile::Open("lrgraphv2_v3_pPb_185-220.root");
-    TFile* file_hadv2 = TFile::Open("lrgraphv2_v3_pPb_hadron_185-above.root");
-
-    TGraphErrors* ks_v2 = (TGraphErrors*)file_pPbv2->Get("kshortv2true");
-    TGraphErrors* la_v2 = (TGraphErrors*)file_pPbv2->Get("lambdav2true");
-    //TGraphErrors* ha_v2 = (TGraphErrors*)file_hadv2->Get("hadronv2");
-    TGraphErrors* ha_v2 = (TGraphErrors*)GetGraphWithSymmYErrorsFromFile(Form("data/%s","n185_220_ptass033pPb_v2.txt"),1,28,1.2);
+	const int la_npoints = 10;
+    double v2La8[la_npoints]  = {0.0817952 ,0.0973297 ,0.117934 ,0.136615 ,0.156659 ,0.178532 ,0.193261 ,0.191957 ,0.177981 ,0.168276};
+    double pTLa8[la_npoints]  = {0.9252, 1.224, 1.603, 1.995, 2.485, 3.156, 4.007, 5.116, 6.414, 7.588};
+    double v2La8E[la_npoints] = {0.000541466 ,0.000463843 ,0.000595759 ,0.00077596 ,0.000850846 ,0.00108663 ,0.00159224 ,0.00261702 ,0.00559253 ,0.00709033};
 
     TGraphErrors* xi8_v2 = new TGraphErrors(xi_npoints,pTXi8,v2Xi8,0,v2Xi8E);
     TGraphErrors* ks8_v2 = new TGraphErrors(ks_npoints,pTKs8,v2Ks8,0,v2Ks8E);
 	TGraphErrors* la8_v2 = new TGraphErrors(la_npoints,pTLa8,v2La8,0,v2La8E);
-
-    ha_v2->SetMarkerStyle(28);
-    ha_v2->SetMarkerSize(1.3);
 
     ks8_v2->SetMarkerColor(kRed);
     ks8_v2->SetMarkerStyle(20);
@@ -872,7 +965,7 @@ void Rap_v2bkg()
 
     // draw the frame using a histogram frame
 
-    TH1F* frame = c1->DrawFrame(0,-0.05,20,0.45);
+    TH1F* frame = c1->DrawFrame(0,-0.05,9,0.45);
     /*TH1F* frame = c1->DrawFrame(0,0.01,20,1);*/
     gPad->SetTickx();
     gPad->SetTicky();
@@ -885,16 +978,16 @@ void Rap_v2bkg()
     frame->SetTitleOffset(1.1,"Y");
     frame->SetTitleOffset(1.2,"X");
 
-    //ha_v2->Draw("PESAME");
     ks8_v2->Draw("P");
     la8_v2->Draw("P");
     xi8_v2->Draw("P");
 
     // Write points into rootfile
-    TFile out("8TeVv2bkgGraphv2_pPb185-250.root","RECREATE");
-    ks8_v2->Write("kshortv2bkg");
-    la8_v2->Write("lambdav2bkg");
-    xi8_v2->Write("cascadev2bkg");
+    TFile out(v2RootFileName.c_str(),"UPDATE");
+    ks8_v2->Write("kshortv2bkg",TObject::kOverwrite);
+    la8_v2->Write("lambdav2bkg",TObject::kOverwrite);
+    xi8_v2->Write("cascadev2bkg",TObject::kOverwrite);
+    out.Close();
 
     TLegend* leg = new TLegend(0.15,0.55,0.27,0.75);
     leg->SetFillColor(10);
@@ -915,8 +1008,6 @@ void Rap_v2bkg()
     tex->SetTextSize(0.05);
     tex->DrawLatex(0.15,0.8,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
     tex->SetTextSize(0.045);
-    //tex->DrawLatex(0.15,0.72, "L_{#lower[-0.25]{int}} = #color[38]{35} nb^{#font[122]{\55}1}, #color[46]{62} nb^{#font[122]{\55}1}");
-    // tex->DrawLatex(0.23,0.72, "L_{#lower[-0.25]{int}} = #color[kOrange+8]{35} nb^{#font[122]{\55}1}, 62 nb^{#font[122]{\55}1}");
     tex->SetTextFont(42);
     tex->DrawLatex(0.40,0.24,"185 #leq N_{trk}^{offline} < 250");
     /*tex->DrawLatex(0.15,0.74,"|y| < 1");*/
@@ -933,17 +1024,17 @@ void Rap_fsig()
 {
     MITStyle();
 
-    const int xi_npoints = 9;
-    double fsig_Xi8[xi_npoints]  = {0.954019 ,0.973881 ,0.976705 ,0.97829 ,0.978074 ,0.978057 ,0.978603 ,0.974693 ,0.976012};
-    double pTXi8[xi_npoints]  = {1.267, 1.62, 2.008, 2.501, 3.173, 4.029, 5.055, 6.938, 11.31};
+    const int xi_npoints = 8;
+    double fsig_Xi8[xi_npoints]  = {0.954019 ,0.973881 ,0.976705 ,0.97829 ,0.978074 ,0.978057 ,0.978603 ,0.974644};
+    double pTXi8[xi_npoints]  = {1.267, 1.62, 2.008, 2.501, 3.173, 4.029, 5.055, 6.938};
 
-	const int ks_npoints = 16;
-    double fsig_Ks8[ks_npoints]  = {0.999476 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,0.999999 ,0.999999 ,0.999988 ,0.999997 ,0.992327 ,0.99836 ,0.890106,0.481433};
-    double pTKs8[ks_npoints]  = {0.3666, 0.5309, 0.711, 0.9046, 1.202, 1.591, 1.986, 2.465, 3.136, 4.008, 5.142, 6.431, 7.619, 9.142, 11.64, 16.86};
+	const int ks_npoints = 13;
+    double fsig_Ks8[ks_npoints]  = {0.999476 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,0.999999 ,0.999999 ,0.999988 ,0.999997 ,0.992327};
+    double pTKs8[ks_npoints]  = {0.3666, 0.5309, 0.711, 0.9046, 1.202, 1.591, 1.986, 2.465, 3.136, 4.008, 5.142, 6.431, 7.619};
 
-	const int la_npoints = 13;
-    double fsig_La8[la_npoints]  = {0.99882 ,0.999987 ,1 ,0.999524 ,0.999632 ,0.999855 ,0.999698 ,0.998783 ,0.999771 ,0.997088 ,0.92718 ,0.990913,0.421011};
-    double pTLa8[la_npoints]  = {0.9252, 1.224, 1.603, 1.995, 2.485, 3.156, 4.007, 5.116, 6.414, 7.588, 9.117, 11.56, 16.89};
+	const int la_npoints = 10;
+    double fsig_La8[la_npoints]  = {0.99882 ,0.999987 ,1 ,0.999524 ,0.999632 ,0.999855 ,0.999698 ,0.998783 ,0.999771 ,0.997088};
+    double pTLa8[la_npoints]  = {0.9252, 1.224, 1.603, 1.995, 2.485, 3.156, 4.007, 5.116, 6.414, 7.588};
 
     // Pull TGraph for Kshort and lambda
 
@@ -973,7 +1064,7 @@ void Rap_fsig()
 
     // draw the frame using a histogram frame
 
-    TH1F* frame = c1->DrawFrame(0,0.2,20,1.5);
+    TH1F* frame = c1->DrawFrame(0,0.85,9,1.15);
     /*TH1F* frame = c1->DrawFrame(0,0.01,20,1);*/
     gPad->SetTickx();
     gPad->SetTicky();
@@ -1022,7 +1113,7 @@ void Rap_fsig()
     tex->DrawLatex(0.40,0.24,"185 #leq N_{trk}^{offline} < 250");
     /*tex->DrawLatex(0.15,0.74,"|y| < 1");*/
     //tex->DrawLatex(0.4,0.7, "L_{#lower[-0.25]{int}} = 35 nb^{#font[122]{\55}1}, 185 nb^{#font[122]{\55}1}");
-    TLine* line = new TLine(0,1,20,1);
+    TLine* line = new TLine(0,1,9,1);
     line->SetLineStyle(2);
     line->Draw("same");
 
@@ -1119,7 +1210,7 @@ void RapSys_RecoCutsV0()
     line->SetLineStyle(2);
     line->Draw("same");
 
-    c1_ks->Print("v2KshortRecoSystematics.pdf");
+    c1_ks->Print("v2RecoSystematicsKshort.pdf");
 
     //Do lambda
     const int la_npoints = 13;
@@ -1202,7 +1293,7 @@ void RapSys_RecoCutsV0()
     tex->DrawLatex(0.40,0.32,"185 #leq N_{trk}^{offline} < 250");
     line->Draw("same");
 
-    c1_la->Print("v2LambdaRecoSystematics.pdf");
+    c1_la->Print("v2RecoSystematicsLambda.pdf");
 
     //Combined
     TCanvas* c1_co = MakeCanvas("c1_co", "Plot_co");
@@ -1262,7 +1353,7 @@ void RapSys_RecoCutsV0()
     tex->DrawLatex(0.40,0.32,"185 #leq N_{trk}^{offline} < 250");
     line->Draw("same");
 
-    c1_co->Print("v2CombinedRecoSystematics.pdf");
+    c1_co->Print("v2CombinedRecoSystematicsV0.pdf");
 
     //Calculate Ratios
     std::vector<double> v2RatioLooseKs;
@@ -1478,7 +1569,7 @@ void RapSys_RecoCutsXi()
 
     // draw the frame_xi using a histogram frame_xi
 
-    TH1F* frame_xi = c1_xi->DrawFrame(0,-0.08,8,0.45);
+    TH1F* frame_xi = c1_xi->DrawFrame(0,-0.01,8,0.45);
     /*TH1F* frame_xi = c1_xi->DrawFrame(0,0.01,20,1);*/
     gPad->SetTickx();
     gPad->SetTicky();
@@ -1516,67 +1607,12 @@ void RapSys_RecoCutsXi()
     tex->DrawLatex(0.15,0.8,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
     tex->SetTextSize(0.04);
     tex->SetTextFont(42);
-    tex->DrawLatex(0.40,0.32,"185 #leq N_{trk}^{offline} < 250");
+    tex->DrawLatex(0.40,0.2,"185 #leq N_{trk}^{offline} < 250");
     TLine* line = new TLine(0,0,6,0);
     line->SetLineStyle(2);
     line->Draw("same");
 
-    c1_xi->Print("v2XiRecoSystematics.pdf");
-
-    //Combined
-    TCanvas* c1_co = MakeCanvas("c1_co", "Plot_co");
-    c1_co->cd();
-    /*c1_co->SetLogy();*/
-    c1_co->SetLeftMargin(0.12);
-
-    // draw the frame_co using a histogram frame_co
-
-    TH1F* frame_co = c1_co->DrawFrame(0,-0.15,8,0.60);
-    /*TH1F* frame_co = c1_co->DrawFrame(0,0.01,20,1);*/
-    gPad->SetTickx();
-    gPad->SetTicky();
-    frame_co->GetXaxis()->CenterTitle(1);
-    frame_co->GetYaxis()->CenterTitle(1);
-    frame_co->GetXaxis()->SetTitleSize(0.05);
-    frame_co->GetXaxis()->SetTitle("p_{T} (GeV)");
-    frame_co->GetYaxis()->SetTitle("v_{2}^{sig}");
-    frame_co->GetYaxis()->SetTitleSize(0.05);
-    frame_co->SetTitleOffset(1.1,"Y");
-    frame_co->SetTitleOffset(1.2,"X");
-
-    standard_v2_xi->Draw("P");
-    loose_v2_xi->Draw("P");
-    tight_v2_xi->Draw("P");
-
-    TLegend* leg_co1 = new TLegend(0.15,0.55,0.27,0.75);
-    leg_co1->SetFillColor(10);
-    leg_co1->SetFillStyle(0);
-    leg_co1->SetBorderSize(0);
-    leg_co1->SetTextFont(42);
-    leg_co1->SetTextSize(0.04);
-    leg_co1->AddEntry(standard_v2_xi, "#Xi^{#pm}", "P");
-    leg_co1->Draw();
-
-    TLegend* leg_co2 = new TLegend(0.6,0.65,0.85,0.85);
-    leg_co2->SetFillColor(10);
-    leg_co2->SetFillStyle(0);
-    leg_co2->SetBorderSize(0);
-    leg_co2->SetTextFont(42);
-    leg_co2->SetTextSize(0.03);
-    leg_co2->AddEntry(standard_v2_xi, "Standard reconstruction", "P");
-    leg_co2->AddEntry(tight_v2_xi, "Tight reconstruction", "P");
-    leg_co2->AddEntry(loose_v2_xi, "Loose reconstruction", "P");
-    leg_co2->Draw();
-
-    tex->SetTextFont(62);
-    tex->SetTextSize(0.045);
-    tex->DrawLatex(0.15,0.8,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
-    tex->SetTextSize(0.04);
-    tex->SetTextFont(42);
-    tex->DrawLatex(0.40,0.32,"185 #leq N_{trk}^{offline} < 250");
-    line->Draw("same");
-
-    c1_co->Print("v2CombinedRecoSystematicsXi.pdf");
+    c1_xi->Print("v2RecoSystematicsXi.pdf");
 
     //Calculate Ratios
     std::vector<double> v2RatioLooseXi;
@@ -1585,7 +1621,7 @@ void RapSys_RecoCutsXi()
     std::vector<double> v2ErrorRatioLooseXi;
     std::vector<double> v2ErrorRatioTightXi;
 
-    //Xihort
+    //Xi
     for(int i=0; i<xi_npoints; i++)
     {
         v2RatioLooseXi.push_back(v2loose_xi[i]/v2standard_xi[i]);
@@ -1615,7 +1651,7 @@ void RapSys_RecoCutsXi()
     Ratiotight_v2_xi->SetLineColor(kBlue-4);
 
     TCanvas* c1_ratio_xi = MakeCanvas("c1_ratio_xi", "Plot_ratio_xi");
-    TH1F* frame_Ratio_xi = c1_ratio_xi->DrawFrame(0,0.8,8,1.2);
+    TH1F* frame_Ratio_xi = c1_ratio_xi->DrawFrame(0,0.7,8,1.3);
     /*TH1F* frame_co = c1_co->DrawFrame(0,0.01,20,1);*/
     gPad->SetTickx();
     gPad->SetTicky();
@@ -1810,7 +1846,7 @@ void RapSys_Closure()
     tex->SetTextSize(0.045);
     tex->DrawLatex(0.15,0.8,"pPb EPOS");
 
-    c1_ks->Print("v2KshortClosureSystematics.pdf");
+    c1_ks->Print("v2ClosureSystematicsKshort.pdf");
 
     //Do lambda
 
@@ -1886,7 +1922,7 @@ void RapSys_Closure()
     tex->SetTextFont(42);
     line->Draw("same");
 
-    c1_la->Print("v2LambdaClosureSystematics.pdf");
+    c1_la->Print("v2ClosureSystematicsLambda.pdf");
 
     //Combined
     TCanvas* c1_co = MakeCanvas("c1_co", "Plot_co");

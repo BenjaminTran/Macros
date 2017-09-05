@@ -155,7 +155,7 @@ void Xiv2Fit(  )
 {
     //TLatex
     std::ostringstream os; // stringstream for making dynamic TLatex labels
-    double SNN = 5.02;
+    double SNN = 8.16;
     int Lint = 35;
     int Nmin = 185;
     int Nmax = 220;
@@ -192,8 +192,8 @@ void Xiv2Fit(  )
 
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationPD1-6reverseJL10-15_08_15_2017.root" );
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationpPbPD1-6_08_15_2017.root" );
-    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root" );
-    TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityLoose_08_30_2017.root" );
+    TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root" );
+    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityLoose_08_30_2017.root" );
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTight_08_30_2017.root" );
     TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root" );
 
@@ -237,8 +237,8 @@ void Xiv2Fit(  )
         //================================================================================
         //KET Calculations
         //================================================================================
-        TH1D* hKetXi = (TH1D*)f->Get(Form("xiCorrelationRapidityLoose/KET_xi_pt%d",i));
-        TH1D* hKetXi_bkg = (TH1D*)f->Get(Form("xiCorrelationRapidityLoose/KET_xi_bkg_pt%d",i));
+        TH1D* hKetXi = (TH1D*)f->Get(Form("xiCorrelationRapidity/KET_xi_pt%d",i));
+        TH1D* hKetXi_bkg = (TH1D*)f->Get(Form("xiCorrelationRapidity/KET_xi_bkg_pt%d",i));
 
         int nEntries = 0;
         double KetTotal = 0;
@@ -262,8 +262,8 @@ void Xiv2Fit(  )
                         1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
             TH1D *dPhiHad = new TH1D( "dPhiHad", "h^{#pm}- h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI );
             //Pull 2D Histograms
-            TH2D *hbackgroundPeak = (TH2D*) f->Get( Form( "xiCorrelationRapidityLoose/BackgroundPeak_pt%d",i ) );
-            TH2D *hsignalPeak     = (TH2D*) f->Get( Form( "xiCorrelationRapidityLoose/SignalPeak_pt%d",i ) );
+            TH2D *hbackgroundPeak = (TH2D*) f->Get( Form( "xiCorrelationRapidity/BackgroundPeak_pt%d",i ) );
+            TH2D *hsignalPeak     = (TH2D*) f->Get( Form( "xiCorrelationRapidity/SignalPeak_pt%d",i ) );
             TH2D *hBackgroundHad  = (TH2D*) fhad->Get( "xiCorrelationRapidity/BackgroundHad" );
             TH2D *hSignalHad      = (TH2D*) fhad->Get( "xiCorrelationRapidity/SignalHad" );
 
@@ -494,8 +494,8 @@ void Xiv2Fit(  )
             }
             //side
             dPhiSide[i] = new TH1D( Form( "dPhiSide%d",i ), "#Xi - h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
-            TH2D *hbackgroundSide = (TH2D*) f->Get( Form( "xiCorrelationRapidityLoose/BackgroundSide_pt%d",i ) );
-            TH2D *hsignalSide     = (TH2D*) f->Get( Form( "xiCorrelationRapidityLoose/SignalSide_pt%d",i ) );
+            TH2D *hbackgroundSide = (TH2D*) f->Get( Form( "xiCorrelationRapidity/BackgroundSide_pt%d",i ) );
+            TH2D *hsignalSide     = (TH2D*) f->Get( Form( "xiCorrelationRapidity/SignalSide_pt%d",i ) );
 
             TH1::SetDefaultSumw2(  );
 
@@ -721,8 +721,8 @@ void Xiv2Fit(  )
     //TCanvas* TwoDCorrelation = new TCanvas( "TwoDCorrelation", "", 1000, 1000 );
     //TwoDCorrelation->SetLeftMargin( 0.2 );
 
-    //TH2D* Signal = ( TH2D* )f->Get( "xiCorrelationRapidityLoose/SignalXiHad" );
-    //TH2D* Background = ( TH2D* )f->Get( "xiCorrelationRapidityLoose/BackgroundXiHad" );
+    //TH2D* Signal = ( TH2D* )f->Get( "xiCorrelationRapidity/SignalXiHad" );
+    //TH2D* Background = ( TH2D* )f->Get( "xiCorrelationRapidity/BackgroundXiHad" );
 
     //TGaxis::SetMaxDigits( 1 );
     
