@@ -195,6 +195,7 @@ void Xiv2Fit(  )
     TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root" );
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityLoose_08_30_2017.root" );
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTight_08_30_2017.root" );
+    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityCorrectionA1_3.root" );
     TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root" );
 
     TVirtualFitter::SetMaxIterations( 300000 );
@@ -203,8 +204,8 @@ void Xiv2Fit(  )
     //std::vector<double> fsig_xi = {0.954019 ,0.973881 ,0.976705 ,0.97829 ,0.978074 ,0.978057 ,0.978603 ,0.974644 ,0.975063 ,0.97418 ,0.976012};
     //std::vector<double> PtBin = {1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 10.0, 20.0};
     //std::vector<double> fsig_xi = {0.954019 ,0.973881 ,0.976705 ,0.97829 ,0.978074 ,0.978057 ,0.978603 ,0.974693 ,0.976012};
-    std::vector<double> PtBin = {1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.2, 10.0, 20.0};
-    std::vector<double> fsig_xi = {0.954019 ,0.973881 ,0.976705 ,0.97829 ,0.978074 ,0.978057 ,0.978603 ,0.974644 ,0.974909 ,0.976012};
+    std::vector<double> PtBin = {1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.2, 10.0};//, 20.0};
+    std::vector<double> fsig_xi = {0.954019 ,0.973881 ,0.976705 ,0.97829 ,0.978074 ,0.978057 ,0.978603 ,0.974644 ,0.974909};// ,0.976012};
 
     int numPtBins = PtBin.size()-1;
     TH1D* dPhiFourierPeak[numPtBins];
