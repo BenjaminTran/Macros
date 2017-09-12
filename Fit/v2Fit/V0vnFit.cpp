@@ -28,7 +28,7 @@ Double_t FourierHad(Double_t *x, Double_t *par)
 {
     //Double_t xx1 = par[0]/(2*PI);
     Double_t xx1 = par[0];
-    Double_t xx2 = 1 + 2*(par[1]*TMath::Cos(x[0]) + par[2]*TMath::Cos(2*x[0])  + par[3]*TMath::Cos(3*x[0]));// + par[4]*TMath::Cos(4*x[0]) + par[5]*TMath::Cos(5*x[0]) + par[6]*TMath::Cos(6*x[0]) + par[7]*TMath::Cos(7*x[0]));
+    Double_t xx2 = 1 + 2*(par[1]*TMath::Cos(x[0]) + par[2]*TMath::Cos(2*x[0])  + par[3]*TMath::Cos(3*x[0])) + par[4]*TMath::Cos(4*x[0]);// + par[5]*TMath::Cos(5*x[0]) + par[6]*TMath::Cos(6*x[0]) + par[7]*TMath::Cos(7*x[0]));
     return xx1*xx2;
 }
 
@@ -176,7 +176,11 @@ void vnCalculate(int degree, std::string V0IDname, std::vector<double> vnvalues_
 
 void V0vnFit()
 {
-    int numFourierParams = 4;
+    double maxFact = 2; //2
+    double minFact = 0.005; //0.005
+    double mini = -0.005;
+    double maxi = 0.06;
+    int numFourierParams = 5;
     bool Peak = true;
 	//bool Peak = false;
 	//Aesthetics
@@ -213,11 +217,9 @@ void V0vnFit()
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationTotal_08_20_2017.root");
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityTotal_08_21_2017.root");
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/LooseAndTight/V0CorrelationTightMCTotal_08_23_2017.root");
-    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureReco_08_25_2017.root");
-    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/TestRootFiles/MCClosurePbpSample.root");
-    TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureTotal_08_28_2017.root");
-    //TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationPD1-6reverseJL10-15_08_15_2017.root"); //For vn of hadron
-    TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureHadron_08_29_2017.root"); //For vn of hadron
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureTotal_08_28_2017.root");
+    TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationRapidityClosureNoEff_09_11_17.root");
+    TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureHadronRecoFix_09_10_17.root"); //For vn of hadron
 
 	//Txt files
 	ofstream vnPeak;
@@ -231,8 +233,8 @@ void V0vnFit()
 
     TVirtualFitter::SetMaxIterations(300000);
     TH1::SetDefaultSumw2();
-    std::vector<double> PtBin_ks = {0.2, 0.4, 0.6, 0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.0};//, 10.0, 15.0, 20.0}; //if number of bins changes make sure you change numPtBins
-    std::vector<double> PtBin_la = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.0};//, 10.0, 15.0, 20.0}; //if number of bins changes make sure you change numPtBins
+    std::vector<double> PtBin_ks = {0.2, 0.4, 0.6, 0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5};//, 10.0, 15.0, 20.0}; //if number of bins changes make sure you change numPtBins
+    std::vector<double> PtBin_la = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5};//, 10.0, 15.0, 20.0}; //if number of bins changes make sure you change numPtBins
     int numPtBins_ks = PtBin_ks.size() - 1;
     int numPtBins_la = PtBin_la.size() - 1;
     TH1D* dPhiFourierPeak_ks[numPtBins_ks];
@@ -271,8 +273,10 @@ void V0vnFit()
     //Fsig for vn calculations
     //std::vector<double> fsig_ks = {0.999666 ,0.999977 ,0.999972 ,0.999988 ,0.999998 ,0.999999 ,0.999999 ,0.999992 ,0.999994 ,0.999955, 0.999975};
     //std::vector<double> fsig_la = {0.988877 ,0.9967 ,0.99754 ,0.998939 ,0.999954 ,0.999951 ,0.999992 ,0.999842};
-    std::vector<double> fsig_ks = {0.999476 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,0.999999 ,0.999999 ,0.999988 ,0.999997 ,0.992327};// ,0.99836};// ,0.890106 ,0.481433};
-    std::vector<double> fsig_la = {0.99882 ,0.999987 ,1 ,0.999524 ,0.999632 ,0.999855 ,0.999698 ,0.998783 ,0.999771 ,0.997088};// ,0.92718};// ,0.990913 ,0.421011};
+    //std::vector<double> fsig_ks = {0.999476 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,0.999999 ,0.999999 ,0.999988 ,0.999997 ,0.992327};// ,0.99836};// ,0.890106 ,0.481433};
+    //std::vector<double> fsig_la = {0.99882 ,0.999987 ,1 ,0.999524 ,0.999632 ,0.999855 ,0.999698 ,0.998783 ,0.999771 ,0.997088};// ,0.92718};// ,0.990913 ,0.421011};
+    std::vector<double> fsig_ks = {0.991217 ,1 ,1 ,1 ,1 ,1 ,1 ,0.999988 ,0.99998 ,0.998263 ,0.942699 ,0.999827 ,0.99997};// ,0.99836};// ,0.890106 ,0.481433}; //MC
+    std::vector<double> fsig_la = {0.971604 ,0.985982 ,0.991208 ,0.989859 ,0.997168 ,0.996337 ,0.982485 ,0.953336 ,0.781606 ,0.596769};// ,0.92718};// ,0.990913 ,0.421011}; //MC
 
 
     if((PtBin_ks.size()-1 != fsig_ks.size()) || (PtBin_la.size()-1 != fsig_la.size()))
@@ -400,8 +404,8 @@ void V0vnFit()
 
         double maxBinContent = dPhiFourierPeak_ks[i]->GetBinContent(dPhiFourierPeak_ks[i]->GetMaximumBin());
         double minBinContent = dPhiFourierPeak_ks[i]->GetBinContent(dPhiFourierPeak_ks[i]->GetMinimumBin());
-        double minRange = minBinContent - 0.005*minBinContent;
-        double maxRange = minRange + 2*(maxBinContent - minBinContent);
+        double minRange = minBinContent - minFact*minBinContent;
+        double maxRange = minRange + maxFact*(maxBinContent - minBinContent);
 
         //ZYAM FITS
         TCanvas *c2_ks_peak = new TCanvas("c2_ks_peak", "ZYAM Peak Trg_ks", 800,800);
@@ -413,7 +417,7 @@ void V0vnFit()
         dPhiPeak_ks[i]->SetMarkerColor(4);
         dPhiPeak_ks[i]->SetTitleOffset(2, "Y");
         dPhiPeak_ks[i]->SetTitle("Peak");
-        dPhiPeak_ks[i]->GetYaxis()->SetRangeUser(minRange , maxRange);
+        dPhiPeak_ks[i]->GetYaxis()->SetRangeUser(mini , maxi);
         dPhiPeak_ks[i]->GetYaxis()->SetTitleSize(0.03);
         dPhiPeak_ks[i]->GetYaxis()->CenterTitle(true);
         dPhiPeak_ks[i]->GetYaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} ");
@@ -452,8 +456,8 @@ void V0vnFit()
 
         maxBinContent = dPhiHadFourier->GetBinContent(dPhiHadFourier->GetMaximumBin());
         minBinContent = dPhiHadFourier->GetBinContent(dPhiHadFourier->GetMinimumBin());
-        minRange = minBinContent - 0.005*minBinContent;
-        maxRange = minRange + 2*(maxBinContent - minBinContent);
+        minRange = minBinContent - minFact*minBinContent;
+        maxRange = minRange + maxFact*(maxBinContent - minBinContent);
 
         TCanvas *c3_ks = new TCanvas("c3_ks", "ZYAM Hadronic", 800,800);
         c3_ks->cd();
@@ -463,7 +467,7 @@ void V0vnFit()
         dPhiHad->SetMarkerSize(1.5);
         dPhiHad->SetTitleOffset(2, "Y");
         dPhiHad->SetTitle("");
-        dPhiHad->GetYaxis()->SetRangeUser(minRange , maxRange);
+        dPhiHad->GetYaxis()->SetRangeUser(mini , maxi);
         dPhiHad->GetYaxis()->SetTitleSize(0.03);
         dPhiHad->GetYaxis()->CenterTitle(true);
         dPhiHad->GetYaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi}");
@@ -513,7 +517,8 @@ void V0vnFit()
         dPhiFourierPeak_ks[i]->GetYaxis()->CenterTitle(true);
         dPhiFourierPeak_ks[i]->GetYaxis()->SetTitleSize(0.03);
         dPhiFourierPeak_ks[i]->GetYaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} - C_{#lower[-0.3]{ZYAM}}");
-        dPhiFourierPeak_ks[i]->GetYaxis()->SetRangeUser(-0.0004, 0.008);
+        //dPhiFourierPeak_ks[i]->GetYaxis()->SetRangeUser(-0.0004, 0.008);
+        dPhiFourierPeak_ks[i]->GetYaxis()->SetRangeUser(mini, maxi);
         dPhiFourierPeak_ks[i]->SetTitleOffset(1.5, "X");
         dPhiFourierPeak_ks[i]->GetXaxis()->SetTitleSize(0.035);
         dPhiFourierPeak_ks[i]->GetXaxis()->CenterTitle(true);
@@ -598,8 +603,8 @@ void V0vnFit()
 
         maxBinContent = dPhiFourierSide_ks[i]->GetBinContent(dPhiFourierSide_ks[i]->GetMaximumBin());
         minBinContent = dPhiFourierSide_ks[i]->GetBinContent(dPhiFourierSide_ks[i]->GetMinimumBin());
-        minRange = minBinContent - 0.005*minBinContent;
-        maxRange = minRange + 2*(maxBinContent - minBinContent);
+        minRange = minBinContent - minFact*minBinContent;
+        maxRange = minRange + maxFact*(maxBinContent - minBinContent);
 
         //ZYAM FITS
         TCanvas *c2_ks_side = new TCanvas("c2_ks_side", "ZYAM Side trg_ks", 800,800);
@@ -611,7 +616,7 @@ void V0vnFit()
         dPhiSide_ks[i]->SetMarkerColor(4);
         dPhiSide_ks[i]->SetTitleOffset(2, "Y");
         dPhiSide_ks[i]->SetTitle("Sideband");
-        dPhiSide_ks[i]->GetYaxis()->SetRangeUser(minRange , maxRange);
+        dPhiSide_ks[i]->GetYaxis()->SetRangeUser(mini , maxi);
         dPhiSide_ks[i]->GetYaxis()->SetTitleSize(0.03);
         dPhiSide_ks[i]->GetYaxis()->CenterTitle(true);
         dPhiSide_ks[i]->GetYaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} ");
@@ -664,7 +669,8 @@ void V0vnFit()
         dPhiFourierSide_ks[i]->GetYaxis()->CenterTitle(true);
         dPhiFourierSide_ks[i]->GetYaxis()->SetTitleSize(0.03);
         dPhiFourierSide_ks[i]->GetYaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} - C_{#lower[-0.3]{ZYAM}}");
-        dPhiFourierSide_ks[i]->GetYaxis()->SetRangeUser(-0.0004, 0.008);
+        //dPhiFourierSide_ks[i]->GetYaxis()->SetRangeUser(-0.0004, 0.008);
+        dPhiFourierSide_ks[i]->GetYaxis()->SetRangeUser(mini, maxi);
         dPhiFourierSide_ks[i]->SetTitleOffset(1.5, "X");
         dPhiFourierSide_ks[i]->GetXaxis()->SetTitleSize(0.035);
         dPhiFourierSide_ks[i]->GetXaxis()->CenterTitle(true);
@@ -778,8 +784,8 @@ void V0vnFit()
 
         double maxBinContent = dPhiFourierPeak_la[i]->GetBinContent(dPhiFourierPeak_la[i]->GetMaximumBin());
         double minBinContent = dPhiFourierPeak_la[i]->GetBinContent(dPhiFourierPeak_la[i]->GetMinimumBin());
-        double minRange = minBinContent - 0.005*minBinContent;
-        double maxRange = minRange + 2*(maxBinContent - minBinContent);
+        double minRange = minBinContent - minFact*minBinContent;
+        double maxRange = minRange + maxFact*(maxBinContent - minBinContent);
 
         //ZYAM FITS
         TCanvas *c2_la_peak = new TCanvas("c2_la_peak", "ZYAM Peak Trg_la", 800,800);
@@ -791,7 +797,7 @@ void V0vnFit()
         dPhiPeak_la[i]->SetMarkerColor(4);
         dPhiPeak_la[i]->SetTitleOffset(2, "Y");
         dPhiPeak_la[i]->SetTitle("Peak");
-        dPhiPeak_la[i]->GetYaxis()->SetRangeUser(minRange , maxRange);
+        dPhiPeak_la[i]->GetYaxis()->SetRangeUser(mini , maxi);
         dPhiPeak_la[i]->GetYaxis()->SetTitleSize(0.03);
         dPhiPeak_la[i]->GetYaxis()->CenterTitle(true);
         dPhiPeak_la[i]->GetYaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} ");
@@ -830,8 +836,8 @@ void V0vnFit()
 
         maxBinContent = dPhiHadFourier->GetBinContent(dPhiHadFourier->GetMaximumBin());
         minBinContent = dPhiHadFourier->GetBinContent(dPhiHadFourier->GetMinimumBin());
-        minRange = minBinContent - 0.005*minBinContent;
-        maxRange = minRange + 2*(maxBinContent - minBinContent);
+        minRange = minBinContent - minFact*minBinContent;
+        maxRange = minRange + maxFact*(maxBinContent - minBinContent);
 
         TCanvas *c3_la = new TCanvas("c3_la", "ZYAM Hadronic", 800,800);
         c3_la->cd();
@@ -841,7 +847,7 @@ void V0vnFit()
         dPhiHad->SetMarkerSize(1.5);
         dPhiHad->SetTitleOffset(2, "Y");
         dPhiHad->SetTitle("");
-        dPhiHad->GetYaxis()->SetRangeUser(minRange , maxRange);
+        dPhiHad->GetYaxis()->SetRangeUser(mini , maxi);
         dPhiHad->GetYaxis()->SetTitleSize(0.03);
         dPhiHad->GetYaxis()->CenterTitle(true);
         dPhiHad->GetYaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi}");
@@ -891,7 +897,8 @@ void V0vnFit()
         dPhiFourierPeak_la[i]->GetYaxis()->CenterTitle(true);
         dPhiFourierPeak_la[i]->GetYaxis()->SetTitleSize(0.03);
         dPhiFourierPeak_la[i]->GetYaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} - C_{#lower[-0.3]{ZYAM}}");
-        dPhiFourierPeak_la[i]->GetYaxis()->SetRangeUser(-0.0004, 0.008);
+        //dPhiFourierPeak_la[i]->GetYaxis()->SetRangeUser(-0.0004, 0.008);
+        dPhiFourierPeak_la[i]->GetYaxis()->SetRangeUser(mini, maxi);
         dPhiFourierPeak_la[i]->SetTitleOffset(1.5, "X");
         dPhiFourierPeak_la[i]->GetXaxis()->SetTitleSize(0.035);
         dPhiFourierPeak_la[i]->GetXaxis()->CenterTitle(true);
@@ -976,8 +983,8 @@ void V0vnFit()
 
         maxBinContent = dPhiFourierSide_la[i]->GetBinContent(dPhiFourierSide_la[i]->GetMaximumBin());
         minBinContent = dPhiFourierSide_la[i]->GetBinContent(dPhiFourierSide_la[i]->GetMinimumBin());
-        minRange = minBinContent - 0.005*minBinContent;
-        maxRange = minRange + 2*(maxBinContent - minBinContent);
+        minRange = minBinContent - minFact*minBinContent;
+        maxRange = minRange + maxFact*(maxBinContent - minBinContent);
 
         //ZYAM FITS
         TCanvas *c2_la_side = new TCanvas("c2_la_side", "ZYAM Side trg_la", 800,800);
@@ -989,7 +996,7 @@ void V0vnFit()
         dPhiSide_la[i]->SetMarkerColor(4);
         dPhiSide_la[i]->SetTitleOffset(2, "Y");
         dPhiSide_la[i]->SetTitle("Sideband");
-        dPhiSide_la[i]->GetYaxis()->SetRangeUser(minRange , maxRange);
+        dPhiSide_la[i]->GetYaxis()->SetRangeUser(mini , maxi);
         dPhiSide_la[i]->GetYaxis()->SetTitleSize(0.03);
         dPhiSide_la[i]->GetYaxis()->CenterTitle(true);
         dPhiSide_la[i]->GetYaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} ");
@@ -1042,7 +1049,8 @@ void V0vnFit()
         dPhiFourierSide_la[i]->GetYaxis()->CenterTitle(true);
         dPhiFourierSide_la[i]->GetYaxis()->SetTitleSize(0.03);
         dPhiFourierSide_la[i]->GetYaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} - C_{#lower[-0.3]{ZYAM}}");
-        dPhiFourierSide_la[i]->GetYaxis()->SetRangeUser(-0.0004, 0.008);
+        //dPhiFourierSide_la[i]->GetYaxis()->SetRangeUser(-0.0004, 0.008);
+        dPhiFourierSide_la[i]->GetYaxis()->SetRangeUser(mini, maxi);
         dPhiFourierSide_la[i]->SetTitleOffset(1.5, "X");
         dPhiFourierSide_la[i]->GetXaxis()->SetTitleSize(0.035);
         dPhiFourierSide_la[i]->GetXaxis()->CenterTitle(true);

@@ -13,6 +13,7 @@
 #include "TF1.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "TH3.h"
 #include "TMath.h"
 #include "TFile.h"
 #include "TGraph.h"
@@ -55,6 +56,8 @@ void V0MassFit()
     TH1D* massla;
     TH2D* MassKs;
     TH2D* MassLa;
+    TH3D* MassKs3D;
+    TH3D* MassLa3D;
     bool lambda;
 
     std::vector<RooPlot*> Xframe_Ks;
@@ -70,27 +73,32 @@ void V0MassFit()
     std::vector<double> covQual_la;
 
     //int pTksLength = 26; // the number of bins to be fitted is half of this number
-    //double pks[] = {3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,90, 91,120};
-    //double pla[] = {0,0, 0,0, 0,0, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,90, 91,120};
-    std::vector<double> pks = {3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70, 71,85, 86,100, 101,150, 151,200};//, 201,250, 251,300};
-    std::vector<double> pla = {0,0, 0,0, 0,0, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70, 71,85, 86,100, 101,150, 151,200};//, 201,250, 251,300};
+    //std::vector<double> pks = {3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70, 71,85, 86,100};//, 201,250, 251,300};
+    //std::vector<double> pla = {0,0, 0,0, 0,0, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70, 71,85, 86,100};//, 201,250, 251,300};
+    std::vector<double> pks = {3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70, 71,85};//, 86,100};//, 201,250, 251,300};
+    std::vector<double> pla = {0,0, 0,0, 0,0, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70, 71,85};//, 86,100};//, 201,250, 251,300};
 
     TCanvas* Composite_Ks = new TCanvas("Composite_Ks","",1000,1200);
-    Composite_Ks->Divide(3,6);
+    Composite_Ks->Divide(3,5);
 
     TCanvas* Composite_La = new TCanvas("Composite_La","",1000,1200);
-    Composite_La->Divide(3,5);
+    Composite_La->Divide(3,4);
 
     //File Creation
     myfile.open("V0PeakParam.txt");
     //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Ksla/kslaMassPtJL1.root");
-    TFile* file_ks = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Composites/V0CasMassPtPD11_16.root");
-    //MassKs = (TH2D*)file->Get("MassPt/KsMassPt");
-    //MassLa = (TH2D*)file->Get("MassPt/LaMassPt");
-    TFile* file_la = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/La/LaMassPtPD1_6JL17_22.root");
+    //TFile* file_ks = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Composites/V0CasMassPtPD11_16.root");
+    TFile* file_ks = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/All/MCMassPtTotal_08_23_2017.root"); //Gen
+    //TFile* file_la = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/La/LaMassPtPD1_6JL17_22.root");
+    TFile* file_la = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/All/MCMassPtTotal_08_23_2017.root"); //Gen
 
-    MassKs = (TH2D*)file_ks->Get("MassPt/KsMassPt");
-    MassLa = (TH2D*)file_la->Get("LaMassPt/LaMassPt");
+
+    //MassKs = (TH2D*)file_ks->Get("MassPt/KsMassPt");
+    //MassLa = (TH2D*)file_la->Get("LaMassPt/LaMassPt");
+    MassKs3D = (TH3D*)file_ks->Get("MassPtRapidityMC/KsMassPtRap");
+    MassLa3D = (TH3D*)file_la->Get("MassPtRapidityMC/LaMassPtRap");
+    MassKs = (TH2D*)MassKs3D->Project3D("yx");
+    MassLa = (TH2D*)MassLa3D->Project3D("yx");
 
     //Fit
     int pkscounter  = 0; //for correct bin counting

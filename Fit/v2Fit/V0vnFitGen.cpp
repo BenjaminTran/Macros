@@ -28,7 +28,7 @@ Double_t FourierHad(Double_t *x, Double_t *par)
 {
     //Double_t xx1 = par[0]/(2*PI);
     Double_t xx1 = par[0];
-    Double_t xx2 = 1 + 2*(par[1]*TMath::Cos(x[0]) + par[2]*TMath::Cos(2*x[0])  + par[3]*TMath::Cos(3*x[0]));// + par[4]*TMath::Cos(4*x[0]) + par[5]*TMath::Cos(5*x[0]) + par[6]*TMath::Cos(6*x[0]) + par[7]*TMath::Cos(7*x[0]));
+    Double_t xx2 = 1 + 2*(par[1]*TMath::Cos(x[0]) + par[2]*TMath::Cos(2*x[0])  + par[3]*TMath::Cos(3*x[0])) + par[4]*TMath::Cos(4*x[0]);// + par[5]*TMath::Cos(5*x[0]) + par[6]*TMath::Cos(6*x[0]) + par[7]*TMath::Cos(7*x[0]));
     return xx1*xx2;
 }
 
@@ -163,7 +163,9 @@ void vnCalculate(int degree, std::string V0IDname, std::vector<double> vnvalues_
 
 void V0vnFit()
 {
-    int numFourierParams = 4;
+    double mini = -0.005;
+    double maxi = 0.006;
+    int numFourierParams = 5;
     bool Peak = true;
 	//bool Peak = false;
 	//Aesthetics
@@ -204,7 +206,7 @@ void V0vnFit()
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/TestRootFiles/MCClosurePbpSample.root");
     TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureGenTotal_08_28_2017.root");
     //TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationPD1-6reverseJL10-15_08_15_2017.root"); //For vn of hadron
-    TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureHadron_08_29_2017.root"); //For vn of hadron
+    TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureHadronRecoFix_09_10_17.root"); //For vn of hadron
 
 	//Txt files
 	ofstream vnPeak;
@@ -218,8 +220,8 @@ void V0vnFit()
 
     TVirtualFitter::SetMaxIterations(300000);
     TH1::SetDefaultSumw2();
-    std::vector<double> PtBin_ks = {0.2, 0.4, 0.6, 0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.0};//, 10.0, 15.0, 20.0}; //if number of bins changes make sure you change numPtBins
-    std::vector<double> PtBin_la = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.0};//, 10.0, 15.0, 20.0}; //if number of bins changes make sure you change numPtBins
+    std::vector<double> PtBin_ks = {0.2, 0.4, 0.6, 0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5};//, 10.0, 15.0, 20.0}; //if number of bins changes make sure you change numPtBins
+    std::vector<double> PtBin_la = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5};//, 10.0, 15.0, 20.0}; //if number of bins changes make sure you change numPtBins
     int numPtBins_ks = PtBin_ks.size() - 1;
     int numPtBins_la = PtBin_la.size() - 1;
     TH1D* dPhiFourierPeak_ks[numPtBins_ks];
@@ -258,8 +260,8 @@ void V0vnFit()
     //Fsig for vn calculations
     //std::vector<double> fsig_ks = {0.999666 ,0.999977 ,0.999972 ,0.999988 ,0.999998 ,0.999999 ,0.999999 ,0.999992 ,0.999994 ,0.999955, 0.999975};
     //std::vector<double> fsig_la = {0.988877 ,0.9967 ,0.99754 ,0.998939 ,0.999954 ,0.999951 ,0.999992 ,0.999842};
-    std::vector<double> fsig_ks = {0.999476 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,0.999999 ,0.999999 ,0.999988 ,0.999997 ,0.992327};// ,0.99836};// ,0.890106 ,0.481433};
-    std::vector<double> fsig_la = {0.99882 ,0.999987 ,1 ,0.999524 ,0.999632 ,0.999855 ,0.999698 ,0.998783 ,0.999771 ,0.997088};// ,0.92718};// ,0.990913 ,0.421011};
+    std::vector<double> fsig_ks = {1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1};// ,0.99836};// ,0.890106 ,0.481433};
+    std::vector<double> fsig_la = {1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1};// ,0.92718};// ,0.990913 ,0.421011};
 
 
     if((PtBin_ks.size()-1 != fsig_ks.size()) || (PtBin_la.size()-1 != fsig_la.size()))
@@ -500,7 +502,7 @@ void V0vnFit()
         dPhiFourierPeak_ks[i]->GetYaxis()->CenterTitle(true);
         dPhiFourierPeak_ks[i]->GetYaxis()->SetTitleSize(0.03);
         dPhiFourierPeak_ks[i]->GetYaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} - C_{#lower[-0.3]{ZYAM}}");
-        dPhiFourierPeak_ks[i]->GetYaxis()->SetRangeUser(-0.0004, 0.008);
+        dPhiFourierPeak_ks[i]->GetYaxis()->SetRangeUser(mini, maxi);
         dPhiFourierPeak_ks[i]->SetTitleOffset(1.5, "X");
         dPhiFourierPeak_ks[i]->GetXaxis()->SetTitleSize(0.035);
         dPhiFourierPeak_ks[i]->GetXaxis()->CenterTitle(true);
@@ -756,7 +758,7 @@ void V0vnFit()
         dPhiFourierPeak_la[i]->GetYaxis()->CenterTitle(true);
         dPhiFourierPeak_la[i]->GetYaxis()->SetTitleSize(0.03);
         dPhiFourierPeak_la[i]->GetYaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} - C_{#lower[-0.3]{ZYAM}}");
-        dPhiFourierPeak_la[i]->GetYaxis()->SetRangeUser(-0.0004, 0.008);
+        dPhiFourierPeak_la[i]->GetYaxis()->SetRangeUser(mini, maxi);
         dPhiFourierPeak_la[i]->SetTitleOffset(1.5, "X");
         dPhiFourierPeak_la[i]->GetXaxis()->SetTitleSize(0.035);
         dPhiFourierPeak_la[i]->GetXaxis()->CenterTitle(true);
