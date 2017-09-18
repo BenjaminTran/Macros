@@ -80,18 +80,18 @@ void SigCalcXi(std::string name, int cutNum)// uses cut parameter name
 	std::vector<double> std_xi;
 	std::vector<double> fsig_xi;
 	std::vector<double> covQual_xi;
-    std::vector< std::vector<float> > significance_xi2; // first index is the parameter value and the second index is the significance at a given indexed pTBin
+    std::vector<std::vector<float> > significance_xi2; // first index is the parameter value and the second index is the significance at a given indexed pTBin
     std::ostringstream os;
     std::ostringstream fileos;
     std::ostringstream imageos;
 
     TH1D* massxi;
 	TH2D* MassXi;
-    std::string NoCutExt = "NoCut";
-    std::string LogPath = "Log/";
-    std::string PdfPath = "Plots/Peaks/";
+    std::string NoCutExt  = "NoCut";
+    std::string LogPath   = "Log/";
+    std::string PdfPath   = "Plots/Peaks/";
     std::string GraphPath = "Plots/Graphs/";
-    std::string filename = LogPath + name + std::to_string(cutNum) + ".txt";
+    std::string filename  = LogPath + name + std::to_string(cutNum) + ".txt";
     if(NoCut)
     {
         filename = LogPath + name + "_" + NoCutExt + ".txt";
@@ -108,12 +108,12 @@ void SigCalcXi(std::string name, int cutNum)// uses cut parameter name
     //float xi_xiflightsig[]   = {2.5  , 2.6  , 2.7  , 2.8  , 2.9  , 3.0  , 3.1  , 3.2 , 3.3 , 3.4 , 3.5, 2.5, 2.5};//, 3.0};
     //float xi_distancesig[]   = {12.0 , 11.8 , 11.6 , 11.4 , 11.0 , 10.5 , 10.0 , 9.5 , 9.0 , 8.5 , 8.0, 8.0, 8.5};//, 12.0};
 
-    float xi_xi3dipsig[]     = {2.5  , 2.6  , 2.7  , 2.8  , 2.9  , 3.0  , 3.1  , 3.2 , 3.3 , 3.4 , 3.5, 3.5, 4.0};//, 2.5};
-    float xi_xipi3dipsig[]   = {5.0  , 4.9  , 4.8  , 4.7  , 4.6  , 4.5  , 4.4  , 4.3 , 4.2 , 4.1 , 4.0, 3.1, 3.3};//, 5.0};
-    float xi_vtrkpi3dipsig[] = {4.5  , 4.6  , 4.7  , 4.8  , 4.9  , 5.0  , 5.1  , 5.2 , 5.3 , 5.4 , 5.5, 3.0, 3.3};//, 4.0};
-    float xi_vtrkp3dipsig[]  = {2.5  , 2.6  , 2.7  , 2.8  , 2.9  , 3.0  , 3.1  , 3.2 , 3.3 , 3.4 , 3.5, 2.5, 2.5};//, 3.0};
-    float xi_xiflightsig[]   = {2.5  , 2.6  , 2.7  , 2.8  , 2.9  , 3.0  , 3.1  , 3.2 , 3.3 , 3.4 , 3.5, 2.5, 2.5};//, 3.0};
-    float xi_distancesig[]   = {12.0 , 11.8 , 11.6 , 11.4 , 11.0 , 10.5 , 10.0 , 9.5 , 9.0 , 8.5 , 8.0, 8.0, 8.5};//, 12.0};
+    std::vector<double> xi_xi3dipsig     = {3.0};//, 2.5};
+    std::vector<double> xi_xipi3dipsig   = {4.0};//, 5.0};
+    std::vector<double> xi_vtrkpi3dipsig = {3.0};//, 4.0};
+    std::vector<double> xi_vtrkp3dipsig  = {2.0};//, 3.0};
+    std::vector<double> xi_xiflightsig   = {2.0};//, 3.0};
+    std::vector<double> xi_distancesig   = {10.0};//, 12.0};
 
     // Open output txt file
     ofstream myfile;
@@ -138,12 +138,12 @@ void SigCalcXi(std::string name, int cutNum)// uses cut parameter name
             hlooper = numparam-1;
             fileos << "hxi_" << name;
         }
-        if(name == "xi3dipsig") fileos << "hxi_" << name << "_" << std::fixed << std::setprecision(1) << xi_xi3dipsig[hlooper];
-        if(name == "xipi3dipsig") fileos << "hxi_" << name << "_" << std::fixed << std::setprecision(1) << xi_xipi3dipsig[hlooper];
+        if(name == "xi3dipsig") fileos     << "hxi_" << name << "_" << std::fixed << std::setprecision(1) << xi_xi3dipsig[hlooper];
+        if(name == "xipi3dipsig") fileos   << "hxi_" << name << "_" << std::fixed << std::setprecision(1) << xi_xipi3dipsig[hlooper];
         if(name == "vtrkpi3dipsig") fileos << "hxi_" << name << "_" << std::fixed << std::setprecision(1) << xi_vtrkpi3dipsig[hlooper];
-        if(name == "vtrkp3dipsig") fileos << "hxi_" << name << "_" << std::fixed << std::setprecision(1) << xi_vtrkp3dipsig[hlooper];
-        if(name == "xiflightsig") fileos << "hxi_" << name << "_" << std::fixed << std::setprecision(1) << xi_xiflightsig[hlooper];
-        if(name == "distancesig") fileos << "hxi_" << name << "_" << std::fixed << std::setprecision(1) << xi_distancesig[hlooper];
+        if(name == "vtrkp3dipsig") fileos  << "hxi_" << name << "_" << std::fixed << std::setprecision(1) << xi_vtrkp3dipsig[hlooper];
+        if(name == "xiflightsig") fileos   << "hxi_" << name << "_" << std::fixed << std::setprecision(1) << xi_xiflightsig[hlooper];
+        if(name == "distancesig") fileos   << "hxi_" << name << "_" << std::fixed << std::setprecision(1) << xi_distancesig[hlooper];
         MassXi = (TH2D*)file->Get(fileos.str().c_str());
         cout << fileos.str() << endl;
 

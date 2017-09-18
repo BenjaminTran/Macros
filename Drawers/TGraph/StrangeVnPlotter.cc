@@ -1445,11 +1445,11 @@ void RapSys_RecoCutsV0()
     /*LineRatio_ks->SetLineStyle(2);*/
     LineRatio_ks->Draw();
 
-    TLine* LineRatio_min_ks = new TLine(0,0.9936,8,0.9936);
+    TLine* LineRatio_min_ks = new TLine(0,0.995,8,0.995);
     LineRatio_min_ks->SetLineStyle(2);
     LineRatio_min_ks->Draw();
 
-    TLine* LineRatio_max_ks = new TLine(0,1.0064,8,1.0064);
+    TLine* LineRatio_max_ks = new TLine(0,1.005,8,1.005);
     LineRatio_max_ks->SetLineStyle(2);
     LineRatio_max_ks->Draw();
 
@@ -1485,11 +1485,11 @@ void RapSys_RecoCutsV0()
     //LineRatio_la->SetLineStyle(2);
     LineRatio_la->Draw();
 
-    TLine* LineRatio_min_la = new TLine(0,0.9934,8,0.9934);
+    TLine* LineRatio_min_la = new TLine(0,0.995,8,0.995);
     LineRatio_min_la->SetLineStyle(2);
     LineRatio_min_la->Draw();
 
-    TLine* LineRatio_max_la = new TLine(0,1.0066,8,1.0066);
+    TLine* LineRatio_max_la = new TLine(0,1.005,8,1.005);
     LineRatio_max_la->SetLineStyle(2);
     LineRatio_max_la->Draw();
 
@@ -1651,7 +1651,7 @@ void RapSys_RecoCutsXi()
     Ratiotight_v2_xi->SetLineColor(kBlue-4);
 
     TCanvas* c1_ratio_xi = MakeCanvas("c1_ratio_xi", "Plot_ratio_xi");
-    TH1F* frame_Ratio_xi = c1_ratio_xi->DrawFrame(0,0.7,8,1.3);
+    TH1F* frame_Ratio_xi = c1_ratio_xi->DrawFrame(0,0.85,8,1.2);
     /*TH1F* frame_co = c1_co->DrawFrame(0,0.01,20,1);*/
     gPad->SetTickx();
     gPad->SetTicky();
@@ -1669,18 +1669,18 @@ void RapSys_RecoCutsXi()
     /*LineRatio_xi->SetLineStyle(2);*/
     LineRatio_xi->Draw();
 
-    TLine* LineRatio_min_xi = new TLine(0,0.97,8,0.97);
+    TLine* LineRatio_min_xi = new TLine(0,0.995,8,0.995);
     LineRatio_min_xi->SetLineStyle(2);
     LineRatio_min_xi->Draw();
 
-    TLine* LineRatio_max_xi = new TLine(0,1.03,8,1.03);
+    TLine* LineRatio_max_xi = new TLine(0,1.005,8,1.005);
     LineRatio_max_xi->SetLineStyle(2);
     LineRatio_max_xi->Draw();
 
     Ratioloose_v2_xi->Draw("P");
     Ratiotight_v2_xi->Draw("P");
 
-    TLegend* leg_ratio_xi = new TLegend(0.45,0.75,0.57,0.85);
+    TLegend* leg_ratio_xi = new TLegend(0.45,0.2,0.57,0.3);
     leg_ratio_xi->SetFillColor(10);
     leg_ratio_xi->SetFillStyle(0);
     leg_ratio_xi->SetBorderSize(0);
@@ -1753,38 +1753,21 @@ void RapSys_Closure()
         PtMeanReco_la.push_back(PtMean/n);
     }
 
-    //double v2Reco_ks[ks_npoints]  = {0.0716828 ,0.147958 ,0.222252 ,0.294719 ,0.368768 ,0.443206 ,0.48744 ,0.516857 ,0.529193 ,0.515685 ,0.460967 ,0.382468 ,0.299024};
-    //double* pTReco_ks = &PtMeanReco_ks[0];
-    //double v2Reco_ksE[ks_npoints] = {0.00437338 ,0.00115865 ,0.000754612 ,0.000676313 ,0.000482406 ,0.000555892 ,0.000694743 ,0.000775075 ,0.00105416 ,0.00166827 ,0.00309608 ,0.00670668 ,0.00959376};
-
-    //double v2Gen_ks[ks_npoints]  = {0.0526786 ,0.140483 ,0.229775 ,0.30729 ,0.383472 ,0.465258 ,0.515712 ,0.546751 ,0.560326 ,0.549022 ,0.494031 ,0.40475 ,0.301131};
-    //double pTGen_ks[ks_npoints]  = {0.303, 0.4971, 0.6951, 0.8948, 1.178, 1.578, 1.979, 2.456, 3.129, 4, 5.131, 6.427, 7.61};
-    //double v2Gen_ksE[ks_npoints] = {0.000120881 ,0.000128552 ,0.000144844 ,0.000166977 ,0.000151319 ,0.00020461 ,0.000277708 ,0.000327182 ,0.00045574 ,0.000719903 ,0.00119092 ,0.0026649 ,0.00361551};
-
-    //double v2Reco_la[la_npoints]  = {0.186875 ,0.256356 ,0.358132 ,0.445933 ,0.527039 ,0.585573 ,0.622052 ,0.629036 ,0.630557 ,0.615147};
-    //double* pTReco_la = &PtMeanReco_la[0];
-    //double v2Reco_laE[la_npoints] = {0.00263636 ,0.00117409 ,0.0011397 ,0.00124199 ,0.00116033 ,0.00128623 ,0.00180496 ,0.00313682 ,0.0111192 ,0.0283021};
-
-    //double v2Gen_la[la_npoints]  = {0.176459 ,0.261876 ,0.373861 ,0.470764 ,0.553231 ,0.621746 ,0.659807 ,0.669019 ,0.654109 ,0.620681};
-    //double pTGen_la[la_npoints]  = {0.8981, 1.189, 1.586, 1.985, 2.466, 3.137, 4.002, 5.118, 6.412, 7.568};
-    //double v2Gen_laE[la_npoints] = {0.000203921 ,0.000165873 ,0.000198241 ,0.000242954 ,0.000260162 ,0.000332735 ,0.000500581 ,0.000832908 ,0.00199005 ,0.00308116};
-
-    double v2Reco_ks[ks_npoints]  = {0.0717221 ,0.147786 ,0.22211 ,0.294887 ,0.369762 ,0.445686 ,0.491178 ,0.52169 ,0.534526 ,0.520702 ,0.464594 ,0.383967 ,0.299493};
+    double v2Reco_ks[ks_npoints]  = {0.0722071 ,0.147723 ,0.222303 ,0.294967 ,0.369263 ,0.445429 ,0.491016 ,0.521116 ,0.533933 ,0.519577 ,0.464798 ,0.381484 ,0.290978};
     double* pTReco_ks = &PtMeanReco_ks[0];
-    double v2Reco_ksE[ks_npoints] = {0.00437825 ,0.00115894 ,0.000754397 ,0.000675979 ,0.000482185 ,0.000555836 ,0.0006949 ,0.000775412 ,0.00105475 ,0.00166889 ,0.00309505 ,0.00670203 ,0.00958706};
+    double v2Reco_ksE[ks_npoints] = {0.00437059 ,0.00115752 ,0.000754802 ,0.000676901 ,0.000484584 ,0.000557721 ,0.0006959 ,0.000776143 ,0.00105449 ,0.00166647 ,0.00308999 ,0.0067008 ,0.00956059};
 
     double v2Gen_ks[ks_npoints]  = {0.052706 ,0.14045 ,0.229782 ,0.307633 ,0.384587 ,0.467894 ,0.519706 ,0.551816 ,0.565919 ,0.554509 ,0.49801 ,0.406751 ,0.301587};
     double pTGen_ks[ks_npoints]  = {0.303, 0.4971, 0.6951, 0.8948, 1.178, 1.578, 1.979, 2.456, 3.129, 4, 5.131, 6.427, 7.61};
     double v2Gen_ksE[ks_npoints] = {0.000121163 ,0.00012872 ,0.000144935 ,0.000167038 ,0.00015137 ,0.000204732 ,0.000277958 ,0.000327538 ,0.000456264 ,0.000720603 ,0.00119137 ,0.00266441 ,0.00361488};
 
-    double v2Reco_la[la_npoints]  = {0.186751 ,0.256306 ,0.358821 ,0.448133 ,0.531512 ,0.592768 ,0.631154 ,0.638628 ,0.639861 ,0.622524};
+    double v2Reco_la[la_npoints]  = {0.191419 ,0.257195 ,0.359238 ,0.449797 ,0.531741 ,0.592744 ,0.63408 ,0.638523 ,0.649031 ,0.630982};
     double* pTReco_la = &PtMeanReco_la[0];
-    double v2Reco_laE[la_npoints] = {0.00263627 ,0.00117363 ,0.00113933 ,0.0012422 ,0.00116131 ,0.00128822 ,0.00180837 ,0.00314365 ,0.0111371 ,0.0283047};
+    double v2Reco_laE[la_npoints] = {0.00263104 ,0.00117218 ,0.00113757 ,0.00124031 ,0.0011602 ,0.00128685 ,0.00180476 ,0.00313557 ,0.0111194 ,0.0282399};
 
     double v2Gen_la[la_npoints]  = {0.176432 ,0.261996 ,0.374751 ,0.473161 ,0.557898 ,0.629242 ,0.66937 ,0.679275 ,0.663517 ,0.628933};
     double pTGen_la[la_npoints]  = {0.8981, 1.189, 1.586, 1.985, 2.466, 3.137, 4.002, 5.118, 6.412, 7.568};
     double v2Gen_laE[la_npoints] = {0.000204122 ,0.000165959 ,0.000198333 ,0.000243174 ,0.000260547 ,0.000333439 ,0.000501804 ,0.000835003 ,0.0019952 ,0.00308793};
-
 
     // Pull TGraph for Kshort and lambda
     TGraphErrors* Reco_v2_ks = new TGraphErrors(ks_npoints,pTReco_ks,v2Reco_ks,0,v2Reco_ksE);
@@ -2084,11 +2067,11 @@ void RapSys_Closure()
     TLine* LineRatio_ks = new TLine(0,1,8.5,1);
     LineRatio_ks->Draw();
 
-    TLine* LineRatio_min_ks = new TLine(0,0.94,8.5,0.94);
+    TLine* LineRatio_min_ks = new TLine(0,0.95,8.5,0.95);
     LineRatio_min_ks->SetLineStyle(2);
     LineRatio_min_ks->Draw();
 
-    TLine* LineRatio_max_ks = new TLine(0,1.06,8.5,1.06);
+    TLine* LineRatio_max_ks = new TLine(0,1.05,8.5,1.05);
     LineRatio_max_ks->SetLineStyle(2);
     LineRatio_max_ks->Draw();
 

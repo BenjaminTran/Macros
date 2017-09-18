@@ -217,8 +217,11 @@ void V0vnFit()
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationTotal_08_20_2017.root");
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityTotal_08_21_2017.root");
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/LooseAndTight/V0CorrelationTightMCTotal_08_23_2017.root");
-    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureTotal_08_28_2017.root");
-    TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationRapidityClosureNoEff_09_11_17.root");
+
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityCorrectMult.root");
+    //TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root" );
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationRapidityClosureNoEff_09_11_17.root");
+    TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureTotal_08_28_2017.root");
     TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureHadronRecoFix_09_10_17.root"); //For vn of hadron
 
 	//Txt files
@@ -338,6 +341,8 @@ void V0vnFit()
         //Pull 2D Histograms
         TH2D *hbackgroundPeak = (TH2D*) f->Get(Form("v0CorrelationRapidityMC/backgroundkshort_pt%d",i));
         TH2D *hsignalPeak     = (TH2D*) f->Get(Form("v0CorrelationRapidityMC/signalkshort_pt%d",i));
+        //TH2D *hBackgroundHad  = (TH2D*) fhad->Get("xiCorrelationRapidity/BackgroundHad");
+        //TH2D *hSignalHad      = (TH2D*) fhad->Get("xiCorrelationRapidity/SignalHad");
         TH2D *hBackgroundHad  = (TH2D*) fhad->Get("HadronCorrelation/BackgroundHadReco");
         TH2D *hSignalHad      = (TH2D*) fhad->Get("HadronCorrelation/SignalHadReco");
 
@@ -726,6 +731,8 @@ void V0vnFit()
         //Pull 2D Histograms
         TH2D *hbackgroundPeak = (TH2D*) f->Get(Form("v0CorrelationRapidityMC/backgroundlambda_pt%d",i));
         TH2D *hsignalPeak     = (TH2D*) f->Get(Form("v0CorrelationRapidityMC/signallambda_pt%d",i));
+        //TH2D *hBackgroundHad  = (TH2D*) fhad->Get("xiCorrelationRapidity/BackgroundHad");
+        //TH2D *hSignalHad      = (TH2D*) fhad->Get("xiCorrelationRapidity/SignalHad");
         TH2D *hBackgroundHad  = (TH2D*) fhad->Get("HadronCorrelation/BackgroundHadReco");
         TH2D *hSignalHad      = (TH2D*) fhad->Get("HadronCorrelation/SignalHadReco");
 

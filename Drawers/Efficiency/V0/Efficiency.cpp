@@ -168,7 +168,6 @@ void Efficiency()
     tex->SetNDC();
     tex->SetTextFont(62);
     tex->SetTextSize(0.05);
-    /*
     //for(unsigned j=0; j<rap_bin_v0.size(); j+=2)
     for(int j=0; j<numRapBins_v0*2; j+=2)
     {
@@ -578,7 +577,6 @@ void Efficiency()
         //else cc1->Print("RECOV0MassFitInd.pdf)","pdf");
 
     }
-*/
 
     for(int j=0; j<numRapBins_xi*2; j+=2){
         for(int i=0; i<numXiBins; i++){
