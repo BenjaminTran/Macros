@@ -60,21 +60,25 @@ void OmMassFit()
     std::vector<double> std_xi;
     std::vector<double> fsig_xi;
     std::vector<double> covQual_xi;
+    bool doRap = true;
 
     //std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,72, 73,85, 86,100, 101,200, 201,300};
     //std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,100, 101,200};//, 201,300};
     //std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,72, 73,100, 101,200};//, 201,300};
-    std::vector<double> pxi = {11,15, 16,19, 20,23, 24,27, 28,33, 34,41, 42,50 ,51,60, 61,80};//, 81,100, 101,200};//, 201,300};
+    //std::vector<double> pxi = {11,15, 16,19, 20,23, 24,27, 28,33, 34,41, 42,50 ,51,60, 61,72, 73,100};//, 81,100, 101,200};//, 201,300};
+    std::vector<double> pxi = {11,15, 16,18, 19,22, 23,28, 29,36, 37,46, 47,60 ,61,72, 73,100};//, 81,100, 101,200};//, 201,300};
 
     TCanvas* cc1 = new TCanvas("cc1","cc1",1200,1200);
     cc1->Divide(3,3);
 
     //File Creation
     myfile.open("OmPeakParam.txt");
+    TFile* file = nullptr;
     //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/CasCutLoose/CasCutLooseJL40.root");
     //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/Thesis/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root");
     //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Composites/V0CasMassPtPD5JL12.root"); //only one PD
-    TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Omega/OmMassPt.root"); //only one PD
+    if(doRap) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Omega/OmMassPtD0Ana.root");
+    else  file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Omega/OmMassPt.root"); //only one PD
 
     //MassXi = (TH2D*)file->Get("XiMassPt/MassPt");
     //MassXi = (TH2D*)file->Get("xiCorrelation/MassPt");
@@ -137,7 +141,27 @@ void OmMassFit()
         RooGenericPdf background("background", "x - (1.115683 + 0.493677)^alpha", RooArgList(x,alpha));
         RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,background),RooArgList(sig1,sig2,qsig));
 
-        x.setRange("cut",1.645,1.7);
+        if(!doRap)
+        {
+            if(i==2 || i==4)
+                x.setRange("cut",1.65,1.694);
+            else if(i==pxi.size()-2)
+                x.setRange("cut",1.645,1.71);
+            else
+                x.setRange("cut",1.645,1.7);
+        }
+        else
+        {
+            if(i==0)
+                //x.setRange("cut",1.6425,1.698);
+                x.setRange("cut",1.6425,1.72);
+            else if(i==4)
+                x.setRange("cut",1.65,1.694);
+            else if(i==pxi.size()-2)
+                x.setRange("cut",1.645,1.71);
+            else
+                x.setRange("cut",1.645,1.7);
+        }
 
         RooFitResult* r_xi = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
         //RooChi2Var chi2_xiVar("chi2_xi","chi2",sum,data);
@@ -288,8 +312,16 @@ void OmMassFit()
         else cc2->Print("OmMassFitInd.pdf)","pdf");
         i++; //to access correct bins
     }
-    cc1->Print("OmMassFitComposite.pdf");
-    cc1->Print("OmMassFitComposite.png");
+    if(!doRap)
+    {
+        cc1->Print("OmMassFitComposite.pdf");
+        cc1->Print("OmMassFitComposite.png");
+    }
+    else
+    {
+        cc1->Print("OmMassFitCompositeD0Ana.pdf");
+        cc1->Print("OmMassFitCompositeD0Ana.png");
+    }
 
     //Output
     pxicounter = 0;

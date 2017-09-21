@@ -151,7 +151,7 @@ void vnCalculate(int degree, std::string V0IDname, std::vector<double> vnvalues_
     for(unsigned i=0; i<vnvalues_side.size(); i++) myfile << vnObs[i]*TMath::Sqrt(TMath::Power(vnerrors_side[i]/vnvalues_side[i],2) + TMath::Power(vnRefError[i]/vnvalues_h[degree],2)) << "\n";
 }
 
-void Xiv2Fit(  )
+void OmvnFit(  )
 {
     //TLatex
     std::ostringstream os; // stringstream for making dynamic TLatex labels
@@ -179,9 +179,9 @@ void Xiv2Fit(  )
     gStyle->SetTextSize( 20 );
     gStyle->SetTextFont( 42 ); //2=times-bold-r-normal, 2=precision for TLatex to work
 
-    std::string Xiv2PeakName = "Xiv2PeakLoose.txt";
-    std::string Xiv2SideName = "Xiv2SideLoose.txt";
-    std::string Xiv2CalculatorName = "Xiv2SignalLoose.txt";
+    std::string Xiv2PeakName = "Omv2Peak.txt";
+    std::string Xiv2SideName = "Omv2Side.txt";
+    std::string Xiv2CalculatorName = "Omv2Signal.txt";
 
     std::ofstream Xiv2Peak;
     std::ofstream Xiv2Side;
@@ -194,7 +194,7 @@ void Xiv2Fit(  )
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationpPbPD1-6_08_15_2017.root" );
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityLoose_08_30_2017.root" );
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTight_08_30_2017.root" );
-    TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root" );
+    TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/OmCorr/OmCorrelationBJL65_70_09_19_17.root" );
     TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root" );
 
     TVirtualFitter::SetMaxIterations( 300000 );
@@ -204,7 +204,7 @@ void Xiv2Fit(  )
     //std::vector<double> PtBin = {1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 10.0, 20.0};
     //std::vector<double> fsig_xi = {0.954019 ,0.973881 ,0.976705 ,0.97829 ,0.978074 ,0.978057 ,0.978603 ,0.974693 ,0.976012};
     std::vector<double> PtBin = {1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.2, 10.0};//, 20.0};
-    std::vector<double> fsig_xi = {0.954019 ,0.973881 ,0.976705 ,0.97829 ,0.978074 ,0.978057 ,0.978603 ,0.974644 ,0.974909};// ,0.976012};
+    std::vector<double> fsig_xi = {0.519579 ,0.664389 ,0.757589 ,0.820397 ,0.864778 ,0.903763 ,0.933867 ,0.928403 ,0.949529};// ,0.976012};
 
     int numPtBins = PtBin.size()-1;
     TH1D* dPhiFourierPeak[numPtBins];
@@ -237,8 +237,8 @@ void Xiv2Fit(  )
         //================================================================================
         //KET Calculations
         //================================================================================
-        TH1D* hKetXi = (TH1D*)f->Get(Form("xiCorrelationRapidity/KET_xi_pt%d",i));
-        TH1D* hKetXi_bkg = (TH1D*)f->Get(Form("xiCorrelationRapidity/KET_xi_bkg_pt%d",i));
+        TH1D* hKetXi = (TH1D*)f->Get(Form("omCorrelation/KET_xi_pt%d",i));
+        TH1D* hKetXi_bkg = (TH1D*)f->Get(Form("omCorrelation/KET_xi_bkg_pt%d",i));
 
         int nEntries = 0;
         double KetTotal = 0;
@@ -262,8 +262,8 @@ void Xiv2Fit(  )
                         1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
             TH1D *dPhiHad = new TH1D( "dPhiHad", "h^{#pm}- h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI );
             //Pull 2D Histograms
-            TH2D *hbackgroundPeak = (TH2D*) f->Get( Form( "xiCorrelationRapidity/BackgroundPeak_pt%d",i ) );
-            TH2D *hsignalPeak     = (TH2D*) f->Get( Form( "xiCorrelationRapidity/SignalPeak_pt%d",i ) );
+            TH2D *hbackgroundPeak = (TH2D*) f->Get( Form( "omCorrelation/BackgroundPeak_pt%d",i ) );
+            TH2D *hsignalPeak     = (TH2D*) f->Get( Form( "omCorrelation/SignalPeak_pt%d",i ) );
             TH2D *hBackgroundHad  = (TH2D*) fhad->Get( "xiCorrelationRapidity/BackgroundHad" );
             TH2D *hSignalHad      = (TH2D*) fhad->Get( "xiCorrelationRapidity/SignalHad" );
 
@@ -494,8 +494,8 @@ void Xiv2Fit(  )
             }
             //side
             dPhiSide[i] = new TH1D( Form( "dPhiSide%d",i ), "#Xi - h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
-            TH2D *hbackgroundSide = (TH2D*) f->Get( Form( "xiCorrelationRapidity/BackgroundSide_pt%d",i ) );
-            TH2D *hsignalSide     = (TH2D*) f->Get( Form( "xiCorrelationRapidity/SignalSide_pt%d",i ) );
+            TH2D *hbackgroundSide = (TH2D*) f->Get( Form( "omCorrelation/BackgroundSide_pt%d",i ) );
+            TH2D *hsignalSide     = (TH2D*) f->Get( Form( "omCorrelation/SignalSide_pt%d",i ) );
 
             TH1::SetDefaultSumw2(  );
 

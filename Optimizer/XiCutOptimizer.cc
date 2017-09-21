@@ -39,14 +39,15 @@ void XiCutOptimizer(std::string name)
     //Cut parameters to be varied. The commented elements are Hong's cuts to make a plot of them remember to change the numparam value as well
     //float xi_xi3dipsig[]     = {8.0  , 8.5  , 9.0  , 9.5  , 10.0 , 10.5 , 11.0 , 11.5, 12.0, 12.5, 13.0, 13.5};//, 2.5};
     int Oparamindex          = 12; // For deciding which parameter that is not being varied to use
-    std::vector<double> om_om3dipsig     = {};//3.0 };//, 2.5};
-    std::vector<double> om_omKaon3dipsig = {};//4.0 };//, 5.0};
-    std::vector<double> om_vtrkpi3dipsig = {};//3.0 };//, 4.0};
-    std::vector<double> om_vtrkp3dipsig  = {};//2.0 };//, 3.0};
-    std::vector<double> om_omflightsig   = {};//2.0 };//, 3.0};
-    std::vector<double> om_distancesig   = {};//10.0};//, 12.0};
+    std::vector<double> om_om3dipsig     = {3.0 };//3.0 };//, 2.5};
+    std::vector<double> om_omKaon3dipsig = {4.0 };//4.0 };//, 5.0};
+    std::vector<double> om_vtrkpi3dipsig = {3.0 };//3.0 };//, 4.0};
+    std::vector<double> om_vtrkp3dipsig  = {2.0 };//2.0 };//, 3.0};
+    std::vector<double> om_omflightsig   = {2.0 };//2.0 };//, 3.0};
+    std::vector<double> om_distancesig   = {10.0};//10.0};//, 12.0};
     double misIDMass = 0.015;
-    int multHigh_ = 220;
+    double rapidity = 1.0;
+    int multHigh_ = 250;
 
     int numparam             = om_om3dipsig.size();
 
@@ -61,6 +62,7 @@ void XiCutOptimizer(std::string name)
     float tom_mass          [CONTSIZE];
     float tom_pt            [CONTSIZE];
     float tom_eta [CONTSIZE];
+    float tom_rap [CONTSIZE];
     float tom_nTrkAcc [CONTSIZE];
     float tom_misIDMassLapi [CONTSIZE];
     float tom_misIDMasspiLa [CONTSIZE];
@@ -88,6 +90,7 @@ void XiCutOptimizer(std::string name)
     OmTree->SetBranchAddress("mass",           &tom_mass);
     OmTree->SetBranchAddress("pt",             &tom_pt);
     OmTree->SetBranchAddress("eta", &tom_eta);
+    OmTree->SetBranchAddress("rapidity", &tom_rap);
     OmTree->SetBranchAddress("nTrkAcc", &tom_nTrkAcc);
     OmTree->SetBranchAddress("misIDMassLapi", &tom_misIDMassLapi);
     OmTree->SetBranchAddress("misIDMasspiLa", &tom_misIDMasspiLa);
@@ -221,6 +224,7 @@ void XiCutOptimizer(std::string name)
                 if(tom_vtrkp3dipsig[k] < om_vtrkp3dipsig[0])   continue;
                 if(tom_omflightsig[k] < om_omflightsig[0])     continue;
                 if(tom_distancesig[k] < om_distancesig[0])     continue;
+                if(std::abs(tom_rap[k]) > rapidity) continue;
                 if(std::abs(tom_misIDMasspiLa[k]) < misIDMass) continue;
                 if(std::abs(tom_misIDMassLapi[k]) < misIDMass) continue;
 

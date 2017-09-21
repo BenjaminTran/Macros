@@ -345,6 +345,11 @@ void Cascade_v2()
     double pTXi8[xi_npoints]  = {1.267, 1.62, 2.008, 2.501, 3.173, 4.029, 5.055};
     double v2Xi8E[xi_npoints] = {0.017074, 0.008531, 0.007160, 0.005156, 0.004894, 0.006175, 0.010446};
 
+	const int om_npoints = 9;
+    double v2Om8[om_npoints]  = {0.0191671 ,0.0770592 ,0.0777969 ,0.101627 ,0.146736 ,0.201549 ,0.251998 ,0.261003 ,0.189401};
+    double pTOm8[om_npoints]  = {1.319, 1.658, 2.002, 2.492, 3.164, 4.026, 5.138, 6.476, 8.05};
+    double v2Om8E[om_npoints] = {0.0365897 ,0.0213553 ,0.0133332 ,0.00922245 ,0.00840292 ,0.00953781 ,0.0132644 ,0.0286688 ,0.043903};
+
 	const int ks_npoints = 11;
     double v2Ks8[ks_npoints]  = {0.012813549, 0.028133917,0.043212, 0.05876162, 0.081288146 ,0.105507591 ,0.123968514 ,0.135179572 ,0.144205576 ,0.142730876 ,0.129697566};
     double pTKs8[ks_npoints]  = {0.3401, 0.5213, 0.7084, 0.9036, 1.201, 1.591, 1.986, 2.465, 3.136, 4.008, 5.071};
@@ -357,15 +362,11 @@ void Cascade_v2()
 
     // Pull TGraph for Kshort and lambda
 
-    TFile* file_pPbv2 = TFile::Open("lrgraphv2_v3_pPb_185-220.root");
-    TFile* file_hadv2 = TFile::Open("lrgraphv2_v3_pPb_hadron_185-above.root");
-
-    TGraphErrors* ks_v2 = (TGraphErrors*)file_pPbv2->Get("kshortv2true");
-    TGraphErrors* la_v2 = (TGraphErrors*)file_pPbv2->Get("lambdav2true");
     //TGraphErrors* ha_v2 = (TGraphErrors*)file_hadv2->Get("hadronv2");
     TGraphErrors* ha_v2 = (TGraphErrors*)GetGraphWithSymmYErrorsFromFile(Form("data/%s","n185_220_ptass033pPb_v2.txt"),1,28,1.2);
 
     TGraphErrors* xi8_v2 = new TGraphErrors(xi_npoints,pTXi8,v2Xi8,0,v2Xi8E);
+    TGraphErrors* om8_v2 = new TGraphErrors(om_npoints,pTOm8,v2Om8,0,v2Om8E);
     TGraphErrors* ks8_v2 = new TGraphErrors(ks_npoints,pTKs8,v2Ks8,0,v2Ks8E);
 	TGraphErrors* la8_v2 = new TGraphErrors(la_npoints,pTLa8,v2La8,0,v2La8E);
 
@@ -377,15 +378,20 @@ void Cascade_v2()
     ks8_v2->SetMarkerSize(1.5);
     ks8_v2->SetLineColor(kRed);
 
-    xi8_v2->SetMarkerColor(kMagenta-4);
+    xi8_v2->SetMarkerColor(kGreen+2);
     xi8_v2->SetMarkerStyle(21);
     xi8_v2->SetMarkerSize(1.5);
-    xi8_v2->SetLineColor(kMagenta-4);
+    xi8_v2->SetLineColor(kGreen+2);
 
-    la8_v2->SetMarkerColor(kGreen+2);
+    om8_v2->SetMarkerColor(kMagenta-4);
+    om8_v2->SetMarkerStyle(29);
+    om8_v2->SetMarkerSize(1.5);
+    om8_v2->SetLineColor(kMagenta-4);
+
+    la8_v2->SetMarkerColor(kBlue-4);
     la8_v2->SetMarkerStyle(22);
     la8_v2->SetMarkerSize(1.5);
-    la8_v2->SetLineColor(kGreen+2);
+    la8_v2->SetLineColor(kBlue-4);
 
     TCanvas* c1 = MakeCanvas("c1", "Plot");
     c1->cd();
@@ -393,7 +399,7 @@ void Cascade_v2()
 
     // draw the frame using a histogram frame
 
-    TH1F* frame = c1->DrawFrame(0,-0.01,6,0.31);
+    TH1F* frame = c1->DrawFrame(0,-0.01,10,0.61);
     gPad->SetTickx();
     gPad->SetTicky();
     frame->GetXaxis()->CenterTitle(1);
@@ -409,12 +415,14 @@ void Cascade_v2()
     ks8_v2->Draw("P");
     la8_v2->Draw("P");
     xi8_v2->Draw("P");
+    om8_v2->Draw("P");
 
     // Write points into rootfile
     TFile out("8TeVgraphv2_pPb185-220.root","RECREATE");
     ks8_v2->Write("kshortv2");
     la8_v2->Write("lambdav2");
-    xi8_v2->Write("cascadev2");
+    xi8_v2->Write("xiv2");
+    om8_v2->Write("omegav2");
 
     TLegend* leg = new TLegend(0.15,0.45,0.51,0.68);
     leg->SetFillColor(10);
@@ -423,9 +431,10 @@ void Cascade_v2()
     leg->SetTextFont(42);
     leg->SetTextSize(0.05);
     //leg->AddEntry(ha_v2, "h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}", "P");
-    leg->AddEntry(ks8_v2, "K_{#lower[-0.3]{S}}#kern[-1.05]{#lower[0.1]{{}^{0}}}", "P");
-    leg->AddEntry(la8_v2, "#Lambda / #lower[0.1]{#bar{  }}#kern[-1.2]{#Lambda}", "P");
-    leg->AddEntry(xi8_v2, "#Xi#kern[-0.3]{#lower[0.1]{{}^{+}}}/ #Xi#kern[-0.3]{#lower[0.1]{{}^{-}}}", "P");
+    leg->AddEntry(ks8_v2, "K_{S}^{0}", "P");
+    leg->AddEntry(la8_v2, "#Lambda/#bar{#Lambda}", "P");
+    leg->AddEntry(xi8_v2, "#Xi^{#pm}", "P");
+    leg->AddEntry(om8_v2, "#Omega^{#pm}", "P");
     leg->Draw();
 
     TLatex *tex = new TLatex();
@@ -438,9 +447,12 @@ void Cascade_v2()
     // tex->DrawLatex(0.23,0.72, "L_{#lower[-0.25]{int}} = #color[kOrange+8]{35} nb^{#font[122]{\55}1}, 62 nb^{#font[122]{\55}1}");
     tex->DrawLatex(0.55,0.23,"185 #leq N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 220");
     //tex->DrawLatex(0.4,0.7, "L_{#lower[-0.25]{int}} = 35 nb^{#font[122]{\55}1}, 185 nb^{#font[122]{\55}1}");
-    TLine* line = new TLine(0,0,6,0);
+    TLine* line = new TLine(0,0,10,0);
     line->SetLineStyle(8);
     line->Draw();
+
+    c1->Print("V2all.pdf");
+    c1->Print("V2all.png");
 }
 
 void Rap_v2sig()
@@ -1710,8 +1722,11 @@ void RapSys_Closure()
     const int la_npoints = 10;
     std::vector<double> PtMeanReco_ks;
     std::vector<double> PtMeanReco_la;
+    std::vector<double> PtMeanRecoMatch_ks;
+    std::vector<double> PtMeanRecoMatch_la;
 
     TFile* f_Reco = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureTotal_08_28_2017.root");
+    TFile* f_Match = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/MatchV0ClosureBpPb_09_20_17.root"); //1 | Forgot to cut on abs(dpt/pt_gen)
 
     //Determine Mean pt points for Ks
     for(int i=0; i<ks_npoints; i++)
@@ -1753,9 +1768,54 @@ void RapSys_Closure()
         PtMeanReco_la.push_back(PtMean/n);
     }
 
+    //MATCHED
+    //Determine Mean pt points for Ks
+    for(int i=0; i<ks_npoints; i++)
+    {
+        TH1D* pt_ks = (TH1D*)f_Match->Get(Form("v0CorrelationRapidityMatchMC/Ptkshort_pt%d",i));
+        TH1D* pt_bkg_ks = (TH1D*)f_Match->Get(Form("v0CorrelationRapidityMatchMC/Ptkshort_bkg_pt%d",i));
+        double PtMean = 0;
+        int n = 0;
+        for(int j=pt_ks->FindFirstBinAbove(0,1); j<pt_ks->FindLastBinAbove(0,1); j++)
+        {
+            PtMean += pt_ks->GetBinCenter(j)*(pt_ks->GetBinContent(j));
+            n += pt_ks->GetBinContent(j);
+        }
+        for(int j=pt_bkg_ks->FindFirstBinAbove(0,1); j<pt_bkg_ks->FindLastBinAbove(0,1); j++)
+        {
+            PtMean += pt_bkg_ks->GetBinCenter(j)*(pt_bkg_ks->GetBinContent(j));
+            n += pt_bkg_ks->GetBinContent(j);
+        }
+        PtMeanRecoMatch_ks.push_back(PtMean/n);
+        cout << i << ": " << PtMean/n << endl;
+    }
+    //Determine Mean pt points for La
+    for(int i=0; i<la_npoints; i++)
+    {
+        TH1D* pt_la = (TH1D*)f_Match->Get(Form("v0CorrelationRapidityMatchMC/Ptlambda_pt%d",i));
+        TH1D* pt_bkg_la = (TH1D*)f_Match->Get(Form("v0CorrelationRapidityMatchMC/Ptlambda_bkg_pt%d",i));
+        double PtMean = 0;
+        int n = 0;
+        for(int j=pt_la->FindFirstBinAbove(0,1); j<pt_la->FindLastBinAbove(0,1); j++)
+        {
+            PtMean += pt_la->GetBinCenter(j)*(pt_la->GetBinContent(j));
+            n += pt_la->GetBinContent(j);
+        }
+        for(int j=pt_bkg_la->FindFirstBinAbove(0,1); j<pt_bkg_la->FindLastBinAbove(0,1); j++)
+        {
+            PtMean += pt_bkg_la->GetBinCenter(j)*(pt_bkg_la->GetBinContent(j));
+            n += pt_bkg_la->GetBinContent(j);
+        }
+        PtMeanRecoMatch_la.push_back(PtMean/n);
+    }
+
     double v2Reco_ks[ks_npoints]  = {0.0722071 ,0.147723 ,0.222303 ,0.294967 ,0.369263 ,0.445429 ,0.491016 ,0.521116 ,0.533933 ,0.519577 ,0.464798 ,0.381484 ,0.290978};
     double* pTReco_ks = &PtMeanReco_ks[0];
     double v2Reco_ksE[ks_npoints] = {0.00437059 ,0.00115752 ,0.000754802 ,0.000676901 ,0.000484584 ,0.000557721 ,0.0006959 ,0.000776143 ,0.00105449 ,0.00166647 ,0.00308999 ,0.0067008 ,0.00956059};
+
+    double v2RecoMatch_ks[ks_npoints]  = {0.0553694 ,0.145913 ,0.220285 ,0.294232 ,0.369009 ,0.446266 ,0.490768 ,0.521643 ,0.532904 ,0.520321 ,0.473552 ,0.392277 ,0.287408};
+    double* pTRecoMatch_ks = &PtMeanRecoMatch_ks[0];
+    double v2RecoMatch_ksE[ks_npoints] = {0.00365939 ,0.00126627 ,0.000890618 ,0.000837354 ,0.000628735 ,0.000747037 ,0.000940407 ,0.00105765 ,0.00144895 ,0.00229439 ,0.00427065 ,0.0090483 ,0.0130823};
 
     double v2Gen_ks[ks_npoints]  = {0.052706 ,0.14045 ,0.229782 ,0.307633 ,0.384587 ,0.467894 ,0.519706 ,0.551816 ,0.565919 ,0.554509 ,0.49801 ,0.406751 ,0.301587};
     double pTGen_ks[ks_npoints]  = {0.303, 0.4971, 0.6951, 0.8948, 1.178, 1.578, 1.979, 2.456, 3.129, 4, 5.131, 6.427, 7.61};
@@ -1765,12 +1825,17 @@ void RapSys_Closure()
     double* pTReco_la = &PtMeanReco_la[0];
     double v2Reco_laE[la_npoints] = {0.00263104 ,0.00117218 ,0.00113757 ,0.00124031 ,0.0011602 ,0.00128685 ,0.00180476 ,0.00313557 ,0.0111194 ,0.0282399};
 
+    double v2RecoMatch_la[la_npoints]  = {0.186242 ,0.252737 ,0.359515 ,0.449549 ,0.52772 ,0.591169 ,0.629537 ,0.637112 ,0.616482 ,0.544056};
+    double* pTRecoMatch_la = &PtMeanRecoMatch_la[0];
+    double v2RecoMatch_laE[la_npoints] = {0.00275591 ,0.00145987 ,0.00143559 ,0.00156058 ,0.00149181 ,0.00170974 ,0.00243067 ,0.00416321 ,0.0155256 ,0.0435596};
+
     double v2Gen_la[la_npoints]  = {0.176432 ,0.261996 ,0.374751 ,0.473161 ,0.557898 ,0.629242 ,0.66937 ,0.679275 ,0.663517 ,0.628933};
     double pTGen_la[la_npoints]  = {0.8981, 1.189, 1.586, 1.985, 2.466, 3.137, 4.002, 5.118, 6.412, 7.568};
     double v2Gen_laE[la_npoints] = {0.000204122 ,0.000165959 ,0.000198333 ,0.000243174 ,0.000260547 ,0.000333439 ,0.000501804 ,0.000835003 ,0.0019952 ,0.00308793};
 
     // Pull TGraph for Kshort and lambda
     TGraphErrors* Reco_v2_ks = new TGraphErrors(ks_npoints,pTReco_ks,v2Reco_ks,0,v2Reco_ksE);
+    TGraphErrors* RecoMatch_v2_ks = new TGraphErrors(ks_npoints,pTRecoMatch_ks,v2RecoMatch_ks,0,v2RecoMatch_ksE);
     TGraphErrors* Gen_v2_ks = new TGraphErrors(ks_npoints,pTGen_ks,v2Gen_ks,0,v2Gen_ksE);
 
     Gen_v2_ks->SetMarkerColor(kRed);
@@ -1782,6 +1847,11 @@ void RapSys_Closure()
     Reco_v2_ks->SetMarkerStyle(25);
     Reco_v2_ks->SetMarkerSize(1.5);
     Reco_v2_ks->SetLineColor(kRed);
+
+    RecoMatch_v2_ks->SetMarkerColor(kGreen);
+    RecoMatch_v2_ks->SetMarkerStyle(25);
+    RecoMatch_v2_ks->SetMarkerSize(1.5);
+    RecoMatch_v2_ks->SetLineColor(kGreen);
 
     TCanvas* c1_ks = MakeCanvas("c1_ks", "Plot_ks");
     c1_ks->cd();
@@ -1824,6 +1894,8 @@ void RapSys_Closure()
     //ha_v2->Draw("PESAME");
     Gen_v2_ks->Draw("P");
     Reco_v2_ks->Draw("P");
+    RecoMatch_v2_ks->Draw("P");
+
     TLatex *tex = new TLatex();
     tex->SetNDC();
     tex->SetTextSize(0.045);
@@ -1840,6 +1912,7 @@ void RapSys_Closure()
     leg_ks->SetTextSize(0.03);
     leg_ks->AddEntry(Gen_v2_ks, "Gen K_{S}^{0}", "P");
     leg_ks->AddEntry(Reco_v2_ks, "Reco K_{S}^{0}", "P");
+    leg_ks->AddEntry(RecoMatch_v2_ks, "Reco Matched K_{S}^{0}", "P");
     leg_ks->Draw();
 
     tex->SetTextFont(62);
@@ -1854,6 +1927,7 @@ void RapSys_Closure()
     // Pull TGraph for Kshort and lambda
 
     TGraphErrors* Reco_v2_la = new TGraphErrors(la_npoints,pTReco_la,v2Reco_la,0,v2Reco_laE);
+    TGraphErrors* RecoMatch_v2_la = new TGraphErrors(la_npoints,pTRecoMatch_la,v2RecoMatch_la,0,v2RecoMatch_laE);
     TGraphErrors* Gen_v2_la = new TGraphErrors(la_npoints,pTGen_la,v2Gen_la,0,v2Gen_laE);
 
     Gen_v2_la->SetMarkerColor(kBlue-4);
@@ -1865,6 +1939,11 @@ void RapSys_Closure()
     Reco_v2_la->SetMarkerStyle(25);
     Reco_v2_la->SetMarkerSize(1.5);
     Reco_v2_la->SetLineColor(kBlue-4);
+
+    RecoMatch_v2_la->SetMarkerColor(kGreen);
+    RecoMatch_v2_la->SetMarkerStyle(25);
+    RecoMatch_v2_la->SetMarkerSize(1.5);
+    RecoMatch_v2_la->SetLineColor(kGreen);
 
 
     TCanvas* c1_la = MakeCanvas("c1_la", "Plot_la");
@@ -1904,6 +1983,7 @@ void RapSys_Closure()
     //ha_v2->Draw("PESAME");
     Gen_v2_la->Draw("P");
     Reco_v2_la->Draw("P");
+    RecoMatch_v2_la->Draw("P");
 
     TLegend* leg_la = new TLegend(0.15,0.65,0.3,0.75);
     leg_la->SetFillColor(10);
@@ -1913,6 +1993,7 @@ void RapSys_Closure()
     leg_la->SetTextSize(0.03);
     leg_la->AddEntry(Gen_v2_la, "Gen #Lambda/#bar{#Lambda}", "P");
     leg_la->AddEntry(Reco_v2_la, "Reco #Lambda/#bar{#Lambda}", "P");
+    leg_la->AddEntry(RecoMatch_v2_la, "Reco Match #Lambda/#bar{#Lambda}", "P");
     leg_la->Draw();
 
     tex->SetTextFont(62);
@@ -1947,9 +2028,11 @@ void RapSys_Closure()
 
     Gen_v2_ks->Draw("P");
     Reco_v2_ks->Draw("P");
+    RecoMatch_v2_ks->Draw("P");
 
     Gen_v2_la->Draw("P");
     Reco_v2_la->Draw("P");
+    RecoMatch_v2_la->Draw("P");
 
     TLegend* leg_co1 = new TLegend(0.15,0.65,0.27,0.75);
     leg_co1->SetFillColor(10);
@@ -1969,6 +2052,7 @@ void RapSys_Closure()
     leg_co2->SetTextSize(0.03);
     leg_co2->AddEntry(Gen_v2_la, "Gen", "P");
     leg_co2->AddEntry(Reco_v2_la, "Reco", "P");
+    leg_co2->AddEntry(RecoMatch_v2_la, "Reco Match", "P");
     leg_co2->Draw();
 
     tex->SetTextFont(62);
@@ -1983,12 +2067,16 @@ void RapSys_Closure()
     //Calculate Ratios Reco/Gen
     std::vector<double> v2RatioKsReco;
     std::vector<double> v2RatioLaReco;
+    std::vector<double> v2RatioKsRecoMatch;
+    std::vector<double> v2RatioLaRecoMatch;
 
     std::vector<double> v2RatioKsGen;
     std::vector<double> v2RatioLaGen;
 
     std::vector<double> v2ErrorRatioKsReco;
     std::vector<double> v2ErrorRatioLaReco;
+    std::vector<double> v2ErrorRatioKsRecoMatch;
+    std::vector<double> v2ErrorRatioLaRecoMatch;
 
     std::vector<double> v2ErrorRatioKsGen;
     std::vector<double> v2ErrorRatioLaGen;
@@ -1998,6 +2086,9 @@ void RapSys_Closure()
     {
         v2RatioKsReco.push_back(v2Reco_ks[i]/ksFit->Eval(pTReco_ks[i]));
         v2ErrorRatioKsReco.push_back(v2Reco_ksE[i]/ksFit->Eval(pTReco_ks[i]));
+
+        v2RatioKsRecoMatch.push_back(v2RecoMatch_ks[i]/ksFit->Eval(pTRecoMatch_ks[i]));
+        v2ErrorRatioKsRecoMatch.push_back(v2RecoMatch_ksE[i]/ksFit->Eval(pTRecoMatch_ks[i]));
 
         v2RatioKsGen.push_back(v2Gen_ks[i]/ksFit->Eval(pTReco_ks[i]));
         v2ErrorRatioKsGen.push_back(v2Gen_ksE[i]/ksFit->Eval(pTReco_ks[i]));
@@ -2010,6 +2101,11 @@ void RapSys_Closure()
     {
         v2RatioLaReco.push_back(v2Reco_la[i]/laFit->Eval(pTReco_la[i]));
         v2ErrorRatioLaReco.push_back(v2Reco_laE[i]/laFit->Eval(pTReco_la[i]));
+        cout << i << endl;
+
+        v2RatioLaRecoMatch.push_back(v2RecoMatch_la[i]/laFit->Eval(pTRecoMatch_la[i]));
+        v2ErrorRatioLaRecoMatch.push_back(v2RecoMatch_laE[i]/laFit->Eval(pTRecoMatch_la[i]));
+        cout << i << endl;
 
         v2RatioLaGen.push_back(v2Gen_la[i]/laFit->Eval(pTReco_la[i]));
         v2ErrorRatioLaGen.push_back(v2Gen_laE[i]/laFit->Eval(pTReco_la[i]));
@@ -2017,24 +2113,36 @@ void RapSys_Closure()
 
     double* av2RatioKsReco = &v2RatioKsReco[0];
     double* av2RatioLaReco = &v2RatioLaReco[0];
+    double* av2RatioKsRecoMatch = &v2RatioKsRecoMatch[0];
+    double* av2RatioLaRecoMatch = &v2RatioLaRecoMatch[0];
     double* av2RatioKsGen = &v2RatioKsGen[0];
     double* av2RatioLaGen = &v2RatioLaGen[0];
 
     double* av2ErrorRatioKsReco = &v2ErrorRatioKsReco[0];
     double* av2ErrorRatioLaReco = &v2ErrorRatioLaReco[0];
+    double* av2ErrorRatioKsRecoMatch = &v2ErrorRatioKsRecoMatch[0];
+    double* av2ErrorRatioLaRecoMatch = &v2ErrorRatioLaRecoMatch[0];
     double* av2ErrorRatioKsGen = &v2ErrorRatioKsGen[0];
     double* av2ErrorRatioLaGen = &v2ErrorRatioLaGen[0];
 
     TGraphErrors* RatioReco_v2_la = new TGraphErrors(la_npoints,pTReco_la,av2RatioLaReco,0,av2ErrorRatioLaReco);
+    TGraphErrors* RatioRecoMatch_v2_la = new TGraphErrors(la_npoints,pTRecoMatch_la,av2RatioLaRecoMatch,0,av2ErrorRatioLaRecoMatch);
     TGraphErrors* RatioGen_v2_la = new TGraphErrors(la_npoints,pTGen_la,av2RatioLaGen,0,av2ErrorRatioLaGen);
 
+
     TGraphErrors* RatioReco_v2_ks = new TGraphErrors(ks_npoints,pTReco_ks,av2RatioKsReco,0,av2ErrorRatioKsReco);
+    TGraphErrors* RatioRecoMatch_v2_ks = new TGraphErrors(ks_npoints,pTRecoMatch_ks,av2RatioKsRecoMatch,0,av2ErrorRatioKsRecoMatch);
     TGraphErrors* RatioGen_v2_ks = new TGraphErrors(ks_npoints,pTGen_ks,av2RatioKsGen,0,av2ErrorRatioKsGen);
 
     RatioReco_v2_ks->SetMarkerColor(kRed);
     RatioReco_v2_ks->SetMarkerStyle(25);
     RatioReco_v2_ks->SetMarkerSize(1.3);
     RatioReco_v2_ks->SetLineColor(kRed);
+
+    RatioRecoMatch_v2_ks->SetMarkerColor(kRed);
+    RatioRecoMatch_v2_ks->SetMarkerStyle(26);
+    RatioRecoMatch_v2_ks->SetMarkerSize(1.3);
+    RatioRecoMatch_v2_ks->SetLineColor(kRed);
 
     RatioGen_v2_ks->SetMarkerColor(kRed);
     RatioGen_v2_ks->SetMarkerStyle(20);
@@ -2046,6 +2154,11 @@ void RapSys_Closure()
     RatioReco_v2_la->SetMarkerSize(1.3);
     RatioReco_v2_la->SetLineColor(kBlue-4);
 
+    RatioRecoMatch_v2_la->SetMarkerColor(kBlue-4);
+    RatioRecoMatch_v2_la->SetMarkerStyle(26);
+    RatioRecoMatch_v2_la->SetMarkerSize(1.3);
+    RatioRecoMatch_v2_la->SetLineColor(kBlue-4);
+
     RatioGen_v2_la->SetMarkerColor(kBlue-4);
     RatioGen_v2_la->SetMarkerStyle(20);
     RatioGen_v2_la->SetMarkerSize(1.3);
@@ -2053,6 +2166,7 @@ void RapSys_Closure()
 
     TCanvas* c1_ratio = MakeCanvas("c1_ratio", "Plot_ratio");
     TH1F* frame_Ratio = c1_ratio->DrawFrame(0,0.8,8.5,1.2);
+    //TH1F* frame_Ratio = c1_ratio->DrawFrame(0,0,8.5,2);
     gPad->SetTickx();
     gPad->SetTicky();
     frame_Ratio->GetXaxis()->CenterTitle(1);
@@ -2077,6 +2191,8 @@ void RapSys_Closure()
 
     RatioReco_v2_ks->Draw("P");
     RatioReco_v2_la->Draw("P");
+    RatioRecoMatch_v2_ks->Draw("P");
+    RatioRecoMatch_v2_la->Draw("P");
     RatioGen_v2_ks->Draw("P");
     RatioGen_v2_la->Draw("P");
 
