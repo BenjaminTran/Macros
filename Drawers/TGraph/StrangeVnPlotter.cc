@@ -463,6 +463,8 @@ void Rap_v2sig()
     /*c1->SetLogy();*/
     c1->SetLeftMargin(0.12);
 
+    TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityCorrectMultB_09_19_17.root"); //D0 study
+
     // draw the frame using a histogram frame
     TH1F* frame;
 
@@ -482,23 +484,71 @@ void Rap_v2sig()
     std::vector<double> pTLa8;
     std::vector<double> v2La8E;
 
+
     for(int i=0; i<3; i++)
     {
         if(i==0) // v2 vs pt
         {
+            for(int i=0; i<ks_npoints; i++)
+            {
+                TH1D* hPtKs = (TH1D*)f->Get(Form("v0CorrelationRapidity/Ptkshort_pt%d",i));
+                TH1D* hPtKs_bkg = (TH1D*)f->Get(Form("v0CorrelationRapidity/Ptkshort_bkg_pt%d",i));
+
+                int nEntries = 0;
+                double PtTotal = 0;
+                for(int j=hPtKs->FindFirstBinAbove(0,1); j<=hPtKs->FindLastBinAbove(0,1); j++)
+                {
+                    double nPt = hPtKs->GetBinContent(j);
+                    double Pt = nPt*(hPtKs->GetBinCenter(j));
+                    nEntries+=nPt;
+                    PtTotal += Pt;
+                }
+                for(int j=hPtKs_bkg->FindFirstBinAbove(0,1); j<=hPtKs_bkg->FindLastBinAbove(0,1); j++)
+                {
+                    double nPt_bkg = hPtKs_bkg->GetBinContent(j);
+                    double Pt_bkg = nPt_bkg*(hPtKs_bkg->GetBinCenter(j));
+                    nEntries += nPt_bkg;
+                    PtTotal += Pt_bkg;
+                }
+                pTKs8.push_back(PtTotal/nEntries);
+            }
+            for(int i=0; i<la_npoints; i++)
+            {
+                TH1D* hPtLa = (TH1D*)f->Get(Form("v0CorrelationRapidity/Ptlambda_pt%d",i));
+                TH1D* hPtLa_bkg = (TH1D*)f->Get(Form("v0CorrelationRapidity/Ptlambda_bkg_pt%d",i));
+
+                int nEntries = 0;
+                double PtTotal = 0;
+                for(int j=hPtLa->FindFirstBinAbove(0,1); j<=hPtLa->FindLastBinAbove(0,1); j++)
+                {
+                    double nPt = hPtLa->GetBinContent(j);
+                    double Pt = nPt*(hPtLa->GetBinCenter(j));
+                    nEntries+=nPt;
+                    PtTotal += Pt;
+                }
+                for(int j=hPtLa_bkg->FindFirstBinAbove(0,1); j<=hPtLa_bkg->FindLastBinAbove(0,1); j++)
+                {
+                    double nPt_bkg = hPtLa_bkg->GetBinContent(j);
+                    double Pt_bkg = nPt_bkg*(hPtLa_bkg->GetBinCenter(j));
+                    nEntries += nPt_bkg;
+                    PtTotal += Pt_bkg;
+                }
+                pTLa8.push_back(PtTotal/nEntries);
+            }
+
             v2Xi8.insert(v2Xi8.end(),{0.0371521 ,0.0669904 ,0.0877339 ,0.123959 ,0.163467 ,0.183918 ,0.209974 ,0.17582});
             pTXi8.insert(pTXi8.end(),{1.267, 1.62, 2.008, 2.501, 3.173, 4.029, 5.055, 6.474});
             v2Xi8E.insert(v2Xi8E.end(),{0.00932224 ,0.00484125 ,0.0041527 ,0.00326934 ,0.00309064 ,0.00361334 ,0.00517473 ,0.0113186});
 
-            v2Ks8.insert(v2Ks8.end(),{0.0135543 ,0.0293041 ,0.0433881 ,0.0594498 ,0.082389 ,0.106184 ,0.124363 ,0.137749 ,0.146475 ,0.145182 ,0.135266 ,0.125505 ,0.124708});
-            pTKs8.insert(pTKs8.end(),{0.3666, 0.5309, 0.711, 0.9046, 1.202, 1.591, 1.986, 2.465, 3.136, 4.008, 5.142, 6.431, 7.619, 9.142, 11.64, 16.86});
-            v2Ks8E.insert(v2Ks8E.end(),{0.00217719 ,0.000522063 ,0.000305164 ,0.000248705 ,0.000161989 ,0.000173887 ,0.000208535 ,0.000225897 ,0.000298544 ,0.000448324 ,0.000705022 ,0.00146462 ,0.00192261});
+            v2Ks8.insert(v2Ks8.end(),{0.0134706 ,0.0291376 ,0.0430301 ,0.0594915 ,0.0822571 ,0.105851 ,0.124123 ,0.137468 ,0.146174 ,0.144044 ,0.131987 ,0.124602 ,0.123191});
+            //pTKs8.insert(pTKs8.end(),{0.3666, 0.5309, 0.711, 0.9046, 1.202, 1.591, 1.986, 2.465, 3.136, 4.008, 5.142, 6.431, 7.619, 9.142, 11.64, 16.86});
+            v2Ks8E.insert(v2Ks8E.end(),{0.00248373 ,0.000592259 ,0.000347889 ,0.00028455 ,0.000187699 ,0.000201148 ,0.000240112 ,0.000259821 ,0.000342163 ,0.000513599 ,0.000872609 ,0.00167536 ,0.00218428});
 
-            v2La8.insert(v2La8.end(),{0.0345669 ,0.0510091 ,0.0771498 ,0.106513 ,0.138504 ,0.171975 ,0.19385 ,0.202724 ,0.19716 ,0.178541});
-            pTLa8.insert(pTLa8.end(),{0.9252, 1.224, 1.603, 1.995, 2.485, 3.156, 4.007, 5.116, 6.414, 7.588});
-            v2La8E.insert(v2La8E.end(),{0.00106898 ,0.000437383 ,0.000387893 ,0.000396151 ,0.000360204 ,0.000398977 ,0.000561998 ,0.000940498 ,0.00223511 ,0.0032202});
+            v2La8.insert(v2La8.end(),{0.0322326 ,0.0504116 ,0.0773716 ,0.105974 ,0.137721 ,0.17128 ,0.194142 ,0.20458 ,0.204979 ,0.197623});
+            //pTLa8.insert(pTLa8.end(),{0.9252, 1.224, 1.603, 1.995, 2.485, 3.156, 4.007, 5.116, 6.414, 7.588});
+            v2La8E.insert(v2La8E.end(),{0.00124602 ,0.000505562 ,0.000446541 ,0.00045671 ,0.000412522 ,0.00045697 ,0.000652359 ,0.00113058 ,0.00363793 ,0.00800843});
 
-            frame = c1->DrawFrame(0,-0.01,8,0.5);
+            frame = c1->DrawFrame(0,-0.01,9,0.5);
             gPad->SetTickx();
             gPad->SetTicky();
             frame->GetXaxis()->CenterTitle(1);
@@ -512,29 +562,59 @@ void Rap_v2sig()
         }
         else if(i==1) // v2 vs KET
         {
-            v2Xi8.clear();
             pTXi8.clear();
-            v2Xi8E.clear();
-
-            v2Ks8.clear();
             pTKs8.clear();
-            v2Ks8E.clear();
-
-            v2La8.clear();
             pTLa8.clear();
-            v2La8E.clear();
 
-            v2Xi8.insert(v2Xi8.end(),{0.0371521 ,0.0669904 ,0.0877339 ,0.123959 ,0.163467 ,0.183918 ,0.209974 ,0.17582});
+            for(int i=0; i<ks_npoints; i++)
+            {
+                TH1D* hKetKs = (TH1D*)f->Get(Form("v0CorrelationRapidity/KETkshort_pt%d",i));
+                TH1D* hKetKs_bkg = (TH1D*)f->Get(Form("v0CorrelationRapidity/KETkshort_bkg_pt%d",i));
+
+                int nEntries = 0;
+                double KetTotal = 0;
+                for(int j=hKetKs->FindFirstBinAbove(0,1); j<=hKetKs->FindLastBinAbove(0,1); j++)
+                {
+                    double nKet = hKetKs->GetBinContent(j);
+                    double Ket = nKet*(hKetKs->GetBinCenter(j));
+                    nEntries+=nKet;
+                    KetTotal += Ket;
+                }
+                for(int j=hKetKs_bkg->FindFirstBinAbove(0,1); j<=hKetKs_bkg->FindLastBinAbove(0,1); j++)
+                {
+                    double nKet_bkg = hKetKs_bkg->GetBinContent(j);
+                    double Ket_bkg = nKet_bkg*(hKetKs_bkg->GetBinCenter(j));
+                    nEntries += nKet_bkg;
+                    KetTotal += Ket_bkg;
+                }
+                pTKs8.push_back(KetTotal/nEntries);
+            }
+            for(int i=0; i<la_npoints; i++)
+            {
+                TH1D* hKetLa = (TH1D*)f->Get(Form("v0CorrelationRapidity/KETlambda_pt%d",i));
+                TH1D* hKetLa_bkg = (TH1D*)f->Get(Form("v0CorrelationRapidity/KETlambda_bkg_pt%d",i));
+
+                int nEntries = 0;
+                double KetTotal = 0;
+                for(int j=hKetLa->FindFirstBinAbove(0,1); j<=hKetLa->FindLastBinAbove(0,1); j++)
+                {
+                    double nKet = hKetLa->GetBinContent(j);
+                    double Ket = nKet*(hKetLa->GetBinCenter(j));
+                    nEntries+=nKet;
+                    KetTotal += Ket;
+                }
+                for(int j=hKetLa_bkg->FindFirstBinAbove(0,1); j<=hKetLa_bkg->FindLastBinAbove(0,1); j++)
+                {
+                    double nKet_bkg = hKetLa_bkg->GetBinContent(j);
+                    double Ket_bkg = nKet_bkg*(hKetLa_bkg->GetBinCenter(j));
+                    nEntries += nKet_bkg;
+                    KetTotal += Ket_bkg;
+                }
+                pTLa8.push_back(KetTotal/nEntries);
+            }
+
             pTXi8.insert(pTXi8.end(),{0.515319 ,0.768532 ,1.07944 ,1.50413 ,2.12034 ,2.92705 ,3.98122 ,5.28277});
-            v2Xi8E.insert(v2Xi8E.end(),{0.00932224 ,0.00484125 ,0.0041527 ,0.00326934 ,0.00309064 ,0.00361334 ,0.00517473 ,0.0113186});
-
-            v2Ks8.insert(v2Ks8.end(),{0.0135543 ,0.0293041 ,0.0433881 ,0.0594498 ,0.082389 ,0.106184 ,0.124363 ,0.137749 ,0.146475 ,0.145182 ,0.135266 ,0.125505 ,0.124708});
-            pTKs8.insert(pTKs8.end(),{0.120493 ,0.230933 ,0.370907 ,0.535241 ,0.804172 ,1.17001 ,1.55031 ,2.01776 ,2.67887 ,3.54188 ,4.67169 ,5.95357 ,7.13835});
-            v2Ks8E.insert(v2Ks8E.end(),{0.00217719 ,0.000522063 ,0.000305164 ,0.000248705 ,0.000161989 ,0.000173887 ,0.000208535 ,0.000225897 ,0.000298544 ,0.000448324 ,0.000705022 ,0.00146462 ,0.00192261});
-
-            v2La8.insert(v2La8.end(),{0.0345669 ,0.0510091 ,0.0771498 ,0.106513 ,0.138504 ,0.171975 ,0.19385 ,0.202724 ,0.19716 ,0.178541});
-            pTLa8.insert(pTLa8.end(),{0.326395 ,0.537952 ,0.836813 ,1.16991 ,1.60772 ,2.23092 ,3.0437 ,4.1234 ,5.39811 ,6.55991});
-            v2La8E.insert(v2La8E.end(),{0.00106898 ,0.000437383 ,0.000387893 ,0.000396151 ,0.000360204 ,0.000398977 ,0.000561998 ,0.000940498 ,0.00223511 ,0.0032202});
+            //v2Xi8E.insert(v2Xi8E.end(),{0.00932224 ,0.00484125 ,0.0041527 ,0.00326934 ,0.00309064 ,0.00361334 ,0.00517473 ,0.0113186});
 
             frame = c1->DrawFrame(0,-0.01,8,0.5);
             gPad->SetTickx();
@@ -551,29 +631,47 @@ void Rap_v2sig()
         }
         else // v2/nq vs KET/nq
         {
-            v2Xi8.clear();
-            pTXi8.clear();
-            v2Xi8E.clear();
+            for(unsigned i=0; i<v2Xi8.size(); i++)
+            {
+                v2Xi8[i] = v2Xi8[i]/3;
+                pTXi8[i] = pTXi8[i]/3;
+                v2Xi8E[i] = v2Xi8E[i]/3;
+            }
+            for(unsigned i=0; i<v2Ks8.size(); i++)
+            {
+                v2Ks8[i] = v2Ks8[i]/2;
+                pTKs8[i] = pTKs8[i]/2;
+                v2Ks8E[i] = v2Ks8E[i]/2;
+            }
+            for(unsigned i=0; i<v2La8.size(); i++)
+            {
+                v2La8[i] = v2La8[i]/3;
+                pTLa8[i] = pTLa8[i]/3;
+                v2La8E[i] = v2La8E[i]/3;
+            }
+            //v2Xi8.clear();
+            //pTXi8.clear();
+            //v2Xi8E.clear();
 
-            v2Ks8.clear();
-            pTKs8.clear();
-            v2Ks8E.clear();
+            //v2Ks8.clear();
+            //pTKs8.clear();
+            //v2Ks8E.clear();
 
-            v2La8.clear();
-            pTLa8.clear();
-            v2La8E.clear();
+            //v2La8.clear();
+            //pTLa8.clear();
+            //v2La8E.clear();
 
-            v2Xi8.insert(v2Xi8.end(),{0.012384 ,0.0223301 ,0.0292446 ,0.0413197 ,0.0544889 ,0.0613061 ,0.0699914 ,0.0586068});
-            pTXi8.insert(pTXi8.end(),{0.171773 ,0.256177 ,0.359813 ,0.501378 ,0.70678 ,0.975684 ,1.32707 ,1.76092});
-            v2Xi8E.insert(v2Xi8E.end(),{0.00310741 ,0.00161375 ,0.00138423 ,0.00108978 ,0.00103021 ,0.00120445 ,0.00172491 ,0.00377288});
+            //v2Xi8.insert(v2Xi8.end(),{0.012384 ,0.0223301 ,0.0292446 ,0.0413197 ,0.0544889 ,0.0613061 ,0.0699914 ,0.0586068});
+            //pTXi8.insert(pTXi8.end(),{0.171773 ,0.256177 ,0.359813 ,0.501378 ,0.70678 ,0.975684 ,1.32707 ,1.76092});
+            //v2Xi8E.insert(v2Xi8E.end(),{0.00310741 ,0.00161375 ,0.00138423 ,0.00108978 ,0.00103021 ,0.00120445 ,0.00172491 ,0.00377288});
 
-            v2Ks8.insert(v2Ks8.end(),{0.00677717 ,0.0146521 ,0.021694 ,0.0297249 ,0.0411945 ,0.0530921 ,0.0621816 ,0.0688744 ,0.0732373 ,0.0725908 ,0.0676328 ,0.0627523 ,0.062354});
-            pTKs8.insert(pTKs8.end(),{0.0602465 ,0.115467 ,0.185454 ,0.26762 ,0.402086 ,0.585004 ,0.775155 ,1.00888 ,1.33943 ,1.77094 ,2.33584 ,2.97678 ,3.56917});
-            v2Ks8E.insert(v2Ks8E.end(),{0.0010886 ,0.000261031 ,0.000152582 ,0.000124353 ,8.09944e-05 ,8.69433e-05 ,0.000104268 ,0.000112948 ,0.000149272 ,0.000224162 ,0.000352511 ,0.00073231 ,0.000961305});
+            //v2Ks8.insert(v2Ks8.end(),{0.00673528 ,0.0145688 ,0.021515 ,0.0297458 ,0.0411285 ,0.0529255 ,0.0620613 ,0.0687342 ,0.0730871 ,0.0720222 ,0.0659935 ,0.062301 ,0.0615953});
+            //pTKs8.insert(pTKs8.end(),{0.0491511 ,0.107642 ,0.181863 ,0.265131 ,0.39337 ,0.580146 ,0.773427 ,1.00715 ,1.33834 ,1.77237 ,2.34047 ,2.97792 ,3.57267});
+            //v2Ks8E.insert(v2Ks8E.end(),{0.00124186 ,0.00029613 ,0.000173945 ,0.000142275 ,9.38494e-05 ,0.000100574 ,0.000120056 ,0.00012991 ,0.000171082 ,0.0002568 ,0.000436305 ,0.00083768 ,0.00109214});
 
-            v2La8.insert(v2La8.end(),{0.0115223 ,0.017003 ,0.0257166 ,0.0355043 ,0.0461679 ,0.0573251 ,0.0646166 ,0.0675745 ,0.0657199 ,0.0595136});
-            pTLa8.insert(pTLa8.end(),{0.108798 ,0.179317 ,0.278938 ,0.389971 ,0.535908 ,0.74364 ,1.01457 ,1.37447 ,1.79937 ,2.18664});
-            v2La8E.insert(v2La8E.end(),{0.000356326 ,0.000145794 ,0.000129298 ,0.00013205 ,0.000120068 ,0.000132992 ,0.000187333 ,0.000313499 ,0.000745036 ,0.0010734});
+            //v2La8.insert(v2La8.end(),{0.0107442 ,0.0168039 ,0.0257905 ,0.0353248 ,0.045907 ,0.0570934 ,0.064714 ,0.0681934 ,0.0683265 ,0.0658742});
+            //pTLa8.insert(pTLa8.end(),{0.10882 ,0.169831 ,0.276836 ,0.387927 ,0.530737 ,0.737755 ,1.01321 ,1.377 ,1.80224 ,2.19446});
+            //v2La8E.insert(v2La8E.end(),{0.000415341 ,0.000168521 ,0.000148847 ,0.000152237 ,0.000137507 ,0.000152323 ,0.000217453 ,0.000376861 ,0.00121264 ,0.00266948});
 
             frame = c1->DrawFrame(0,-0.01,5,0.2);
             gPad->SetTickx();
@@ -699,7 +797,7 @@ void Rap_v2sig()
     }
 }
 
-void Rap_v2obs()
+void Rap_v2obs(std::vector<double> pTXi8, std::vector<double> pTKs8, std::vector<double> pTLa8)
 {
     MITStyle();
     TCanvas* c1 = MakeCanvas("c1", "Individual");
@@ -754,16 +852,13 @@ void Rap_v2obs()
     std::string yaxis = "";
 
     std::vector<double> v2Xi8;
-    std::vector<double> pTXi8;
     std::vector<double> v2Xi8E;
 
     std::vector<double> v2Ks8;
-    std::vector<double> pTKs8;
-    std::vector<double> v2Ks8E;
+    std::vector<double> v2KsObs8E;
 
-    std::vector<double> v2La8;
-    std::vector<double> pTLa8;
-    std::vector<double> v2La8E;
+    std::vector<double> v2LaObs8;
+    std::vector<double> v2LaObs8E;
 
     for(int i=0; i<2; i++)
     {
@@ -773,30 +868,27 @@ void Rap_v2obs()
             lambdav2 = "lambdav2Obs";
             cascadev2 = "cascadev2Obs";
             yaxis = "v_{2}^{obs}";
-            v2Xi8.insert(v2Xi8.end(),{0.0397521 ,0.0672835 ,0.0879851 ,0.123906 ,0.163679 ,0.184638 ,0.210454 ,0.177214});
-            pTXi8.insert(pTXi8.end(),{1.267, 1.62, 2.008, 2.501, 3.173, 4.029, 5.055, 6.938});
-            v2Xi8E.insert(v2Xi8E.end(),{0.00885641 ,0.00470611 ,0.0040499 ,0.00319483 ,0.0030202 ,0.0035308 ,0.00505887 ,0.0110131});
+            v2XiObs8.insert(v2XiObs8.end(),{0.0397521 ,0.0672835 ,0.0879851 ,0.123906 ,0.163679 ,0.184638 ,0.210454 ,0.177214});
+            //pTXi8.insert(pTXi8.end(),{1.267, 1.62, 2.008, 2.501, 3.173, 4.029, 5.055, 6.938});
+            v2XiObs8E.insert(v2XiObs8E.end(),{0.00885641 ,0.00470611 ,0.0040499 ,0.00319483 ,0.0030202 ,0.0035308 ,0.00505887 ,0.0110131});
 
             v2Ks8.insert(v2Ks8.end(),{0.0135496 ,0.0293041 ,0.0433881 ,0.0594498 ,0.082389 ,0.106184 ,0.124363 ,0.137749 ,0.146475 ,0.145182 ,0.135266 ,0.125505 ,0.12497});
-            pTKs8.insert(pTKs8.end(),{0.3666, 0.5309, 0.711, 0.9046, 1.202, 1.591, 1.986, 2.465, 3.136, 4.008, 5.142, 6.431, 7.619});
+            //pTKs8.insert(pTKs8.end(),{0.3666, 0.5309, 0.711, 0.9046, 1.202, 1.591, 1.986, 2.465, 3.136, 4.008, 5.142, 6.431, 7.619});
             v2Ks8E.insert(v2Ks8E.end(),{0.00217605 ,0.000522193 ,0.000305651 ,0.000249826 ,0.000165266 ,0.000178936 ,0.000214314 ,0.000232438 ,0.000304168 ,0.000452022 ,0.000707061 ,0.00146546 ,0.00190789});
 
             v2La8.insert(v2La8.end(),{0.0346226 ,0.0510097 ,0.0771498 ,0.106527 ,0.13851 ,0.171976 ,0.19385 ,0.202711 ,0.197155 ,0.178511});
-            pTLa8.insert(pTLa8.end(),{0.9252, 1.224, 1.603, 1.995, 2.485, 3.156, 4.007, 5.116, 6.414, 7.588});
+            //pTLa8.insert(pTLa8.end(),{0.9252, 1.224, 1.603, 1.995, 2.485, 3.156, 4.007, 5.116, 6.414, 7.588});
             v2La8E.insert(v2La8E.end(),{0.00106781 ,0.000437847 ,0.000389104 ,0.00039822 ,0.000364256 ,0.000404734 ,0.000567087 ,0.000942798 ,0.00223597 ,0.00321154});
         }
         else
         {
-            v2Xi8.clear();
-            pTXi8.clear();
-            v2Xi8E.clear();
+            v2XiObs8.clear();
+            v2XiObs8E.clear();
 
             v2Ks8.clear();
-            pTKs8.clear();
             v2Ks8E.clear();
 
             v2La8.clear();
-            pTLa8.clear();
             v2La8E.clear();
 
             kshortv2 = "kshortv2Bkg";
@@ -804,16 +896,16 @@ void Rap_v2obs()
             cascadev2 = "cascadev2Bkg";
             yaxis = "v_{2}^{bkg}";
 
-            v2Xi8.insert(v2Xi8.end(),{0.0936965 ,0.0782133 ,0.0985179 ,0.121518 ,0.173158 ,0.216723 ,0.232391 ,0.230779});
-            pTXi8.insert(pTXi8.end(),{1.267, 1.62, 2.008, 2.501, 3.173, 4.029, 5.055, 6.938});
-            v2Xi8E.insert(v2Xi8E.end(),{0.00749852 ,0.00950025 ,0.00868329 ,0.00770257 ,0.00664219 ,0.00701412 ,0.010755 ,0.0195874});
+            v2XiObs8.insert(v2XiObs8.end(),{0.0936965 ,0.0782133 ,0.0985179 ,0.121518 ,0.173158 ,0.216723 ,0.232391 ,0.230779});
+            //pTXi8.insert(pTXi8.end(),{1.267, 1.62, 2.008, 2.501, 3.173, 4.029, 5.055, 6.938});
+            v2XiObs8E.insert(v2XiObs8E.end(),{0.00749852 ,0.00950025 ,0.00868329 ,0.00770257 ,0.00664219 ,0.00701412 ,0.010755 ,0.0195874});
 
             v2Ks8.insert(v2Ks8.end(),{0.00449492 ,0.0473127 ,0.0585964 ,0.0687393 ,0.0931208 ,0.114931 ,0.132041 ,0.149003 ,0.166686 ,0.172154 ,0.171293 ,0.158914 ,0.158798});
-            pTKs8.insert(pTKs8.end(),{0.3666, 0.5309, 0.711, 0.9046, 1.202, 1.591, 1.986, 2.465, 3.136, 4.008, 5.142, 6.431, 7.619});
+            //pTKs8.insert(pTKs8.end(),{0.3666, 0.5309, 0.711, 0.9046, 1.202, 1.591, 1.986, 2.465, 3.136, 4.008, 5.142, 6.431, 7.619});
             v2Ks8E.insert(v2Ks8E.end(),{0.0390969 ,0.00255086 ,0.00181359 ,0.00163701 ,0.000986848 ,0.000960547 ,0.0010765 ,0.00101774 ,0.00108115 ,0.00148885 ,0.00198329 ,0.00404482 ,0.00497703});
 
             v2La8.insert(v2La8.end(),{0.0817952 ,0.0973297 ,0.117934 ,0.136615 ,0.156659 ,0.178532 ,0.193261 ,0.191957 ,0.177981 ,0.168276});
-            pTLa8.insert(pTLa8.end(),{0.9252, 1.224, 1.603, 1.995, 2.485, 3.156, 4.007, 5.116, 6.414, 7.588});
+            //pTLa8.insert(pTLa8.end(),{0.9252, 1.224, 1.603, 1.995, 2.485, 3.156, 4.007, 5.116, 6.414, 7.588});
             v2La8E.insert(v2La8E.end(),{0.000541466 ,0.000463843 ,0.000595759 ,0.00077596 ,0.000850846 ,0.00108663 ,0.00159224 ,0.00261702 ,0.00559253 ,0.00709033});
 
             c2->cd();
@@ -828,7 +920,7 @@ void Rap_v2obs()
             c1->cd();
         }
 
-        TGraphErrors* xi8_v2 = new TGraphErrors(xi_npoints,&pTXi8[0],&v2Xi8[0],0,&v2Xi8E[0]);
+        TGraphErrors* xi8_v2 = new TGraphErrors(xi_npoints,&pTXi8[0],&v2XiObs8[0],0,&v2XiObs8E[0]);
         TGraphErrors* ks8_v2 = new TGraphErrors(ks_npoints,&pTKs8[0],&v2Ks8[0],0,&v2Ks8E[0]);
         TGraphErrors* la8_v2 = new TGraphErrors(la_npoints,&pTLa8[0],&v2La8[0],0,&v2La8E[0]);
 

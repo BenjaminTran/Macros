@@ -18,8 +18,9 @@
 #include "TStyle.h"
 #include "TString.h"
 #include "TGaxis.h"
+#include "TROOT.h"
 
-#include <vector>
+//#include <vector>
 #include <iomanip>
 #include <stdio.h>
 #include <string>
@@ -35,6 +36,7 @@ void XiCutOptimizer(std::string name)
     bool Cut = false;
     const int CONTSIZE = 10000;
     TH1::SetDefaultSumw2();
+    gROOT->ProcessLine("#include <vector>");
 
     //Cut parameters to be varied. The commented elements are Hong's cuts to make a plot of them remember to change the numparam value as well
     //float xi_xi3dipsig[]     = {8.0  , 8.5  , 9.0  , 9.5  , 10.0 , 10.5 , 11.0 , 11.5, 12.0, 12.5, 13.0, 13.5};//, 2.5};
@@ -62,7 +64,8 @@ void XiCutOptimizer(std::string name)
     float tom_mass          [CONTSIZE];
     float tom_pt            [CONTSIZE];
     float tom_eta [CONTSIZE];
-    float tom_rap [CONTSIZE];
+    //float tom_rap [CONTSIZE];
+    std::vector<float> *tom_rap = 0;
     float tom_nTrkAcc [CONTSIZE];
     float tom_misIDMassLapi [CONTSIZE];
     float tom_misIDMasspiLa [CONTSIZE];
@@ -224,7 +227,8 @@ void XiCutOptimizer(std::string name)
                 if(tom_vtrkp3dipsig[k] < om_vtrkp3dipsig[0])   continue;
                 if(tom_omflightsig[k] < om_omflightsig[0])     continue;
                 if(tom_distancesig[k] < om_distancesig[0])     continue;
-                if(std::abs(tom_rap[k]) > rapidity) continue;
+                //if(std::fabs((tom_rap[k])) > rapidity) continue;
+                if(((*tom_rap)[k]) > rapidity) continue;
                 if(std::abs(tom_misIDMasspiLa[k]) < misIDMass) continue;
                 if(std::abs(tom_misIDMassLapi[k]) < misIDMass) continue;
 
