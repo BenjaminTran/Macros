@@ -59,6 +59,7 @@ bool XiCutOptimizer(std::string name)
     std::vector<double> om_distancesig   = {10.0};//10.0};//, 12.0};
     double misIDMass = 0.015;
     double rapidity = 1.0;
+    double etacut = 2.4;
     int multHigh_ = 250;
 
     int numparam             = om_om3dipsig.size();
@@ -74,9 +75,10 @@ bool XiCutOptimizer(std::string name)
     TH2D* hom_distancesig   [numparam];
 
     //Tree setup
-    TFile* f1=TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/Trees/All/V0CasTree_09_14_17.root");
+    //TFile* f1=TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/Trees/All/V0CasTree_09_14_17.root");
+    TFile* f1=TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/Trees/All/V0CasTreePbPb_09_25_17.root");
 
-    TTreeReader reader("OmTreeProducer/OmTree",f1);
+    TTreeReader reader("OmTreeProducerRapidityPbPb/OmTree",f1);
 
     TTreeReaderArray<float> om3dipsig(reader    ,"om3dipsig.om3dipsig");
     TTreeReaderArray<float> omKaon3dipsig(reader,"omKaon3dipsig.omKaon3dipsig");
@@ -88,9 +90,9 @@ bool XiCutOptimizer(std::string name)
     TTreeReaderArray<float> pt(reader           ,"pt.pt");
     TTreeReaderArray<float> eta(reader          ,"eta.eta");
     TTreeReaderArray<float> rap(reader          ,"rapidity.rapidity");
-    TTreeReaderArray<int> nTrkAcc(reader      ,"nTrkAcc.nTrkAcc");
-    TTreeReaderArray<float> misIDMassLapi(reader,"misIDMassLapi.misIDMassLapi");
-    TTreeReaderArray<float> misIDMasspiLa(reader,"misIDMasspiLa.misIDMasspiLa");
+    //TTreeReaderArray<int> nTrkAcc(reader        ,"nTrkAcc.nTrkAcc");
+    //TTreeReaderArray<float> misIDMassLapi(reader,"misIDMassLapi.misIDMassLapi");
+    //TTreeReaderArray<float> misIDMasspiLa(reader,"misIDMasspiLa.misIDMasspiLa");
 
     //Intialize Histograms
     TH2D* hom_NoCut = NULL;
@@ -130,9 +132,9 @@ bool XiCutOptimizer(std::string name)
         if(!CheckValue(pt))            return false;
         if(!CheckValue(eta))           return false;
         if(!CheckValue(rap))           return false;
-        if(!CheckValue(nTrkAcc))       return false;
-        if(!CheckValue(misIDMassLapi)) return false;
-        if(!CheckValue(misIDMasspiLa)) return false;
+        //if(!CheckValue(nTrkAcc))       return false;
+        //if(!CheckValue(misIDMassLapi)) return false;
+        //if(!CheckValue(misIDMasspiLa)) return false;
         /*
         if(Cut)
         {
@@ -224,16 +226,17 @@ bool XiCutOptimizer(std::string name)
                 //hom_NoCut->Fill(mass[k],pt[k]);
                 for(int i=0;i<mass.GetSize();i++)
                 {
-                    if(nTrkAcc[i]                 > multHigh_)           continue;
+                    //if(nTrkAcc[i]                 > multHigh_)           continue;
                     if(om3dipsig[i]               > om_om3dipsig[0])     continue;
-                    if(std::fabs(rap[i])          > rapidity)            continue;
+                    //if(std::fabs(eta[i])          > etacut)              continue;
+                    if(std::fabs(rap[i])          > rapidity)              continue;
                     if(omKaon3dipsig[i]           < om_omKaon3dipsig[0]) continue;
                     if(vtrkpi3dipsig[i]           < om_vtrkpi3dipsig[0]) continue;
                     if(vtrkp3dipsig[i]            < om_vtrkp3dipsig[0])  continue;
                     if(omflightsig[i]             < om_omflightsig[0])   continue;
                     if(distancesig[i]             < om_distancesig[0])   continue;
-                    if(std::abs(misIDMasspiLa[i]) < misIDMass)           continue;
-                    if(std::abs(misIDMassLapi[i]) < misIDMass)           continue;
+                    //if(std::abs(misIDMasspiLa[i]) < misIDMass)           continue;
+                    //if(std::abs(misIDMassLapi[i]) < misIDMass)           continue;
 
                     hom_defaultcut->Fill(mass[i],pt[i]);
                 }

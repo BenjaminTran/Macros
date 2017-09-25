@@ -125,9 +125,9 @@ void OmMassFit()
         RooRealVar mean("mean","mean",1.67,1.29,1.99);
         RooRealVar sigma1("sigma1","sigma1",0.004,0.001,0.04);
         RooRealVar sigma2("sigma2","sigma2",0.006,0.001,0.04);
-        RooRealVar sig1("sig1","signal1",12,0,1000000000);
-        RooRealVar sig2("sig2","signal2",10,0,1000000000);
-        RooRealVar qsig("qsig","qsig",500,0,1000000000);
+        RooRealVar sig1("sig1","signal1",50,0,10000);
+        RooRealVar sig2("sig2","signal2",50,0,10000);
+        RooRealVar qsig("qsig","qsig",500,0,1000000);
         RooRealVar alpha("alpha","alpha",0.001,-1,10);
         RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
         RooGaussian gaus2("gaus2","gaus2",x,mean,sigma2);
@@ -143,24 +143,17 @@ void OmMassFit()
 
         if(!doRap)
         {
-            if(i==2 || i==4)
-                x.setRange("cut",1.65,1.694);
-            else if(i==pxi.size()-2)
-                x.setRange("cut",1.645,1.71);
-            else
-                x.setRange("cut",1.645,1.7);
+            //if(i==2 || i==4)
+                //x.setRange("cut",1.65,1.694);
+            //else if(i==pxi.size()-2)
+                //x.setRange("cut",1.645,1.71);
+            //else
+                //x.setRange("cut",1.645,1.7);
+            x.setRange("cut",1.635,1.715);
         }
         else
         {
-            if(i==0)
-                //x.setRange("cut",1.6425,1.698);
-                x.setRange("cut",1.6425,1.72);
-            else if(i==4)
-                x.setRange("cut",1.65,1.694);
-            else if(i==pxi.size()-2)
-                x.setRange("cut",1.645,1.71);
-            else
-                x.setRange("cut",1.645,1.7);
+            x.setRange("cut",1.63,1.72);
         }
 
         RooFitResult* r_xi = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
