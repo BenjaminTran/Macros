@@ -129,7 +129,8 @@ void XiMassFit()
         RooGenericPdf background("background", "x - (1.115683 + 0.13957018)^alpha", RooArgList(x,alpha));
         RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,background),RooArgList(sig1,sig2,qsig));
 
-        x.setRange("cut",1.285,1.375);
+        //x.setRange("cut",1.285,1.375);
+        x.setRange("cut",1.26,1.4);
 
         RooFitResult* r_xi = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
         //RooChi2Var chi2_xiVar("chi2_xi","chi2",sum,data);

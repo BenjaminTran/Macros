@@ -385,9 +385,9 @@ void OmvnFit(  )
     std::string branchname_om_bkg = "omCorrelationRapidity/Pt_xi_bkg_pt";
     std::string branchname_ket_om = "omCorrelationRapidity/KET_xi_pt";
     std::string branchname_ket_om_bkg = "omCorrelationRapidity/KET_xi_bkg_pt";
-    std::string graphName = "v2valuesRapidity_etaGap_2.root";
-    int binlow = 10;
-    int binhigh = 23;
+    std::string graphName = "v2valuesRapidity_etaGap_0p75.root";
+    int binlow = 14;
+    int binhigh = 19;
 
 
     TLatex* ltx2 = new TLatex(  );

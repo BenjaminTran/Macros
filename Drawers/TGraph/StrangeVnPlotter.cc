@@ -2309,6 +2309,7 @@ void RapSys_etaGap()
     frame_ks = c1->DrawFrame(0,-0.01,9,0.5);
     gPad->SetTickx();
     gPad->SetTicky();
+    frame_ks->SetTitle("K_{S}^{0}");
     frame_ks->GetXaxis()->CenterTitle(1);
     frame_ks->GetYaxis()->CenterTitle(1);
     frame_ks->GetXaxis()->SetTitleSize(0.05);
@@ -2322,6 +2323,7 @@ void RapSys_etaGap()
     frame_la = c2->DrawFrame(0,-0.01,9,0.5);
     gPad->SetTickx();
     gPad->SetTicky();
+    frame_la->SetTitle("#Lambda/#bar{#Lambda}");
     frame_la->GetXaxis()->CenterTitle(1);
     frame_la->GetYaxis()->CenterTitle(1);
     frame_la->GetXaxis()->SetTitleSize(0.05);
@@ -2343,13 +2345,13 @@ void RapSys_etaGap()
     frame_ratio_ks->SetTitleOffset(1.1,"Y");
     frame_ratio_ks->SetTitleOffset(1.2,"X");
     frame_ratio_ks->GetXaxis()->SetTitle("p_{T} (GeV)");
-    frame_ratio_ks->GetYaxis()->SetTitle("v_{2}^{|#eta|}/v_{2}^{|#eta|>2}");
+    frame_ratio_ks->GetYaxis()->SetTitle("v_{2}^{|#Delta#eta|}/v_{2}^{|#Delta#eta|>2}");
 
     c4->cd();
     frame_ratio_la = c4->DrawFrame(0,0.90,9,1.5);
     gPad->SetTickx();
     gPad->SetTicky();
-    frame_ratio_la->SetTitle("#Lambda");
+    frame_ratio_la->SetTitle("#Lambda/#bar{#Lambda}");
     frame_ratio_la->GetXaxis()->CenterTitle(1);
     frame_ratio_la->GetYaxis()->CenterTitle(1);
     frame_ratio_la->GetXaxis()->SetTitleSize(0.05);
@@ -2357,12 +2359,13 @@ void RapSys_etaGap()
     frame_ratio_la->SetTitleOffset(1.1,"Y");
     frame_ratio_la->SetTitleOffset(1.2,"X");
     frame_ratio_la->GetXaxis()->SetTitle("p_{T} (GeV)");
-    frame_ratio_la->GetYaxis()->SetTitle("v_{2}^{|#eta|}/v_{2}^{|#eta|>2}");
+    frame_ratio_la->GetYaxis()->SetTitle("v_{2}^{|#Delta#eta|}/v_{2}^{|#Delta#eta|>2}");
 
     c5->cd();
     frame_xi = c5->DrawFrame(0,-0.01,9,0.5);
     gPad->SetTickx();
     gPad->SetTicky();
+    frame_xi->SetTitle("#Xi^{#pm}");
     frame_xi->GetXaxis()->CenterTitle(1);
     frame_xi->GetYaxis()->CenterTitle(1);
     frame_xi->GetXaxis()->SetTitleSize(0.05);
@@ -2376,6 +2379,7 @@ void RapSys_etaGap()
     frame_om = c6->DrawFrame(0,-0.01,9,0.5);
     gPad->SetTickx();
     gPad->SetTicky();
+    frame_om->SetTitle("#Omega^{#pm}");
     frame_om->GetXaxis()->CenterTitle(1);
     frame_om->GetYaxis()->CenterTitle(1);
     frame_om->GetXaxis()->SetTitleSize(0.05);
@@ -2389,7 +2393,7 @@ void RapSys_etaGap()
     frame_ratio_xi = c7->DrawFrame(0,0.90,9,1.5);
     gPad->SetTickx();
     gPad->SetTicky();
-    frame_ratio_xi->SetTitle("#Xi");
+    frame_ratio_xi->SetTitle("#Xi^{#pm}");
     frame_ratio_xi->GetXaxis()->CenterTitle(1);
     frame_ratio_xi->GetYaxis()->CenterTitle(1);
     frame_ratio_xi->GetXaxis()->SetTitleSize(0.05);
@@ -2397,13 +2401,13 @@ void RapSys_etaGap()
     frame_ratio_xi->SetTitleOffset(1.1,"Y");
     frame_ratio_xi->SetTitleOffset(1.2,"X");
     frame_ratio_xi->GetXaxis()->SetTitle("p_{T} (GeV)");
-    frame_ratio_xi->GetYaxis()->SetTitle("v_{2}^{|#eta|}/v_{2}^{|#eta|>2}");
+    frame_ratio_xi->GetYaxis()->SetTitle("v_{2}^{|#Delta#eta|}/v_{2}^{|#Delta#eta|>2}");
 
     c8->cd();
-    frame_ratio_om = c8->DrawFrame(0,0.90,9,2.2);
+    frame_ratio_om = c8->DrawFrame(0,0.90,9,1.8);
     gPad->SetTickx();
     gPad->SetTicky();
-    frame_ratio_om->SetTitle("#Omega");
+    frame_ratio_om->SetTitle("#Omega^{#pm}");
     frame_ratio_om->GetXaxis()->CenterTitle(1);
     frame_ratio_om->GetYaxis()->CenterTitle(1);
     frame_ratio_om->GetXaxis()->SetTitleSize(0.05);
@@ -2411,7 +2415,7 @@ void RapSys_etaGap()
     frame_ratio_om->SetTitleOffset(1.1,"Y");
     frame_ratio_om->SetTitleOffset(1.2,"X");
     frame_ratio_om->GetXaxis()->SetTitle("p_{T} (GeV)");
-    frame_ratio_om->GetYaxis()->SetTitle("v_{2}^{|#eta|}/v_{2}^{|#eta|>2}");
+    frame_ratio_om->GetYaxis()->SetTitle("v_{2}^{|#Delta#eta|}/v_{2}^{|#Delta#eta|>2}");
 
     std::vector<double> ratio_ks_1p65;
     std::vector<double> ratio_ks_1p35;
@@ -2728,103 +2732,103 @@ void RapSys_etaGap()
     om8_v2_0p75_ratio->SetMarkerSize(1.5);
     om8_v2_0p75_ratio->SetLineColor(kMagenta);
 
-    TLegend* leg_ks = new TLegend(0.2,0.55,0.37,0.85);
+    TLegend* leg_ks = new TLegend(0.25,0.55,0.4,0.85);
     leg_ks->SetFillColor(10);
     leg_ks->SetFillStyle(0);
     leg_ks->SetBorderSize(0);
     leg_ks->SetTextFont(42);
     leg_ks->SetTextSize(0.05);
-    leg_ks->AddEntry(ks8_v2_2, "K_{S}^{0} |#eta| > 2.0", "P");
-    leg_ks->AddEntry(ks8_v2_1p65, "|#eta| > 1.65", "P");
-    leg_ks->AddEntry(ks8_v2_1p35, "|#eta| > 1.35", "P");
-    leg_ks->AddEntry(ks8_v2_1p05, "|#eta| > 1.05", "P");
-    leg_ks->AddEntry(ks8_v2_0p75, "|#eta| > 0.75", "P");
+    leg_ks->AddEntry(ks8_v2_2, "|#Delta#eta| > 2.0", "P");
+    leg_ks->AddEntry(ks8_v2_1p65, "|#Delta#eta| > 1.65", "P");
+    leg_ks->AddEntry(ks8_v2_1p35, "|#Delta#eta| > 1.35", "P");
+    leg_ks->AddEntry(ks8_v2_1p05, "|#Delta#eta| > 1.05", "P");
+    leg_ks->AddEntry(ks8_v2_0p75, "|#Delta#eta| > 0.75", "P");
     //leg_ks->AddEntry(xi8_v2, "#Xi^{+}/ #Xi^{-}", "P");
 
-    TLegend* leg_la = new TLegend(0.2,0.55,0.37,0.85);
+    TLegend* leg_la = new TLegend(0.25,0.55,0.4,0.85);
     leg_la->SetFillColor(10);
     leg_la->SetFillStyle(0);
     leg_la->SetBorderSize(0);
     leg_la->SetTextFont(42);
     leg_la->SetTextSize(0.05);
-    leg_la->AddEntry(la8_v2_2, "#Lambda / #bar{#Lambda} |#eta| > 2.0", "P");
-    leg_la->AddEntry(la8_v2_1p65, "|#eta| > 1.65", "P");
-    leg_la->AddEntry(la8_v2_1p35, "|#eta| > 1.35", "P");
-    leg_la->AddEntry(la8_v2_1p05, "|#eta| > 1.05", "P");
-    leg_la->AddEntry(la8_v2_0p75, "|#eta| > 0.75", "P");
+    leg_la->AddEntry(la8_v2_2, "|#Delta#eta| > 2.0", "P");
+    leg_la->AddEntry(la8_v2_1p65, "|#Delta#eta| > 1.65", "P");
+    leg_la->AddEntry(la8_v2_1p35, "|#Delta#eta| > 1.35", "P");
+    leg_la->AddEntry(la8_v2_1p05, "|#Delta#eta| > 1.05", "P");
+    leg_la->AddEntry(la8_v2_0p75, "|#Delta#eta| > 0.75", "P");
     //leg_la->AddEntry(xi8_v2, "#Xi^{+}/ #Xi^{-}", "P");
 
-    TLegend* leg_xi = new TLegend(0.2,0.55,0.37,0.85);
+    TLegend* leg_xi = new TLegend(0.25,0.55,0.40,0.85);
     leg_xi->SetFillColor(10);
     leg_xi->SetFillStyle(0);
     leg_xi->SetBorderSize(0);
     leg_xi->SetTextFont(42);
     leg_xi->SetTextSize(0.05);
-    leg_xi->AddEntry(xi8_v2_2, "#Xi |#eta| > 2.0", "P");
-    leg_xi->AddEntry(xi8_v2_1p65, "|#eta| > 1.65", "P");
-    leg_xi->AddEntry(xi8_v2_1p35, "|#eta| > 1.35", "P");
-    leg_xi->AddEntry(xi8_v2_1p05, "|#eta| > 1.05", "P");
-    leg_xi->AddEntry(xi8_v2_0p75, "|#eta| > 0.75", "P");
+    leg_xi->AddEntry(xi8_v2_2, "|#Delta#eta| > 2.0", "P");
+    leg_xi->AddEntry(xi8_v2_1p65, "|#Delta#eta| > 1.65", "P");
+    leg_xi->AddEntry(xi8_v2_1p35, "|#Delta#eta| > 1.35", "P");
+    leg_xi->AddEntry(xi8_v2_1p05, "|#Delta#eta| > 1.05", "P");
+    leg_xi->AddEntry(xi8_v2_0p75, "|#Delta#eta| > 0.75", "P");
     //leg_xi->AddEntry(xi8_v2, "#Xi^{+}/ #Xi^{-}", "P");
 
-    TLegend* leg_om = new TLegend(0.2,0.55,0.37,0.85);
+    TLegend* leg_om = new TLegend(0.25,0.55,0.4,0.85);
     leg_om->SetFillColor(10);
     leg_om->SetFillStyle(0);
     leg_om->SetBorderSize(0);
     leg_om->SetTextFont(42);
     leg_om->SetTextSize(0.05);
-    leg_om->AddEntry(om8_v2_2, "#Omega |#eta| > 2.0", "P");
-    leg_om->AddEntry(om8_v2_1p65, "|#eta| > 1.65", "P");
-    leg_om->AddEntry(om8_v2_1p35, "|#eta| > 1.35", "P");
-    leg_om->AddEntry(om8_v2_1p05, "|#eta| > 1.05", "P");
-    leg_om->AddEntry(om8_v2_0p75, "|#eta| > 0.75", "P");
+    leg_om->AddEntry(om8_v2_2, "|#Delta#eta| > 2.0", "P");
+    leg_om->AddEntry(om8_v2_1p65, "|#Delta#eta| > 1.65", "P");
+    leg_om->AddEntry(om8_v2_1p35, "|#Delta#eta| > 1.35", "P");
+    leg_om->AddEntry(om8_v2_1p05, "|#Delta#eta| > 1.05", "P");
+    leg_om->AddEntry(om8_v2_0p75, "|#Delta#eta| > 0.75", "P");
     //leg_om->AddEntry(xi8_v2, "#Xi^{+}/ #Xi^{-}", "P");
 
-    TLegend* leg_ks_ratio = new TLegend(0.2,0.55,0.37,0.85);
+    TLegend* leg_ks_ratio = new TLegend(0.25,0.55,0.4,0.85);
     leg_ks_ratio->SetFillColor(10);
     leg_ks_ratio->SetFillStyle(0);
     leg_ks_ratio->SetBorderSize(0);
     leg_ks_ratio->SetTextFont(42);
     leg_ks_ratio->SetTextSize(0.05);
-    leg_ks_ratio->AddEntry(ks8_v2_1p65_ratio, "|#eta| > 1.65", "P");
-    leg_ks_ratio->AddEntry(ks8_v2_1p35_ratio, "|#eta| > 1.35", "P");
-    leg_ks_ratio->AddEntry(ks8_v2_1p05_ratio, "|#eta| > 1.05", "P");
-    leg_ks_ratio->AddEntry(ks8_v2_0p75_ratio, "|#eta| > 0.75", "P");
+    leg_ks_ratio->AddEntry(ks8_v2_1p65_ratio, "|#Delta#eta| > 1.65", "P");
+    leg_ks_ratio->AddEntry(ks8_v2_1p35_ratio, "|#Delta#eta| > 1.35", "P");
+    leg_ks_ratio->AddEntry(ks8_v2_1p05_ratio, "|#Delta#eta| > 1.05", "P");
+    leg_ks_ratio->AddEntry(ks8_v2_0p75_ratio, "|#Delta#eta| > 0.75", "P");
     //leg_ks->AddEntry(xi8_v2, "#Xi^{+}/ #Xi^{-}", "P");
 
-    TLegend* leg_la_ratio = new TLegend(0.2,0.55,0.37,0.85);
+    TLegend* leg_la_ratio = new TLegend(0.25,0.55,0.4,0.85);
     leg_la_ratio->SetFillColor(10);
     leg_la_ratio->SetFillStyle(0);
     leg_la_ratio->SetBorderSize(0);
     leg_la_ratio->SetTextFont(42);
     leg_la_ratio->SetTextSize(0.05);
-    leg_la_ratio->AddEntry(la8_v2_1p65_ratio, "|#eta| > 1.65", "P");
-    leg_la_ratio->AddEntry(la8_v2_1p35_ratio, "|#eta| > 1.35", "P");
-    leg_la_ratio->AddEntry(la8_v2_1p05_ratio, "|#eta| > 1.05", "P");
-    leg_la_ratio->AddEntry(la8_v2_0p75_ratio, "|#eta| > 0.75", "P");
+    leg_la_ratio->AddEntry(la8_v2_1p65_ratio, "|#Delta#eta| > 1.65", "P");
+    leg_la_ratio->AddEntry(la8_v2_1p35_ratio, "|#Delta#eta| > 1.35", "P");
+    leg_la_ratio->AddEntry(la8_v2_1p05_ratio, "|#Delta#eta| > 1.05", "P");
+    leg_la_ratio->AddEntry(la8_v2_0p75_ratio, "|#Delta#eta| > 0.75", "P");
 
-    TLegend* leg_xi_ratio = new TLegend(0.2,0.55,0.37,0.85);
+    TLegend* leg_xi_ratio = new TLegend(0.25,0.55,0.4,0.85);
     leg_xi_ratio->SetFillColor(10);
     leg_xi_ratio->SetFillStyle(0);
     leg_xi_ratio->SetBorderSize(0);
     leg_xi_ratio->SetTextFont(42);
     leg_xi_ratio->SetTextSize(0.05);
-    leg_xi_ratio->AddEntry(xi8_v2_1p65_ratio, "|#eta| > 1.65", "P");
-    leg_xi_ratio->AddEntry(xi8_v2_1p35_ratio, "|#eta| > 1.35", "P");
-    leg_xi_ratio->AddEntry(xi8_v2_1p05_ratio, "|#eta| > 1.05", "P");
-    leg_xi_ratio->AddEntry(xi8_v2_0p75_ratio, "|#eta| > 0.75", "P");
+    leg_xi_ratio->AddEntry(xi8_v2_1p65_ratio, "|#Delta#eta| > 1.65", "P");
+    leg_xi_ratio->AddEntry(xi8_v2_1p35_ratio, "|#Delta#eta| > 1.35", "P");
+    leg_xi_ratio->AddEntry(xi8_v2_1p05_ratio, "|#Delta#eta| > 1.05", "P");
+    leg_xi_ratio->AddEntry(xi8_v2_0p75_ratio, "|#Delta#eta| > 0.75", "P");
     //leg_xi->AddEntry(xi8_v2, "#Xi^{+}/ #Xi^{-}", "P");
 
-    TLegend* leg_om_ratio = new TLegend(0.2,0.55,0.37,0.85);
+    TLegend* leg_om_ratio = new TLegend(0.65,0.55,0.77,0.85);
     leg_om_ratio->SetFillColor(10);
     leg_om_ratio->SetFillStyle(0);
     leg_om_ratio->SetBorderSize(0);
     leg_om_ratio->SetTextFont(42);
     leg_om_ratio->SetTextSize(0.05);
-    leg_om_ratio->AddEntry(om8_v2_1p65_ratio, "|#eta| > 1.65", "P");
-    leg_om_ratio->AddEntry(om8_v2_1p35_ratio, "|#eta| > 1.35", "P");
-    leg_om_ratio->AddEntry(om8_v2_1p05_ratio, "|#eta| > 1.05", "P");
-    leg_om_ratio->AddEntry(om8_v2_0p75_ratio, "|#eta| > 0.75", "P");
+    leg_om_ratio->AddEntry(om8_v2_1p65_ratio, "|#Delta#eta| > 1.65", "P");
+    leg_om_ratio->AddEntry(om8_v2_1p35_ratio, "|#Delta#eta| > 1.35", "P");
+    leg_om_ratio->AddEntry(om8_v2_1p05_ratio, "|#Delta#eta| > 1.05", "P");
+    leg_om_ratio->AddEntry(om8_v2_0p75_ratio, "|#Delta#eta| > 0.75", "P");
     //leg_om->AddEntry(xi8_v2, "#Xi^{+}/ #Xi^{-}", "P");
 
     TLine* line = new TLine(0,1,9,1);
@@ -2895,17 +2899,14 @@ void RapSys_etaGap()
     leg_om_ratio->Draw("same");
     line->Draw("same");
 
-    if(i==0)
-    {
-        c1->Print("v2SigEtaGap_ks.pdf");
-        c2->Print("v2SigEtaGap_la.pdf");
-        c3->Print("v2SigEtaGap_ratio_ks.pdf");
-        c4->Print("v2SigEtaGap_ratio_la.pdf");
-        c5->Print("v2SigEtaGap_xi.pdf");
-        c6->Print("v2SigEtaGap_om.pdf");
-        c7->Print("v2SigEtaGap_ratio_xi.pdf");
-        c8->Print("v2SigEtaGap_ratio_om.pdf");
-    }
+    c1->Print("v2SigEtaGap_ks.pdf");
+    c2->Print("v2SigEtaGap_la.pdf");
+    c3->Print("v2SigEtaGap_ratio_ks.pdf");
+    c4->Print("v2SigEtaGap_ratio_la.pdf");
+    c5->Print("v2SigEtaGap_xi.pdf");
+    c6->Print("v2SigEtaGap_om.pdf");
+    c7->Print("v2SigEtaGap_ratio_xi.pdf");
+    c8->Print("v2SigEtaGap_ratio_om.pdf");
 }
 
 void V0_v4()
