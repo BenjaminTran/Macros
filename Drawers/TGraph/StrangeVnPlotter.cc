@@ -2454,6 +2454,682 @@ void RapSys_Closure()
     RatioReco_v2_la->Write("RatioRecoLa");
 }
 
+void RapSys_etaGap()
+{
+    TFile* f_RapSys_etaGap_2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Fit/v2Fit/v2valuesRapidity_etaGap_2.root");
+    TFile* f_RapSys_etaGap_1p65 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Fit/v2Fit/v2valuesRapidity_etaGap_1p65.root");
+    TFile* f_RapSys_etaGap_1p35 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Fit/v2Fit/v2valuesRapidity_etaGap_1p35.root");
+    TFile* f_RapSys_etaGap_1p05 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Fit/v2Fit/v2valuesRapidity_etaGap_1p05.root");
+    TFile* f_RapSys_etaGap_0p75 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Fit/v2Fit/v2valuesRapidity_etaGap_0p75.root");
+    MITStyle();
+    TCanvas* c1 = MakeCanvas("c1", "Plot_ks");
+    TCanvas* c2 = MakeCanvas("c2", "Plot_la");
+    TCanvas* c3 = MakeCanvas("c3", "Ratio_ks");
+    TCanvas* c4 = MakeCanvas("c4", "Ratio_la");
+    TCanvas* c5 = MakeCanvas("c5", "Plot_xi");
+    TCanvas* c6 = MakeCanvas("c6", "Plot_om");
+    TCanvas* c7 = MakeCanvas("c7", "Ratio_xi");
+    TCanvas* c8 = MakeCanvas("c8", "Ratio_om");
+    c1->cd();
+    /*c1->SetLogy();*/
+    c1->SetLeftMargin(0.12);
+
+    TGraphErrors* ks8_v2_2 = 0;
+    TGraphErrors* la8_v2_2 = 0;
+    TGraphErrors* xi8_v2_2 = 0;
+    TGraphErrors* om8_v2_2 = 0;
+    TGraphErrors* ks8_v2_1p65 = 0;
+    TGraphErrors* la8_v2_1p65 = 0;
+    TGraphErrors* xi8_v2_1p65 = 0;
+    TGraphErrors* om8_v2_1p65 = 0;
+    TGraphErrors* ks8_v2_1p35 = 0;
+    TGraphErrors* la8_v2_1p35 = 0;
+    TGraphErrors* xi8_v2_1p35 = 0;
+    TGraphErrors* om8_v2_1p35 = 0;
+    TGraphErrors* ks8_v2_1p05 = 0;
+    TGraphErrors* la8_v2_1p05 = 0;
+    TGraphErrors* xi8_v2_1p05 = 0;
+    TGraphErrors* om8_v2_1p05 = 0;
+    TGraphErrors* ks8_v2_0p75 = 0;
+    TGraphErrors* la8_v2_0p75 = 0;
+    TGraphErrors* xi8_v2_0p75 = 0;
+    TGraphErrors* om8_v2_0p75 = 0;
+
+    // draw the frame using a histogram frame
+    TH1F* frame_ks;
+    TH1F* frame_la;
+    TH1F* frame_xi;
+    TH1F* frame_om;
+    TH1F* frame_ratio_ks;
+    TH1F* frame_ratio_la;
+    TH1F* frame_ratio_xi;
+    TH1F* frame_ratio_om;
+
+    ks8_v2_2 = (TGraphErrors*)f_RapSys_etaGap_2->Get("v2kshort");
+    la8_v2_2 = (TGraphErrors*)f_RapSys_etaGap_2->Get("v2lambda");
+    xi8_v2_2 = (TGraphErrors*)f_RapSys_etaGap_2->Get("v2xi");
+    om8_v2_2 = (TGraphErrors*)f_RapSys_etaGap_2->Get("v2omega");
+    ks8_v2_1p65 = (TGraphErrors*)f_RapSys_etaGap_1p65->Get("v2kshort");
+    la8_v2_1p65 = (TGraphErrors*)f_RapSys_etaGap_1p65->Get("v2lambda");
+    xi8_v2_1p65 = (TGraphErrors*)f_RapSys_etaGap_1p65->Get("v2xi");
+    om8_v2_1p65 = (TGraphErrors*)f_RapSys_etaGap_1p65->Get("v2omega");
+    ks8_v2_1p35 = (TGraphErrors*)f_RapSys_etaGap_1p35->Get("v2kshort");
+    la8_v2_1p35 = (TGraphErrors*)f_RapSys_etaGap_1p35->Get("v2lambda");
+    xi8_v2_1p35 = (TGraphErrors*)f_RapSys_etaGap_1p35->Get("v2xi");
+    om8_v2_1p35 = (TGraphErrors*)f_RapSys_etaGap_1p35->Get("v2omega");
+    ks8_v2_1p05 = (TGraphErrors*)f_RapSys_etaGap_1p05->Get("v2kshort");
+    la8_v2_1p05 = (TGraphErrors*)f_RapSys_etaGap_1p05->Get("v2lambda");
+    xi8_v2_1p05 = (TGraphErrors*)f_RapSys_etaGap_1p05->Get("v2xi");
+    om8_v2_1p05 = (TGraphErrors*)f_RapSys_etaGap_1p05->Get("v2omega");
+    ks8_v2_0p75 = (TGraphErrors*)f_RapSys_etaGap_0p75->Get("v2kshort");
+    la8_v2_0p75 = (TGraphErrors*)f_RapSys_etaGap_0p75->Get("v2lambda");
+    xi8_v2_0p75 = (TGraphErrors*)f_RapSys_etaGap_0p75->Get("v2xi");
+    om8_v2_0p75 = (TGraphErrors*)f_RapSys_etaGap_0p75->Get("v2omega");
+
+    c1->cd();
+    frame_ks = c1->DrawFrame(0,-0.01,9,0.5);
+    gPad->SetTickx();
+    gPad->SetTicky();
+    frame_ks->SetTitle("K_{S}^{0}");
+    frame_ks->GetXaxis()->CenterTitle(1);
+    frame_ks->GetYaxis()->CenterTitle(1);
+    frame_ks->GetXaxis()->SetTitleSize(0.05);
+    frame_ks->GetYaxis()->SetTitleSize(0.05);
+    frame_ks->SetTitleOffset(1.1,"Y");
+    frame_ks->SetTitleOffset(1.2,"X");
+    frame_ks->GetXaxis()->SetTitle("p_{T} (GeV)");
+    frame_ks->GetYaxis()->SetTitle("v_{2}^{sig}");
+
+    c2->cd();
+    frame_la = c2->DrawFrame(0,-0.01,9,0.5);
+    gPad->SetTickx();
+    gPad->SetTicky();
+    frame_la->SetTitle("#Lambda/#bar{#Lambda}");
+    frame_la->GetXaxis()->CenterTitle(1);
+    frame_la->GetYaxis()->CenterTitle(1);
+    frame_la->GetXaxis()->SetTitleSize(0.05);
+    frame_la->GetYaxis()->SetTitleSize(0.05);
+    frame_la->SetTitleOffset(1.1,"Y");
+    frame_la->SetTitleOffset(1.2,"X");
+    frame_la->GetXaxis()->SetTitle("p_{T} (GeV)");
+    frame_la->GetYaxis()->SetTitle("v_{2}^{sig}");
+
+    c3->cd();
+    frame_ratio_ks = c3->DrawFrame(0,0.90,9,1.5);
+    gPad->SetTickx();
+    gPad->SetTicky();
+    frame_ratio_ks->SetTitle("K_{S}^{0}");
+    frame_ratio_ks->GetXaxis()->CenterTitle(1);
+    frame_ratio_ks->GetYaxis()->CenterTitle(1);
+    frame_ratio_ks->GetXaxis()->SetTitleSize(0.05);
+    frame_ratio_ks->GetYaxis()->SetTitleSize(0.05);
+    frame_ratio_ks->SetTitleOffset(1.1,"Y");
+    frame_ratio_ks->SetTitleOffset(1.2,"X");
+    frame_ratio_ks->GetXaxis()->SetTitle("p_{T} (GeV)");
+    frame_ratio_ks->GetYaxis()->SetTitle("v_{2}^{|#Delta#eta|}/v_{2}^{|#Delta#eta|>2}");
+
+    c4->cd();
+    frame_ratio_la = c4->DrawFrame(0,0.90,9,1.5);
+    gPad->SetTickx();
+    gPad->SetTicky();
+    frame_ratio_la->SetTitle("#Lambda/#bar{#Lambda}");
+    frame_ratio_la->GetXaxis()->CenterTitle(1);
+    frame_ratio_la->GetYaxis()->CenterTitle(1);
+    frame_ratio_la->GetXaxis()->SetTitleSize(0.05);
+    frame_ratio_la->GetYaxis()->SetTitleSize(0.05);
+    frame_ratio_la->SetTitleOffset(1.1,"Y");
+    frame_ratio_la->SetTitleOffset(1.2,"X");
+    frame_ratio_la->GetXaxis()->SetTitle("p_{T} (GeV)");
+    frame_ratio_la->GetYaxis()->SetTitle("v_{2}^{|#Delta#eta|}/v_{2}^{|#Delta#eta|>2}");
+
+    c5->cd();
+    frame_xi = c5->DrawFrame(0,-0.01,9,0.5);
+    gPad->SetTickx();
+    gPad->SetTicky();
+    frame_xi->SetTitle("#Xi^{#pm}");
+    frame_xi->GetXaxis()->CenterTitle(1);
+    frame_xi->GetYaxis()->CenterTitle(1);
+    frame_xi->GetXaxis()->SetTitleSize(0.05);
+    frame_xi->GetYaxis()->SetTitleSize(0.05);
+    frame_xi->SetTitleOffset(1.1,"Y");
+    frame_xi->SetTitleOffset(1.2,"X");
+    frame_xi->GetXaxis()->SetTitle("p_{T} (GeV)");
+    frame_xi->GetYaxis()->SetTitle("v_{2}^{sig}");
+
+    c6->cd();
+    frame_om = c6->DrawFrame(0,-0.01,9,0.5);
+    gPad->SetTickx();
+    gPad->SetTicky();
+    frame_om->SetTitle("#Omega^{#pm}");
+    frame_om->GetXaxis()->CenterTitle(1);
+    frame_om->GetYaxis()->CenterTitle(1);
+    frame_om->GetXaxis()->SetTitleSize(0.05);
+    frame_om->GetYaxis()->SetTitleSize(0.05);
+    frame_om->SetTitleOffset(1.1,"Y");
+    frame_om->SetTitleOffset(1.2,"X");
+    frame_om->GetXaxis()->SetTitle("p_{T} (GeV)");
+    frame_om->GetYaxis()->SetTitle("v_{2}^{sig}");
+
+    c7->cd();
+    frame_ratio_xi = c7->DrawFrame(0,0.90,9,1.5);
+    gPad->SetTickx();
+    gPad->SetTicky();
+    frame_ratio_xi->SetTitle("#Xi^{#pm}");
+    frame_ratio_xi->GetXaxis()->CenterTitle(1);
+    frame_ratio_xi->GetYaxis()->CenterTitle(1);
+    frame_ratio_xi->GetXaxis()->SetTitleSize(0.05);
+    frame_ratio_xi->GetYaxis()->SetTitleSize(0.05);
+    frame_ratio_xi->SetTitleOffset(1.1,"Y");
+    frame_ratio_xi->SetTitleOffset(1.2,"X");
+    frame_ratio_xi->GetXaxis()->SetTitle("p_{T} (GeV)");
+    frame_ratio_xi->GetYaxis()->SetTitle("v_{2}^{|#Delta#eta|}/v_{2}^{|#Delta#eta|>2}");
+
+    c8->cd();
+    frame_ratio_om = c8->DrawFrame(0,0.90,9,1.8);
+    gPad->SetTickx();
+    gPad->SetTicky();
+    frame_ratio_om->SetTitle("#Omega^{#pm}");
+    frame_ratio_om->GetXaxis()->CenterTitle(1);
+    frame_ratio_om->GetYaxis()->CenterTitle(1);
+    frame_ratio_om->GetXaxis()->SetTitleSize(0.05);
+    frame_ratio_om->GetYaxis()->SetTitleSize(0.05);
+    frame_ratio_om->SetTitleOffset(1.1,"Y");
+    frame_ratio_om->SetTitleOffset(1.2,"X");
+    frame_ratio_om->GetXaxis()->SetTitle("p_{T} (GeV)");
+    frame_ratio_om->GetYaxis()->SetTitle("v_{2}^{|#Delta#eta|}/v_{2}^{|#Delta#eta|>2}");
+
+    std::vector<double> ratio_ks_1p65;
+    std::vector<double> ratio_ks_1p35;
+    std::vector<double> ratio_ks_1p05;
+    std::vector<double> ratio_ks_0p75;
+
+    std::vector<double> ratio_la_1p65;
+    std::vector<double> ratio_la_1p35;
+    std::vector<double> ratio_la_1p05;
+    std::vector<double> ratio_la_0p75;
+
+    std::vector<double> xcor_ks;
+    std::vector<double> xcor_la;
+
+    std::vector<double> ratio_xi_1p65;
+    std::vector<double> ratio_xi_1p35;
+    std::vector<double> ratio_xi_1p05;
+    std::vector<double> ratio_xi_0p75;
+
+    std::vector<double> ratio_om_1p65;
+    std::vector<double> ratio_om_1p35;
+    std::vector<double> ratio_om_1p05;
+    std::vector<double> ratio_om_0p75;
+
+    std::vector<double> xcor_xi;
+    std::vector<double> xcor_om;
+
+    double x_2=-99;
+    double y_2=-99;
+    double x_1p65=-99;
+    double y_1p65=-99;
+    double x_1p35=-99;
+    double y_1p35=-99;
+    double x_1p05=-99;
+    double y_1p05=-99;
+    double x_0p75=-99;
+    double y_0p75=-99;
+
+    int Npoints_ks = 0;
+    int Npoints_la = 0;
+    int Npoints_xi = 0;
+    int Npoints_om = 0;
+    Npoints_ks = ks8_v2_2->GetN();
+    Npoints_la = la8_v2_2->GetN();
+    Npoints_xi = xi8_v2_2->GetN();
+    Npoints_om = om8_v2_2->GetN();
+
+    for(int i=0; i<Npoints_ks; i++)
+    {
+        ks8_v2_2->GetPoint(i,x_2,y_2);
+        ks8_v2_1p65->GetPoint(i,x_1p65,y_1p65);
+        ks8_v2_1p35->GetPoint(i,x_1p35,y_1p35);
+        ks8_v2_1p05->GetPoint(i,x_1p05,y_1p05);
+        ks8_v2_0p75->GetPoint(i,x_0p75,y_0p75);
+
+        ratio_ks_1p65.push_back(y_1p65/y_2 );
+        ratio_ks_1p35.push_back(y_1p35/y_2 );
+        ratio_ks_1p05.push_back(y_1p05/y_2 );
+        ratio_ks_0p75.push_back(y_0p75/y_2 );
+
+        xcor_ks.push_back(x_2);
+
+    }
+    for(int i=0; i<Npoints_la; i++)
+    {
+        la8_v2_2->GetPoint(i,x_2,y_2);
+        la8_v2_1p65->GetPoint(i,x_1p65,y_1p65);
+        la8_v2_1p35->GetPoint(i,x_1p35,y_1p35);
+        la8_v2_1p05->GetPoint(i,x_1p05,y_1p05);
+        la8_v2_0p75->GetPoint(i,x_0p75,y_0p75);
+
+        ratio_la_1p65.push_back(y_1p65/y_2 );
+        ratio_la_1p35.push_back(y_1p35/y_2 );
+        ratio_la_1p05.push_back(y_1p05/y_2 );
+        ratio_la_0p75.push_back(y_0p75/y_2 );
+
+        xcor_la.push_back(x_2);
+    }
+    for(int i=0; i<Npoints_xi; i++)
+    {
+        xi8_v2_2->GetPoint(i,x_2,y_2);
+        xi8_v2_1p65->GetPoint(i,x_1p65,y_1p65);
+        xi8_v2_1p35->GetPoint(i,x_1p35,y_1p35);
+        xi8_v2_1p05->GetPoint(i,x_1p05,y_1p05);
+        xi8_v2_0p75->GetPoint(i,x_0p75,y_0p75);
+
+        ratio_xi_1p65.push_back(y_1p65/y_2 );
+        ratio_xi_1p35.push_back(y_1p35/y_2 );
+        ratio_xi_1p05.push_back(y_1p05/y_2 );
+        ratio_xi_0p75.push_back(y_0p75/y_2 );
+
+        xcor_xi.push_back(x_2);
+
+    }
+    for(int i=0; i<Npoints_om; i++)
+    {
+        om8_v2_2->GetPoint(i,x_2,y_2);
+        om8_v2_1p65->GetPoint(i,x_1p65,y_1p65);
+        om8_v2_1p35->GetPoint(i,x_1p35,y_1p35);
+        om8_v2_1p05->GetPoint(i,x_1p05,y_1p05);
+        om8_v2_0p75->GetPoint(i,x_0p75,y_0p75);
+
+        ratio_om_1p65.push_back(y_1p65/y_2 );
+        ratio_om_1p35.push_back(y_1p35/y_2 );
+        ratio_om_1p05.push_back(y_1p05/y_2 );
+        ratio_om_0p75.push_back(y_0p75/y_2 );
+
+        xcor_om.push_back(x_2);
+
+    }
+
+
+    TGraphErrors* ks8_v2_1p65_ratio = new TGraphErrors(Npoints_ks,&xcor_ks[0],&ratio_ks_1p65[0],0,0);
+    TGraphErrors* ks8_v2_1p35_ratio = new TGraphErrors(Npoints_ks,&xcor_ks[0],&ratio_ks_1p35[0],0,0);
+    TGraphErrors* ks8_v2_1p05_ratio = new TGraphErrors(Npoints_ks,&xcor_ks[0],&ratio_ks_1p05[0],0,0);
+    TGraphErrors* ks8_v2_0p75_ratio = new TGraphErrors(Npoints_ks,&xcor_ks[0],&ratio_ks_0p75[0],0,0);
+
+    TGraphErrors* la8_v2_1p65_ratio = new TGraphErrors(Npoints_la,&xcor_la[0],&ratio_la_1p65[0],0,0);
+    TGraphErrors* la8_v2_1p35_ratio = new TGraphErrors(Npoints_la,&xcor_la[0],&ratio_la_1p35[0],0,0);
+    TGraphErrors* la8_v2_1p05_ratio = new TGraphErrors(Npoints_la,&xcor_la[0],&ratio_la_1p05[0],0,0);
+    TGraphErrors* la8_v2_0p75_ratio = new TGraphErrors(Npoints_la,&xcor_la[0],&ratio_la_0p75[0],0,0);
+
+    TGraphErrors* xi8_v2_1p65_ratio = new TGraphErrors(Npoints_xi,&xcor_xi[0],&ratio_xi_1p65[0],0,0);
+    TGraphErrors* xi8_v2_1p35_ratio = new TGraphErrors(Npoints_xi,&xcor_xi[0],&ratio_xi_1p35[0],0,0);
+    TGraphErrors* xi8_v2_1p05_ratio = new TGraphErrors(Npoints_xi,&xcor_xi[0],&ratio_xi_1p05[0],0,0);
+    TGraphErrors* xi8_v2_0p75_ratio = new TGraphErrors(Npoints_xi,&xcor_xi[0],&ratio_xi_0p75[0],0,0);
+
+    TGraphErrors* om8_v2_1p65_ratio = new TGraphErrors(Npoints_om,&xcor_om[0],&ratio_om_1p65[0],0,0);
+    TGraphErrors* om8_v2_1p35_ratio = new TGraphErrors(Npoints_om,&xcor_om[0],&ratio_om_1p35[0],0,0);
+    TGraphErrors* om8_v2_1p05_ratio = new TGraphErrors(Npoints_om,&xcor_om[0],&ratio_om_1p05[0],0,0);
+    TGraphErrors* om8_v2_0p75_ratio = new TGraphErrors(Npoints_om,&xcor_om[0],&ratio_om_0p75[0],0,0);
+
+    ks8_v2_2->SetMarkerColor(kRed+4);
+    ks8_v2_2->SetMarkerStyle(20);
+    ks8_v2_2->SetMarkerSize(1.5);
+    ks8_v2_2->SetLineColor(kRed+4);
+
+    ks8_v2_1p65->SetMarkerColor(kRed+3);
+    ks8_v2_1p65->SetMarkerStyle(24);
+    ks8_v2_1p65->SetMarkerSize(1.5);
+    ks8_v2_1p65->SetLineColor(kRed+3);
+
+    ks8_v2_1p35->SetMarkerColor(kRed+2);
+    ks8_v2_1p35->SetMarkerStyle(24);
+    ks8_v2_1p35->SetMarkerSize(1.5);
+    ks8_v2_1p35->SetLineColor(kRed+2);
+
+    ks8_v2_1p05->SetMarkerColor(kRed+1);
+    ks8_v2_1p05->SetMarkerStyle(24);
+    ks8_v2_1p05->SetMarkerSize(1.5);
+    ks8_v2_1p05->SetLineColor(kRed+1);
+
+    ks8_v2_0p75->SetMarkerColor(kRed);
+    ks8_v2_0p75->SetMarkerStyle(24);
+    ks8_v2_0p75->SetMarkerSize(1.5);
+    ks8_v2_0p75->SetLineColor(kRed);
+
+    ks8_v2_1p65_ratio->SetMarkerColor(kRed);
+    ks8_v2_1p65_ratio->SetMarkerStyle(24);
+    ks8_v2_1p65_ratio->SetMarkerSize(1.5);
+    ks8_v2_1p65_ratio->SetLineColor(kRed);
+
+    ks8_v2_1p35_ratio->SetMarkerColor(kBlue);
+    ks8_v2_1p35_ratio->SetMarkerStyle(24);
+    ks8_v2_1p35_ratio->SetMarkerSize(1.5);
+    ks8_v2_1p35_ratio->SetLineColor(kBlue);
+
+    ks8_v2_1p05_ratio->SetMarkerColor(kGreen-2);
+    ks8_v2_1p05_ratio->SetMarkerStyle(24);
+    ks8_v2_1p05_ratio->SetMarkerSize(1.5);
+    ks8_v2_1p05_ratio->SetLineColor(kGreen-2);
+
+    ks8_v2_0p75_ratio->SetMarkerColor(kMagenta);
+    ks8_v2_0p75_ratio->SetMarkerStyle(24);
+    ks8_v2_0p75_ratio->SetMarkerSize(1.5);
+    ks8_v2_0p75_ratio->SetLineColor(kMagenta);
+    //xi8_v2->SetMarkerColor(kGreen+2);
+    //xi8_v2->SetMarkerStyle(21);
+    //xi8_v2->SetMarkerSize(1.5);
+    //xi8_v2->SetLineColor(kGreen+2);
+
+    la8_v2_2->SetMarkerColor(kBlue+4);
+    la8_v2_2->SetMarkerStyle(22);
+    la8_v2_2->SetMarkerSize(1.5);
+    la8_v2_2->SetLineColor(kBlue+4);
+
+    la8_v2_1p65->SetMarkerColor(kBlue+3);
+    la8_v2_1p65->SetMarkerStyle(26);
+    la8_v2_1p65->SetMarkerSize(1.5);
+    la8_v2_1p65->SetLineColor(kBlue+3);
+
+    la8_v2_1p35->SetMarkerColor(kBlue+2);
+    la8_v2_1p35->SetMarkerStyle(26);
+    la8_v2_1p35->SetMarkerSize(1.5);
+    la8_v2_1p35->SetLineColor(kBlue+2);
+
+    la8_v2_1p05->SetMarkerColor(kBlue+1);
+    la8_v2_1p05->SetMarkerStyle(26);
+    la8_v2_1p05->SetMarkerSize(1.5);
+    la8_v2_1p05->SetLineColor(kBlue+1);
+
+    la8_v2_0p75->SetMarkerColor(kBlue);
+    la8_v2_0p75->SetMarkerStyle(26);
+    la8_v2_0p75->SetMarkerSize(1.5);
+    la8_v2_0p75->SetLineColor(kBlue);
+
+    la8_v2_1p65_ratio->SetMarkerColor(kRed);
+    la8_v2_1p65_ratio->SetMarkerStyle(26);
+    la8_v2_1p65_ratio->SetMarkerSize(1.5);
+    la8_v2_1p65_ratio->SetLineColor(kRed);
+
+    la8_v2_1p35_ratio->SetMarkerColor(kBlue);
+    la8_v2_1p35_ratio->SetMarkerStyle(26);
+    la8_v2_1p35_ratio->SetMarkerSize(1.5);
+    la8_v2_1p35_ratio->SetLineColor(kBlue);
+
+    la8_v2_1p05_ratio->SetMarkerColor(kGreen-2);
+    la8_v2_1p05_ratio->SetMarkerStyle(26);
+    la8_v2_1p05_ratio->SetMarkerSize(1.5);
+    la8_v2_1p05_ratio->SetLineColor(kGreen-2);
+
+    la8_v2_0p75_ratio->SetMarkerColor(kMagenta);
+    la8_v2_0p75_ratio->SetMarkerStyle(26);
+    la8_v2_0p75_ratio->SetMarkerSize(1.5);
+    la8_v2_0p75_ratio->SetLineColor(kMagenta);
+
+    xi8_v2_2->SetMarkerColor(kRed+4);
+    xi8_v2_2->SetMarkerStyle(20);
+    xi8_v2_2->SetMarkerSize(1.5);
+    xi8_v2_2->SetLineColor(kRed+4);
+
+    xi8_v2_1p65->SetMarkerColor(kRed+3);
+    xi8_v2_1p65->SetMarkerStyle(24);
+    xi8_v2_1p65->SetMarkerSize(1.5);
+    xi8_v2_1p65->SetLineColor(kRed+3);
+
+    xi8_v2_1p35->SetMarkerColor(kRed+2);
+    xi8_v2_1p35->SetMarkerStyle(24);
+    xi8_v2_1p35->SetMarkerSize(1.5);
+    xi8_v2_1p35->SetLineColor(kRed+2);
+
+    xi8_v2_1p05->SetMarkerColor(kRed+1);
+    xi8_v2_1p05->SetMarkerStyle(24);
+    xi8_v2_1p05->SetMarkerSize(1.5);
+    xi8_v2_1p05->SetLineColor(kRed+1);
+
+    xi8_v2_0p75->SetMarkerColor(kRed);
+    xi8_v2_0p75->SetMarkerStyle(24);
+    xi8_v2_0p75->SetMarkerSize(1.5);
+    xi8_v2_0p75->SetLineColor(kRed);
+
+    xi8_v2_1p65_ratio->SetMarkerColor(kRed);
+    xi8_v2_1p65_ratio->SetMarkerStyle(24);
+    xi8_v2_1p65_ratio->SetMarkerSize(1.5);
+    xi8_v2_1p65_ratio->SetLineColor(kRed);
+
+    xi8_v2_1p35_ratio->SetMarkerColor(kBlue);
+    xi8_v2_1p35_ratio->SetMarkerStyle(24);
+    xi8_v2_1p35_ratio->SetMarkerSize(1.5);
+    xi8_v2_1p35_ratio->SetLineColor(kBlue);
+
+    xi8_v2_1p05_ratio->SetMarkerColor(kGreen-2);
+    xi8_v2_1p05_ratio->SetMarkerStyle(24);
+    xi8_v2_1p05_ratio->SetMarkerSize(1.5);
+    xi8_v2_1p05_ratio->SetLineColor(kGreen-2);
+
+    xi8_v2_0p75_ratio->SetMarkerColor(kMagenta);
+    xi8_v2_0p75_ratio->SetMarkerStyle(24);
+    xi8_v2_0p75_ratio->SetMarkerSize(1.5);
+    xi8_v2_0p75_ratio->SetLineColor(kMagenta);
+
+    om8_v2_2->SetMarkerColor(kRed+4);
+    om8_v2_2->SetMarkerStyle(20);
+    om8_v2_2->SetMarkerSize(1.5);
+    om8_v2_2->SetLineColor(kRed+4);
+
+    om8_v2_1p65->SetMarkerColor(kRed+3);
+    om8_v2_1p65->SetMarkerStyle(24);
+    om8_v2_1p65->SetMarkerSize(1.5);
+    om8_v2_1p65->SetLineColor(kRed+3);
+
+    om8_v2_1p35->SetMarkerColor(kRed+2);
+    om8_v2_1p35->SetMarkerStyle(24);
+    om8_v2_1p35->SetMarkerSize(1.5);
+    om8_v2_1p35->SetLineColor(kRed+2);
+
+    om8_v2_1p05->SetMarkerColor(kRed+1);
+    om8_v2_1p05->SetMarkerStyle(24);
+    om8_v2_1p05->SetMarkerSize(1.5);
+    om8_v2_1p05->SetLineColor(kRed+1);
+
+    om8_v2_0p75->SetMarkerColor(kRed);
+    om8_v2_0p75->SetMarkerStyle(24);
+    om8_v2_0p75->SetMarkerSize(1.5);
+    om8_v2_0p75->SetLineColor(kRed);
+
+    om8_v2_1p65_ratio->SetMarkerColor(kRed);
+    om8_v2_1p65_ratio->SetMarkerStyle(24);
+    om8_v2_1p65_ratio->SetMarkerSize(1.5);
+    om8_v2_1p65_ratio->SetLineColor(kRed);
+
+    om8_v2_1p35_ratio->SetMarkerColor(kBlue);
+    om8_v2_1p35_ratio->SetMarkerStyle(24);
+    om8_v2_1p35_ratio->SetMarkerSize(1.5);
+    om8_v2_1p35_ratio->SetLineColor(kBlue);
+
+    om8_v2_1p05_ratio->SetMarkerColor(kGreen-2);
+    om8_v2_1p05_ratio->SetMarkerStyle(24);
+    om8_v2_1p05_ratio->SetMarkerSize(1.5);
+    om8_v2_1p05_ratio->SetLineColor(kGreen-2);
+
+    om8_v2_0p75_ratio->SetMarkerColor(kMagenta);
+    om8_v2_0p75_ratio->SetMarkerStyle(24);
+    om8_v2_0p75_ratio->SetMarkerSize(1.5);
+    om8_v2_0p75_ratio->SetLineColor(kMagenta);
+
+    TLegend* leg_ks = new TLegend(0.25,0.55,0.4,0.85);
+    leg_ks->SetFillColor(10);
+    leg_ks->SetFillStyle(0);
+    leg_ks->SetBorderSize(0);
+    leg_ks->SetTextFont(42);
+    leg_ks->SetTextSize(0.05);
+    leg_ks->AddEntry(ks8_v2_2, "|#Delta#eta| > 2.0", "P");
+    leg_ks->AddEntry(ks8_v2_1p65, "|#Delta#eta| > 1.65", "P");
+    leg_ks->AddEntry(ks8_v2_1p35, "|#Delta#eta| > 1.35", "P");
+    leg_ks->AddEntry(ks8_v2_1p05, "|#Delta#eta| > 1.05", "P");
+    leg_ks->AddEntry(ks8_v2_0p75, "|#Delta#eta| > 0.75", "P");
+    //leg_ks->AddEntry(xi8_v2, "#Xi^{+}/ #Xi^{-}", "P");
+
+    TLegend* leg_la = new TLegend(0.25,0.55,0.4,0.85);
+    leg_la->SetFillColor(10);
+    leg_la->SetFillStyle(0);
+    leg_la->SetBorderSize(0);
+    leg_la->SetTextFont(42);
+    leg_la->SetTextSize(0.05);
+    leg_la->AddEntry(la8_v2_2, "|#Delta#eta| > 2.0", "P");
+    leg_la->AddEntry(la8_v2_1p65, "|#Delta#eta| > 1.65", "P");
+    leg_la->AddEntry(la8_v2_1p35, "|#Delta#eta| > 1.35", "P");
+    leg_la->AddEntry(la8_v2_1p05, "|#Delta#eta| > 1.05", "P");
+    leg_la->AddEntry(la8_v2_0p75, "|#Delta#eta| > 0.75", "P");
+    //leg_la->AddEntry(xi8_v2, "#Xi^{+}/ #Xi^{-}", "P");
+
+    TLegend* leg_xi = new TLegend(0.25,0.55,0.40,0.85);
+    leg_xi->SetFillColor(10);
+    leg_xi->SetFillStyle(0);
+    leg_xi->SetBorderSize(0);
+    leg_xi->SetTextFont(42);
+    leg_xi->SetTextSize(0.05);
+    leg_xi->AddEntry(xi8_v2_2, "|#Delta#eta| > 2.0", "P");
+    leg_xi->AddEntry(xi8_v2_1p65, "|#Delta#eta| > 1.65", "P");
+    leg_xi->AddEntry(xi8_v2_1p35, "|#Delta#eta| > 1.35", "P");
+    leg_xi->AddEntry(xi8_v2_1p05, "|#Delta#eta| > 1.05", "P");
+    leg_xi->AddEntry(xi8_v2_0p75, "|#Delta#eta| > 0.75", "P");
+    //leg_xi->AddEntry(xi8_v2, "#Xi^{+}/ #Xi^{-}", "P");
+
+    TLegend* leg_om = new TLegend(0.25,0.55,0.4,0.85);
+    leg_om->SetFillColor(10);
+    leg_om->SetFillStyle(0);
+    leg_om->SetBorderSize(0);
+    leg_om->SetTextFont(42);
+    leg_om->SetTextSize(0.05);
+    leg_om->AddEntry(om8_v2_2, "|#Delta#eta| > 2.0", "P");
+    leg_om->AddEntry(om8_v2_1p65, "|#Delta#eta| > 1.65", "P");
+    leg_om->AddEntry(om8_v2_1p35, "|#Delta#eta| > 1.35", "P");
+    leg_om->AddEntry(om8_v2_1p05, "|#Delta#eta| > 1.05", "P");
+    leg_om->AddEntry(om8_v2_0p75, "|#Delta#eta| > 0.75", "P");
+    //leg_om->AddEntry(xi8_v2, "#Xi^{+}/ #Xi^{-}", "P");
+
+    TLegend* leg_ks_ratio = new TLegend(0.25,0.55,0.4,0.85);
+    leg_ks_ratio->SetFillColor(10);
+    leg_ks_ratio->SetFillStyle(0);
+    leg_ks_ratio->SetBorderSize(0);
+    leg_ks_ratio->SetTextFont(42);
+    leg_ks_ratio->SetTextSize(0.05);
+    leg_ks_ratio->AddEntry(ks8_v2_1p65_ratio, "|#Delta#eta| > 1.65", "P");
+    leg_ks_ratio->AddEntry(ks8_v2_1p35_ratio, "|#Delta#eta| > 1.35", "P");
+    leg_ks_ratio->AddEntry(ks8_v2_1p05_ratio, "|#Delta#eta| > 1.05", "P");
+    leg_ks_ratio->AddEntry(ks8_v2_0p75_ratio, "|#Delta#eta| > 0.75", "P");
+    //leg_ks->AddEntry(xi8_v2, "#Xi^{+}/ #Xi^{-}", "P");
+
+    TLegend* leg_la_ratio = new TLegend(0.25,0.55,0.4,0.85);
+    leg_la_ratio->SetFillColor(10);
+    leg_la_ratio->SetFillStyle(0);
+    leg_la_ratio->SetBorderSize(0);
+    leg_la_ratio->SetTextFont(42);
+    leg_la_ratio->SetTextSize(0.05);
+    leg_la_ratio->AddEntry(la8_v2_1p65_ratio, "|#Delta#eta| > 1.65", "P");
+    leg_la_ratio->AddEntry(la8_v2_1p35_ratio, "|#Delta#eta| > 1.35", "P");
+    leg_la_ratio->AddEntry(la8_v2_1p05_ratio, "|#Delta#eta| > 1.05", "P");
+    leg_la_ratio->AddEntry(la8_v2_0p75_ratio, "|#Delta#eta| > 0.75", "P");
+
+    TLegend* leg_xi_ratio = new TLegend(0.25,0.55,0.4,0.85);
+    leg_xi_ratio->SetFillColor(10);
+    leg_xi_ratio->SetFillStyle(0);
+    leg_xi_ratio->SetBorderSize(0);
+    leg_xi_ratio->SetTextFont(42);
+    leg_xi_ratio->SetTextSize(0.05);
+    leg_xi_ratio->AddEntry(xi8_v2_1p65_ratio, "|#Delta#eta| > 1.65", "P");
+    leg_xi_ratio->AddEntry(xi8_v2_1p35_ratio, "|#Delta#eta| > 1.35", "P");
+    leg_xi_ratio->AddEntry(xi8_v2_1p05_ratio, "|#Delta#eta| > 1.05", "P");
+    leg_xi_ratio->AddEntry(xi8_v2_0p75_ratio, "|#Delta#eta| > 0.75", "P");
+    //leg_xi->AddEntry(xi8_v2, "#Xi^{+}/ #Xi^{-}", "P");
+
+    TLegend* leg_om_ratio = new TLegend(0.65,0.55,0.77,0.85);
+    leg_om_ratio->SetFillColor(10);
+    leg_om_ratio->SetFillStyle(0);
+    leg_om_ratio->SetBorderSize(0);
+    leg_om_ratio->SetTextFont(42);
+    leg_om_ratio->SetTextSize(0.05);
+    leg_om_ratio->AddEntry(om8_v2_1p65_ratio, "|#Delta#eta| > 1.65", "P");
+    leg_om_ratio->AddEntry(om8_v2_1p35_ratio, "|#Delta#eta| > 1.35", "P");
+    leg_om_ratio->AddEntry(om8_v2_1p05_ratio, "|#Delta#eta| > 1.05", "P");
+    leg_om_ratio->AddEntry(om8_v2_0p75_ratio, "|#Delta#eta| > 0.75", "P");
+    //leg_om->AddEntry(xi8_v2, "#Xi^{+}/ #Xi^{-}", "P");
+
+    TLine* line = new TLine(0,1,9,1);
+    line->SetLineStyle(2);
+
+    c1->cd();
+    ks8_v2_2->Draw("P");
+    ks8_v2_1p65->Draw("P");
+    ks8_v2_1p35->Draw("P");
+    ks8_v2_1p05->Draw("P");
+    ks8_v2_0p75->Draw("P");
+    leg_ks->Draw("same");
+
+    c2->cd();
+    la8_v2_2->Draw("P");
+    la8_v2_1p65->Draw("P");
+    la8_v2_1p35->Draw("P");
+    la8_v2_1p05->Draw("P");
+    la8_v2_0p75->Draw("P");
+    leg_la->Draw("same");
+    //xi8_v2->Draw("P");
+
+    c3->cd();
+    ks8_v2_1p65_ratio->Draw("P");
+    ks8_v2_1p35_ratio->Draw("P");
+    ks8_v2_1p05_ratio->Draw("P");
+    ks8_v2_0p75_ratio->Draw("P");
+    leg_ks_ratio->Draw("same");
+    line->Draw("same");
+
+    c4->cd();
+    la8_v2_1p65_ratio->Draw("P");
+    la8_v2_1p35_ratio->Draw("P");
+    la8_v2_1p05_ratio->Draw("P");
+    la8_v2_0p75_ratio->Draw("P");
+    leg_la_ratio->Draw("same");
+    line->Draw("same");
+
+    c5->cd();
+    xi8_v2_2->Draw("P");
+    xi8_v2_1p65->Draw("P");
+    xi8_v2_1p35->Draw("P");
+    xi8_v2_1p05->Draw("P");
+    xi8_v2_0p75->Draw("P");
+    leg_xi->Draw("same");
+
+    c6->cd();
+    om8_v2_2->Draw("P");
+    om8_v2_1p65->Draw("P");
+    om8_v2_1p35->Draw("P");
+    om8_v2_1p05->Draw("P");
+    om8_v2_0p75->Draw("P");
+    leg_om->Draw("same");
+
+    c7->cd();
+    xi8_v2_1p65_ratio->Draw("P");
+    xi8_v2_1p35_ratio->Draw("P");
+    xi8_v2_1p05_ratio->Draw("P");
+    xi8_v2_0p75_ratio->Draw("P");
+    leg_xi_ratio->Draw("same");
+    line->Draw("same");
+
+    c8->cd();
+    om8_v2_1p65_ratio->Draw("P");
+    om8_v2_1p35_ratio->Draw("P");
+    om8_v2_1p05_ratio->Draw("P");
+    om8_v2_0p75_ratio->Draw("P");
+    leg_om_ratio->Draw("same");
+    line->Draw("same");
+
+    c1->Print("v2SigEtaGap_ks.pdf");
+    c2->Print("v2SigEtaGap_la.pdf");
+    c3->Print("v2SigEtaGap_ratio_ks.pdf");
+    c4->Print("v2SigEtaGap_ratio_la.pdf");
+    c5->Print("v2SigEtaGap_xi.pdf");
+    c6->Print("v2SigEtaGap_om.pdf");
+    c7->Print("v2SigEtaGap_ratio_xi.pdf");
+    c8->Print("v2SigEtaGap_ratio_om.pdf");
+}
+
 void V0_v4()
 {
     MITStyle();
