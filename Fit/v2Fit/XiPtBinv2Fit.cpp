@@ -151,6 +151,165 @@ void vnCalculate(int degree, std::string V0IDname, std::vector<double> vnvalues_
     for(unsigned i=0; i<vnvalues_side.size(); i++) myfile << vnObs[i]*TMath::Sqrt(TMath::Power(vnerrors_side[i]/vnvalues_side[i],2) + TMath::Power(vnRefError[i]/vnvalues_h[degree],2)) << "\n";
 }
 
+std::map<std::string, std::vector<double> > vnCalculateMap(int degree, std::string V0IDname, std::vector<double> vnvalues_peak, std::vector<double> vnerrors_peak, std::vector<double> vnvalues_side, std::vector<double> vnerrors_side, std::vector<double> vnvalues_h, std::vector<double> vnerrors_h, std::vector<double> fsig)
+{
+    std::map<std::string, std::vector<double> > returnContainer;
+    std::vector<double> sigvalues;
+    std::vector<double> sigvalues_nq;
+    std::vector<double> sigerrors;
+    std::vector<double> sigerrors_nq;
+
+    std::vector<double> vnObs;
+    std::vector<double> vnObs_errors;
+    std::vector<double> vnObs_nq;
+    std::vector<double> vnObs_errors_nq;
+
+    std::vector<double> vnBkg;
+    std::vector<double> vnBkg_errors;
+    std::vector<double> vnBkg_nq;
+    std::vector<double> vnBkg_errors_nq;
+    std::vector<double> vnRefError;
+
+    for(unsigned i=0; i<fsig.size(); i++)
+    {
+        double vnObs_ = vnvalues_peak[i]/TMath::Sqrt(vnvalues_h[degree]);
+        double vnBkg_ = vnvalues_side[i]/TMath::Sqrt(vnvalues_h[degree]);
+        vnObs.push_back(vnObs_);
+        vnBkg.push_back(vnBkg_);
+        double sig = (vnObs_ - (1 - fsig[i])*vnBkg_)/fsig[i];
+
+        double vnObsError = vnObs_*TMath::Sqrt(TMath::Power(vnerrors_peak[i]/vnvalues_peak[i],2) + TMath::Power(0.5*vnerrors_h[degree]/vnvalues_h[degree],2));
+        double vnBkgError = vnBkg_*TMath::Sqrt(TMath::Power(vnerrors_side[i]/vnvalues_side[i],2) + TMath::Power(0.5*vnerrors_h[degree]/vnvalues_h[degree],2));
+        double sigError = TMath::Sqrt(vnObsError*vnObsError + TMath::Power(vnBkgError*(1-fsig[i]),2))/fsig[i];
+
+        vnRefError.push_back(0.5*vnerrors_h[degree]/TMath::Sqrt(vnvalues_h[degree]));
+
+        sigvalues.push_back(sig);
+        sigerrors.push_back(sigError);
+        vnObs_errors.push_back(vnObsError);
+        vnBkg_errors.push_back(vnBkgError);
+    }
+
+    int divFactor = 1;
+    if(V0IDname == "Xi") divFactor = 3;
+
+    for(unsigned i=0; i<sigvalues.size(); i++   ) sigvalues_nq.push_back(sigvalues[i]/divFactor);
+    for(unsigned i=0; i<sigerrors.size(); i++   ) sigerrors_nq.push_back(sigerrors[i]/divFactor);
+    for(unsigned i=0; i<vnObs.size(); i++       ) vnObs_nq.push_back(vnObs[i]/divFactor);
+    for(unsigned i=0; i<vnBkg.size(); i++       ) vnBkg_nq.push_back(vnBkg[i]/divFactor);
+    for(unsigned i=0; i<vnObs_errors.size(); i++) vnObs_errors_nq.push_back(vnObs_errors[i]/divFactor);
+    for(unsigned i=0; i<vnBkg_errors.size(); i++) vnBkg_errors_nq.push_back(vnBkg_errors[i]/divFactor);
+
+    returnContainer["sig"]           = sigvalues;
+    returnContainer["sig_errors"]    = sigerrors;
+    returnContainer["sig_nq"]        = sigvalues_nq;
+    returnContainer["sig_errors_nq"] = sigerrors_nq;
+    returnContainer["obs"]           = vnObs;
+    returnContainer["obs_errors"]    = vnObs_errors;
+    returnContainer["obs_nq"]        = vnObs_nq;
+    returnContainer["obs_errors_nq"] = vnObs_errors_nq;
+    returnContainer["bkg"]           = vnBkg;
+    returnContainer["bkg_errors"]    = vnBkg_errors;
+    returnContainer["bkg_nq"]        = vnBkg_nq;
+    returnContainer["bkg_errors_nq"] = vnBkg_errors_nq;
+
+    return returnContainer;
+}
+
+std::vector<double> AvgX(TFile* file, std::string branch, std::string branch_bkg, int numPtBins)
+{
+    std::vector<double> AvgXcoor;
+    branch +="%d";
+    branch_bkg += "%d";
+    for(int i=0; i<numPtBins; i++)
+    {
+        TH1D* hX = (TH1D*)file->Get(Form(branch.c_str(),i));
+        TH1D* hX_bkg = (TH1D*)file->Get(Form(branch_bkg.c_str(),i));
+
+        int nEntries = 0;
+        double XTotal = 0;
+        for(int j=hX->FindFirstBinAbove(0,1); j<=hX->FindLastBinAbove(0,1); j++)
+        {
+            double nX = hX->GetBinContent(j);
+            double X = nX*(hX->GetBinCenter(j));
+            nEntries+=nX;
+            XTotal += X;
+        }
+        for(int j=hX_bkg->FindFirstBinAbove(0,1); j<=hX_bkg->FindLastBinAbove(0,1); j++)
+        {
+            double nX_bkg = hX_bkg->GetBinContent(j);
+            double X_bkg = nX_bkg*(hX_bkg->GetBinCenter(j));
+            nEntries += nX_bkg;
+            XTotal += X_bkg;
+        }
+        AvgXcoor.push_back(XTotal/nEntries);
+    }
+
+    return AvgXcoor;
+}
+
+void vnGraph(std::map<std::string,std::vector<double> > returnContainer, std::vector<double> AvgX_pt, std::vector<double> AvgX_ket, std::string V0ID, std::string fn)
+{
+    TFile* out = new TFile(fn.c_str(),"UPDATE");
+    int divFactor = 1;
+    std::vector<double> AvgX_ket_nq = AvgX_ket;
+
+    if(V0ID == "Xi")
+    {
+        divFactor = 3;
+        for(unsigned i=0; i<AvgX_ket.size(); i++)
+        {
+            AvgX_ket_nq[i] = AvgX_ket[i]/divFactor;
+        }
+    }
+
+    TGraphErrors* v2           = new TGraphErrors(returnContainer["sig"].size(),&AvgX_pt[0],&(returnContainer["sig"])[0],0,&(returnContainer["sig_errors"])[0]);
+    TGraphErrors* v2_nq        = new TGraphErrors(returnContainer["sig_nq"].size(),&AvgX_pt[0],&(returnContainer["sig_nq"])[0],0,&(returnContainer["sig_errors_nq"])[0]);
+    TGraphErrors* v2_ket       = new TGraphErrors(returnContainer["sig"].size(),&AvgX_ket[0],&(returnContainer["sig"])[0],0,&(returnContainer["sig_errors"])[0]);
+    TGraphErrors* v2_ket_nq    = new TGraphErrors(returnContainer["sig_nq"].size(),&AvgX_ket_nq[0],&(returnContainer["sig_nq"])[0],0,&(returnContainer["sig_errors_nq"])[0]);
+    TGraphErrors* v2obs        = new TGraphErrors(returnContainer["obs"].size(),&AvgX_pt[0],&(returnContainer["obs"])[0],0,&(returnContainer["obs_errors"])[0]);
+    TGraphErrors* v2obs_nq     = new TGraphErrors(returnContainer["obs_nq"].size(),&AvgX_pt[0],&(returnContainer["obs_nq"])[0],0,&(returnContainer["obs_errors_nq"])[0]);
+    TGraphErrors* v2obs_ket    = new TGraphErrors(returnContainer["obs"].size(),&AvgX_ket[0],&(returnContainer["obs"])[0],0,&(returnContainer["obs_errors"])[0]);
+    TGraphErrors* v2obs_ket_nq = new TGraphErrors(returnContainer["obs_nq"].size(),&AvgX_ket_nq[0],&(returnContainer["obs_nq"])[0],0,&(returnContainer["obs_errors_nq"])[0]);
+    TGraphErrors* v2bkg        = new TGraphErrors(returnContainer["bkg"].size(),&AvgX_pt[0],&(returnContainer["bkg"])[0],0,&(returnContainer["bkg_errors"])[0]);
+    TGraphErrors* v2bkg_nq     = new TGraphErrors(returnContainer["bkg_nq"].size(),&AvgX_pt[0],&(returnContainer["bkg_nq"])[0],0,&(returnContainer["bkg_errors_nq"])[0]);
+    TGraphErrors* v2bkg_ket    = new TGraphErrors(returnContainer["bkg"].size(),&AvgX_ket[0],&(returnContainer["bkg"])[0],0,&(returnContainer["bkg_errors"])[0]);
+    TGraphErrors* v2bkg_ket_nq = new TGraphErrors(returnContainer["bkg_nq"].size(),&AvgX_ket_nq[0],&(returnContainer["bkg_nq"])[0],0,&(returnContainer["bkg_errors_nq"])[0]);
+
+    if(V0ID == "Kshort")
+    {
+        v2           -> Write("v2kshort",TObject::kOverwrite);
+        v2_nq        -> Write("v2kshort_nq",TObject::kOverwrite);
+        v2_ket       -> Write("v2kshort_ket",TObject::kOverwrite);
+        v2_ket_nq    -> Write("v2kshort_ket_nq",TObject::kOverwrite);
+        v2obs        -> Write("v2obskshort",TObject::kOverwrite);
+        v2obs_nq     -> Write("v2obskshort_nq",TObject::kOverwrite);
+        v2obs_ket    -> Write("v2obskshort_ket",TObject::kOverwrite);
+        v2obs_ket_nq -> Write("v2obskshort_ket_nq",TObject::kOverwrite);
+        v2bkg        -> Write("v2bkgkshort",TObject::kOverwrite);
+        v2bkg_nq     -> Write("v2bkgkshort_nq",TObject::kOverwrite);
+        v2bkg_ket    -> Write("v2bkgkshort_ket",TObject::kOverwrite);
+        v2bkg_ket_nq -> Write("v2bkgkshort_ket_nq",TObject::kOverwrite);
+    }
+    if(V0ID == "Xi")
+    {
+        v2           -> Write("v2xi",TObject::kOverwrite);
+        v2_nq        -> Write("v2xi_nq",TObject::kOverwrite);
+        v2_ket       -> Write("v2xi_ket",TObject::kOverwrite);
+        v2_ket_nq    -> Write("v2xi_ket_nq",TObject::kOverwrite);
+        v2obs        -> Write("v2obsxi",TObject::kOverwrite);
+        v2obs_nq     -> Write("v2obsxi_nq",TObject::kOverwrite);
+        v2obs_ket    -> Write("v2obsxi_ket",TObject::kOverwrite);
+        v2obs_ket_nq -> Write("v2obsxi_ket_nq",TObject::kOverwrite);
+        v2bkg        -> Write("v2bkgxi",TObject::kOverwrite);
+        v2bkg_nq     -> Write("v2bkgxi_nq",TObject::kOverwrite);
+        v2bkg_ket    -> Write("v2bkgxi_ket",TObject::kOverwrite);
+        v2bkg_ket_nq -> Write("v2bkgxi_ket_nq",TObject::kOverwrite);
+    }
+
+    out->Close();
+}
+
 void Xiv2Fit(  )
 {
     //TLatex
@@ -182,6 +341,13 @@ void Xiv2Fit(  )
     std::string Xiv2PeakName = "Xiv2PeakLoose.txt";
     std::string Xiv2SideName = "Xiv2SideLoose.txt";
     std::string Xiv2CalculatorName = "Xiv2SignalLoose.txt";
+    std::string branchname_xi = "xiCorrelationRapidity/Pt_xi_pt";
+    std::string branchname_xi_bkg = "xiCorrelationRapidity/Pt_xi_bkg_pt";
+    std::string branchname_ket_xi = "xiCorrelationRapidity/KET_xi_pt";
+    std::string branchname_ket_xi_bkg = "xiCorrelationRapidity/KET_xi_bkg_pt";
+    std::string graphName = "v2valuesRapidity_etaGap_0p75.root";
+    int binlow = 14;
+    int binhigh = 19;
 
     std::ofstream Xiv2Peak;
     std::ofstream Xiv2Side;
@@ -271,14 +437,14 @@ void Xiv2Fit(  )
             //Project Phi
 
             // For projecting both shoulders
-            TH1D* hbPhiTotPeak = hbackgroundPeak->ProjectionY( "PhiBkgTotPeak", 1, 10 );
-            TH1D* hbPhiOthPeak = hbackgroundPeak->ProjectionY( "PhiBkgOthPeak", 23, -1 );
-            TH1D* hsPhiTotPeak = hsignalPeak->ProjectionY( "PhiSigTotPeak", 1, 10 );
-            TH1D* hsPhiOthPeak = hsignalPeak->ProjectionY( "PhiSigOthPeak", 23, -1 );
-            TH1D* hbHadPhiTot = hBackgroundHad->ProjectionY( "PhiBkgHadTot", 1, 10 );
-            TH1D* hbHadPhiOth = hBackgroundHad->ProjectionY( "PhiBkgHadOth", 23, -1 );
-            TH1D* hsHadPhiTot = hSignalHad->ProjectionY( "PhiSigHadTot", 1, 10 );
-            TH1D* hsHadPhiOth = hSignalHad->ProjectionY( "PhiSigHadOth", 23, -1 );
+            TH1D* hbPhiTotPeak = hbackgroundPeak->ProjectionY( "PhiBkgTotPeak", 1, binlow );
+            TH1D* hbPhiOthPeak = hbackgroundPeak->ProjectionY( "PhiBkgOthPeak", binhigh, -1 );
+            TH1D* hsPhiTotPeak = hsignalPeak->ProjectionY( "PhiSigTotPeak", 1, binlow );
+            TH1D* hsPhiOthPeak = hsignalPeak->ProjectionY( "PhiSigOthPeak", binhigh, -1 );
+            TH1D* hbHadPhiTot = hBackgroundHad->ProjectionY( "PhiBkgHadTot", 1, binlow );
+            TH1D* hbHadPhiOth = hBackgroundHad->ProjectionY( "PhiBkgHadOth", binhigh, -1 );
+            TH1D* hsHadPhiTot = hSignalHad->ProjectionY( "PhiSigHadTot", 1, binlow );
+            TH1D* hsHadPhiOth = hSignalHad->ProjectionY( "PhiSigHadOth", binhigh, -1 );
 
             hbPhiTotPeak->Add( hbPhiOthPeak );
             hsPhiTotPeak->Add( hsPhiOthPeak );
@@ -637,6 +803,14 @@ void Xiv2Fit(  )
 
     //Calculate Flow
     vnCalculate(2,"Xi",v2values_peak,v2errors_peak,v2values_side,v2errors_side,v2value_h,v2error_h,fsig_xi,Xiv2CalculatorName);
+
+    std::map<std::string, std::vector<double> > results_xi = vnCalculateMap(2,"Xi",v2values_peak,v2errors_peak,v2values_side,v2errors_side,v2value_h,v2error_h,fsig_xi);
+
+    std::vector<double> AvgX_xi = AvgX(f,branchname_xi,branchname_xi_bkg,numPtBins);
+
+    std::vector<double> AvgX_ket_xi = AvgX(f,branchname_ket_xi,branchname_ket_xi_bkg,numPtBins);
+
+    vnGraph(results_xi,AvgX_xi,AvgX_ket_xi,"Xi",graphName);
 
     std::ofstream XiKET;
     XiKET.open("XiAvgKET.txt");
