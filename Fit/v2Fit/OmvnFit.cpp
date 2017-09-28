@@ -170,17 +170,17 @@ std::map<std::string, std::vector<double> > vnCalculateMap(int degree, std::stri
     std::vector<double> vnBkg_errors_nq;
     std::vector<double> vnRefError;
 
-    for(unsigned i=0; i<fsig.size(); i++)
+    for(unsigned i=0; i<fsig.size()-1; i++)
     {
         double vnObs_ = vnvalues_peak[i]/TMath::Sqrt(vnvalues_h[degree]);
         double vnBkg_ = vnvalues_side[i]/TMath::Sqrt(vnvalues_h[degree]);
         vnObs.push_back(vnObs_);
         vnBkg.push_back(vnBkg_);
-        double sig = (vnObs_ - (1 - fsig[i])*vnBkg_)/fsig[i];
+        double sig = (vnObs_ - (1 - fsig[i+1])*vnBkg_)/fsig[i+1];
 
         double vnObsError = vnObs_*TMath::Sqrt(TMath::Power(vnerrors_peak[i]/vnvalues_peak[i],2) + TMath::Power(0.5*vnerrors_h[degree]/vnvalues_h[degree],2));
         double vnBkgError = vnBkg_*TMath::Sqrt(TMath::Power(vnerrors_side[i]/vnvalues_side[i],2) + TMath::Power(0.5*vnerrors_h[degree]/vnvalues_h[degree],2));
-        double sigError = TMath::Sqrt(vnObsError*vnObsError + TMath::Power(vnBkgError*(1-fsig[i]),2))/fsig[i];
+        double sigError = TMath::Sqrt(vnObsError*vnObsError + TMath::Power(vnBkgError*(1-fsig[i+1]),2))/fsig[i+1];
 
         vnRefError.push_back(0.5*vnerrors_h[degree]/TMath::Sqrt(vnvalues_h[degree]));
 
@@ -221,7 +221,7 @@ std::vector<double> AvgX(TFile* file, std::string branch, std::string branch_bkg
     std::vector<double> AvgXcoor;
     branch +="%d";
     branch_bkg += "%d";
-    for(int i=0; i<numPtBins; i++)
+    for(int i=1; i<numPtBins; i++)
     {
         TH1D* hX = (TH1D*)file->Get(Form(branch.c_str(),i));
         TH1D* hX_bkg = (TH1D*)file->Get(Form(branch_bkg.c_str(),i));
@@ -385,9 +385,9 @@ void OmvnFit(  )
     std::string branchname_om_bkg = "omCorrelationRapidity/Pt_xi_bkg_pt";
     std::string branchname_ket_om = "omCorrelationRapidity/KET_xi_pt";
     std::string branchname_ket_om_bkg = "omCorrelationRapidity/KET_xi_bkg_pt";
-    std::string graphName = "v2valuesRapidity_etaGap_0p75.root";
-    int binlow = 14;
-    int binhigh = 19;
+    std::string graphName = "v2valuesRapidity_etaGap_2.root";
+    int binlow = 10;
+    int binhigh = 23;
 
 
     TLatex* ltx2 = new TLatex(  );
@@ -399,7 +399,7 @@ void OmvnFit(  )
     //Define divided hist
     bool Peak = true;
     //bool Peak = false;
-    for( int i=0; i<numPtBins; i++ )
+    for( int i=1; i<numPtBins; i++ )
     {
 
             dPhiPeak[i] = new TH1D( Form( "dPhiPeak%d",i ), "#Xi - h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
@@ -642,11 +642,11 @@ void OmvnFit(  )
 
         TH1::SetDefaultSumw2(  );
 
-        //Project Phi
-        TH1D* hbPhiTotSide = hbackgroundSide->ProjectionY( "PhiBkgTot", 0, 10 );
-        TH1D* hbPhiOthSide = hbackgroundSide->ProjectionY( "PhiBkgOthPeak", 23, -1 );
-        TH1D* hsPhiTotSide = hsignalSide->ProjectionY( "PhiSigTot", 0, 10 );
-        TH1D* hsPhiOthSide = hsignalSide->ProjectionY( "PhiSigOthPeak", 23, -1 );
+            //Project Phi
+            TH1D* hbPhiTotSide = hbackgroundSide->ProjectionY( "PhiBkgTot", 0, binlow );
+            TH1D* hbPhiOthSide = hbackgroundSide->ProjectionY( "PhiBkgOthPeak", binhigh, -1 );
+            TH1D* hsPhiTotSide = hsignalSide->ProjectionY( "PhiSigTot", 0, binlow );
+            TH1D* hsPhiOthSide = hsignalSide->ProjectionY( "PhiSigOthPeak", binhigh, -1 );
 
         hbPhiTotSide->Add( hbPhiOthSide );
         hsPhiTotSide->Add( hsPhiOthSide );
