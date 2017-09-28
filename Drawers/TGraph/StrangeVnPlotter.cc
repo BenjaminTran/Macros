@@ -2235,11 +2235,11 @@ void RapSys_Closure()
 
 void RapSys_etaGap()
 {
-    TFile* f_RapSys_etaGap_2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Fit/v2Fit/v2valuesRapidity_etaGap_2.root");
-    TFile* f_RapSys_etaGap_1p65 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Fit/v2Fit/v2valuesRapidity_etaGap_1p65.root");
-    TFile* f_RapSys_etaGap_1p35 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Fit/v2Fit/v2valuesRapidity_etaGap_1p35.root");
-    TFile* f_RapSys_etaGap_1p05 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Fit/v2Fit/v2valuesRapidity_etaGap_1p05.root");
-    TFile* f_RapSys_etaGap_0p75 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Fit/v2Fit/v2valuesRapidity_etaGap_0p75.root");
+    TFile* f_RapSys_etaGap_2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Fit/v2Fit/data/v2valuesRapidity_etaGap_2.root");
+    TFile* f_RapSys_etaGap_1p65 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Fit/v2Fit/data/v2valuesRapidity_etaGap_1p65.root");
+    TFile* f_RapSys_etaGap_1p35 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Fit/v2Fit/data/v2valuesRapidity_etaGap_1p35.root");
+    TFile* f_RapSys_etaGap_1p05 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Fit/v2Fit/data/v2valuesRapidity_etaGap_1p05.root");
+    TFile* f_RapSys_etaGap_0p75 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Fit/v2Fit/data/v2valuesRapidity_etaGap_0p75.root");
     MITStyle();
     TCanvas* c1 = MakeCanvas("c1", "Plot_ks");
     TCanvas* c2 = MakeCanvas("c2", "Plot_la");

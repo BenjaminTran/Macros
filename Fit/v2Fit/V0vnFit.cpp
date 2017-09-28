@@ -411,7 +411,9 @@ void V0vnFit()
     std::string branchname_ket_ks_bkg = "v0CorrelationRapidity/KETkshort_bkg_pt";
     std::string branchname_ket_la = "v0CorrelationRapidity/KETlambda_pt";
     std::string branchname_ket_la_bkg = "v0CorrelationRapidity/KETlambda_bkg_pt";
-    std::string graphName = "v2valuesRapidity_etaGap_0p75.root";
+    std::string graphName = "v2valuesRapidityEtaGap1.root";
+    int binlow = 13;
+    int binhigh = 20;
 	vnPeak.open(vnPeakName);
 	vnSide.open(vnSideName);
     vnH.open(vnHName);
@@ -501,17 +503,6 @@ void V0vnFit()
         //Project Phi
 
         // For projecting both shoulders
-        //TH1D* hbPhiTotPeak = hbackgroundPeak->ProjectionY("PhiBkgTotPeak", 1, 10);
-        //TH1D* hbPhiOthPeak = hbackgroundPeak->ProjectionY("PhiBkgOthPeak", 23, -1);
-        //TH1D* hsPhiTotPeak = hsignalPeak->ProjectionY("PhiSigTotPeak", 1, 10);
-        //TH1D* hsPhiOthPeak = hsignalPeak->ProjectionY("PhiSigOthPeak", 23, -1);
-        //TH1D* hbHadPhiTot = hBackgroundHad->ProjectionY("PhiBkgHadTot", 1, 10);
-        //TH1D* hbHadPhiOth = hBackgroundHad->ProjectionY("PhiBkgHadOth", 23, -1);
-        //TH1D* hsHadPhiTot = hSignalHad->ProjectionY("PhiSigHadTot", 1, 10);
-        //TH1D* hsHadPhiOth = hSignalHad->ProjectionY("PhiSigHadOth", 23, -1);
-
-        int binlow = 14;
-        int binhigh = 19;
         TH1D* hbPhiTotPeak = hbackgroundPeak->ProjectionY("PhiBkgTotPeak", 1, binlow);
         TH1D* hbPhiOthPeak = hbackgroundPeak->ProjectionY("PhiBkgOthPeak", binhigh, -1);
         TH1D* hsPhiTotPeak = hsignalPeak->ProjectionY("PhiSigTotPeak", 1, binlow);
@@ -539,10 +530,6 @@ void V0vnFit()
         FourierFit_ks[i]->SetNpx(250);
         FourierFit_ks[i]->SetParNames("Scale", "V_{1}", "V_{2}", "V_{3}");
 
-        TCanvas *c4_ks_peak = new TCanvas("c4_ks_peak", "Fourier peak trg_ks", 800,800);
-        c4_ks_peak->cd();
-        gPad->SetTickx();
-        gPad->SetTicky();
         dPhiFourierPeak_ks[i]->Fit(Form("FourierFit_ks%d",i));
         dPhiFourierPeak_ks[i]->SetStats(kFALSE);
         for(int j=2; j<numFourierParams; j++)
@@ -555,10 +542,10 @@ void V0vnFit()
         FourierFitHad->SetNpx(250);
         FourierFitHad->SetParNames("Scale", "V_{1}", "V_{2}", "V_{3}");
 
-        TCanvas *c5_ks = new TCanvas("c5_ks", "c5_ks", 800,800);
-        c5_ks->cd();
-        gPad->SetTickx();
-        gPad->SetTicky();
+        //TCanvas *c5_ks = new TCanvas("c5_ks", "c5_ks", 800,800);
+        //c5_ks->cd();
+        //gPad->SetTickx();
+        //gPad->SetTicky();
         dPhiHadFourier->Fit("FourierFitHad");
         dPhiHadFourier->SetStats(kFALSE);
         if(i==0)
@@ -672,7 +659,6 @@ void V0vnFit()
             dPhiHadFourier->AddBinContent(j, -dPhiHadFitMin);
         }
 
-        c4_ks_peak->cd();
         dPhiFourierPeak_ks[i]->SetMarkerStyle(21);
         dPhiFourierPeak_ks[i]->SetMarkerColor(4);
         //dPhiFourierPeak_ks[i]->Draw("E1");
@@ -703,7 +689,6 @@ void V0vnFit()
             ltx2->DrawLatex(0.7, 0.74, "#Xi#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}");
         }
 
-        c5_ks->cd();
         dPhiHadFourier->SetMarkerStyle(34);
         dPhiHadFourier->SetMarkerSize(1.5);
         dPhiHadFourier->Draw("E1");
@@ -738,10 +723,10 @@ void V0vnFit()
         TH2D *hsignalSide     = (TH2D*) f->Get(Form("v0CorrelationRapidity/signalkshort_bkg_pt%d",i));
 
         //Project Phi
-        TH1D* hbPhiTotSide = hbackgroundSide->ProjectionY("PhiBkgTot", 0, 10);
-        TH1D* hbPhiOthSide = hbackgroundSide->ProjectionY("PhiBkgOthPeak", 23, -1);
-        TH1D* hsPhiTotSide = hsignalSide->ProjectionY("PhiSigTot", 0, 10);
-        TH1D* hsPhiOthSide = hsignalSide->ProjectionY("PhiSigOthPeak", 23, -1);
+        TH1D* hbPhiTotSide = hbackgroundSide->ProjectionY("PhiBkgTot", 0, binlow);
+        TH1D* hbPhiOthSide = hbackgroundSide->ProjectionY("PhiBkgOthPeak", binhigh, -1);
+        TH1D* hsPhiTotSide = hsignalSide->ProjectionY("PhiSigTot", 0, binlow);
+        TH1D* hsPhiOthSide = hsignalSide->ProjectionY("PhiSigOthPeak", binhigh, -1);
 
         hbPhiTotSide->Add(hbPhiOthSide);
         hsPhiTotSide->Add(hsPhiOthSide);
@@ -890,8 +875,6 @@ void V0vnFit()
         //TH1D* hsHadPhiTot = hSignalHad->ProjectionY("PhiSigHadTot", 1, 10);
         //TH1D* hsHadPhiOth = hSignalHad->ProjectionY("PhiSigHadOth", 23, -1);
 
-        int binlow = 14;
-        int binhigh = 19;
         TH1D* hbPhiTotPeak = hbackgroundPeak->ProjectionY("PhiBkgTotPeak", 1, binlow);
         TH1D* hbPhiOthPeak = hbackgroundPeak->ProjectionY("PhiBkgOthPeak", binhigh, -1);
         TH1D* hsPhiTotPeak = hsignalPeak->ProjectionY("PhiSigTotPeak", 1, binlow);
@@ -1110,10 +1093,10 @@ void V0vnFit()
         TH2D *hsignalSide     = (TH2D*) f->Get(Form("v0CorrelationRapidity/signallambda_bkg_pt%d",i));
 
         //Project Phi
-        TH1D* hbPhiTotSide = hbackgroundSide->ProjectionY("PhiBkgTot", 0, 10);
-        TH1D* hbPhiOthSide = hbackgroundSide->ProjectionY("PhiBkgOthPeak", 23, -1);
-        TH1D* hsPhiTotSide = hsignalSide->ProjectionY("PhiSigTot", 0, 10);
-        TH1D* hsPhiOthSide = hsignalSide->ProjectionY("PhiSigOthPeak", 23, -1);
+        TH1D* hbPhiTotSide = hbackgroundSide->ProjectionY("PhiBkgTot", 0, binlow);
+        TH1D* hbPhiOthSide = hbackgroundSide->ProjectionY("PhiBkgOthPeak", binhigh, -1);
+        TH1D* hsPhiTotSide = hsignalSide->ProjectionY("PhiSigTot", 0, binlow);
+        TH1D* hsPhiOthSide = hsignalSide->ProjectionY("PhiSigOthPeak", binhigh, -1);
 
         hbPhiTotSide->Add(hbPhiOthSide);
         hsPhiTotSide->Add(hsPhiOthSide);
@@ -1128,13 +1111,7 @@ void V0vnFit()
         FourierFit_la[i]->SetNpx(250);
         FourierFit_la[i]->SetParNames("Scale", "V_{1}", "V_{2}", "V_{3}");
 
-        TCanvas *c4_la_side = new TCanvas("c4_la_side", "Fourier side trg_la", 800,800);
-        c4_la_side->cd();
-        gPad->SetTickx();
-        gPad->SetTicky();
-        //dPhiFourierSide_la->Fit("FourierFit_la","","",0,PI);
         dPhiFourierSide_la[i]->Fit(Form("FourierFit_la%d",i));
-        dPhiFourierSide_la[i]->SetStats(kFALSE);
         for(int j=2; j<numFourierParams; j++)
         {
             vnValues_la_side[j].push_back(FourierFit_la[i]->GetParameter(j));
@@ -1147,45 +1124,8 @@ void V0vnFit()
         maxRange = minRange + maxFact*(maxBinContent - minBinContent);
 
         //ZYAM FITS
-        TCanvas *c2_la_side = new TCanvas("c2_la_side", "ZYAM Side trg_la", 800,800);
-        c2_la_side->cd();
-
-        gPad->SetTickx();
-        gPad->SetTicky();
-        dPhiSide_la[i]->SetMarkerStyle(21);
-        dPhiSide_la[i]->SetMarkerColor(4);
-        dPhiSide_la[i]->SetTitleOffset(2, "Y");
-        dPhiSide_la[i]->SetTitle("Sideband");
-        dPhiSide_la[i]->GetYaxis()->SetRangeUser(mini , maxi);
-        dPhiSide_la[i]->GetYaxis()->SetTitleSize(0.03);
-        dPhiSide_la[i]->GetYaxis()->CenterTitle(true);
-        dPhiSide_la[i]->GetYaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} ");
-        dPhiSide_la[i]->SetTitleOffset(1.5, "X");
-        dPhiSide_la[i]->GetXaxis()->SetTitleSize(0.035);
-        dPhiSide_la[i]->GetXaxis()->CenterTitle(true);
-        dPhiSide_la[i]->GetXaxis()->SetTitle("#Delta#phi (radians)");
         dPhiSide_la[i]->Fit("pol2","","", 0.4,2.4);
         dPhiSide_la[i]->SetStats(!publish);
-
-        if(publish)
-        {
-            os << "CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = " << fixed << std::setprecision(2) << SNN << " TeV";
-            ltx3->DrawLatex(0.2, 0.82, os.str().c_str());
-            os.str(std::string());
-            os << "L_{#lower[-0.25]{int}} = " << Lint << " nb^{-1}";
-            ltx3->DrawLatex(0.2, 0.74, os.str().c_str());
-            os.str(std::string());
-            os << Nmin << "  #leq  N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< " << Nmax;
-            ltx3->DrawLatex(0.2, 0.67, os.str().c_str());
-            os.str(std::string());
-            os << pTassMin << " < p_{T}#kern[-0.3]{#lower[0.1]{{}^{assoc}}} < " << pTassMax << " GeV";
-            ltx3->DrawLatex(0.2, 0.60, os.str().c_str());
-            os.str(std::string());
-            os << "Long range (|#Delta#eta| > " <<  longRange << ")";
-            ltx3->DrawLatex(0.2, 0.53, os.str().c_str());
-            os.str(std::string());
-            ltx2->DrawLatex(0.7, 0.74, "#Xi#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}");
-        }
 
         TF1 *dPhiFitSide = dPhiSide_la[i]->GetFunction("pol2");
 
@@ -1196,68 +1136,8 @@ void V0vnFit()
             dPhiFourierSide_la[i]->AddBinContent(j, -dPhiFitMinSide);
         }
 
-        c4_la_side->cd();
-        dPhiFourierSide_la[i]->SetMarkerStyle(21);
-        dPhiFourierSide_la[i]->SetMarkerColor(4);
-        //dPhiFourierSide_la[i]->Draw("E1");
-        dPhiFourierSide_la[i]->SetStats(kFALSE);
         dPhiFourierSide_la[i]->Fit(Form("FourierFit_la%d",i));
-        os << "SideBand " << PtBin_la[i] << "_Pt_" << PtBin_la[i+1];
-        dPhiFourierSide_la[i]->SetTitle(os.str().c_str());
-        os.str(std::string());
-        dPhiFourierSide_la[i]->SetTitleOffset(2, "Y");
-        dPhiFourierSide_la[i]->GetYaxis()->CenterTitle(true);
-        dPhiFourierSide_la[i]->GetYaxis()->SetTitleSize(0.03);
-        dPhiFourierSide_la[i]->GetYaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} - C_{#lower[-0.3]{ZYAM}}");
-        //dPhiFourierSide_la[i]->GetYaxis()->SetRangeUser(-0.0004, 0.008);
-        dPhiFourierSide_la[i]->GetYaxis()->SetRangeUser(mini, maxi);
-        dPhiFourierSide_la[i]->SetTitleOffset(1.5, "X");
-        dPhiFourierSide_la[i]->GetXaxis()->SetTitleSize(0.035);
-        dPhiFourierSide_la[i]->GetXaxis()->CenterTitle(true);
-        dPhiFourierSide_la[i]->GetXaxis()->SetTitle("#Delta#phi (radians)");
 
-        if(publish)
-        {
-            ltx3->DrawLatex(0.2, 0.82, "CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 5.02 TeV");
-            ltx3->DrawLatex(0.2, 0.74, "L_{#lower[-0.25]{int}} = 35 nb^{-1}");
-            ltx3->DrawLatex(0.2, 0.67,"185  #leq  N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 220");
-            ltx3->DrawLatex(0.2, 0.60, "1 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{assoc}}} < 3 GeV");
-            ltx3->DrawLatex(0.2, 0.53, "Long range (|#Delta#eta| > 2)");
-            ltx2->DrawLatex(0.7, 0.74, "#Xi#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}");
-        }
-    }
-
-    //Output peak values and errors Kshort
-    for(int i=2; i<numFourierParams; i++)
-    {
-        OutputVnValues(i,"Peak","Kshort",vnValues_ks_peak[i],PtBin_ks,vnPeakName);
-        OutputVnErrors(i,"Peak","Kshort",vnErrors_ks_peak[i],PtBin_ks,vnPeakName);
-    }
-    //Output side values and errors Kshort
-    for(int i=2; i<numFourierParams; i++)
-    {
-        OutputVnValues(i,"Side","Kshort",vnValues_ks_side[i],PtBin_ks,vnSideName);
-        OutputVnErrors(i,"Side","Kshort",vnErrors_ks_side[i],PtBin_ks,vnSideName);
-    }
-
-    //Output peak values and errors Lambda
-    //for(int i=2; i<numFourierParams; i++)
-    for(int i=2; i<numFourierParams; i++)
-    {
-        OutputVnValues(i,"Peak","Lambda",vnValues_la_peak[i],PtBin_la,vnPeakName);
-        OutputVnErrors(i,"Peak","Lambda",vnErrors_la_peak[i],PtBin_la,vnPeakName);
-    }
-    //Output side values and errors Lambda
-    for(int i=2; i<numFourierParams; i++)
-    {
-        OutputVnValues(i,"Side","Lambda",vnValues_la_side[i],PtBin_la,vnSideName);
-        OutputVnErrors(i,"Side","Lambda",vnErrors_la_side[i],PtBin_la,vnSideName);
-    }
-
-    //Output hadron vn values and errors
-    for(int i=2; i<numFourierParams; i++)
-    {
-        OutputVnH(i,vnValues_h,vnErrors_h,"vnHadron.txt");
     }
 
     TCanvas* Fourier_ks_peak = new TCanvas("Fourier_ks_peak", "Fourier_ks_peak", 1600,800);
@@ -1309,211 +1189,4 @@ void V0vnFit()
 
     vnGraph(results_ks,AvgX_ks,AvgX_ket_ks,"Kshort",graphName);
     vnGraph(results_la,AvgX_la,AvgX_ket_la,"Lambda",graphName);
-
-    //Output Publication plots
-	if(publish)
-	{
-    //1D correlation functions
-	//Kshort
-    if(Peak){
-        TCanvas* PubFourier_ks = new TCanvas("PubFourier_ks", "Pub_ks", 800,800);
-        PubFourier_ks->cd();
-        gPad->SetTickx();
-        gPad->SetTicky();
-        TH1D* dPhiFourierPeakCopy_ks = (TH1D*)dPhiFourierPeak_ks[4]->Clone();
-        dPhiFourierPeakCopy_ks->SetTitle("Peak");
-        dPhiFourierPeakCopy_ks->Draw("E1");
-
-        TLatex *ltx3 = new TLatex();
-        ltx3->SetTextSize(0.035);
-        ltx3->SetNDC(kTRUE);
-        ltx3->SetTextFont(42);
-        if(publish)
-        {
-            ltx3->DrawLatex(0.2, 0.82, "CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV, L_{#lower[-0.25]{int}} = 62 nb^{-1}");
-            ltx3->DrawLatex(0.2, 0.74,"185  #leq  N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 220");
-            ltx3->DrawLatex(0.2, 0.67, "0.3 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{assoc}}} < 3 GeV");
-            ltx3->DrawLatex(0.2, 0.60, "2.8 < p_{T}^{#Xi} < 3.6 GeV");
-            ltx3->DrawLatex(0.2, 0.53, "Long range (|#Delta#eta| > 2)");
-            ltx3->SetTextSize(0.045);
-            ltx3->DrawLatex(0.7, 0.74, "#Xi#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}");
-        }
-    }
-    else{
-        TCanvas* PubFourier_ks = new TCanvas("PubFourier_ks", "Pub_ks", 800,800);
-        PubFourier_ks->cd();
-        gPad->SetTickx();
-        gPad->SetTicky();
-        TH1D* dPhiFourierSideCopy_ks = (TH1D*)dPhiFourierSide_ks[4]->Clone();
-        dPhiFourierSideCopy_ks->SetTitle("SideBand");
-        dPhiFourierSideCopy_ks->Draw("E1");
-
-
-        TLatex *ltx3 = new TLatex();
-        ltx3->SetTextSize(0.035);
-        ltx3->SetNDC(kTRUE);
-        ltx3->SetTextFont(42);
-        if(publish)
-        {
-            ltx3->DrawLatex(0.2, 0.82, "CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV, L_{#lower[-0.25]{int}} = 62 nb^{-1}");
-            ltx3->DrawLatex(0.2, 0.74,"185  #leq  N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 220");
-            ltx3->DrawLatex(0.2, 0.67, "0.3 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{assoc}}} < 3 GeV");
-            ltx3->DrawLatex(0.2, 0.60, "2.8 < p_{T}^{#Xi} < 3.6 GeV");
-            ltx3->DrawLatex(0.2, 0.53, "Long range (|#Delta#eta| > 2)");
-            ltx3->SetTextSize(0.045);
-            ltx3->DrawLatex(0.7, 0.74, "#Xi#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}");
-        }
-    }
-
-
-	// Lambda
-    if(Peak){
-        TCanvas* PubFourier_la = new TCanvas("PubFourier_la", "Pub_la", 800,800);
-        PubFourier_la->cd();
-        gPad->SetTickx();
-        gPad->SetTicky();
-        TH1D* dPhiFourierPeakCopy_la = (TH1D*)dPhiFourierPeak_la[4]->Clone();
-        dPhiFourierPeakCopy_la->SetTitle("Peak");
-        dPhiFourierPeakCopy_la->Draw("E1");
-
-        TLatex *ltx3 = new TLatex();
-        ltx3->SetTextSize(0.035);
-        ltx3->SetNDC(kTRUE);
-        ltx3->SetTextFont(42);
-        if(publish)
-        {
-            ltx3->DrawLatex(0.2, 0.82, "CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV, L_{#lower[-0.25]{int}} = 62 nb^{-1}");
-            ltx3->DrawLatex(0.2, 0.74,"185  #leq  N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 220");
-            ltx3->DrawLatex(0.2, 0.67, "0.3 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{assoc}}} < 3 GeV");
-            ltx3->DrawLatex(0.2, 0.60, "2.8 < p_{T}^{#Xi} < 3.6 GeV");
-            ltx3->DrawLatex(0.2, 0.53, "Long range (|#Delta#eta| > 2)");
-            ltx3->SetTextSize(0.045);
-            ltx3->DrawLatex(0.7, 0.74, "#Xi#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}");
-        }
-    }
-    else{
-        TCanvas* PubFourier_la = new TCanvas("PubFourier_la", "Pub_la", 800,800);
-        PubFourier_la->cd();
-        gPad->SetTickx();
-        gPad->SetTicky();
-        TH1D* dPhiFourierSideCopy_la = (TH1D*)dPhiFourierSide_la[4]->Clone();
-        dPhiFourierSideCopy_la->SetTitle("SideBand");
-        dPhiFourierSideCopy_la->Draw("E1");
-
-
-        TLatex *ltx3 = new TLatex();
-        ltx3->SetTextSize(0.035);
-        ltx3->SetNDC(kTRUE);
-        ltx3->SetTextFont(42);
-        if(publish)
-        {
-            ltx3->DrawLatex(0.2, 0.82, "CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV, L_{#lower[-0.25]{int}} = 62 nb^{-1}");
-            ltx3->DrawLatex(0.2, 0.74,"185  #leq  N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 220");
-            ltx3->DrawLatex(0.2, 0.67, "0.3 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{assoc}}} < 3 GeV");
-            ltx3->DrawLatex(0.2, 0.60, "2.8 < p_{T}^{#Xi} < 3.6 GeV");
-            ltx3->DrawLatex(0.2, 0.53, "Long range (|#Delta#eta| > 2)");
-            ltx3->SetTextSize(0.045);
-            ltx3->DrawLatex(0.7, 0.74, "#Xi#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}");
-        }
-    }
-	}
-
-/*
-    //2D Correlation function 1-3 GeV associated
-    TLatex *ltx0 = new TLatex();
-    ltx0->SetTextSize(0.031);
-    ltx0->SetNDC(kTRUE);
-    ltx0->SetTextFont(42);
-
-	//Kshort
-    TCanvas* TwoDCorrelation_ks = new TCanvas("TwoDCorrelation_ks", "", 1000, 1000);
-    TwoDCorrelation_ks->SetLeftMargin(0.2);
-
-    TH2D* Signal_ks = (TH2D*)f->Get("v0CorrelationRapidity/signalkshort_pt2");
-    TH2D* Background_ks = (TH2D*)f->Get("v0CorrelationRapidity/backgroundkshort_pt2");
-
-    TGaxis::SetMaxDigits(1);
-
-    TH2D* Correlation_ks = (TH2D*)Signal_ks->Clone();
-    Correlation_ks->Divide(Background_ks);
-    Correlation_ks->GetXaxis()->SetRangeUser(-4.0,4.0);
-    Correlation_ks->GetYaxis()->SetRangeUser(-PI/2.0,4.5);
-    Correlation_ks->GetXaxis()->SetTitle("#Delta#eta");
-    Correlation_ks->GetXaxis()->SetTitleOffset(1.4);
-    Correlation_ks->GetXaxis()->CenterTitle(true);
-    Correlation_ks->GetYaxis()->SetTitle("#Delta#phi (radians)");
-    Correlation_ks->GetYaxis()->SetTitleOffset(1.4);
-    Correlation_ks->GetYaxis()->CenterTitle(true);
-    Correlation_ks->GetZaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{d^{2}N^{pair}}{d#Delta#eta d#Delta#phi}");
-    Correlation_ks->GetZaxis()->SetTitleOffset(2.3);
-    Correlation_ks->GetZaxis()->CenterTitle(true);
-    Correlation_ks->GetXaxis()->SetNdivisions(405);
-    Correlation_ks->GetYaxis()->SetNdivisions(405);
-    Correlation_ks->GetZaxis()->SetNdivisions(4);
-    Correlation_ks->SetTitle("");
-    Correlation_ks->SetStats(kFALSE);
-    Correlation_ks->Scale(10);
-
-    const Int_t NRGBs = 5;
-    const Int_t NCont = 20;
-
-    Double_t stops[NRGBs] = { 0.00, 0.34, 0.61, 0.84, 1.00 };
-    Double_t red[NRGBs]   = { 0.00, 0.00, 0.87, 1.00, 0.51 };
-    Double_t green[NRGBs] = { 0.00, 0.81, 1.00, 0.20, 0.00 };
-    Double_t blue[NRGBs]  = { 0.51, 1.00, 0.12, 0.00, 0.00 };
-    TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
-    //gStyle->SetNumberContours(90);
-
-    TwoDCorrelation_ks->cd();
-    Correlation_ks->Draw("SURF1 FB ");
-
-
-    ltx0->DrawLatex(0.05, 0.95, "CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV, L_{#lower[-0.25]{int}} = 62 nb^{-1}");
-    ltx0->DrawLatex(0.05, 0.88, "185 #leq N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 220");
-    ltx0->DrawLatex(0.05, 0.81, "1 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{assoc}}} < 3 GeV");
-    ltx0->DrawLatex(0.05, 0.75, "1 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{trig}}} < 3 GeV");
-    ltx0->SetTextSize(0.04);
-    ltx0->DrawLatex(0.85, 0.88, "K_{S}^{0}#kern[-0.3]{#lower[0.02]{{}^{#pm}}}- h^{#pm}");
-
-
-	//Lambda
-    TCanvas* TwoDCorrelation_la = new TCanvas("TwoDCorrelation_la", "", 1000, 1000);
-    TwoDCorrelation_la->SetLeftMargin(0.2);
-
-    TH2D* Signal_la = (TH2D*)f->Get("v0CorrelationRapidity/signallambda_pt2");
-    TH2D* Background_la = (TH2D*)f->Get("v0CorrelationRapidity/backgroundlambda_pt2");
-
-    TGaxis::SetMaxDigits(1);
-
-    TH2D* Correlation_la = (TH2D*)Signal_la->Clone();
-    Correlation_la->Divide(Background_la);
-    Correlation_la->GetXaxis()->SetRangeUser(-4.0,4.0);
-    Correlation_la->GetYaxis()->SetRangeUser(-PI/2.0,4.5);
-    Correlation_la->GetXaxis()->SetTitle("#Delta#eta");
-    Correlation_la->GetXaxis()->SetTitleOffset(1.4);
-    Correlation_la->GetXaxis()->CenterTitle(true);
-    Correlation_la->GetYaxis()->SetTitle("#Delta#phi (radians)");
-    Correlation_la->GetYaxis()->SetTitleOffset(1.4);
-    Correlation_la->GetYaxis()->CenterTitle(true);
-    Correlation_la->GetZaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{d^{2}N^{pair}}{d#Delta#eta d#Delta#phi}");
-    Correlation_la->GetZaxis()->SetTitleOffset(2.3);
-    Correlation_la->GetZaxis()->CenterTitle(true);
-    Correlation_la->GetXaxis()->SetNdivisions(405);
-    Correlation_la->GetYaxis()->SetNdivisions(405);
-    Correlation_la->GetZaxis()->SetNdivisions(4);
-    Correlation_la->SetTitle("");
-    Correlation_la->SetStats(kFALSE);
-    Correlation_la->Scale(10);
-
-    TwoDCorrelation_la->cd();
-    Correlation_la->Draw("SURF1 FB ");
-
-
-    ltx0->DrawLatex(0.05, 0.95, "CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV, L_{#lower[-0.25]{int}} = 62 nb^{-1}");
-    ltx0->DrawLatex(0.05, 0.88, "185 #leq N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 220");
-    ltx0->DrawLatex(0.05, 0.81, "1 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{assoc}}} < 3 GeV");
-    ltx0->DrawLatex(0.05, 0.75, "1 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{trig}}} < 3 GeV");
-    ltx0->SetTextSize(0.04);
-    ltx0->DrawLatex(0.85, 0.88, "#Lambda#kern[-0.3]{#lower[0.02]{{}^{#pm}}}- h^{#pm}");
-    */
 }

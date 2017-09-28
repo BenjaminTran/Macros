@@ -345,9 +345,9 @@ void Xiv2Fit(  )
     std::string branchname_xi_bkg = "xiCorrelationRapidity/Pt_xi_bkg_pt";
     std::string branchname_ket_xi = "xiCorrelationRapidity/KET_xi_pt";
     std::string branchname_ket_xi_bkg = "xiCorrelationRapidity/KET_xi_bkg_pt";
-    std::string graphName = "v2valuesRapidity_etaGap_0p75.root";
-    int binlow = 14;
-    int binhigh = 19;
+    std::string graphName = "v2valuesRapidity_etaGap_2.root";
+    int binlow = 10;
+    int binhigh = 23;
 
     std::ofstream Xiv2Peak;
     std::ofstream Xiv2Side;
@@ -666,10 +666,10 @@ void Xiv2Fit(  )
             TH1::SetDefaultSumw2(  );
 
             //Project Phi
-            TH1D* hbPhiTotSide = hbackgroundSide->ProjectionY( "PhiBkgTot", 0, 10 );
-            TH1D* hbPhiOthSide = hbackgroundSide->ProjectionY( "PhiBkgOthPeak", 23, -1 );
-            TH1D* hsPhiTotSide = hsignalSide->ProjectionY( "PhiSigTot", 0, 10 );
-            TH1D* hsPhiOthSide = hsignalSide->ProjectionY( "PhiSigOthPeak", 23, -1 );
+            TH1D* hbPhiTotSide = hbackgroundSide->ProjectionY( "PhiBkgTot", 0, binlow );
+            TH1D* hbPhiOthSide = hbackgroundSide->ProjectionY( "PhiBkgOthPeak", binhigh, -1 );
+            TH1D* hsPhiTotSide = hsignalSide->ProjectionY( "PhiSigTot", 0, binlow );
+            TH1D* hsPhiOthSide = hsignalSide->ProjectionY( "PhiSigOthPeak", binhigh, -1 );
 
             hbPhiTotSide->Add( hbPhiOthSide );
             hsPhiTotSide->Add( hsPhiOthSide );
