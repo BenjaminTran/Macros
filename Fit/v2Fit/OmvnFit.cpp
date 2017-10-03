@@ -367,17 +367,17 @@ void OmvnFit(  )
     std::vector<double> fsig_xi = {0.519579 ,0.664389 ,0.757589 ,0.820397 ,0.864778 ,0.903763 ,0.933867 ,0.928403 ,0.949529};// ,0.976012};
 
     int numPtBins = PtBin.size()-1;
-    TH1D* dPhiFourierPeak[numPtBins];
-    TH1D* dPhiFourierSide[numPtBins];
+    TH1D* dPhiFourierPeak_om[numPtBins];
+    TH1D* dPhiFourierSide_om[numPtBins];
 
-    TH1D* dPhiPeak[numPtBins];
-    TH1D* dPhiSide[numPtBins];
+    TH1D* dPhiPeak_om[numPtBins];
+    TH1D* dPhiSide_om[numPtBins];
 
-    TF1* FourierFitXi[numPtBins];
-    std::vector<double> v2values_peak;
-    std::vector<double> v2values_side;
-    std::vector<double> v2errors_peak;
-    std::vector<double> v2errors_side;
+    TF1* FourierFit_om[numPtBins];
+    std::vector<double> v2values_om_peak;
+    std::vector<double> v2values_om_side;
+    std::vector<double> v2errors_om_peak;
+    std::vector<double> v2errors_om_side;
     std::vector<double> v2value_h; //Need to use vector for vnCalculate function
     std::vector<double> v2error_h;
 
@@ -402,7 +402,7 @@ void OmvnFit(  )
     for( int i=1; i<numPtBins; i++ )
     {
 
-            dPhiPeak[i] = new TH1D( Form( "dPhiPeak%d",i ), "#Xi - h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
+            dPhiPeak_om[i] = new TH1D( Form( "dPhiPeak_om%d",i ), "#Xi - h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
             TH1D *dPhiHad = new TH1D( "dPhiHad", "h^{#pm}- h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI );
             //Pull 2D Histograms
             TH2D *hbackgroundPeak = (TH2D*) f->Get( Form( "omCorrelationRapidity/BackgroundPeak_pt%d",i ) );
@@ -431,28 +431,28 @@ void OmvnFit(  )
 
 
         //Divide
-        dPhiPeak[i]->Divide( hsPhiTotPeak, hbPhiTotPeak );
+        dPhiPeak_om[i]->Divide( hsPhiTotPeak, hbPhiTotPeak );
         dPhiHad->Divide( hsHadPhiTot, hbHadPhiTot );
 
         //Clone histograms for display without fit functions
-        dPhiFourierPeak[i] = ( TH1D* )dPhiPeak[i]->Clone(  );
+        dPhiFourierPeak_om[i] = ( TH1D* )dPhiPeak_om[i]->Clone(  );
         TH1D* dPhiHadFourier = ( TH1D* )dPhiHad->Clone(  );
 
-        FourierFitXi[i] = new TF1( Form( "FourierFitXi%d",i ), FourierHad, -1.5, 5, 4 );
-        FourierFitXi[i]->SetNpx( 250 );
-        FourierFitXi[i]->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
+        FourierFit_om[i] = new TF1( Form( "FourierFit_om%d",i ), FourierHad, -1.5, 5, 4 );
+        FourierFit_om[i]->SetNpx( 250 );
+        FourierFit_om[i]->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
 
         TCanvas *FourierPeak = new TCanvas( "FourierPeak", "Fourier Peak", 800,800 );
         FourierPeak->cd(  );
         gPad->SetTickx(  );
         gPad->SetTicky(  );
-        //dPhiFourierPeak->Fit( "FourierFitXi","","",0,PI );
-        dPhiFourierPeak[i]->Fit( Form( "FourierFitXi%d",i ) );
-        dPhiFourierPeak[i]->SetStats( kFALSE );
-        v2values_peak.push_back( FourierFitXi[i]->GetParameter( 2 ) );
-        v2errors_peak.push_back( FourierFitXi[i]->GetParError( 2 ) );
+        //dPhiFourierPeak_om->Fit( "FourierFit_om","","",0,PI );
+        dPhiFourierPeak_om[i]->Fit( Form( "FourierFit_om%d",i ) );
+        dPhiFourierPeak_om[i]->SetStats( kFALSE );
+        v2values_om_peak.push_back( FourierFit_om[i]->GetParameter( 2 ) );
+        v2errors_om_peak.push_back( FourierFit_om[i]->GetParError( 2 ) );
         cout << "---------------------------------" << endl;
-        cout << "Peak V2 for xi-h is " << FourierFitXi[i]->GetParameter( 2 ) << endl;
+        cout << "Peak V2 for xi-h is " << FourierFit_om[i]->GetParameter( 2 ) << endl;
         cout << "---------------------------------" << endl;
 
         TF1 *FourierFitHad = new TF1( "FourierFitHad", FourierHad, -1.5, 5, 4 );
@@ -469,8 +469,8 @@ void OmvnFit(  )
         v2value_h.push_back(FourierFitHad->GetParameter(2));
         v2error_h.push_back(FourierFitHad->GetParError(2));
 
-        double maxBinContent = dPhiFourierPeak[i]->GetBinContent( dPhiFourierPeak[i]->GetMaximumBin(  ) );
-        double minBinContent = dPhiFourierPeak[i]->GetBinContent( dPhiFourierPeak[i]->GetMinimumBin(  ) );
+        double maxBinContent = dPhiFourierPeak_om[i]->GetBinContent( dPhiFourierPeak[i]->GetMaximumBin(  ) );
+        double minBinContent = dPhiFourierPeak_om[i]->GetBinContent( dPhiFourierPeak[i]->GetMinimumBin(  ) );
         double minRange = minBinContent - 0.005*minBinContent;
         double maxRange = minRange + 2*( maxBinContent - minBinContent );
 
@@ -480,21 +480,21 @@ void OmvnFit(  )
 
         gPad->SetTickx(  );
         gPad->SetTicky(  );
-        dPhiPeak[i]->SetMarkerStyle( 21 );
-        dPhiPeak[i]->SetMarkerColor( 4 );
-        dPhiPeak[i]->SetTitleOffset( 2, "Y" );
-        dPhiPeak[i]->SetTitle( "Peak" );
-        dPhiPeak[i]->GetYaxis(  )->SetRangeUser( minRange , maxRange );
-        dPhiPeak[i]->GetYaxis(  )->SetTitleSize( 0.03 );
-        dPhiPeak[i]->GetYaxis(  )->CenterTitle( true );
-        dPhiPeak[i]->GetYaxis(  )->SetTitle( "#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} " );
-        dPhiPeak[i]->SetTitleOffset( 1.5, "X" );
-        dPhiPeak[i]->GetXaxis(  )->SetTitleSize( 0.035 );
-        dPhiPeak[i]->GetXaxis(  )->CenterTitle( true );
-        dPhiPeak[i]->GetXaxis(  )->SetTitle( "#Delta#phi (radians)" );
-        //dPhiPeak[i]->Draw( "E1" );
-        dPhiPeak[i]->Fit( "pol2","","", 0.4,2.4 );
-        dPhiPeak[i]->SetStats( !publish );
+        dPhiPeak_om[i]->SetMarkerStyle( 21 );
+        dPhiPeak_om[i]->SetMarkerColor( 4 );
+        dPhiPeak_om[i]->SetTitleOffset( 2, "Y" );
+        dPhiPeak_om[i]->SetTitle( "Peak" );
+        dPhiPeak_om[i]->GetYaxis(  )->SetRangeUser( minRange , maxRange );
+        dPhiPeak_om[i]->GetYaxis(  )->SetTitleSize( 0.03 );
+        dPhiPeak_om[i]->GetYaxis(  )->CenterTitle( true );
+        dPhiPeak_om[i]->GetYaxis(  )->SetTitle( "#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} " );
+        dPhiPeak_om[i]->SetTitleOffset( 1.5, "X" );
+        dPhiPeak_om[i]->GetXaxis(  )->SetTitleSize( 0.035 );
+        dPhiPeak_om[i]->GetXaxis(  )->CenterTitle( true );
+        dPhiPeak_om[i]->GetXaxis(  )->SetTitle( "#Delta#phi (radians)" );
+        //dPhiPeak_om[i]->Draw( "E1" );
+        dPhiPeak_om[i]->Fit( "pol2","","", 0.4,2.4 );
+        dPhiPeak_om[i]->SetStats( !publish );
 
         TLatex *ltx3 = new TLatex(  );
         ltx3->SetTextSize( 0.035 );
@@ -563,7 +563,7 @@ void OmvnFit(  )
             ltx2->DrawLatex( 0.7, 0.74, "h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}" );
         }
 
-        TF1 *dPhiFitPeak = dPhiPeak[i]->GetFunction( "pol2" );
+        TF1 *dPhiFitPeak = dPhiPeak_om[i]->GetFunction( "pol2" );
         TF1 *dPhiHadFit = dPhiHad->GetFunction( "pol2" );
 
         double dPhiFitMinPeak = dPhiFitPeak->GetMinimum(  );
@@ -571,7 +571,7 @@ void OmvnFit(  )
 
         for( int j = 1; j < 32; j++ )
         {
-            dPhiFourierPeak[i]->AddBinContent( j, -dPhiFitMinPeak );
+            dPhiFourierPeak_om[i]->AddBinContent( j, -dPhiFitMinPeak );
         }
 
         for( int j = 1; j < 32; j++ )
@@ -580,23 +580,23 @@ void OmvnFit(  )
         }
 
         FourierPeak->cd(  );
-        dPhiFourierPeak[i]->SetMarkerStyle( 21 );
-        dPhiFourierPeak[i]->SetMarkerColor( 4 );
-        //dPhiFourierPeak[i]->Draw( "E1" );
-        dPhiFourierPeak[i]->SetStats( kFALSE );
-        dPhiFourierPeak[i]->Fit( Form( "FourierFitXi%d",i ) );
+        dPhiFourierPeak_om[i]->SetMarkerStyle( 21 );
+        dPhiFourierPeak_om[i]->SetMarkerColor( 4 );
+        //dPhiFourierPeak_om[i]->Draw( "E1" );
+        dPhiFourierPeak_om[i]->SetStats( kFALSE );
+        dPhiFourierPeak_om[i]->Fit( Form( "FourierFit_om%d",i ) );
         os << "Peak " << PtBin[i] << "_Pt_" << PtBin[i+1];
-        dPhiFourierPeak[i]->SetTitle( os.str(  ).c_str(  ) );
+        dPhiFourierPeak_om[i]->SetTitle( os.str(  ).c_str(  ) );
         os.str( std::string(  ) );
-        dPhiFourierPeak[i]->SetTitleOffset( 2, "Y" );
-        dPhiFourierPeak[i]->GetYaxis(  )->CenterTitle( true );
-        dPhiFourierPeak[i]->GetYaxis(  )->SetTitleSize( 0.03 );
-        dPhiFourierPeak[i]->GetYaxis(  )->SetTitle( "#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} - C_{#lower[-0.3]{ZYAM}}" );
-        dPhiFourierPeak[i]->GetYaxis(  )->SetRangeUser( -0.0004, 0.008 );
-        dPhiFourierPeak[i]->SetTitleOffset( 1.5, "X" );
-        dPhiFourierPeak[i]->GetXaxis(  )->SetTitleSize( 0.035 );
-        dPhiFourierPeak[i]->GetXaxis(  )->CenterTitle( true );
-        dPhiFourierPeak[i]->GetXaxis(  )->SetTitle( "#Delta#phi (radians)" );
+        dPhiFourierPeak_om[i]->SetTitleOffset( 2, "Y" );
+        dPhiFourierPeak_om[i]->GetYaxis(  )->CenterTitle( true );
+        dPhiFourierPeak_om[i]->GetYaxis(  )->SetTitleSize( 0.03 );
+        dPhiFourierPeak_om[i]->GetYaxis(  )->SetTitle( "#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} - C_{#lower[-0.3]{ZYAM}}" );
+        dPhiFourierPeak_om[i]->GetYaxis(  )->SetRangeUser( -0.0004, 0.008 );
+        dPhiFourierPeak_om[i]->SetTitleOffset( 1.5, "X" );
+        dPhiFourierPeak_om[i]->GetXaxis(  )->SetTitleSize( 0.035 );
+        dPhiFourierPeak_om[i]->GetXaxis(  )->CenterTitle( true );
+        dPhiFourierPeak_om[i]->GetXaxis(  )->SetTitle( "#Delta#phi (radians)" );
 
 
         if( publish )
@@ -636,7 +636,7 @@ void OmvnFit(  )
                 ltx2->DrawLatex( 0.7, 0.74, "h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}" );
             }
             //side
-            dPhiSide[i] = new TH1D( Form( "dPhiSide%d",i ), "#Xi - h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
+            dPhiSide_om[i] = new TH1D( Form( "dPhiSide_om%d",i ), "#Xi - h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
             TH2D *hbackgroundSide = (TH2D*) f->Get( Form( "omCorrelation/BackgroundSide_pt%d",i ) );
             TH2D *hsignalSide     = (TH2D*) f->Get( Form( "omCorrelation/SignalSide_pt%d",i ) );
 
@@ -655,29 +655,29 @@ void OmvnFit(  )
         hsHadPhiTot->Add( hsHadPhiOth );
 
         //Divide
-        dPhiSide[i]->Divide( hsPhiTotSide, hbPhiTotSide );
+        dPhiSide_om[i]->Divide( hsPhiTotSide, hbPhiTotSide );
 
         //Clone histograms for display without fit functions
-        dPhiFourierSide[i] = ( TH1D* )dPhiSide[i]->Clone(  );
+        dPhiFourierSide_om[i] = ( TH1D* )dPhiSide_om[i]->Clone(  );
 
-        FourierFitXi[i] = new TF1( Form( "FourierFitXi%d",i ) , FourierHad, -1.5, 5, 4 );
-        FourierFitXi[i]->SetNpx( 250 );
-        FourierFitXi[i]->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
+        FourierFit_om[i] = new TF1( Form( "FourierFit_om%d",i ) , FourierHad, -1.5, 5, 4 );
+        FourierFit_om[i]->SetNpx( 250 );
+        FourierFit_om[i]->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
 
         TCanvas *FourierSide = new TCanvas( "FourierSide", "Fourier Side", 800,800 );
         FourierSide->cd(  );
         gPad->SetTickx(  );
         gPad->SetTicky(  );
-        dPhiFourierSide[i]->Fit( Form( "FourierFitXi%d",i ) );
-        dPhiFourierSide[i]->SetStats( kFALSE );
-        v2values_side.push_back( FourierFitXi[i]->GetParameter( 2 ) );
-        v2errors_side.push_back( FourierFitXi[i]->GetParError( 2 ) );
+        dPhiFourierSide_om[i]->Fit( Form( "FourierFit_om%d",i ) );
+        dPhiFourierSide_om[i]->SetStats( kFALSE );
+        v2values_om_side.push_back( FourierFit_om[i]->GetParameter( 2 ) );
+        v2errors_om_side.push_back( FourierFit_om[i]->GetParError( 2 ) );
         cout << "---------------------------------" << endl;
-        cout << "Side V2 for xi-h is " << FourierFitXi[i]->GetParameter( 2 ) << endl;
+        cout << "Side V2 for xi-h is " << FourierFit_om[i]->GetParameter( 2 ) << endl;
         cout << "---------------------------------" << endl;
 
-        maxBinContent = dPhiFourierSide[i]->GetBinContent( dPhiFourierSide[i]->GetMaximumBin(  ) );
-        minBinContent = dPhiFourierSide[i]->GetBinContent( dPhiFourierSide[i]->GetMinimumBin(  ) );
+        maxBinContent = dPhiFourierSide_om[i]->GetBinContent( dPhiFourierSide_om[i]->GetMaximumBin(  ) );
+        minBinContent = dPhiFourierSide_om[i]->GetBinContent( dPhiFourierSide_om[i]->GetMinimumBin(  ) );
         minRange = minBinContent - 0.005*minBinContent;
         maxRange = minRange + 2*( maxBinContent - minBinContent );
 
@@ -688,21 +688,21 @@ void OmvnFit(  )
 
         gPad->SetTickx(  );
         gPad->SetTicky(  );
-        dPhiSide[i]->SetMarkerStyle( 21 );
-        dPhiSide[i]->SetMarkerColor( 4 );
-        dPhiSide[i]->SetTitleOffset( 2, "Y" );
-        dPhiSide[i]->SetTitle( "Sideband" );
-        dPhiSide[i]->GetYaxis(  )->SetRangeUser( minRange , maxRange );
-        dPhiSide[i]->GetYaxis(  )->SetTitleSize( 0.03 );
-        dPhiSide[i]->GetYaxis(  )->CenterTitle( true );
-        dPhiSide[i]->GetYaxis(  )->SetTitle( "#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} " );
-        dPhiSide[i]->SetTitleOffset( 1.5, "X" );
-        dPhiSide[i]->GetXaxis(  )->SetTitleSize( 0.035 );
-        dPhiSide[i]->GetXaxis(  )->CenterTitle( true );
-        dPhiSide[i]->GetXaxis(  )->SetTitle( "#Delta#phi (radians)" );
-        //dPhiSide[i]->Draw( "E1" );
-        dPhiSide[i]->Fit( "pol2","","", 0.4,2.4 );
-        dPhiSide[i]->SetStats( !publish );
+        dPhiSide_om[i]->SetMarkerStyle( 21 );
+        dPhiSide_om[i]->SetMarkerColor( 4 );
+        dPhiSide_om[i]->SetTitleOffset( 2, "Y" );
+        dPhiSide_om[i]->SetTitle( "Sideband" );
+        dPhiSide_om[i]->GetYaxis(  )->SetRangeUser( minRange , maxRange );
+        dPhiSide_om[i]->GetYaxis(  )->SetTitleSize( 0.03 );
+        dPhiSide_om[i]->GetYaxis(  )->CenterTitle( true );
+        dPhiSide_om[i]->GetYaxis(  )->SetTitle( "#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} " );
+        dPhiSide_om[i]->SetTitleOffset( 1.5, "X" );
+        dPhiSide_om[i]->GetXaxis(  )->SetTitleSize( 0.035 );
+        dPhiSide_om[i]->GetXaxis(  )->CenterTitle( true );
+        dPhiSide_om[i]->GetXaxis(  )->SetTitle( "#Delta#phi (radians)" );
+        //dPhiSide_om[i]->Draw( "E1" );
+        dPhiSide_om[i]->Fit( "pol2","","", 0.4,2.4 );
+        dPhiSide_om[i]->SetStats( !publish );
 
         if( publish )
         {
@@ -731,34 +731,34 @@ void OmvnFit(  )
             //ltx2->DrawLatex( 0.7, 0.74, "#Xi#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}" );
         }
 
-        TF1 *dPhiFitSide = dPhiSide[i]->GetFunction( "pol2" );
+        TF1 *dPhiFitSide = dPhiSide_om[i]->GetFunction( "pol2" );
 
         double dPhiFitMinSide = dPhiFitSide->GetMinimum(  );
 
         for( int j = 1; j < 32; j++ )
         {
-            dPhiFourierSide[i]->AddBinContent( j, -dPhiFitMinSide );
+            dPhiFourierSide_om[i]->AddBinContent( j, -dPhiFitMinSide );
         }
 
 
         FourierSide->cd(  );
-        dPhiFourierSide[i]->SetMarkerStyle( 21 );
-        dPhiFourierSide[i]->SetMarkerColor( 4 );
-        //dPhiFourierSide[i]->Draw( "E1" );
-        dPhiFourierSide[i]->SetStats( kFALSE );
-        dPhiFourierSide[i]->Fit( Form( "FourierFitXi%d",i ) );
+        dPhiFourierSide_om[i]->SetMarkerStyle( 21 );
+        dPhiFourierSide_om[i]->SetMarkerColor( 4 );
+        //dPhiFourierSide_om[i]->Draw( "E1" );
+        dPhiFourierSide_om[i]->SetStats( kFALSE );
+        dPhiFourierSide_om[i]->Fit( Form( "FourierFit_om%d",i ) );
         os << "SideBand " << PtBin[i] << "_Pt_" << PtBin[i+1];
-        dPhiFourierSide[i]->SetTitle( os.str(  ).c_str(  ) );
+        dPhiFourierSide_om[i]->SetTitle( os.str(  ).c_str(  ) );
         os.str( std::string(  ) );
-        dPhiFourierSide[i]->SetTitleOffset( 2, "Y" );
-        dPhiFourierSide[i]->GetYaxis(  )->CenterTitle( true );
-        dPhiFourierSide[i]->GetYaxis(  )->SetTitleSize( 0.03 );
-        dPhiFourierSide[i]->GetYaxis(  )->SetTitle( "#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} - C_{#lower[-0.3]{ZYAM}}" );
-        dPhiFourierSide[i]->GetYaxis(  )->SetRangeUser( -0.0004, 0.008 );
-        dPhiFourierSide[i]->SetTitleOffset( 1.5, "X" );
-        dPhiFourierSide[i]->GetXaxis(  )->SetTitleSize( 0.035 );
-        dPhiFourierSide[i]->GetXaxis(  )->CenterTitle( true );
-        dPhiFourierSide[i]->GetXaxis(  )->SetTitle( "#Delta#phi (radians)" );
+        dPhiFourierSide_om[i]->SetTitleOffset( 2, "Y" );
+        dPhiFourierSide_om[i]->GetYaxis(  )->CenterTitle( true );
+        dPhiFourierSide_om[i]->GetYaxis(  )->SetTitleSize( 0.03 );
+        dPhiFourierSide_om[i]->GetYaxis(  )->SetTitle( "#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} - C_{#lower[-0.3]{ZYAM}}" );
+        dPhiFourierSide_om[i]->GetYaxis(  )->SetRangeUser( -0.0004, 0.008 );
+        dPhiFourierSide_om[i]->SetTitleOffset( 1.5, "X" );
+        dPhiFourierSide_om[i]->GetXaxis(  )->SetTitleSize( 0.035 );
+        dPhiFourierSide_om[i]->GetXaxis(  )->CenterTitle( true );
+        dPhiFourierSide_om[i]->GetXaxis(  )->SetTitle( "#Delta#phi (radians)" );
 
         if( publish )
         {
@@ -772,16 +772,16 @@ void OmvnFit(  )
 
     }
 
-    OutputVnValues(2,"Peak","Om",v2values_peak,PtBin,Xiv2PeakName);
-    OutputVnErrors(2,"Peak","Om",v2errors_peak,PtBin,Xiv2PeakName);
+    OutputVnValues(2,"Peak","Om",v2values_om_peak,PtBin,Xiv2PeakName);
+    OutputVnErrors(2,"Peak","Om",v2errors_om_peak,PtBin,Xiv2PeakName);
 
-    OutputVnValues(2,"Side","Om",v2values_side,PtBin,Xiv2SideName);
-    OutputVnErrors(2,"Side","Om",v2errors_side,PtBin,Xiv2SideName);
+    OutputVnValues(2,"Side","Om",v2values_om_side,PtBin,Xiv2SideName);
+    OutputVnErrors(2,"Side","Om",v2errors_om_side,PtBin,Xiv2SideName);
 
     //Calculate Flow
-    vnCalculate(2,"Om",v2values_peak,v2errors_peak,v2values_side,v2errors_side,v2value_h,v2error_h,fsig_xi,Xiv2CalculatorName);
+    vnCalculate(2,"Om",v2values_om_peak,v2errors_om_peak,v2values_om_side,v2errors_om_side,v2value_h,v2error_h,fsig_xi,Xiv2CalculatorName);
 
-    std::map<std::string, std::vector<double> > results_om = vnCalculateMap(2,"Omega",v2values_peak,v2errors_peak,v2values_side,v2errors_side,v2value_h,v2error_h,fsig_xi);
+    std::map<std::string, std::vector<double> > results_om = vnCalculateMap(2,"Omega",v2values_om_peak,v2errors_om_peak,v2values_om_side,v2errors_om_side,v2value_h,v2error_h,fsig_xi);
 
     cout<< "1" << endl;
 
@@ -801,7 +801,7 @@ void OmvnFit(  )
         FourierPeakComp->cd( i+1 );
         gPad->SetTickx(  );
         gPad->SetTicky(  );
-        dPhiFourierPeak[i+1]->Draw( "E1" );
+        dPhiFourierPeak_om[i+1]->Draw( "E1" );
     }
     TCanvas* FourierSideComp = new TCanvas( "FourierSideComp", "Fourier Side Composite", 1200,1000 );
     FourierSideComp->Divide( 3,3 );
@@ -809,7 +809,7 @@ void OmvnFit(  )
         FourierSideComp->cd( i+1 );
         gPad->SetTickx(  );
         gPad->SetTicky(  );
-        dPhiFourierSide[i+1]->Draw( "E1" );
+        dPhiFourierSide_om[i+1]->Draw( "E1" );
     }
 
     //Output Publication plots
@@ -819,7 +819,7 @@ void OmvnFit(  )
         PubFourier->cd(  );
         gPad->SetTickx(  );
         gPad->SetTicky(  );
-        TH1D* dPhiFourierPeakCopy = ( TH1D* )dPhiFourierPeak[4]->Clone(  );
+        TH1D* dPhiFourierPeakCopy = ( TH1D* )dPhiFourierPeak_om[4]->Clone(  );
         dPhiFourierPeakCopy->SetTitle( "Peak" );
         dPhiFourierPeakCopy->Draw( "E1" );
 
@@ -843,7 +843,7 @@ void OmvnFit(  )
         PubFourier->cd(  );
         gPad->SetTickx(  );
         gPad->SetTicky(  );
-        TH1D* dPhiFourierSideCopy = ( TH1D* )dPhiFourierSide[4]->Clone(  );
+        TH1D* dPhiFourierSideCopy = ( TH1D* )dPhiFourierSide_om[4]->Clone(  );
         dPhiFourierSideCopy->SetTitle( "SideBand" );
         dPhiFourierSideCopy->Draw( "E1" );
 

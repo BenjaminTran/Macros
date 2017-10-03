@@ -87,18 +87,18 @@ void V0MassFit()
     //File Creation
     myfile.open("V0PeakParam.txt");
     //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Ksla/kslaMassPtJL1.root");
-    //TFile* file_ks = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Composites/V0CasMassPtPD11_16.root");
-    TFile* file_ks = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/All/MCMassPtTotal_08_23_2017.root"); //Gen
-    //TFile* file_la = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/La/LaMassPtPD1_6JL17_22.root");
-    TFile* file_la = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/All/MCMassPtTotal_08_23_2017.root"); //Gen
+    TFile* file_ks = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Composites/V0CasMassPtPD11_16.root");
+    TFile* file_la = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/La/LaMassPtPD1_6JL17_22.root");
+    //TFile* file_ks = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/All/MCMassPtTotal_08_23_2017.root"); //Gen
+    //TFile* file_la = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/All/MCMassPtTotal_08_23_2017.root"); //Gen
 
 
-    //MassKs = (TH2D*)file_ks->Get("MassPt/KsMassPt");
-    //MassLa = (TH2D*)file_la->Get("LaMassPt/LaMassPt");
+    MassKs = (TH2D*)file_ks->Get("MassPt/KsMassPt");
+    MassLa = (TH2D*)file_la->Get("LaMassPt/LaMassPt");
     MassKs3D = (TH3D*)file_ks->Get("MassPtRapidityMC/KsMassPtRap");
     MassLa3D = (TH3D*)file_la->Get("MassPtRapidityMC/LaMassPtRap");
-    MassKs = (TH2D*)MassKs3D->Project3D("yx");
-    MassLa = (TH2D*)MassLa3D->Project3D("yx");
+    //MassKs = (TH2D*)MassKs3D->Project3D("yx"); //For Gen
+    //MassLa = (TH2D*)MassLa3D->Project3D("yx"); //For Gen
 
     //Fit
     int pkscounter  = 0; //for correct bin counting

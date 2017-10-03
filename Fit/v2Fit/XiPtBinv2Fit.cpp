@@ -379,7 +379,7 @@ void Xiv2Fit(  )
     TH1D* dPhiPeak[numPtBins];
     TH1D* dPhiSide[numPtBins];
 
-    TF1* FourierFitXi[numPtBins];
+    TF1* FourierFit_xi[numPtBins];
     std::vector<double> v2values_peak;
     std::vector<double> v2values_side;
     std::vector<double> v2errors_peak;
@@ -461,21 +461,21 @@ void Xiv2Fit(  )
             dPhiFourierPeak[i] = ( TH1D* )dPhiPeak[i]->Clone(  );
             TH1D* dPhiHadFourier = ( TH1D* )dPhiHad->Clone(  );
 
-            FourierFitXi[i] = new TF1( Form( "FourierFitXi%d",i ), FourierHad, -1.5, 5, 4 );
-            FourierFitXi[i]->SetNpx( 250 );
-            FourierFitXi[i]->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
+            FourierFit_xi[i] = new TF1( Form( "FourierFit_xi%d",i ), FourierHad, -1.5, 5, 4 );
+            FourierFit_xi[i]->SetNpx( 250 );
+            FourierFit_xi[i]->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
 
             TCanvas *FourierPeak = new TCanvas( "FourierPeak", "Fourier Peak", 800,800 );
             FourierPeak->cd(  );
             gPad->SetTickx(  );
             gPad->SetTicky(  );
-            //dPhiFourierPeak->Fit( "FourierFitXi","","",0,PI );
-            dPhiFourierPeak[i]->Fit( Form( "FourierFitXi%d",i ) );
+            //dPhiFourierPeak->Fit( "FourierFit_xi","","",0,PI );
+            dPhiFourierPeak[i]->Fit( Form( "FourierFit_xi%d",i ) );
             dPhiFourierPeak[i]->SetStats( kFALSE );
-            v2values_peak.push_back( FourierFitXi[i]->GetParameter( 2 ) );
-            v2errors_peak.push_back( FourierFitXi[i]->GetParError( 2 ) );
+            v2values_peak.push_back( FourierFit_xi[i]->GetParameter( 2 ) );
+            v2errors_peak.push_back( FourierFit_xi[i]->GetParError( 2 ) );
             cout << "---------------------------------" << endl;
-            cout << "Peak V2 for xi-h is " << FourierFitXi[i]->GetParameter( 2 ) << endl;
+            cout << "Peak V2 for xi-h is " << FourierFit_xi[i]->GetParameter( 2 ) << endl;
             cout << "---------------------------------" << endl;
 
             TF1 *FourierFitHad = new TF1( "FourierFitHad", FourierHad, -1.5, 5, 4 );
@@ -607,7 +607,7 @@ void Xiv2Fit(  )
             dPhiFourierPeak[i]->SetMarkerColor( 4 );
             //dPhiFourierPeak[i]->Draw( "E1" );
             dPhiFourierPeak[i]->SetStats( kFALSE );
-            dPhiFourierPeak[i]->Fit( Form( "FourierFitXi%d",i ) );
+            dPhiFourierPeak[i]->Fit( Form( "FourierFit_xi%d",i ) );
             os << "Peak " << PtBin[i] << "_Pt_" << PtBin[i+1];
             dPhiFourierPeak[i]->SetTitle( os.str(  ).c_str(  ) );
             os.str( std::string(  ) );
@@ -683,20 +683,20 @@ void Xiv2Fit(  )
             //Clone histograms for display without fit functions
             dPhiFourierSide[i] = ( TH1D* )dPhiSide[i]->Clone(  );
 
-            FourierFitXi[i] = new TF1( Form( "FourierFitXi%d",i ) , FourierHad, -1.5, 5, 4 );
-            FourierFitXi[i]->SetNpx( 250 );
-            FourierFitXi[i]->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
+            FourierFit_xi[i] = new TF1( Form( "FourierFit_xi%d",i ) , FourierHad, -1.5, 5, 4 );
+            FourierFit_xi[i]->SetNpx( 250 );
+            FourierFit_xi[i]->SetParNames( "Scale", "V_{1}", "V_{2}", "V_{3}" );
 
             TCanvas *FourierSide = new TCanvas( "FourierSide", "Fourier Side", 800,800 );
             FourierSide->cd(  );
             gPad->SetTickx(  );
             gPad->SetTicky(  );
-            dPhiFourierSide[i]->Fit( Form( "FourierFitXi%d",i ) );
+            dPhiFourierSide[i]->Fit( Form( "FourierFit_xi%d",i ) );
             dPhiFourierSide[i]->SetStats( kFALSE );
-            v2values_side.push_back( FourierFitXi[i]->GetParameter( 2 ) );
-            v2errors_side.push_back( FourierFitXi[i]->GetParError( 2 ) );
+            v2values_side.push_back( FourierFit_xi[i]->GetParameter( 2 ) );
+            v2errors_side.push_back( FourierFit_xi[i]->GetParError( 2 ) );
             cout << "---------------------------------" << endl;
-            cout << "Side V2 for xi-h is " << FourierFitXi[i]->GetParameter( 2 ) << endl;
+            cout << "Side V2 for xi-h is " << FourierFit_xi[i]->GetParameter( 2 ) << endl;
             cout << "---------------------------------" << endl;
 
             maxBinContent = dPhiFourierSide[i]->GetBinContent( dPhiFourierSide[i]->GetMaximumBin(  ) );
@@ -769,7 +769,7 @@ void Xiv2Fit(  )
             dPhiFourierSide[i]->SetMarkerColor( 4 );
             //dPhiFourierSide[i]->Draw( "E1" );
             dPhiFourierSide[i]->SetStats( kFALSE );
-            dPhiFourierSide[i]->Fit( Form( "FourierFitXi%d",i ) );
+            dPhiFourierSide[i]->Fit( Form( "FourierFit_xi%d",i ) );
             os << "SideBand " << PtBin[i] << "_Pt_" << PtBin[i+1];
             dPhiFourierSide[i]->SetTitle( os.str(  ).c_str(  ) );
             os.str( std::string(  ) );
