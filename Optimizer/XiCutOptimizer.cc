@@ -61,100 +61,308 @@ bool CheckValue(ROOT::Internal::TTreeReaderValueBase& value) {
    return true;
 }
 
-bool XiCutOptimizer(std::string name)
+void WriteVector(std::vector<float> cutVector, std::ofstream &myfile, std::string name){
+    myfile << name << ": ";
+    for(std::vector<float>::iterator it=cutVector.begin(); it!=cutVector.end(); it++){
+        myfile << *it << ", ";
+    }
+    myfile << "\n";
+}
+
+TTreeReaderValue<float> SetValues(TTreeReader& reader, std::string branchName ){
+    TTreeReaderValue<float> ReaderValue(reader, branchName.c_str());
+    return ReaderValue;
+}
+
+bool SparseCreatorOmXi(std::string name = "Test", std::string PID = "Omega")
 {
     //Initializers
     bool Cut = false;
     TH1::SetDefaultSumw2();
+    std::ofstream myfile;
+    std::string txtname = name + ".txt";
+    myfile.open(txtname.c_str());
 
     //Cut parameters to be varied. The commented elements are Hong's cuts to make a plot of them remember to change the numparam value as well
-    int numCuts = 6;
-    std::vector<float> om_om3dipsig     = {2.6 , 2.8 , 3.0 , 3.2 , 3.3  , 3.4 , 3.5};//3.0 };//  , 2.5};
-    std::vector<float> om_omKaon3dipsig = {3.5 , 3.6 , 3.7 , 3.8 , 4.0  , 4.2 , 4.4};//4.0 };// , 5.0};
-    std::vector<float> om_vtrkpi3dipsig = {2.5 , 2.6 , 2.7 , 2.8 , 3.0  , 3.2 , 3.4};//3.0 };//  , 4.0};
-    std::vector<float> om_vtrkp3dipsig  = {1.5 , 1.6 , 1.7 , 1.8 , 2.0  , 2.2 , 2.4};//2.0 };//  , 3.0};
-    std::vector<float> om_omflightsig   = {1.5 , 1.6 , 1.7 , 1.8 , 2.0  , 2.2 , 2.4};//2.0 };//  , 3.0};
-    std::vector<float> om_distancesig   = {5.0 , 6.0 , 7.0 , 8.0 , 10.0 , 12. , 14.};//10.0};//  , 12.0};
+    std::vector<float> VvarBins_pt            = {1.0,1.5,1.8,2.2,2.8,3.6,4.6,6.0,7.2,10.0};
+    std::vector<float> VvarBins_eta           = {-2.4,-2.0,-1.5,-1.0,-0.5,0,0.5,1.0,1.5,2.0,2.4};
+
+    std::vector<float> Vcas3dipsig;
+    std::vector<float> VBat3dipsig;
+    std::vector<float> Vvtrkpi3dipsig;
+    std::vector<float> Vvtrkp3dipsig;
+    std::vector<float> Vflightsig;
+    std::vector<float> Vdistancesig;
+
+    if(PID == "Omega")
+    {
+        Vcas3dipsig.insert(Vcas3dipsig.begin(),{2.0, 3.0 , 3.4  , 3.6 , 3.8  , 4.0 , 4.2 , 4.5 , 5.0});
+        VBat3dipsig.insert(VBat3dipsig.begin(),{3.0 , 3.4  , 3.8 , 4.0  , 4.2 , 4.4 , 4.8 , 5.0 , 5.2});
+        Vvtrkpi3dipsig.insert(Vvtrkpi3dipsig.begin(),{3.0 , 3.2  , 3.5 , 3.8  , 4.0 , 4.5 , 5.0 , 5.5 , 6.0});
+        Vvtrkp3dipsig.insert(Vvtrkp3dipsig.begin(),{2.0 , 2.2  , 2.5 , 2.8  , 4.0 , 4.5 , 5.0 , 5.5 , 6.0});
+        Vflightsig.insert(Vflightsig.begin(),{1.5 , 2.0  , 2.5 , 3.0  , 3.5 , 4.0 , 4.5 , 5.0 , 5.5});
+        Vdistancesig.insert(Vdistancesig.begin(),{10. , 10.5 , 11  , 11.5 , 12. , 13  , 14  , 15  , 16  });
+    }
+    else
+    {
+        Vcas3dipsig.insert(Vcas3dipsig.begin(),{2.0, 3.0 , 3.4  , 3.6 , 3.8  , 4.0 , 4.2 , 4.5 , 5.0});
+        VBat3dipsig.insert(VBat3dipsig.begin(),{3.0 , 3.4  , 3.8 , 4.0  , 4.2 , 4.4 , 4.8 , 5.0 , 5.2});
+        Vvtrkpi3dipsig.insert(Vvtrkpi3dipsig.begin(),{3.0 , 3.2  , 3.5 , 3.8  , 4.0 , 4.5 , 5.0 , 5.5 , 6.0});
+        Vvtrkp3dipsig.insert(Vvtrkp3dipsig.begin(),{2.0 , 2.2  , 2.5 , 2.8  , 4.0 , 4.5 , 5.0 , 5.5 , 6.0});
+        Vflightsig.insert(Vflightsig.begin(),{1.5 , 2.0  , 2.5 , 3.0  , 3.5 , 4.0 , 4.5 , 5.0 , 5.5});
+        Vdistancesig.insert(Vdistancesig.begin(),{10. , 10.5 , 11  , 11.5 , 12. , 13  , 14  , 15  , 16  });
+    }
+
+    //std::vector<float> Vcas3dipsig    = {2.4 , 2.5 , 2.7 , 3.0 , 3.2  , 3.4 , 3.6};//3.0 };// , 2.5};
+    //std::vector<float> VBat3dipsig    = {4.0 , 4.2 , 4.4 , 4.6 , 4.8 , 5.0 , 5.2};//4.0 };// , 5.0};
+    //std::vector<float> Vvtrkpi3dipsig = {3.0 , 3.2 , 3.4  , 3.6 , 3.8 , 4.0 ,4.2};//3.0 };// , 4.0};
+    //std::vector<float> Vvtrkp3dipsig  = {2.0 , 2.2 , 2.4  , 2.6 , 2.8 , 3.0, 3.2};//2.0 };// , 3.0};
+    //std::vector<float> Vflightsig     = {2.0 , 2.2 , 2.4  , 2.6 , 2.8 , 3.0 ,3.2};//2.0 };// , 3.0};
+    //std::vector<float> Vdistancesig   = {5. , 6. , 7.0 , 8.0 , 10.0 , 12.0 ,14.0};//10.0};// , 12.0};
+
+
 
     double misIDMass = 0.015;
     double rapidity = 1.0;
     double etacut = 2.4;
     int multHigh_ = 250;
-    int numparam = om_om3dipsig.size();
+    int numparam = Vcas3dipsig.size();
     const int nDim = 9;
     // mass, pt, eta, then cuts
     //These are for eta cut
-    //std::vector<int> nBins = {150,9,10,static_cast<int>(om_om3dipsig.size()),static_cast<int>(om_omKaon3dipsig.size()),static_cast<int>(om_vtrkpi3dipsig.size()),static_cast<int>(om_vtrkp3dipsig.size()),static_cast<int>(om_omflightsig.size()),static_cast<int>(om_distancesig.size())};
-    std::vector<int> nBins = {150,9,10,static_cast<int>(om_om3dipsig.size()-1),static_cast<int>(om_omKaon3dipsig.size()-1),static_cast<int>(om_vtrkpi3dipsig.size()-1),static_cast<int>(om_vtrkp3dipsig.size()-1),static_cast<int>(om_omflightsig.size()-1),static_cast<int>(om_distancesig.size()-1)};
-    //int nBins[nDim] = {150,9,10,(int)om_om3dipsig.size()+1,(int)om_omKaon3dipsig.size()+1,(int)om_vtrkpi3dipsig.size()+1,(int)om_vtrkp3dipsig.size()+1,(int)om_omflightsig.size()+1,(int)om_distancesig.size()+1};
-    //int nBins[nDim] = {150,9,10,7,7,7,7,7,7};
-    //double minbins[nDim] = {1.6  , 1.0 , -2.4 , 0                   , 3.5   , 2.5   , 1.5   , 1.5   , 5.0};
-    double minbins[nDim] = {1.6  , 1.0 , -2.4 , 0                   , 3.5   , 2.5   , 1.5   , 1.5   , 5.0};
-    double maxbins[nDim] = {1.75 , 10  , 2.4  , om_om3dipsig.back() , om_omKaon3dipsig.back() , om_vtrkpi3dipsig.back() , om_vtrkp3dipsig.back() , om_omflightsig.back() , om_distancesig.back()};
-    //double maxbins[nDim] = {1.75 , 10  , 2.4  , 3.5 , 99999 , 99999 , 99999 , 99999 , 99999};
+    std::vector<int> nBins = {150,9,10,static_cast<int>(Vcas3dipsig.size()),static_cast<int>(VBat3dipsig.size()),static_cast<int>(Vvtrkpi3dipsig.size()),static_cast<int>(Vvtrkp3dipsig.size()),static_cast<int>(Vflightsig.size()),static_cast<int>(Vdistancesig.size())};
+    std::vector<double> minbins;
+    std::vector<double> maxbins;
+
+    //Omega
+    if(PID == "Omega")
+    {
+        minbins.insert(minbins.begin(),{1.6 ,1.0,-2.4,0                 ,3.5               ,2.5                  ,1.5                 ,1.5              ,5.0});
+        maxbins.insert(maxbins.begin(),{1.75,10 ,2.4 ,Vcas3dipsig.back(),VBat3dipsig.back(),Vvtrkpi3dipsig.back(),Vvtrkp3dipsig.back(),Vflightsig.back(),Vdistancesig.back()});
+    }
+    else
+    {
+        minbins.insert(minbins.begin(),{1.25 , 1.0 , -2.4 , 0                  , VBat3dipsig.front() , Vvtrkpi3dipsig.front() , Vvtrkp3dipsig.front() , Vflightsig.front() , Vdistancesig.front()});
+        maxbins.insert(maxbins.begin(),{1.40 , 10  , 2.4  , Vcas3dipsig.back() , 99999               , 99999                  , 99999                 , 99999              , 99999});
+    }
+    //Xi
 
 //These are for rap cut
-    //int nBins[nDim] = {150,9,12,om_om3dipsig.size()+1,om_omKaon3dipsig.size()+1,om_vtrkpi3dipsig.size()+1,om_vtrkp3dipsig.size()+1,om_omflightsig.size()+1,om_distancesig.size()+1};
+    //int nBins[nDim] = {150,9,12,Vcas3dipsig.size()+1,VBat3dipsig.size()+1,Vvtrkpi3dipsig.size()+1,Vvtrkp3dipsig.size()+1,Vflightsig.size()+1,Vdistancesig.size()+1};
 //These are for eta cut
     //float minbins[nDim] = {1.6  , 1.0 , -5 , 0                   , 3.5   , 2.5   , 1.5   , 1.5   , 5.0};
-    //float maxbins[nDim] = {1.75 , 10  , 5  , om_om3dipsig.back() , 99999 , 99999 , 99999 , 99999 , 99999};
+    //float maxbins[nDim] = {1.75 , 10  , 5  , Vcas3dipsig.back() , 99999 , 99999 , 99999 , 99999 , 99999};
 
 
     //Now make variable sized bins for everything besides mass
-    std::vector<double> VvarBins_pt            = {1.0,1.5,1.8,2.2,2.8,3.6,4.6,6.0,7.2,10.0};
-    std::vector<double> VvarBins_eta           = {-2.4,-2.0,-1.5,-1.0,-0.5,0,0.5,1.0,1.5,2.0,2.4};
-    //std::vector<double> VvarBins_om3dipsig     = {0   , 2.59999 , 2.79999 , 2.99999 , 3.199999  , 3.299999 , 3.399999 , 3.499999};
-    //std::vector<double> VvarBins_omKaon3dipsig = {3.5 , 3.60001 , 3.70001 , 3.80001 , 4.000001  , 4.200001 , 4.400001 , 99999};
-    //std::vector<double> VvarBins_vtrkpi3dipsig = {2.5 , 2.60001 , 2.70001 , 2.80001 , 3.000001  , 3.200001 , 3.400001 , 99999};
-    //std::vector<double> VvarBins_vtrkp3dipsig  = {1.5 , 1.60001 , 1.70001 , 1.80001 , 2.000001  , 2.200001 , 2.400001 , 99999};
-    //std::vector<double> VvarBins_omflightsig   = {1.5 , 1.60001 , 1.70001 , 1.80001 , 2.000001  , 2.200001 , 2.400001 , 99999};
-    //std::vector<double> VvarBins_distancesig   = {5.0 , 6.00001 , 7.00001 , 8.00001 , 10.00001 , 12.00001 , 14.00001 , 99999};
-
-    std::vector<double> VvarBins_om3dipsig     = {2.6 , 2.8 , 3.0 , 3.2  , 3.3 , 3.4 , 3.5};
-    std::vector<double> VvarBins_omKaon3dipsig = {3.5 , 3.6 , 3.7 , 3.8 , 4.0  , 4.2 , 4.4};
-    std::vector<double> VvarBins_vtrkpi3dipsig = {2.5 , 2.6 , 2.7 , 2.8 , 3.0  , 3.2 , 3.4};
-    std::vector<double> VvarBins_vtrkp3dipsig  = {1.5 , 1.6 , 1.7 , 1.8 , 2.0  , 2.2 , 2.4};
-    std::vector<double> VvarBins_omflightsig   = {1.5 , 1.6 , 1.7 , 1.8 , 2.0  , 2.2 , 2.4};
-    std::vector<double> VvarBins_distancesig   = {5.0 , 6.0 , 7.0 , 8.0 , 10.0 , 12. , 14.};
+    // Insert the maximum to cut parameters
+    Vcas3dipsig.insert(Vcas3dipsig.begin(),0);
+    VBat3dipsig.push_back(99999);
+    Vvtrkpi3dipsig.push_back(99999);
+    Vvtrkp3dipsig.push_back(99999);
+    Vflightsig.push_back(99999);
+    Vdistancesig.push_back(99999);
 
 
+    WriteVector(VvarBins_pt,myfile,"Pt");
+    WriteVector(VvarBins_eta,myfile,"Eta");
 
-    //for(int i=0; i<nBins[3]; i++){
-        //if(i==0) VvarBins_om3dipsig.push_back(0);
-        //else{
-            //VvarBins_om3dipsig.push_back(om_om3dipsig[i-1]);
-        //}
-    //}
-    //for(int i=0; i<nBins[4]; i++){
-        //if(i==nBins[4]-1) VvarBins_omKaon3dipsig.push_back(99999);
-        //else{
-            //VvarBins_omKaon3dipsig.push_back(om_omKaon3dipsig[i]);
-        //}
-    //}
-    //for(int i=0; i<nBins[5]; i++){
-        //if(i==nBins[5]-1) VvarBins_vtrkpi3dipsig.push_back(99999);
-        //else{
-            //VvarBins_vtrkpi3dipsig.push_back(om_vtrkpi3dipsig[i]);
-        //}
-    //}
-    //for(int i=0; i<nBins[6]; i++){
-        //if(i==nBins[6]-1) VvarBins_vtrkp3dipsig.push_back(99999);
-        //else{
-            //VvarBins_vtrkp3dipsig.push_back(om_vtrkp3dipsig[i]);
-        //}
-    //}
-    //for(int i=0; i<nBins[7]; i++){
-        //if(i==nBins[7]-1) VvarBins_omflightsig.push_back(99999);
-        //else{
-            //VvarBins_omflightsig.push_back(om_omflightsig[i]);
-        //}
-    //}
-    //for(int i=0; i<nBins[8]; i++){
-        //if(i==nBins[8]-1) VvarBins_distancesig.push_back(99999);
-        //else{
-            //VvarBins_distancesig.push_back(om_distancesig[i]);
-        //}
-    //}
+    if(PID == "Omega")
+    {
+        WriteVector(Vcas3dipsig,myfile,"Om DCA");
+        WriteVector(VBat3dipsig,myfile,"Bat DCA");
+        WriteVector(Vvtrkpi3dipsig,myfile,"Pi DCA");
+        WriteVector(Vvtrkp3dipsig,myfile,"Pr DCA");
+        WriteVector(Vflightsig,myfile,"Om DLS");
+        WriteVector(Vdistancesig,myfile,"La DLS");
+    }
+    else
+    {
+        WriteVector(Vcas3dipsig,myfile,"Xi DCA");
+        WriteVector(VBat3dipsig,myfile,"Bat DCA");
+        WriteVector(Vvtrkpi3dipsig,myfile,"Pi DCA");
+        WriteVector(Vvtrkp3dipsig,myfile,"Pr DCA");
+        WriteVector(Vflightsig,myfile,"Xi DLS");
+        WriteVector(Vdistancesig,myfile,"La DLS");
+    }
+
+    THnSparseF* h = new THnSparseF("hSparse","Cuts",nDim,&nBins[0],&minbins[0],&maxbins[0]);
+
+    h->GetAxis(0)->SetName("Mass");
+    h->GetAxis(1)->SetName("Pt");
+    h->GetAxis(2)->SetName("Eta");
+    h->GetAxis(3)->SetName("CasDCA");
+    h->GetAxis(4)->SetName("BatDCA");
+    h->GetAxis(5)->SetName("LamPiDCA");
+    h->GetAxis(6)->SetName("LamProDCA");
+    h->GetAxis(7)->SetName("CasDLS");
+    h->GetAxis(8)->SetName("LamDLS");
+
+    cout << "1" << endl;
+    h->GetAxis(1)->Set(nBins[1],&VvarBins_pt[0]);
+    cout << "2" << endl;
+    h->GetAxis(2)->Set(nBins[2],&VvarBins_eta[0]);
+    cout << "3" << endl;
+    h->GetAxis(3)->Set(nBins[3],&Vcas3dipsig[0]);
+    cout << "4" << endl;
+    h->GetAxis(4)->Set(nBins[4],&VBat3dipsig[0]);
+    cout << "5" << endl;
+    h->GetAxis(5)->Set(nBins[5],&Vvtrkpi3dipsig[0]);
+    cout << "6" << endl;
+    h->GetAxis(6)->Set(nBins[6],&Vvtrkp3dipsig[0]);
+    cout << "7" << endl;
+    h->GetAxis(7)->Set(nBins[7],&Vflightsig[0]);
+    cout << "8" << endl;
+    h->GetAxis(8)->Set(nBins[8],&Vdistancesig[0]);
+
+
+
+    //Containers
+
+
+    //Tree setup
+    //TFile* f1=TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/Trees/All/V0CasTree_09_14_17.root");
+    TFile* f1=TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/Trees/All/V0CasTreePbPb_Production_10_02_17.root");
+
+    TTreeReader reader("OmTreeProducerRapidityPbPb/OmTree",f1);
+    //TTreeReader reader("XiTreeProducerRapidityPbPb/XiTree",f1);
+
+    //Omega
+    TTreeReaderValue<float> cas3dipsig;
+    TTreeReaderValue<float> rap;
+    TTreeReaderValue<float> eta;
+    TTreeReaderValue<float> pt;
+    TTreeReaderValue<float> mass;
+    TTreeReaderValue<float> distancesig;
+    TTreeReaderValue<float> flightsig;
+    TTreeReaderValue<float> vtrkp3dipsig;
+    TTreeReaderValue<float> vtrkpi3dipsig;
+    TTreeReaderValue<float> bat3dipsig;
+
+    if(PID == "Omega")
+    {
+        cas3dipsig    = SetValues(reader,"om3dipsig.om3dipsig");
+        bat3dipsig    = SetValues(reader,"omKaon3dipsig.omKaon3dipsig");
+        vtrkpi3dipsig = SetValues(reader,"vtrkpi3dipsig.vtrkpi3dipsig");
+        vtrkp3dipsig  = SetValues(reader,"vtrkp3dipsig.vtrkp3dipsigpt");
+        flightsig     = SetValues(reader,"omflightsig.omflightsig");
+        distancesig   = SetValues(reader,"distancesig.distancesig");
+        mass          = SetValues(reader,"mass.mass");
+        pt            = SetValues(reader,"pt.pt");
+        eta           = SetValues(reader,"eta.eta");
+        rap           = SetValues(reader,"rapidity.rapidity");
+    }
+    else
+    {
+        cas3dipsig    = SetValues(reader,"xi3dipsig.xi3dipsig");
+        bat3dipsig    = SetValues(reader,"xipi3dipsig.xipi3dipsig");
+        vtrkpi3dipsig = SetValues(reader,"vtrkpi3dipsig.vtrkpi3dipsig");
+        vtrkp3dipsig  = SetValues(reader,"vtrkp3dipsig.vtrkp3dipsigpt");
+        flightsig     = SetValues(reader,"xiflightsig.xiflightsig");
+        distancesig   = SetValues(reader,"distancesig.distancesig");
+        mass          = SetValues(reader,"mass.mass");
+        pt            = SetValues(reader,"pt.pt");
+        eta           = SetValues(reader,"eta.eta");
+        rap           = SetValues(reader,"rapidity.rapidity");
+    }
+
+
+    reader.SetEntriesRange(0,10);
+    while(reader.Next())
+    {
+        if(!CheckValue(cas3dipsig))     return false;
+        if(!CheckValue(bat3dipsig)) return false;
+        if(!CheckValue(vtrkpi3dipsig)) return false;
+        if(!CheckValue(vtrkp3dipsig))  return false;
+        if(!CheckValue(flightsig))   return false;
+        if(!CheckValue(distancesig))   return false;
+        if(!CheckValue(mass))          return false;
+        if(!CheckValue(pt))            return false;
+        if(!CheckValue(eta))           return false;
+
+        double value[nDim] = {*mass,*pt,*eta,*cas3dipsig,*bat3dipsig,*vtrkpi3dipsig,*vtrkp3dipsig,*flightsig,*distancesig};
+        h->Fill(value);
+    }
+
+    f1->Close();
+
+    //Output file creation
+    std::string filetype = ".root";
+    name += filetype;
+    TFile out(name.c_str(),"RECREATE");
+    cout << name.c_str() << " created!" << endl;
+
+    h->Write();
+    out.Close();
+    return true;
+}
+
+
+/*
+bool LaSparseCreator(std::string name)
+{
+    //Initializers
+    TH1::SetDefaultSumw2();
+    std::ofstream myfile;
+    std::string txtname = name + ".txt";
+    myfile.open(txtname.c_str());
+
+    //Cut parameters to be varied. The commented elements are Hong's cuts to make a plot of them remember to change the numparam value as well
+    std::vector<float> VvarBins_pt            = {0.8,1.0,1.4,1.8,2.2,2.8,3.6,4.6,6.0,7.0,8.5,10.0};
+    std::vector<float> VvarBins_eta           = {-2.4,-2.0,-1.5,-1.0,-0.5,0,0.5,1.0,1.5,2.0,2.4};
+
+    std::vector<float> vdca = {0.9   , 1.0   , 1.2    , 1.3    , 1.4    , 1.5    , 1.6     , 1.7};
+    std::vector<float> vdls = {4     , 5     , 6      , 7      , 8      , 9      , 10      , 11};
+    std::vector<float> vagl = {0.998 , 0.999 , 0.9992 , 0.9995 , 0.9998 , 0.9999 , 0.99995 , 0.99999};
+
+    int numparam = vdca.size();
+    const int nDim = 6;
+    // mass, pt, eta, then cuts
+    //These are for eta cut
+    //Lambda
+    std::vector<int> nBins = {160,13,10,static_cast<int>(Vcas3dipsig.size()),static_cast<int>(VBat3dipsig.size()),static_cast<int>(Vvtrkpi3dipsig.size()),static_cast<int>(Vvtrkp3dipsig.size()),static_cast<int>(Vflightsig.size()),static_cast<int>(Vdistancesig.size())};
+    //Omega
+    //double minbins[nDim] = {1.6  , 1.0 , -2.4 , 0                   , 3.5   , 2.5   , 1.5   , 1.5   , 5.0};
+    //double maxbins[nDim] = {1.75 , 10  , 2.4  , Vcas3dipsig.back() , VBat3dipsig.back() , Vvtrkpi3dipsig.back() , Vvtrkp3dipsig.back() , Vflightsig.back() , Vdistancesig.back()};
+    //Xi
+    double minbins[nDim] = {1.08 , 1.0 , -2.4 , 0                  , VBat3dipsig.front() , Vvtrkpi3dipsig.front() , Vvtrkp3dipsig.front() , Vflightsig.front() , Vdistancesig.front()};
+    double maxbins[nDim] = {1.16 , 10  , 2.4  , Vcas3dipsig.back() , 99999               , 99999                  , 99999                 , 99999              , 99999};
+
+//These are for rap cut
+    //int nBins[nDim] = {150,9,12,Vcas3dipsig.size()+1,VBat3dipsig.size()+1,Vvtrkpi3dipsig.size()+1,Vvtrkp3dipsig.size()+1,Vflightsig.size()+1,Vdistancesig.size()+1};
+//These are for eta cut
+    //float minbins[nDim] = {1.6  , 1.0 , -5 , 0                   , 3.5   , 2.5   , 1.5   , 1.5   , 5.0};
+    //float maxbins[nDim] = {1.75 , 10  , 5  , Vcas3dipsig.back() , 99999 , 99999 , 99999 , 99999 , 99999};
+
+
+    //Now make variable sized bins for everything besides mass
+    // Insert the maximum to cut parameters
+    Vcas3dipsig.insert(Vcas3dipsig.begin(),0);
+    VBat3dipsig.push_back(99999);
+    Vvtrkpi3dipsig.push_back(99999);
+    Vvtrkp3dipsig.push_back(99999);
+    Vflightsig.push_back(99999);
+    Vdistancesig.push_back(99999);
+
+
+    WriteVector(VvarBins_pt,myfile,"Pt");
+    WriteVector(VvarBins_eta,myfile,"Eta");
+
+    //Omega
+    //WriteVector(Vcas3dipsig,myfile,"Om DCA");
+    //WriteVector(VBat3dipsig,myfile,"Ka DCA");
+    //WriteVector(Vvtrkpi3dipsig,myfile,"Pi DCA");
+    //WriteVector(Vvtrkp3dipsig,myfile,"Pr DCA");
+    //WriteVector(Vflightsig,myfile,"Om DLS");
+    //WriteVector(Vdistancesig,myfile,"La DLS");
+
+    //Xi
+    WriteVector(Vcas3dipsig,myfile,"Xi DCA");
+    WriteVector(VBat3dipsig,myfile,"Bat DCA");
+    WriteVector(Vvtrkpi3dipsig,myfile,"Pi DCA");
+    WriteVector(Vvtrkp3dipsig,myfile,"Pr DCA");
+    WriteVector(Vflightsig,myfile,"Xi DLS");
+    WriteVector(Vdistancesig,myfile,"La DLS");
 
     THnSparseF* h = new THnSparseF("hSparse","Cuts",nDim,&nBins[0],minbins,maxbins);
 
@@ -163,76 +371,67 @@ bool XiCutOptimizer(std::string name)
     cout << "2" << endl;
     h->GetAxis(2)->Set(nBins[2],&VvarBins_eta[0]);
     cout << "3" << endl;
-    h->GetAxis(3)->Set(nBins[3],&VvarBins_om3dipsig[0]);
+    h->GetAxis(3)->Set(nBins[3],&Vcas3dipsig[0]);
     cout << "4" << endl;
-    h->GetAxis(4)->Set(nBins[4],&VvarBins_omKaon3dipsig[0]);
+    h->GetAxis(4)->Set(nBins[4],&VBat3dipsig[0]);
     cout << "5" << endl;
-    h->GetAxis(5)->Set(nBins[5],&VvarBins_vtrkpi3dipsig[0]);
+    h->GetAxis(5)->Set(nBins[5],&Vvtrkpi3dipsig[0]);
     cout << "6" << endl;
-    h->GetAxis(6)->Set(nBins[6],&VvarBins_vtrkp3dipsig[0]);
+    h->GetAxis(6)->Set(nBins[6],&Vvtrkp3dipsig[0]);
     cout << "7" << endl;
-    h->GetAxis(7)->Set(nBins[7],&VvarBins_omflightsig[0]);
+    h->GetAxis(7)->Set(nBins[7],&Vflightsig[0]);
     cout << "8" << endl;
-    h->GetAxis(8)->Set(nBins[8],&VvarBins_distancesig[0]);
+    h->GetAxis(8)->Set(nBins[8],&Vdistancesig[0]);
 
 
 
     //Containers
 
-    //Hist Containers
-    //TH2D* hom_om3dipsig     [numparam];
-    //TH2D* hom_omKaon3dipsig   [numparam];
-    //TH2D* hom_vtrkpi3dipsig [numparam];
-    //TH2D* hom_vtrkp3dipsig  [numparam];
-    //TH2D* hom_omflightsig   [numparam];
-    //TH2D* hom_distancesig   [numparam];
 
     //Tree setup
     //TFile* f1=TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/Trees/All/V0CasTree_09_14_17.root");
     TFile* f1=TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/Trees/All/V0CasTreePbPb_09_25_17.root");
     //TFile* f1= new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/Trees/All/PbPbTreeSmall.root");
 
-    TTreeReader reader("OmTreeProducerRapidityPbPb/OmTree",f1);
+    //TTreeReader reader("OmTreeProducerRapidityPbPb/OmTree",f1);
+    TTreeReader reader("XiTreeProducerRapidityPbPb/XiTree",f1);
 
-    TTreeReaderArray<float> om3dipsig(reader    ,"om3dipsig.om3dipsig");
-    TTreeReaderArray<float> omKaon3dipsig(reader,"omKaon3dipsig.omKaon3dipsig");
+    //Omega
+    //TTreeReaderArray<float> cas3dipsig(reader    ,"om3dipsig.om3dipsig");
+    //TTreeReaderArray<float> bat3dipsig(reader,"omKaon3dipsig.omKaon3dipsig");
+    //TTreeReaderArray<float> vtrkpi3dipsig(reader,"vtrkpi3dipsig.vtrkpi3dipsig");
+    //TTreeReaderArray<float> vtrkp3dipsig(reader ,"vtrkp3dipsig.vtrkp3dipsigpt");
+    //TTreeReaderArray<float> flightsig(reader  ,"omflightsig.omflightsig");
+    //TTreeReaderArray<float> distancesig(reader  ,"distancesig.distancesig");
+    //TTreeReaderArray<float> mass(reader         ,"mass.mass");
+    //TTreeReaderArray<float> pt(reader           ,"pt.pt");
+    //TTreeReaderArray<float> eta(reader          ,"eta.eta");
+    //TTreeReaderArray<float> rap(reader          ,"rapidity.rapidity");
+
+    //Xi
+    TTreeReaderArray<float> cas3dipsig(reader    ,"xi3dipsig.xi3dipsig");
+    TTreeReaderArray<float> bat3dipsig(reader,"xipi3dipsig.xipi3dipsig");
     TTreeReaderArray<float> vtrkpi3dipsig(reader,"vtrkpi3dipsig.vtrkpi3dipsig");
     TTreeReaderArray<float> vtrkp3dipsig(reader ,"vtrkp3dipsig.vtrkp3dipsigpt");
-    TTreeReaderArray<float> omflightsig(reader  ,"omflightsig.omflightsig");
+    TTreeReaderArray<float> flightsig(reader  ,"xiflightsig.xiflightsig");
     TTreeReaderArray<float> distancesig(reader  ,"distancesig.distancesig");
     TTreeReaderArray<float> mass(reader         ,"mass.mass");
     TTreeReaderArray<float> pt(reader           ,"pt.pt");
     TTreeReaderArray<float> eta(reader          ,"eta.eta");
     TTreeReaderArray<float> rap(reader          ,"rapidity.rapidity");
-    //TTreeReaderArray<int> nTrkAcc(reader        ,"nTrkAcc.nTrkAcc");
-    //TTreeReaderArray<float> misIDMassLapi(reader,"misIDMassLapi.misIDMassLapi");
-    //TTreeReaderArray<float> misIDMasspiLa(reader,"misIDMasspiLa.misIDMasspiLa");
-
-    //Intialize Histograms
-    TH2D* hom_NoCut = NULL;
-    if(!Cut) hom_NoCut = new TH2D("hom_NoCut"    ,"NoCut"  ,150,1.25,1.40,150,0,15);
-    TH2D* hom_defaultcut = new TH2D("hom_Default","Default",150,1.60,1.75,400,0,40);
-    //for(int j=0; j<numparam; j++)
-    //{
-        //hom_om3dipsig[j]     = new TH2D(Form("hom_om3dipsig_%.1f"    ,om_om3dipsig[j])    ,Form("hom_om3dipsig_%.1f"    ,om_om3dipsig[j])    ,150,1.25,1.40,150,0,15);
-        //hom_omKaon3dipsig[j] = new TH2D(Form("hom_omKaon3dipsig_%.1f",om_omKaon3dipsig[j]),Form("hom_omKaon3dipsig_%.1f",om_omKaon3dipsig[j]),150,1.25,1.40,150,0,15);
-        //hom_vtrkpi3dipsig[j] = new TH2D(Form("hom_vtrkpi3dipsig_%.1f",om_vtrkpi3dipsig[j]),Form("hom_vtrkpi3dipsig_%.1f",om_vtrkpi3dipsig[j]),150,1.25,1.40,150,0,15);
-        //hom_vtrkp3dipsig[j]  = new TH2D(Form("hom_vtrkp3dipsig_%.1f" ,om_vtrkp3dipsig[j]) ,Form("hom_vtrkp3dipsig_%.1f" ,om_vtrkp3dipsig[j]) ,150,1.25,1.40,150,0,15);
-        //hom_omflightsig[j]   = new TH2D(Form("hom_omflightsig_%.1f"  ,om_omflightsig[j])  ,Form("hom_omflightsig_%.1f"  ,om_omflightsig[j])  ,150,1.25,1.40,150,0,15);
-        //hom_distancesig[j]   = new TH2D(Form("hom_distancesig_%.1f"  ,om_distancesig[j])  ,Form("hom_distancesig_%.1f"  ,om_distancesig[j])  ,150,1.25,1.40,150,0,15);
-    //}
 
 
-
-    int j=0;
+    //int j=0;
     while(reader.Next())
-    //while(j<100)
+    //while(j<10000)
     {
-        if(!CheckValue(om3dipsig))     return false;
-        if(!CheckValue(omKaon3dipsig)) return false;
+        //j++;
+        //reader.Next();
+        if(!CheckValue(cas3dipsig))     return false;
+        if(!CheckValue(bat3dipsig)) return false;
         if(!CheckValue(vtrkpi3dipsig)) return false;
         if(!CheckValue(vtrkp3dipsig))  return false;
-        if(!CheckValue(omflightsig))   return false;
+        if(!CheckValue(flightsig))   return false;
         if(!CheckValue(distancesig))   return false;
         if(!CheckValue(mass))          return false;
         if(!CheckValue(pt))            return false;
@@ -240,76 +439,197 @@ bool XiCutOptimizer(std::string name)
 
         for(int i=0; i<mass.GetSize(); i++)
         {
-            double value[nDim] = {mass[i],pt[i],eta[i],om3dipsig[i],omKaon3dipsig[i],vtrkpi3dipsig[i],vtrkp3dipsig[i],omflightsig[i],distancesig[i]};
+            double value[nDim] = {mass[i],pt[i],eta[i],cas3dipsig[i],bat3dipsig[i],vtrkpi3dipsig[i],vtrkp3dipsig[i],flightsig[i],distancesig[i]};
             h->Fill(value);
         }
-        j++;
     }
-f1->Close();
-    TCanvas* c1 = new TCanvas("c1","",600,600);
-    TH1D* h2 = new TH1D("1","",100,0,10);
-    h2->Fill(1);
-    h2->Draw();
+
+    f1->Close();
 
     //Output file creation
     std::string filetype = ".root";
     name += filetype;
-    //struct stat buffer;
-    //if(stat(name.c_str(), &buffer) == 0)
-    //{
-        //cout << "File with this name already eomsts, please select a different name" << endl;
-        //return false;
-    //}
     TFile out(name.c_str(),"RECREATE");
     cout << name.c_str() << " created!" << endl;
 
-    //Write histograms to root file
-    if(Cut)
-    {
-        //for(int j=0; j<numparam; j++)
-            //hom_om3dipsig[j]->Write();
-        //for(int j=0; j<numparam; j++)
-            //hom_omKaon3dipsig[j]->Write();
-        //for(int j=0; j<numparam; j++)
-            //hom_vtrkpi3dipsig[j]->Write();
-        //for(int j=0; j<numparam; j++)
-            //hom_vtrkp3dipsig[j]->Write();
-        //for(int j=0; j<numparam; j++)
-            //hom_omflightsig[j]->Write();
-        //for(int j=0; j<numparam; j++)
-            //hom_distancesig[j]->Write();
-    }
-    else
-    {
-        //hom_defaultcut->Write();
-        h->Write();
-        out.Close();
-        //c2->cd(3);
-        //h->Projection(4)->Draw();
-        //c2->cd(4);
-        //h->Projection(3)->Draw();
-    }
+    h->Write();
+    out.Close();
     return true;
 }
 
-void readSparse()
+*/
+
+/*
+bool KsSparseCreator(std::string name)
 {
+    //Initializers
+    TH1::SetDefaultSumw2();
+    std::ofstream myfile;
+    std::string txtname = name + ".txt";
+    myfile.open(txtname.c_str());
+
+    //Cut parameters to be varied. The commented elements are Hong's cuts to make a plot of them remember to change the numparam value as well
+    //std::vector<float> VvarBins_pt            = {0.2,0.4,0.6,0.8,1.0,1.4,1.8,2.2,2.8,3.6,4.6,6.0,7.0,8.5,10.0};
+    //std::vector<float> VvarBins_eta           = {-2.4,-2.0,-1.5,-1.0,-0.5,0,0.5,1.0,1.5,2.0,2.4};
+
+    std::vector<float> vdz1  = {1.0    , 1.2   , 1.5   , 1.7    , 2.0};
+    std::vector<float> vdz2  = {1.0    , 1.2   , 1.5   , 1.7    , 2.0};
+    std::vector<float> vdxy1 = {1.0    , 1.2   , 1.5   , 1.7    , 2.0};
+    std::vector<float> vdxy2 = {1.0    , 1.2   , 1.5   , 1.7    , 2.0};
+    std::vector<float> vdls  = {4      , 6     , 7     , 9      , 10};
+    std::vector<float> vagl  = {0.9965 , 0.997 , 0.999 , 0.9995 , 0.9999};
+
+    const int nDim = 9;
+    // mass, pt, eta, then cuts
+    //These are for eta cut
+    //Lambda
+    std::vector<int> nBins = {270,14,10,(int)vdz1.size(),(int)vdz2.size(),(int)vdxy1.size(),(int)vdxy2.size(),(int)vdls.size(),(int)vagl.size()};
+    //Omega
+    //double minbins[nDim] = {1.6  , 1.0 , -2.4 , 0                   , 3.5   , 2.5   , 1.5   , 1.5   , 5.0};
+    //double maxbins[nDim] = {1.75 , 10  , 2.4  , Vcas3dipsig.back() , VBat3dipsig.back() , Vvtrkpi3dipsig.back() , Vvtrkp3dipsig.back() , Vflightsig.back() , Vdistancesig.back()};
+    //Xi
+    double minbins[nDim] = {0.43  , 1.0 , -2.4 , vdz1.front() , vdz2.front() , vdxy1.front() , vdxy2.front() , vdls.front() , vagl.front()};
+    double maxbins[nDim] = {0.565 , 10  , 2.4  , 99999        , 99999        , 99999         , 99999         , 99999        , 1};
+
+//These are for rap cut
+    //int nBins[nDim] = {150,9,12,Vcas3dipsig.size()+1,VBat3dipsig.size()+1,Vvtrkpi3dipsig.size()+1,Vvtrkp3dipsig.size()+1,Vflightsig.size()+1,Vdistancesig.size()+1};
+//These are for eta cut
+    //float minbins[nDim] = {1.6  , 1.0 , -5 , 0                   , 3.5   , 2.5   , 1.5   , 1.5   , 5.0};
+    //float maxbins[nDim] = {1.75 , 10  , 5  , Vcas3dipsig.back() , 99999 , 99999 , 99999 , 99999 , 99999};
+
+
+    //Now make variable sized bins for everything besides mass
+    // Insert the maximum to cut parameters
+    vdz1.push_back(99999);
+    vdz2.push_back(99999);
+    vdxy1.push_back(99999);
+    vdxy2.push_back(99999);
+    vdls.push_back(99999);
+    vagl.push_back(1);
+
+
+    WriteVector(VvarBins_pt,myfile,"Pt");
+    WriteVector(VvarBins_eta,myfile,"Eta");
+
+    //Omega
+    //WriteVector(Vcas3dipsig,myfile,"Om DCA");
+    //WriteVector(VBat3dipsig,myfile,"Ka DCA");
+    //WriteVector(Vvtrkpi3dipsig,myfile,"Pi DCA");
+    //WriteVector(Vvtrkp3dipsig,myfile,"Pr DCA");
+    //WriteVector(Vflightsig,myfile,"Om DLS");
+    //WriteVector(Vdistancesig,myfile,"La DLS");
+
+    //Xi
+    WriteVector(vdz1,myfile,"Daughter1 dz");
+    WriteVector(vdz2,myfile,"Daughter2 dz");
+    WriteVector(vdxy1,myfile,"Daughter1 dxy");
+    WriteVector(vdxy2,myfile,"Daughter2 dxy");
+    WriteVector(vdls,myfile,"DLS");
+    WriteVector(vagl,myfile,"agl");
+
+    THnSparseF* h = new THnSparseF("hSparse","Cuts",nDim,&nBins[0],minbins,maxbins);
+
+    cout << "1" << endl;
+    h->GetAxis(1)->Set(nBins[1],&VvarBins_pt[0]);
+    cout << "2" << endl;
+    h->GetAxis(2)->Set(nBins[2],&VvarBins_eta[0]);
+    cout << "3" << endl;
+    h->GetAxis(3)->Set(nBins[3],&vdz1[0]);
+    cout << "4" << endl;
+    h->GetAxis(4)->Set(nBins[4],&vdz2[0]);
+    cout << "5" << endl;
+    h->GetAxis(5)->Set(nBins[5],&vdxy1[0]);
+    cout << "6" << endl;
+    h->GetAxis(6)->Set(nBins[6],&vdxy2[0]);
+    cout << "7" << endl;
+    h->GetAxis(7)->Set(nBins[7],&vdls[0]);
+    cout << "8" << endl;
+    h->GetAxis(8)->Set(nBins[8],&vagl[0]);
+
+
+
+    //Containers
+
+
+    //Tree setup
+    //TFile* f1=TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/Trees/All/V0CasTree_09_14_17.root");
+    TFile* f1=TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/Trees/All/V0CasTreePbPb_09_25_17.root");
+    //TFile* f1= new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/Trees/All/PbPbTreeSmall.root");
+
+    //TTreeReader reader("OmTreeProducerRapidityPbPb/OmTree",f1);
+    TTreeReader reader("XiTreeProducerRapidityPbPb/XiTree",f1);
+
+    //Kshort
+    TTreeReaderArray<float> dz1(reader ,"dzSig1.dzSig1");
+    TTreeReaderArray<float> dz2(reader ,"dzSig2.dzSig2");
+    TTreeReaderArray<float> dxy1(reader ,"dxySig1.dxySig1");
+    TTreeReaderArray<float> dxy2(reader ,"dxySig2.dxySig2");
+    TTreeReaderArray<float> distancesig(reader  ,"decayLSig.decayLSig");
+    TTreeReaderArray<float> agl(reader  ,"cosTheta.cosTheta");
+    TTreeReaderArray<float> mass(reader         ,"mass.mass");
+    TTreeReaderArray<float> pt(reader           ,"pt.pt");
+    TTreeReaderArray<float> eta(reader          ,"eta.eta");
+
+
+    //int j=0;
+    while(reader.Next())
+    //while(j<10000)
+    {
+        //j++;
+        //reader.Next();
+        if(!CheckValue(dz1))     return false;
+        if(!CheckValue(dz2)) return false;
+        if(!CheckValue(dxy1)) return false;
+        if(!CheckValue(dxy2))  return false;
+        if(!CheckValue(distancesig))   return false;
+        if(!CheckValue(agl))   return false;
+        if(!CheckValue(mass))          return false;
+        if(!CheckValue(pt))            return false;
+        if(!CheckValue(eta))           return false;
+
+        for(int i=0; i<mass.GetSize(); i++)
+        {
+            double value[nDim] = {mass[i],pt[i],eta[i],fabs(dz1[i]),fabs(dz2[i]),fabs(dxy1[i]),fabs(dxy2[i]),distancesig[i],agl[i]};
+            h->Fill(value);
+        }
+    }
+
+    f1->Close();
+
+    //Output file creation
+    std::string filetype = ".root";
+    name += filetype;
+    TFile out(name.c_str(),"RECREATE");
+    cout << name.c_str() << " created!" << endl;
+
+    h->Write();
+    out.Close();
+    return true;
+}
+*/
+
+void readSparseOmega(std::string name)
+{
+    TFile* f = new TFile(name.c_str());
+    bool DCAExt = false;
+    int version = 1;
+    //TFile* f = new TFile("SmallBins.root");
     std::vector<double> VvarBins_pt            = {1.0,1.5,1.8,2.2,2.8,3.6,4.6,6.0,7.2,10.0};
     std::vector<double> VvarBins_eta           = {-2.4,-2.0,-1.5,-1.0,-0.5,0,0.5,1.0,1.5,2.0,2.4};
 
-    std::vector<double> VvarBins_om3dipsig     = {0   , 2.60000 , 2.80000 , 3.00000 , 3.200000  , 3.300000 , 3.400000 , 3.500000};
-    std::vector<double> VvarBins_omKaon3dipsig = {3.5 , 3.60000 , 3.70000 , 3.80000 , 4.000000  , 4.200000 , 4.400000 , 99999};
-    std::vector<double> VvarBins_vtrkpi3dipsig = {2.5 , 2.60000 , 2.70000 , 2.80000 , 3.000000  , 3.200000 , 3.400000 , 99999};
-    std::vector<double> VvarBins_vtrkp3dipsig  = {1.5 , 1.60000 , 1.70000 , 1.80000 , 2.000000  , 2.200000 , 2.400000 , 99999};
-    std::vector<double> VvarBins_omflightsig   = {1.5 , 1.60000 , 1.70000 , 1.80000 , 2.000000  , 2.200000 , 2.400000 , 99999};
-    std::vector<double> VvarBins_distancesig   = {5.0 , 6.00000 , 7.00000 , 8.00000 , 10.00000 , 12.00000 , 14.00000 , 99999};
 
-    //std::vector<double> VvarBins_om3dipsig     = {2.6 , 2.8 , 3.0 , 3.2  , 3.3 , 3.4 , 3.5};
-    //std::vector<double> VvarBins_omKaon3dipsig = {3.5 , 3.6 , 3.7 , 3.8 , 4.0  , 4.2 , 4.4};
-    //std::vector<double> VvarBins_vtrkpi3dipsig = {2.5 , 2.6 , 2.7 , 2.8 , 3.0  , 3.2 , 3.4};
-    //std::vector<double> VvarBins_vtrkp3dipsig  = {1.5 , 1.6 , 1.7 , 1.8 , 2.0  , 2.2 , 2.4};
-    //std::vector<double> VvarBins_omflightsig   = {1.5 , 1.6 , 1.7 , 1.8 , 2.0  , 2.2 , 2.4};
-    //std::vector<double> VvarBins_distancesig   = {5.0 , 6.0 , 7.0 , 8.0 , 10.0 , 12. , 14.};
+    std::vector<float> Vcas3dipsig    = {2.0, 3.0 , 3.4  , 3.6 , 3.8  , 4.0 , 4.2 , 4.5 , 5.0};
+    std::vector<float> VBat3dipsig    = {3.0 , 3.4  , 3.8 , 4.0  , 4.2 , 4.4 , 4.8 , 5.0 , 5.2};
+    std::vector<float> Vvtrkpi3dipsig = {3.0 , 3.2  , 3.5 , 3.8  , 4.0 , 4.5 , 5.0 , 5.5 , 6.0};
+    std::vector<float> Vvtrkp3dipsig  = {2.0 , 2.2  , 2.5 , 2.8  , 4.0 , 4.5 , 5.0 , 5.5 , 6.0};
+    std::vector<float> Vflightsig     = {1.5 , 2.0  , 2.5 , 3.0  , 3.5 , 4.0 , 4.5 , 5.0 , 5.5};
+    std::vector<float> Vdistancesig   = {10. , 10.5 , 11  , 11.5 , 12. , 13  , 14  , 15  , 16  };
+    Vcas3dipsig.insert(Vcas3dipsig.begin(),0);
+    VBat3dipsig.push_back(99999);
+    Vvtrkpi3dipsig.push_back(99999);
+    Vvtrkp3dipsig.push_back(99999);
+    Vflightsig.push_back(99999);
+    Vdistancesig.push_back(99999);
 
     std::ostringstream os;
     std::ostringstream osYield;
@@ -319,8 +639,6 @@ void readSparse()
     RooMsgService::instance().setStreamStatus(0,kFALSE);
     RooMsgService::instance().setStreamStatus(1,kFALSE);
     gStyle->SetOptStat(1111111);
-    TFile* f = new TFile("OmegaFineBin.root");
-    //TFile* f = new TFile("SmallBins.root");
     THnSparseF* h = (THnSparseF*)f->Get("hSparse");
     //c2->Divide(1,2);
     //c2->cd(1);
@@ -330,38 +648,52 @@ void readSparse()
     //for(int a=1; a<VvarBins_pt.size(); a++)
     TCanvas* c2 = new TCanvas("c2","",600,600);
     std::map<int,double> SigSig;
-    for(int a=5; a<6; a++)
+    int pTBin = 0;
+    for(int a=2; a<3; a++)
     {
+        pTBin = a;
         h->GetAxis(1)->SetRange(a,a);
-        //for(int b=1; b<VvarBins_om3dipsig.size(); b++)
-        for(int b=2; b<5; b++)
+        //for(int b=1; b<Vcas3dipsig.size(); b++)
+        for(int b=3; b<4; b++)
         {
-            h->GetAxis(3)->SetRange(1,b);
-            //for(int c=1; c<VvarBins_omKaon3dipsig.size(); c++)
-            for(int c=3; c<7; c++)
+            h->GetAxis(3)->SetRange(1,b+1);
+            //for(int c=1; c<VBat3dipsig.size(); c++)
+            for(int c=1; c<2; c++)
             {
-                h->GetAxis(4)->SetRange(c,7);
-                //for(int d=1; d<VvarBins_vtrkpi3dipsig.size(); d++)
-                for(int d=3; d<7; d++)
+                h->GetAxis(4)->SetRange(c,10);
+                //for(int d=1; d<Vvtrkpi3dipsig.size(); d++)
+                for(int d=1; d<2; d++)
                 {
-                    h->GetAxis(5)->SetRange(d,7);
-                    //for(int e=1; e<VvarBins_vtrkp3dipsig.size();e++)
-                    for(int e=3; e<7;e++)
+                    h->GetAxis(5)->SetRange(d,10);
+                    //for(int e=1; e<Vvtrkp3dipsig.size();e++)
+                    for(int e=1; e<2;e++)
                     {
-                        h->GetAxis(6)->SetRange(e,7);
-                        //for(int f=1; f<VvarBins_omflightsig.size(); f++)
-                        for(int f=3; f<7; f++)
+                        h->GetAxis(6)->SetRange(e,10);
+                        //for(int f=1; f<Vflightsig.size(); f++)
+                        for(int f=1; f<2; f++)
                         {
-                            h->GetAxis(7)->SetRange(f,7);
-                            //for(int i=1; i<VvarBins_distancesig.size(); i++)
-                            for(int i=3; i<7; i++)
+                            h->GetAxis(7)->SetRange(f,10);
+                            //for(int i=1; i<Vdistancesig.size(); i++)
+                            for(int i=1; i<2; i++)
                             {
                                 struct stat buffer;
                                 std::ostringstream name;
+                                std::string filename;
                                 int mask = b*1e5 + c*1e4 + d*1e3 + e*1e2 + f*1e1 + i;
-                                name << "OmegaDistributions/Omega_" << mask << ".pdf";
-                                if(stat(name.str().c_str(),&buffer) == 0) continue;
-                                h->GetAxis(8)->SetRange(i,7);
+                                //std::string mask = b*1e5 + c*1e4 + d*1e3 + e*1e2 + f*1e1 + i;
+                                if(DCAExt)
+                                {
+                                    name << "OmegaDistributions/Omega_" << mask << "_" << a << ".pdf";
+                                }
+                                else
+                                {
+                                    name << "OmegaDistributions/Omega_" << mask << "_" << a << "_v" << version << ".pdf";
+                                    //name << "OmegaDistributions/Omega_" << Vcas3dipsig[b-1] << "_" << VBat3dipsig[c-1] << "_" << Vvtrkpi3dipsig[d-1] << "_" << Vvtrkp3dipsig[e-1] << "_" << Vflightsig[f-1] << "_" << Vdistancesig[i-1] << "_" << a << "_v" << version << "2.pdf";
+                                    //filename = name.str();
+                                }
+                                //if(stat(name.str().c_str(),&buffer) == 0) continue;
+                                name.str(std::string());
+                                h->GetAxis(8)->SetRange(i,8);
                                 TH1D* h1 = (TH1D*)h->Projection(0);
                                 h1->GetYaxis()->SetRangeUser(0,1000);
                                 gStyle->SetOptTitle(kFALSE);
@@ -372,34 +704,22 @@ void readSparse()
                                 tex->SetTextSize(0.025);
                                 //tex->SetTextAlign(10);
 
+                                double s1=0.001;
+                                double s2=0.001;
+
                                 RooRealVar x("x","mass",1.60,1.75);
-                                //RooRealVar x("x","mass",1.62,1.73);
                                 RooPlot* xframe_ = x.frame(150);
                                 xframe_->GetXaxis()->SetTitle("#Lambda K Invariant mass (GeV)");
                                 xframe_->GetYaxis()->SetTitle("Candidates / 0.002 GeV");
-                                xframe_->GetXaxis()->CenterTitle(1);
-                                xframe_->GetYaxis()->CenterTitle(1);
-                                xframe_->GetXaxis()->SetTickSize(0.02);
-                                xframe_->GetYaxis()->SetTickSize(0.02);
-                                //xframe_->GetXaxis()->SetNdivisions(407);
-                                //xframe_->GetYaxis()->SetNdivisions(410);
-                                //xframe_->GetXaxis()->SetTitleSize(0.06);
-                                //xframe_->GetYaxis()->SetTitleSize(0.06);
-                                //xframe_->GetYaxis()->SetTitleOffset(1.05);
-                                //xframe_->GetXaxis()->SetTitleOffset(0.5);
-                                //xframe_->GetXaxis()->SetLabelSize(xframe_->GetXaxis()->GetLabelSize()*2.0);
-                                //xframe_->GetYaxis()->SetLabelSize(0.1);
-                                //xframe_->GetXaxis()->SetLabelSize(0.1);
-                                //xframe_->GetYaxis()->SetLabelSize(xframe_->GetYaxis()->GetLabelSize()*2.0);
                                 RooDataHist data("data","dataset",x,h1);
                                 data.plotOn(xframe_,Name("data"));
                                 RooRealVar mean("mean","mean",1.67,1.6,1.75);
-                                RooRealVar sigma1("sigma1","sigma1",0.004,0.001,0.04);
-                                RooRealVar sigma2("sigma2","sigma2",0.005,0.001,0.04);
-                                RooRealVar sig1("sig1","signal1",5000,0,10000);
-                                RooRealVar sig2("sig2","signal2",5000,0,10000);
-                                RooRealVar qsig("qsig","qsig",5000,0,100000);
-                                RooRealVar alpha("alpha","alpha",0.9,-1,10);
+                                RooRealVar sigma1("sigma1","sigma1",s1,0.001,0.04);
+                                RooRealVar sigma2("sigma2","sigma2",s2,0.001,0.04);
+                                RooRealVar sig1("sig1","signal1",2000,0,10000);
+                                RooRealVar sig2("sig2","signal2",2000,0,10000);
+                                RooRealVar qsig("qsig","qsig",2000,0,100000);
+                                RooRealVar alpha("alpha","alpha",0.9,-1,9);
                                 RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
                                 RooGaussian gaus2("gaus2","gaus2",x,mean,sigma2);
                                 //RooRealVar a("a","a",0,-100000,100000);
@@ -412,10 +732,25 @@ void readSparse()
                                 RooGenericPdf background("background", "x - (1.115683 + 0.493677)^alpha", RooArgList(x,alpha));
                                 RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,background),RooArgList(sig1,sig2,qsig));
 
+                                RooFitResult* r_xi = sum.fitTo(data,Save(),Range("cut"));
                                 x.setRange("cut",1.60,1.75);
+
+                                int count = 0;
+                                while(r_xi->covQual() < 3 ){
+                                    s1+=0.001;
+                                    s2+=0.001;
+                                    r_xi = sum.fitTo(data,Save(),Range("cut"));
+                                    //if(r_xi->covQual() == 3) break;
+                                    //s2+=0.001;
+                                    //r_xi = sum.fitTo(data,Save(),Range("cut"));
+                                    count++;
+                                    if(count == 10) break;
+                                }
+
                                 //x.setRange("cut",1.62,1.73);
 
-                                RooFitResult* r_xi = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
+                                //RooFitResult* r_xi = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
+                                //RooFitResult* r_xi = sum.fitTo(data,Save(),Range("cut"));
                                 //RooChi2Var chi2_xiVar("chi2_xi","chi2",sum,data);
 
                                 double covQual = r_xi->covQual();
@@ -513,28 +848,54 @@ void readSparse()
 
                                 xpos = 0.20;
                                 ypos = 0.85;
-                                os << "#Omega DCA < " << VvarBins_om3dipsig[b];
+                                os << "#Omega DCA < " << Vcas3dipsig[b];
                                 tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
                                 os.str(std::string());
-                                os << "Kaon DCA > " << VvarBins_omKaon3dipsig[c-1];
+                                os << "Kaon DCA > " << VBat3dipsig[c-1];
                                 tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
                                 os.str(std::string());
-                                os << "#pi DCA > " << VvarBins_vtrkpi3dipsig[d-1];
+                                os << "#pi DCA > " << Vvtrkpi3dipsig[d-1];
                                 tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
                                 os.str(std::string());
-                                os << "proton DCA > " << VvarBins_vtrkp3dipsig[e-1];
+                                os << "proton DCA > " << Vvtrkp3dipsig[e-1];
                                 tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
                                 os.str(std::string());
-                                os << "#Omega DecayL > " << VvarBins_omflightsig[f-1];
+                                os << "#Omega DecayL > " << Vflightsig[f-1];
                                 tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
                                 os.str(std::string());
-                                os << "#Lambda DecayL > " << VvarBins_distancesig[i-1];
+                                os << "#Lambda DecayL > " << Vdistancesig[i-1];
                                 tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
                                 os.str(std::string());
 
-                                SigSig[mask] = significance;
 
-                                c2->Print(Form("OmegaDistributions/Omega_%d.pdf",mask));
+                                if(DCAExt)
+                                {
+                                    if(covQual < 3)
+                                        name << "OmegaDistributions/Omega_DCAExt_" << mask << "_" << a << "_REDO" << ".pdf";
+                                    else
+                                    {
+                                        SigSig[mask] = significance;
+                                        name << "OmegaDistributions/Omega_DCAExt_" << mask << "_" << a << ".pdf";
+                                    }
+                                }
+                                else{
+                                    if(covQual < 3)
+                                    {
+                                    //name << "OmegaDistributions/Omega_" << Vcas3dipsig[b] << "_" << VBat3dipsig[c] << "_" << Vvtrkpi3dipsig[d] << "_" << Vvtrkp3dipsig[e] << "_" << Vflightsig[f] << "_" << Vdistancesig[i] << "_" << a << "_v" << version << "REDO.pdf";
+                                        name << "OmegaDistributions/Omega_" << mask << "_" << a << "_REDO_v" << version << ".pdf";
+                                    }
+                                    else
+                                    {
+                                        SigSig[mask] = significance;
+                                        //name << "OmegaDistributions/Omega_" << Vcas3dipsig[b] << "_" << VBat3dipsig[c] << "_" << Vvtrkpi3dipsig[d] << "_" << Vvtrkp3dipsig[e] << "_" << Vflightsig[f] << "_" << Vdistancesig[i] << "_" << a << "_v" << version << "REDO.pdf";
+                                        name << "OmegaDistributions/Omega_" << mask << "_" << a << "_REDO_v" << version << ".pdf";
+                                        if( remove(name.str().c_str()) == 0) cout << "File deleted";
+                                        name.str(std::string());
+                                        name << "OmegaDistributions/Omega_" << mask << "_" << a << "_v" << version << ".pdf";
+                                    }
+                                }
+
+                                c2->Print(name.str().c_str());
                             }
                         }
                     }
@@ -554,25 +915,27 @@ void readSparse()
         }
     }
     cout << "Max Sig: " << maxVal << endl;
-    cout << "Max pair: " << maxpair << endl;
+    cout << "Max Key: " << maxpair << endl;
+    std::ofstream myfile;
+    std::ostringstream filename;
+    if(DCAExt)
+    {
+        filename << "AllMaxKeys_DCAExt_" << pTBin << ".txt";
+    }
+    else{
+        filename << "AllMaxKeys_" << pTBin << "_v" << version << ".txt";
+    }
+    myfile.open(filename.str().c_str());
+    myfile << "Max Sig: " << maxVal << "\n";
+    myfile << "Max Key: " << maxpair << "\n";
+    myfile << "Other Keys with the same Significance:" << "\n";
+    for(std::map<int,double>::iterator it=SigSig.begin(); it!=SigSig.end(); ++it){
+        double values = it->second;
+        int key = 0;
+        if(values == maxVal){ 
+            key = it->first;
+            myfile << key << "\n";
+        }
+    }
 }
 
-/*
-                for(int i=0;i<mass.GetSize();i++)
-                {
-                    //if(nTrkAcc[i]                 > multHigh_)           continue;
-                    if(om3dipsig[i]               > om_om3dipsig[0])     continue;
-                    //if(std::fabs(eta[i])          > etacut)              continue;
-                    if(std::fabs(rap[i])          > rapidity)              continue;
-                    if(omKaon3dipsig[i]           < om_omKaon3dipsig[0]) continue;
-                    if(vtrkpi3dipsig[i]           < om_vtrkpi3dipsig[0]) continue;
-                    if(vtrkp3dipsig[i]            < om_vtrkp3dipsig[0])  continue;
-                    if(omflightsig[i]             < om_omflightsig[0])   continue;
-                    if(distancesig[i]             < om_distancesig[0])   continue;
-                    //if(std::abs(misIDMasspiLa[i]) < misIDMass)           continue;
-                    //if(std::abs(misIDMassLapi[i]) < misIDMass)           continue;
-
-                    hom_defaultcut->Fill(mass[i],pt[i]);
-                }
-        //}
-        */
