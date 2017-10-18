@@ -459,461 +459,190 @@ void Rap_v2sig()
 {
     MITStyle();
     TCanvas* c1 = MakeCanvas("c1", "Plot");
-    c1->cd();
     /*c1->SetLogy();*/
     c1->SetLeftMargin(0.12);
 
-    TFile *fV0 = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityCorrectMultB_09_19_17.root"); //D0 study
-    TFile *fXi = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root");
-    TFile *fOm = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/OmCorr/OmCorrelationRapidityTotal_09_24_17.root"); //D0 study
+    TCanvas* c2 = MakeCanvas("c2", "Plot");
+    c2->SetLeftMargin(0.12);
+
+    c1->cd();
 
     // draw the frame using a histogram frame
-    TH1F* frame;
+    TH1F* frame1;
+    TH1F* frame2;
 
+    frame1 = c1->DrawFrame(0,-0.01,9,0.6);
+    gPad->SetTickx();
+    gPad->SetTicky();
+    frame1->GetXaxis()->CenterTitle(1);
+    frame1->GetYaxis()->CenterTitle(1);
+    frame1->GetXaxis()->SetTitleSize(0.05);
+    frame1->GetYaxis()->SetTitleSize(0.05);
+    frame1->SetTitleOffset(1.1,"Y");
+    frame1->SetTitleOffset(1.2,"X");
+    frame1->GetXaxis()->SetTitle("p_{T} (GeV)");
+    frame1->GetYaxis()->SetTitle("v_{2}^{sig}");
     const int om_npoints = 8;
     const int xi_npoints = 9;
     const int ks_npoints = 13;
     const int la_npoints = 10;
 
-    std::vector<double> v2Om8;
-    std::vector<double> pTOm8;
-    std::vector<double> v2Om8E;
+    //frame = c1->DrawFrame(0,-0.01,8,0.5);
+    //gPad->SetTickx();
+    //gPad->SetTicky();
+    //frame->GetXaxis()->CenterTitle(1);
+    //frame->GetYaxis()->CenterTitle(1);
+    //frame->GetXaxis()->SetTitleSize(0.05);
+    //frame->GetYaxis()->SetTitleSize(0.05);
+    //frame->SetTitleOffset(1.1,"Y");
+    //frame->SetTitleOffset(1.2,"X");
+    //frame->GetXaxis()->SetTitle("KE_{T} (GeV)");
+    //frame->GetYaxis()->SetTitle("v_{2}^{sig}");
 
-    std::vector<double> v2Xi8;
-    std::vector<double> pTXi8;
-    std::vector<double> v2Xi8E;
+    // Pull TGraph for Kshort and lambda
+    TFile* file_hadv2 = TFile::Open("lrgraphv2_v3_pPb_hadron_185-above.root");
+    TFile* file_pidv2 = TFile::Open("rootFiles/v2valuesRapidityPbPb.root");
 
-    std::vector<double> v2Ks8;
-    std::vector<double> pTKs8;
-    std::vector<double> v2Ks8E;
+    //TGraphErrors* ha_v2 = (TGraphErrors*)file_hadv2->Get("hadronv2");
+    TGraphErrors* ha_v2 = (TGraphErrors*)GetGraphWithSymmYErrorsFromFile(Form("data/%s","n185_220_ptass033pPb_v2.txt"),1,28,1.2);
 
-    std::vector<double> v2La8;
-    std::vector<double> pTLa8;
-    std::vector<double> v2La8E;
+    TGraphErrors* om8_v2 = (TGraphErrors*)file_pidv2->Get("v2omega");
+    TGraphErrors* xi8_v2 = (TGraphErrors*)file_pidv2->Get("v2xi");
+    TGraphErrors* ks8_v2 = (TGraphErrors*)file_pidv2->Get("v2kshort");
+    TGraphErrors* la8_v2 = (TGraphErrors*)file_pidv2->Get("v2lambda");
 
+    TGraphErrors* om8_v2kn = (TGraphErrors*)file_pidv2->Get("v2omega_ket_nq");
+    TGraphErrors* xi8_v2kn = (TGraphErrors*)file_pidv2->Get("v2xi_ket_nq");
+    TGraphErrors* ks8_v2kn = (TGraphErrors*)file_pidv2->Get("v2kshort_ket_nq");
+    TGraphErrors* la8_v2kn = (TGraphErrors*)file_pidv2->Get("v2lambda_ket_nq");
 
-    for(int i=0; i<3; i++)
-    {
-        if(i==0) // v2 vs pt
-        {
-            for(int i=0; i<ks_npoints; i++)
-            {
-                TH1D* hPtKs = (TH1D*)fV0->Get(Form("v0CorrelationRapidity/Ptkshort_pt%d",i));
-                TH1D* hPtKs_bkg = (TH1D*)fV0->Get(Form("v0CorrelationRapidity/Ptkshort_bkg_pt%d",i));
+    ks8_v2->SetMarkerColor(kRed);
+    ks8_v2->SetMarkerStyle(20);
+    ks8_v2->SetMarkerSize(1.5);
+    ks8_v2->SetLineColor(kRed);
 
-                int nEntries = 0;
-                double PtTotal = 0;
-                for(int j=hPtKs->FindFirstBinAbove(0,1); j<=hPtKs->FindLastBinAbove(0,1); j++)
-                {
-                    double nPt = hPtKs->GetBinContent(j);
-                    double Pt = nPt*(hPtKs->GetBinCenter(j));
-                    nEntries+=nPt;
-                    PtTotal += Pt;
-                }
-                for(int j=hPtKs_bkg->FindFirstBinAbove(0,1); j<=hPtKs_bkg->FindLastBinAbove(0,1); j++)
-                {
-                    double nPt_bkg = hPtKs_bkg->GetBinContent(j);
-                    double Pt_bkg = nPt_bkg*(hPtKs_bkg->GetBinCenter(j));
-                    nEntries += nPt_bkg;
-                    PtTotal += Pt_bkg;
-                }
-                pTKs8.push_back(PtTotal/nEntries);
-            }
-            for(int i=0; i<la_npoints; i++)
-            {
-                TH1D* hPtLa = (TH1D*)fV0->Get(Form("v0CorrelationRapidity/Ptlambda_pt%d",i));
-                TH1D* hPtLa_bkg = (TH1D*)fV0->Get(Form("v0CorrelationRapidity/Ptlambda_bkg_pt%d",i));
+    xi8_v2->SetMarkerColor(kGreen+2);
+    xi8_v2->SetMarkerStyle(21);
+    xi8_v2->SetMarkerSize(1.5);
+    xi8_v2->SetLineColor(kGreen+2);
 
-                int nEntries = 0;
-                double PtTotal = 0;
-                for(int j=hPtLa->FindFirstBinAbove(0,1); j<=hPtLa->FindLastBinAbove(0,1); j++)
-                {
-                    double nPt = hPtLa->GetBinContent(j);
-                    double Pt = nPt*(hPtLa->GetBinCenter(j));
-                    nEntries+=nPt;
-                    PtTotal += Pt;
-                }
-                for(int j=hPtLa_bkg->FindFirstBinAbove(0,1); j<=hPtLa_bkg->FindLastBinAbove(0,1); j++)
-                {
-                    double nPt_bkg = hPtLa_bkg->GetBinContent(j);
-                    double Pt_bkg = nPt_bkg*(hPtLa_bkg->GetBinCenter(j));
-                    nEntries += nPt_bkg;
-                    PtTotal += Pt_bkg;
-                }
-                pTLa8.push_back(PtTotal/nEntries);
-            }
-            for(int i=0; i<xi_npoints; i++)
-            {
-                TH1D* hPtXi = (TH1D*)fXi->Get(Form("xiCorrelationRapidity/Pt_xi_pt%d",i));
-                TH1D* hPtXi_bkg = (TH1D*)fXi->Get(Form("xiCorrelationRapidity/Pt_xi_bkg_pt%d",i));
+    la8_v2->SetMarkerColor(kBlue-4);
+    la8_v2->SetMarkerStyle(22);
+    la8_v2->SetMarkerSize(1.5);
+    la8_v2->SetLineColor(kBlue-4);
 
-                int nEntries = 0;
-                double PtTotal = 0;
-                for(int j=hPtXi->FindFirstBinAbove(0,1); j<=hPtXi->FindLastBinAbove(0,1); j++)
-                {
-                    double nPt = hPtXi->GetBinContent(j);
-                    double Pt = nPt*(hPtXi->GetBinCenter(j));
-                    nEntries+=nPt;
-                    PtTotal += Pt;
-                }
-                for(int j=hPtXi_bkg->FindFirstBinAbove(0,1); j<=hPtXi_bkg->FindLastBinAbove(0,1); j++)
-                {
-                    double nPt_bkg = hPtXi_bkg->GetBinContent(j);
-                    double Pt_bkg = nPt_bkg*(hPtXi_bkg->GetBinCenter(j));
-                    nEntries += nPt_bkg;
-                    PtTotal += Pt_bkg;
-                }
-                pTXi8.push_back(PtTotal/nEntries);
-            }
-            for(int i=1; i<om_npoints+1; i++)
-            {
-                TH1D* hPtOm = (TH1D*)fOm->Get(Form("omCorrelationRapidity/Pt_xi_pt%d",i));
-                TH1D* hPtOm_bkg = (TH1D*)fOm->Get(Form("omCorrelationRapidity/Pt_xi_bkg_pt%d",i));
+    om8_v2->SetMarkerColor(kMagenta);
+    om8_v2->SetMarkerStyle(29);
+    om8_v2->SetMarkerSize(1.5);
+    om8_v2->SetLineColor(kMagenta);
 
-                int nEntries = 0;
-                double PtTotal = 0;
-                for(int j=hPtOm->FindFirstBinAbove(0,1); j<=hPtOm->FindLastBinAbove(0,1); j++)
-                {
-                    double nPt = hPtOm->GetBinContent(j);
-                    double Pt = nPt*(hPtOm->GetBinCenter(j));
-                    nEntries+=nPt;
-                    PtTotal += Pt;
-                }
-                for(int j=hPtOm_bkg->FindFirstBinAbove(0,1); j<=hPtOm_bkg->FindLastBinAbove(0,1); j++)
-                {
-                    double nPt_bkg = hPtOm_bkg->GetBinContent(j);
-                    double Pt_bkg = nPt_bkg*(hPtOm_bkg->GetBinCenter(j));
-                    nEntries += nPt_bkg;
-                    PtTotal += Pt_bkg;
-                }
-                pTOm8.push_back(PtTotal/nEntries);
-            }
-            cout << "Pt" << endl;
+    ks8_v2kn->SetMarkerColor(kRed);
+    ks8_v2kn->SetMarkerStyle(20);
+    ks8_v2kn->SetMarkerSize(1.5);
+    ks8_v2kn->SetLineColor(kRed);
 
-            v2Om8.insert(v2Om8.end(),{0.047923 ,0.0883503 ,0.110303 ,0.146473 ,0.19923 ,0.235233 ,0.24263 ,0.224166});
-            v2Om8E.insert(v2Om8E.end(),{0.0150849 ,0.0101656 ,0.00739176 ,0.00684022 ,0.0076592 ,0.0101053 ,0.0210704 ,0.0319097});
+    xi8_v2kn->SetMarkerColor(kGreen+2);
+    xi8_v2kn->SetMarkerStyle(21);
+    xi8_v2kn->SetMarkerSize(1.5);
+    xi8_v2kn->SetLineColor(kGreen+2);
 
-            v2Xi8.insert(v2Xi8.end(),{0.0371521 ,0.0669904 ,0.0877339 ,0.123959 ,0.163467 ,0.183918 ,0.209974 ,0.17582,0.178101});
-            //pTXi8.insert(pTXi8.end(),{1.267, 1.62, 2.008, 2.501, 3.173, 4.029, 5.055, 6.474});
-            v2Xi8E.insert(v2Xi8E.end(),{0.00932224 ,0.00484125 ,0.0041527 ,0.00326934 ,0.00309064 ,0.00361334 ,0.00517473 ,0.0113186,0.0179293});
+    la8_v2kn->SetMarkerColor(kBlue-4);
+    la8_v2kn->SetMarkerStyle(22);
+    la8_v2kn->SetMarkerSize(1.5);
+    la8_v2kn->SetLineColor(kBlue-4);
 
-            v2Ks8.insert(v2Ks8.end(),{0.0134706 ,0.0291376 ,0.0430301 ,0.0594915 ,0.0822571 ,0.105851 ,0.124123 ,0.137468 ,0.146174 ,0.144044 ,0.131987 ,0.124602 ,0.123191});
-            //pTKs8.insert(pTKs8.end(),{0.3666, 0.5309, 0.711, 0.9046, 1.202, 1.591, 1.986, 2.465, 3.136, 4.008, 5.142, 6.431, 7.619, 9.142, 11.64, 16.86});
-            v2Ks8E.insert(v2Ks8E.end(),{0.00248373 ,0.000592259 ,0.000347889 ,0.00028455 ,0.000187699 ,0.000201148 ,0.000240112 ,0.000259821 ,0.000342163 ,0.000513599 ,0.000872609 ,0.00167536 ,0.00218428});
+    om8_v2kn->SetMarkerColor(kMagenta);
+    om8_v2kn->SetMarkerStyle(29);
+    om8_v2kn->SetMarkerSize(1.5);
+    om8_v2kn->SetLineColor(kMagenta);
 
-            v2La8.insert(v2La8.end(),{0.0322326 ,0.0504116 ,0.0773716 ,0.105974 ,0.137721 ,0.17128 ,0.194142 ,0.20458 ,0.204979 ,0.197623});
-            //pTLa8.insert(pTLa8.end(),{0.9252, 1.224, 1.603, 1.995, 2.485, 3.156, 4.007, 5.116, 6.414, 7.588});
-            v2La8E.insert(v2La8E.end(),{0.00124602 ,0.000505562 ,0.000446541 ,0.00045671 ,0.000412522 ,0.00045697 ,0.000652359 ,0.00113058 ,0.00363793 ,0.00800843});
+    c1->cd();
 
-            frame = c1->DrawFrame(0,-0.01,9,0.5);
-            gPad->SetTickx();
-            gPad->SetTicky();
-            frame->GetXaxis()->CenterTitle(1);
-            frame->GetYaxis()->CenterTitle(1);
-            frame->GetXaxis()->SetTitleSize(0.05);
-            frame->GetYaxis()->SetTitleSize(0.05);
-            frame->SetTitleOffset(1.1,"Y");
-            frame->SetTitleOffset(1.2,"X");
-            frame->GetXaxis()->SetTitle("p_{T} (GeV)");
-            frame->GetYaxis()->SetTitle("v_{2}^{sig}");
-        }
-        else if(i==1) // v2 vs KET
-        {
-            pTOm8.clear();
-            pTXi8.clear();
-            pTKs8.clear();
-            pTLa8.clear();
-
-            for(int i=0; i<ks_npoints; i++)
-            {
-                TH1D* hKetKs = (TH1D*)fV0->Get(Form("v0CorrelationRapidity/KETkshort_pt%d",i));
-                TH1D* hKetKs_bkg = (TH1D*)fV0->Get(Form("v0CorrelationRapidity/KETkshort_bkg_pt%d",i));
-
-                int nEntries = 0;
-                double KetTotal = 0;
-                for(int j=hKetKs->FindFirstBinAbove(0,1); j<=hKetKs->FindLastBinAbove(0,1); j++)
-                {
-                    double nKet = hKetKs->GetBinContent(j);
-                    double Ket = nKet*(hKetKs->GetBinCenter(j));
-                    nEntries+=nKet;
-                    KetTotal += Ket;
-                }
-                for(int j=hKetKs_bkg->FindFirstBinAbove(0,1); j<=hKetKs_bkg->FindLastBinAbove(0,1); j++)
-                {
-                    double nKet_bkg = hKetKs_bkg->GetBinContent(j);
-                    double Ket_bkg = nKet_bkg*(hKetKs_bkg->GetBinCenter(j));
-                    nEntries += nKet_bkg;
-                    KetTotal += Ket_bkg;
-                }
-                pTKs8.push_back(KetTotal/nEntries);
-            }
-            for(int i=0; i<la_npoints; i++)
-            {
-                TH1D* hKetLa = (TH1D*)fV0->Get(Form("v0CorrelationRapidity/KETlambda_pt%d",i));
-                TH1D* hKetLa_bkg = (TH1D*)fV0->Get(Form("v0CorrelationRapidity/KETlambda_bkg_pt%d",i));
-
-                int nEntries = 0;
-                double KetTotal = 0;
-                for(int j=hKetLa->FindFirstBinAbove(0,1); j<=hKetLa->FindLastBinAbove(0,1); j++)
-                {
-                    double nKet = hKetLa->GetBinContent(j);
-                    double Ket = nKet*(hKetLa->GetBinCenter(j));
-                    nEntries+=nKet;
-                    KetTotal += Ket;
-                }
-                for(int j=hKetLa_bkg->FindFirstBinAbove(0,1); j<=hKetLa_bkg->FindLastBinAbove(0,1); j++)
-                {
-                    double nKet_bkg = hKetLa_bkg->GetBinContent(j);
-                    double Ket_bkg = nKet_bkg*(hKetLa_bkg->GetBinCenter(j));
-                    nEntries += nKet_bkg;
-                    KetTotal += Ket_bkg;
-                }
-                pTLa8.push_back(KetTotal/nEntries);
-            }
-            for(int i=0; i<xi_npoints; i++)
-            {
-                TH1D* hKetXi = (TH1D*)fXi->Get(Form("xiCorrelationRapidity/KET_xi_pt%d",i));
-                TH1D* hKetXi_bkg = (TH1D*)fXi->Get(Form("xiCorrelationRapidity/KET_xi_bkg_pt%d",i));
-
-                int nEntries = 0;
-                double KetTotal = 0;
-                for(int j=hKetXi->FindFirstBinAbove(0,1); j<=hKetXi->FindLastBinAbove(0,1); j++)
-                {
-                    double nKet = hKetXi->GetBinContent(j);
-                    double Ket = nKet*(hKetXi->GetBinCenter(j));
-                    nEntries+=nKet;
-                    KetTotal += Ket;
-                }
-                for(int j=hKetXi_bkg->FindFirstBinAbove(0,1); j<=hKetXi_bkg->FindLastBinAbove(0,1); j++)
-                {
-                    double nKet_bkg = hKetXi_bkg->GetBinContent(j);
-                    double Ket_bkg = nKet_bkg*(hKetXi_bkg->GetBinCenter(j));
-                    nEntries += nKet_bkg;
-                    KetTotal += Ket_bkg;
-                }
-                pTXi8.push_back(KetTotal/nEntries);
-            }
-            for(int i=1; i<om_npoints+1; i++)
-            {
-                TH1D* hKetOm = (TH1D*)fOm->Get(Form("omCorrelationRapidity/KET_xi_pt%d",i));
-                TH1D* hKetOm_bkg = (TH1D*)fOm->Get(Form("omCorrelationRapidity/KET_xi_bkg_pt%d",i));
-
-                int nEntries = 0;
-                double KetTotal = 0;
-                for(int j=hKetOm->FindFirstBinAbove(0,1); j<=hKetOm->FindLastBinAbove(0,1); j++)
-                {
-                    double nKet = hKetOm->GetBinContent(j);
-                    double Ket = nKet*(hKetOm->GetBinCenter(j));
-                    nEntries+=nKet;
-                    KetTotal += Ket;
-                }
-                for(int j=hKetOm_bkg->FindFirstBinAbove(0,1); j<=hKetOm_bkg->FindLastBinAbove(0,1); j++)
-                {
-                    double nKet_bkg = hKetOm_bkg->GetBinContent(j);
-                    double Ket_bkg = nKet_bkg*(hKetOm_bkg->GetBinCenter(j));
-                    nEntries += nKet_bkg;
-                    KetTotal += Ket_bkg;
-                }
-                pTOm8.push_back(KetTotal/nEntries);
-            }
-
-            //pTXi8.insert(pTXi8.end(),{0.515319 ,0.768532 ,1.07944 ,1.50413 ,2.12034 ,2.92705 ,3.98122 ,5.28277});
-            //v2Xi8E.insert(v2Xi8E.end(),{0.00932224 ,0.00484125 ,0.0041527 ,0.00326934 ,0.00309064 ,0.00361334 ,0.00517473 ,0.0113186});
-
-            frame = c1->DrawFrame(0,-0.01,9,0.5);
-            gPad->SetTickx();
-            gPad->SetTicky();
-            frame->GetXaxis()->CenterTitle(1);
-            frame->GetYaxis()->CenterTitle(1);
-            frame->GetXaxis()->SetTitleSize(0.05);
-            frame->GetYaxis()->SetTitleSize(0.05);
-            frame->SetTitleOffset(1.1,"Y");
-            frame->SetTitleOffset(1.2,"X");
-            frame->GetXaxis()->SetTitle("KE_{T} (GeV)");
-            frame->GetYaxis()->SetTitle("v_{2}^{sig}");
-
-        }
-        else // v2/nq vs KET/nq
-        {
-            for(unsigned i=0; i<v2Om8.size(); i++)
-            {
-                v2Om8[i] = v2Om8[i]/3;
-                pTOm8[i] = pTOm8[i]/3;
-                v2Om8E[i] = v2Om8E[i]/3;
-            }
-            for(unsigned i=0; i<v2Xi8.size(); i++)
-            {
-                v2Xi8[i] = v2Xi8[i]/3;
-                pTXi8[i] = pTXi8[i]/3;
-                v2Xi8E[i] = v2Xi8E[i]/3;
-            }
-            for(unsigned i=0; i<v2Ks8.size(); i++)
-            {
-                v2Ks8[i] = v2Ks8[i]/2;
-                pTKs8[i] = pTKs8[i]/2;
-                v2Ks8E[i] = v2Ks8E[i]/2;
-            }
-            for(unsigned i=0; i<v2La8.size(); i++)
-            {
-                v2La8[i] = v2La8[i]/3;
-                pTLa8[i] = pTLa8[i]/3;
-                v2La8E[i] = v2La8E[i]/3;
-            }
-            //v2Xi8.clear();
-            //pTXi8.clear();
-            //v2Xi8E.clear();
-
-            //v2Ks8.clear();
-            //pTKs8.clear();
-            //v2Ks8E.clear();
-
-            //v2La8.clear();
-            //pTLa8.clear();
-            //v2La8E.clear();
-
-            //v2Xi8.insert(v2Xi8.end(),{0.012384 ,0.0223301 ,0.0292446 ,0.0413197 ,0.0544889 ,0.0613061 ,0.0699914 ,0.0586068});
-            //pTXi8.insert(pTXi8.end(),{0.171773 ,0.256177 ,0.359813 ,0.501378 ,0.70678 ,0.975684 ,1.32707 ,1.76092});
-            //v2Xi8E.insert(v2Xi8E.end(),{0.00310741 ,0.00161375 ,0.00138423 ,0.00108978 ,0.00103021 ,0.00120445 ,0.00172491 ,0.00377288});
-
-            //v2Ks8.insert(v2Ks8.end(),{0.00673528 ,0.0145688 ,0.021515 ,0.0297458 ,0.0411285 ,0.0529255 ,0.0620613 ,0.0687342 ,0.0730871 ,0.0720222 ,0.0659935 ,0.062301 ,0.0615953});
-            //pTKs8.insert(pTKs8.end(),{0.0491511 ,0.107642 ,0.181863 ,0.265131 ,0.39337 ,0.580146 ,0.773427 ,1.00715 ,1.33834 ,1.77237 ,2.34047 ,2.97792 ,3.57267});
-            //v2Ks8E.insert(v2Ks8E.end(),{0.00124186 ,0.00029613 ,0.000173945 ,0.000142275 ,9.38494e-05 ,0.000100574 ,0.000120056 ,0.00012991 ,0.000171082 ,0.0002568 ,0.000436305 ,0.00083768 ,0.00109214});
-
-            //v2La8.insert(v2La8.end(),{0.0107442 ,0.0168039 ,0.0257905 ,0.0353248 ,0.045907 ,0.0570934 ,0.064714 ,0.0681934 ,0.0683265 ,0.0658742});
-            //pTLa8.insert(pTLa8.end(),{0.10882 ,0.169831 ,0.276836 ,0.387927 ,0.530737 ,0.737755 ,1.01321 ,1.377 ,1.80224 ,2.19446});
-            //v2La8E.insert(v2La8E.end(),{0.000415341 ,0.000168521 ,0.000148847 ,0.000152237 ,0.000137507 ,0.000152323 ,0.000217453 ,0.000376861 ,0.00121264 ,0.00266948});
-
-            frame = c1->DrawFrame(0,-0.01,5,0.2);
-            gPad->SetTickx();
-            gPad->SetTicky();
-            frame->GetXaxis()->CenterTitle(1);
-            frame->GetYaxis()->CenterTitle(1);
-            frame->GetXaxis()->SetTitleSize(0.05);
-            frame->GetYaxis()->SetTitleSize(0.05);
-            frame->SetTitleOffset(1.1,"Y");
-            frame->SetTitleOffset(1.2,"X");
-            frame->GetXaxis()->SetTitle("KE_{T}/n_{q} (GeV)");
-            frame->GetYaxis()->SetTitle("v_{2}^{sig}/n_{q}");
-        }
-
-        // Pull TGraph for Kshort and lambda
-        TFile* file_hadv2 = TFile::Open("lrgraphv2_v3_pPb_hadron_185-above.root");
-
-        //TGraphErrors* ha_v2 = (TGraphErrors*)file_hadv2->Get("hadronv2");
-        TGraphErrors* ha_v2 = (TGraphErrors*)GetGraphWithSymmYErrorsFromFile(Form("data/%s","n185_220_ptass033pPb_v2.txt"),1,28,1.2);
-
-        TGraphErrors* om8_v2 = new TGraphErrors(om_npoints,&pTOm8[0],&v2Om8[0],0,&v2Om8E[0]);
-        TGraphErrors* xi8_v2 = new TGraphErrors(xi_npoints,&pTXi8[0],&v2Xi8[0],0,&v2Xi8E[0]);
-        TGraphErrors* ks8_v2 = new TGraphErrors(ks_npoints,&pTKs8[0],&v2Ks8[0],0,&v2Ks8E[0]);
-        TGraphErrors* la8_v2 = new TGraphErrors(la_npoints,&pTLa8[0],&v2La8[0],0,&v2La8E[0]);
-
-        ha_v2->SetMarkerStyle(28);
-        ha_v2->SetMarkerSize(1.3);
-
-        ks8_v2->SetMarkerColor(kRed);
-        ks8_v2->SetMarkerStyle(20);
-        ks8_v2->SetMarkerSize(1.5);
-        ks8_v2->SetLineColor(kRed);
-
-        xi8_v2->SetMarkerColor(kGreen+2);
-        xi8_v2->SetMarkerStyle(21);
-        xi8_v2->SetMarkerSize(1.5);
-        xi8_v2->SetLineColor(kGreen+2);
-
-        la8_v2->SetMarkerColor(kBlue-4);
-        la8_v2->SetMarkerStyle(22);
-        la8_v2->SetMarkerSize(1.5);
-        la8_v2->SetLineColor(kBlue-4);
-
-        om8_v2->SetMarkerColor(kMagenta);
-        om8_v2->SetMarkerStyle(29);
-        om8_v2->SetMarkerSize(1.5);
-        om8_v2->SetLineColor(kMagenta);
-
-        TLegend* leg = new TLegend(0.15,0.55,0.27,0.75);
-        leg->SetFillColor(10);
-        leg->SetFillStyle(0);
-        leg->SetBorderSize(0);
-        leg->SetTextFont(42);
-        leg->SetTextSize(0.05);
-        //leg->AddEntry(ha_v2, "h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}", "P");
-        leg->AddEntry(ks8_v2, "K_{S}^{0}", "P");
-        leg->AddEntry(la8_v2, "#Lambda / #bar{#Lambda}", "P");
-        leg->AddEntry(xi8_v2, "#Xi^{#pm}", "P");
-        leg->AddEntry(om8_v2, "#Omega^{#pm}", "P");
-        leg->Draw();
+    TLegend* leg = new TLegend(0.15,0.55,0.27,0.75);
+    leg->SetFillColor(10);
+    leg->SetFillStyle(0);
+    leg->SetBorderSize(0);
+    leg->SetTextFont(42);
+    leg->SetTextSize(0.05);
+    //leg->AddEntry(ha_v2, "h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}", "P");
+    leg->AddEntry(ks8_v2, "K_{S}^{0}", "P");
+    leg->AddEntry(la8_v2, "#Lambda / #bar{#Lambda}", "P");
+    leg->AddEntry(xi8_v2, "#Xi^{#pm}", "P");
+    leg->AddEntry(om8_v2, "#Omega^{#pm}", "P");
+    leg->Draw();
 
 
-        //ha_v2->Draw("PESAME");
-        ks8_v2->Draw("P");
-        la8_v2->Draw("P");
-        xi8_v2->Draw("P");
-        om8_v2->Draw("P");
+    //ha_v2->Draw("PESAME");
+    ks8_v2->Draw("P");
+    la8_v2->Draw("P");
+    xi8_v2->Draw("P");
+    om8_v2->Draw("P");
 
-        std::string kshortv2 = "";
-        std::string lambdav2 = "";
-        std::string cascadev2 = "";
-        std::string omegav2 = "";
+    TLatex *tex = new TLatex();
+    tex->SetNDC();
+    tex->SetTextFont(62);
+    tex->SetTextSize(0.05);
+    //tex->DrawLatex(0.15,0.8,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
+    tex->DrawLatex(0.15,0.8,"CMS PbPb #sqrt{S_{#lower[-0.3]{NN}}} = 5.02 TeV");
+    tex->SetTextSize(0.045);
+    //tex->DrawLatex(0.15,0.72, "L_{#lower[-0.25]{int}} = #color[38]{35} nb^{#font[122]{\55}1}, #color[46]{62} nb^{#font[122]{\55}1}");
+    // tex->DrawLatex(0.23,0.72, "L_{#lower[-0.25]{int}} = #color[kOrange+8]{35} nb^{#font[122]{\55}1}, 62 nb^{#font[122]{\55}1}");
+    tex->SetTextFont(42);
+    //tex->DrawLatex(0.40,0.24,"185 #leq N_{trk}^{offline} < 250");
+    tex->DrawLatex(0.36,0.72,"Cent: 30% - 50%");
+    /*tex->DrawLatex(0.15,0.74,"|y| < 1");*/
+    //tex->DrawLatex(0.4,0.7, "L_{#lower[-0.25]{int}} = 35 nb^{#font[122]{\55}1}, 185 nb^{#font[122]{\55}1}");
 
-        // Draw Legend and write points into rootfile
-        TFile* out = NULL;
-        if(i==0)
-        {
-            kshortv2 = "kshortv2";
-            lambdav2 = "lambdav2";
-            cascadev2 = "cascadev2";
-            omegav2 = "omegav2";
-            out = new TFile(v2RootFileName.c_str(),"RECREATE");
-        }
-        else if(i==1)
-        {
-            kshortv2 = "kshortv2KET";
-            lambdav2 = "lambdav2KET";
-            cascadev2 = "cascadev2KET";
-            omegav2 = "omegav2KET";
-            out = new TFile(v2RootFileName.c_str(),"UPDATE");
-        }
-        else
-        {
-            kshortv2 = "kshortv2nq";
-            lambdav2 = "lambdav2nq";
-            cascadev2 = "cascadev2nq";
-            omegav2 = "omegav2nq";
-            out = new TFile(v2RootFileName.c_str(),"UPDATE");
-        }
-        ks8_v2->Write(kshortv2.c_str());
-        la8_v2->Write(lambdav2.c_str());
-        xi8_v2->Write(cascadev2.c_str());
-        om8_v2->Write(omegav2.c_str());
-        out->Close();
+    c2->cd();
 
+    frame2 = c2->DrawFrame(0,-0.01,4.5,0.3);
+    gPad->SetTickx();
+    gPad->SetTicky();
+    frame2->GetXaxis()->CenterTitle(1);
+    frame2->GetYaxis()->CenterTitle(1);
+    frame2->GetXaxis()->SetTitleSize(0.05);
+    frame2->GetYaxis()->SetTitleSize(0.05);
+    frame2->SetTitleOffset(1.1,"Y");
+    frame2->SetTitleOffset(1.2,"X");
+    frame2->GetXaxis()->SetTitle("KE_{T}/n_{q} (GeV)");
+    frame2->GetYaxis()->SetTitle("v_{2}^{sig}/n_{q}");
 
-        TLatex *tex = new TLatex();
-        tex->SetNDC();
-        tex->SetTextFont(62);
-        tex->SetTextSize(0.05);
-        tex->DrawLatex(0.15,0.8,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
-        tex->SetTextSize(0.045);
-        //tex->DrawLatex(0.15,0.72, "L_{#lower[-0.25]{int}} = #color[38]{35} nb^{#font[122]{\55}1}, #color[46]{62} nb^{#font[122]{\55}1}");
-        // tex->DrawLatex(0.23,0.72, "L_{#lower[-0.25]{int}} = #color[kOrange+8]{35} nb^{#font[122]{\55}1}, 62 nb^{#font[122]{\55}1}");
-        tex->SetTextFont(42);
-        tex->DrawLatex(0.40,0.24,"185 #leq N_{trk}^{offline} < 250");
-        /*tex->DrawLatex(0.15,0.74,"|y| < 1");*/
-        //tex->DrawLatex(0.4,0.7, "L_{#lower[-0.25]{int}} = 35 nb^{#font[122]{\55}1}, 185 nb^{#font[122]{\55}1}");
+    TLegend* legkn = new TLegend(0.15,0.55,0.27,0.75);
+    legkn->SetFillColor(10);
+    legkn->SetFillStyle(0);
+    legkn->SetBorderSize(0);
+    legkn->SetTextFont(42);
+    legkn->SetTextSize(0.05);
+    legkn->AddEntry(ks8_v2kn, "K_{S}^{0}", "P");
+    legkn->AddEntry(la8_v2kn, "#Lambda / #bar{#Lambda}", "P");
+    legkn->AddEntry(xi8_v2kn, "#Xi^{#pm}", "P");
+    legkn->AddEntry(om8_v2kn, "#Omega^{#pm}", "P");
+    legkn->Draw();
 
-        if(i==0)
-        {
-            c1->Print("v2SigRapidity.pdf");
-        }
-        else if(i==1)
-        {
-            c1->Print("v2SigRapidityKET.pdf");
-        }
-        else
-        {
-            c1->Print("v2SigRapidityDividednq.pdf");
-        }
-    }
+    ks8_v2kn->Draw("P");
+    la8_v2kn->Draw("P");
+    xi8_v2kn->Draw("P");
+    om8_v2kn->Draw("P");
+
+    // Draw Legend and write points into rootfile
+
+    tex->SetTextFont(62);
+    //tex->DrawLatex(0.15,0.8,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
+    tex->DrawLatex(0.15,0.8,"CMS PbPb #sqrt{S_{#lower[-0.3]{NN}}} = 5.02 TeV");
+    tex->SetTextSize(0.045);
+    //tex->DrawLatex(0.15,0.72, "L_{#lower[-0.25]{int}} = #color[38]{35} nb^{#font[122]{\55}1}, #color[46]{62} nb^{#font[122]{\55}1}");
+    // tex->DrawLatex(0.23,0.72, "L_{#lower[-0.25]{int}} = #color[kOrange+8]{35} nb^{#font[122]{\55}1}, 62 nb^{#font[122]{\55}1}");
+    tex->SetTextFont(42);
+    //tex->DrawLatex(0.40,0.24,"185 #leq N_{trk}^{offline} < 250");
+    tex->DrawLatex(0.33,0.72,"Cent: 30% - 50%");
+    /*tex->DrawLatex(0.15,0.74,"|y| < 1");*/
+    //tex->DrawLatex(0.4,0.7, "L_{#lower[-0.25]{int}} = 35 nb^{#font[122]{\55}1}, 185 nb^{#font[122]{\55}1}");
+
+        c1->Print("v2SigRapidityPbPb.pdf");
+        c1->Print("v2SigRapidityPbPb.png");
+        //c1->Print("v2SigRapidityKET.pdf");
+        c2->Print("v2SigRapidityDividednqPbPb.pdf");
+        c2->Print("v2SigRapidityDividednqPbPb.png");
 }
 
 /*
