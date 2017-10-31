@@ -13,7 +13,7 @@
 using namespace std;
 
 struct ParticleData{
-    std::string fn = "V0v2perisub.root";
+    std::string fn = "V0v2perisubAltLongRange.root";
     std::string fn_V0 = "v0CorrelationRapidity";
     std::string fn_Xi = "xiCorrelationRapidity";
     std::string fn_v0cas = "v0CasCorrelationRapidityPeriSub";
@@ -29,7 +29,8 @@ struct ParticleData{
     TFile *f_V0 = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityCorrectMultB_09_19_17.root");
     TFile* f_Xi = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root");
     TFile *f_low_ref = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/Combine_MB0_corr_ref.root");
-    TFile *f_high_ref = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/XiCorrelationRapidityTotal_08_20_2017.root");
+    //TFile *f_high_ref = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/XiCorrelationRapidityTotal_08_20_2017.root");
+    TFile *f_high_ref = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/Combine_HM185_corr_ref_PUrej.root");
 } V0;
 
 void PeriSubObs(ParticleData PD)
@@ -59,6 +60,10 @@ void PeriSubObs(ParticleData PD)
     TCanvas* csPeaksr_xi = new TCanvas("csPeaksr_xi","csPeaksr_xi",1200,900);
     TCanvas* csPeaklr_xi = new TCanvas("csPeaklr_xi","csPeaklr_xi",1200,900);
     TCanvas* c = new TCanvas("c","c",400,400);
+
+    TCanvas* csPeaklr_low_2Dks = new TCanvas("csPeaklr_low_2Dks","csPeaklr_low_2Dks",1200,900);
+
+    csPeaklr_low_2Dks->Divide(2,2);
 
     csPeaksr_low_ks->Divide(4,4);
     csPeaklr_low_ks->Divide(4,4);
@@ -145,25 +150,25 @@ void PeriSubObs(ParticleData PD)
     double bin0yield = hsPeaksr_zeroed_low_ref->GetBinContent(hsPeaksr_zeroed_low_ref->FindBin(0.0))*0.19635;
     Jyieldsr_low_ref[0] = Jyieldsr_low_ref[0]*2 - bin0yield;
 
-    hbPeaklr_low_ref = hbackgroundPeak_low_ref->ProjectionY("hbPeaklr_low_ref",1,14);
-    TH1D* ahbPeaklr_low_ref = hbackgroundPeak_low_ref->ProjectionY("ahbPeaklr_low_ref",20,33);
-    hsPeaklr_low_ref = hsignalPeak_low_ref->ProjectionY("hsPeaklr_low_ref",1,14);
-    TH1D* ahsPeaklr_low_ref = hsignalPeak_low_ref->ProjectionY("ahsPeaklr_low_ref",20,33);
+    hbPeaklr_low_ref = hbackgroundPeak_low_ref->ProjectionY("hbPeaklr_low_ref",1,10);
+    TH1D* ahbPeaklr_low_ref = hbackgroundPeak_low_ref->ProjectionY("ahbPeaklr_low_ref",24,33);
+    hsPeaklr_low_ref = hsignalPeak_low_ref->ProjectionY("hsPeaklr_low_ref",1,10);
+    TH1D* ahsPeaklr_low_ref = hsignalPeak_low_ref->ProjectionY("ahsPeaklr_low_ref",24,33);
 
     hbPeaklr_low_ref->Add(ahbPeaklr_low_ref);
     hsPeaklr_low_ref->Add(ahsPeaklr_low_ref);
     hsPeaklr_low_ref->Divide(hbPeaklr_low_ref);
     hsPeaklr_low_ref->Scale(Bz_low_ref[0]/nEvent_low_ref[0]/BW2D);
 
-    TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.6,2.2);
+    TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.0,2.0);
     quadFit2->SetParameters(1,1,1);
 
     hsPeaklr_low_ref->Fit("quadFit2","R");
     hsPeaklr_low_ref->Fit("quadFit2","R");
     hsPeaklr_low_ref->Fit("quadFit2","R");
 
-    double minVal_lr = quadFit2->GetMinimum(0.6,2.2);
-    double minVal_lrX = quadFit2->GetMinimumX(0.6,2.2);
+    double minVal_lr = quadFit2->GetMinimum(0.0,2.0);
+    double minVal_lrX = quadFit2->GetMinimumX(0.0,2.0);
     TF1* minConst_lr = new TF1("minConst_lr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
     minConst_lr->SetParameter(0,-minVal_lr);
     TH1D* hsPeaklr_zeroed_low_ref = (TH1D*)hsPeaklr_low_ref->Clone();
@@ -177,7 +182,7 @@ void PeriSubObs(ParticleData PD)
     tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
     tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",0.3,3.0));
     tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-    tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
+    tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
     c->cd();
     Jyieldlr_low_ref.push_back(hsPeaklr_zeroed_low_ref->IntegralAndError(hsPeaklr_zeroed_low_ref->FindBin(0.0),hsPeaklr_zeroed_low_ref->FindBin(minVal_lrX),Jyieldlr_err_low_ref,"width"));
     bin0yield = hsPeaklr_zeroed_low_ref->GetBinContent(hsPeaklr_zeroed_low_ref->FindBin(0.0))*0.19635;
@@ -191,10 +196,10 @@ void PeriSubObs(ParticleData PD)
     fit1->SetParameters(10,1,1,1);
     fit1->SetLineColor(2);
 
-    V2lrs_low_ref = hsignalPeak_low_ref->ProjectionY("V2lrs_low_ref",1,14);
-    TH1D* aV2lrs_low_ref = hsignalPeak_low_ref->ProjectionY("aV2lrs_low_ref",20,33);
-    V2lrb_low_ref = hbackgroundPeak_low_ref->ProjectionY("V2lrb_low_ref",1,14);
-    TH1D* aV2lrb_low_ref = hbackgroundPeak_low_ref->ProjectionY("aV2lrb_low_ref",20,33);
+    V2lrs_low_ref = hsignalPeak_low_ref->ProjectionY("V2lrs_low_ref",1,10);
+    TH1D* aV2lrs_low_ref = hsignalPeak_low_ref->ProjectionY("aV2lrs_low_ref",24,33);
+    V2lrb_low_ref = hbackgroundPeak_low_ref->ProjectionY("V2lrb_low_ref",1,10);
+    TH1D* aV2lrb_low_ref = hbackgroundPeak_low_ref->ProjectionY("aV2lrb_low_ref",24,33);
     V2lrs_low_ref->Add(aV2lrs_low_ref);
     V2lrb_low_ref->Add(aV2lrb_low_ref);
     V2lrs_low_ref->Divide(V2lrb_low_ref);
@@ -246,9 +251,12 @@ void PeriSubObs(ParticleData PD)
 
     //Calculate Nassoc, Jet yield, High N
 
-    PD.f_high_ref->GetObject("xiCorrelationRapidity/BackgroundHad",hbackgroundPeak_high_ref);
-    PD.f_high_ref->GetObject("xiCorrelationRapidity/SignalHad",hsignalPeak_high_ref);
-    TH1D* mult_high_ref = (TH1D*) PD.f_high_ref->Get("xiCorrelationRapidity/nTrk");
+    //PD.f_high_ref->GetObject("xiCorrelationRapidity/BackgroundHad",hbackgroundPeak_high_ref);
+    //PD.f_high_ref->GetObject("xiCorrelationRapidity/SignalHad",hsignalPeak_high_ref);
+    //TH1D* mult_high_ref = (TH1D*) PD.f_high_ref->Get("xiCorrelationRapidity/nTrk");
+    PD.f_high_ref->GetObject("pPbCorr/background",hbackgroundPeak_high_ref);
+    PD.f_high_ref->GetObject("pPbCorr/signal",hsignalPeak_high_ref);
+    TH1D* mult_high_ref = (TH1D*) PD.f_high_ref->Get("pPbCorr/mult");
 
     hbPeaksr_high_ref = hbackgroundPeak_high_ref->ProjectionY("hbPeaksr_high_ref", 14, 20);
     hsPeaksr_high_ref = hsignalPeak_high_ref->ProjectionY("hsPeaksr_high_ref", 14, 20);
@@ -288,25 +296,25 @@ void PeriSubObs(ParticleData PD)
     bin0yield = hsPeaksr_zeroed_high_ref->GetBinContent(hsPeaksr_zeroed_high_ref->FindBin(0.0))*0.19635;
     Jyieldsr_high_ref[0] = Jyieldsr_high_ref[0]*2 - bin0yield;
 
-    hbPeaklr_high_ref = hbackgroundPeak_high_ref->ProjectionY("hbPeaklr_high_ref",1,14);
-    TH1D* ahbPeaklr_high_ref = hbackgroundPeak_high_ref->ProjectionY("ahbPeaklr_high_ref",20,33);
-    hsPeaklr_high_ref = hsignalPeak_high_ref->ProjectionY("hsPeaklr_high_ref",1,14);
-    TH1D* ahsPeaklr_high_ref = hsignalPeak_high_ref->ProjectionY("ahsPeaklr_high_ref",20,33);
+    hbPeaklr_high_ref = hbackgroundPeak_high_ref->ProjectionY("hbPeaklr_high_ref",1,10);
+    TH1D* ahbPeaklr_high_ref = hbackgroundPeak_high_ref->ProjectionY("ahbPeaklr_high_ref",24,33);
+    hsPeaklr_high_ref = hsignalPeak_high_ref->ProjectionY("hsPeaklr_high_ref",1,10);
+    TH1D* ahsPeaklr_high_ref = hsignalPeak_high_ref->ProjectionY("ahsPeaklr_high_ref",24,33);
 
     hbPeaklr_high_ref->Add(ahbPeaklr_high_ref);
     hsPeaklr_high_ref->Add(ahsPeaklr_high_ref);
     hsPeaklr_high_ref->Divide(hbPeaklr_high_ref);
     hsPeaklr_high_ref->Scale(Bz_high_ref[0]/nEvent_high_ref[0]/BW2D);
 
-    TF1* quadFit21 = new TF1("quadFit21","[0]*x^2+[1]*x+[2]",0.6,2.2);
+    TF1* quadFit21 = new TF1("quadFit21","[0]*x^2+[1]*x+[2]",0.0,2.0);
     quadFit21->SetParameters(1,1,1);
 
     hsPeaklr_high_ref->Fit("quadFit21","R");
     hsPeaklr_high_ref->Fit("quadFit21","R");
     hsPeaklr_high_ref->Fit("quadFit21","R");
 
-    minVal_lr = quadFit21->GetMinimum(0.6,2.2);
-    minVal_lrX = quadFit21->GetMinimumX(0.6,2.2);
+    minVal_lr = quadFit21->GetMinimum(0.0,2.0);
+    minVal_lrX = quadFit21->GetMinimumX(0.0,2.0);
     TF1* minConst_lr2 = new TF1("minConst_lr2","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
     minConst_lr2->SetParameter(0,-minVal_lr);
     TH1D* hsPeaklr_zeroed_high_ref = (TH1D*)hsPeaklr_high_ref->Clone();
@@ -320,7 +328,7 @@ void PeriSubObs(ParticleData PD)
     tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
     tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",0.3,3.0));
     tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-    tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
+    tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
     c->cd();
     Jyieldlr_high_ref.push_back(hsPeaklr_zeroed_high_ref->IntegralAndError(hsPeaklr_zeroed_high_ref->FindBin(0.0),hsPeaklr_zeroed_high_ref->FindBin(minVal_lrX),Jyieldlr_err_high_ref,"width"));
     bin0yield = hsPeaklr_zeroed_high_ref->GetBinContent(hsPeaklr_zeroed_high_ref->FindBin(0.0))*0.19635;
@@ -334,10 +342,10 @@ void PeriSubObs(ParticleData PD)
     fit2->SetParameters(10,1,1,1);
     fit2->SetLineColor(2);
 
-    V2lrs_high_ref = hsignalPeak_high_ref->ProjectionY("V2lrs_high_ref",1,14);
-    TH1D* aV2lrs_high_ref = hsignalPeak_high_ref->ProjectionY("aV2lrs_high_ref",20,33);
-    V2lrb_high_ref = hbackgroundPeak_high_ref->ProjectionY("V2lrb_high_ref",1,14);
-    TH1D* aV2lrb_high_ref = hbackgroundPeak_high_ref->ProjectionY("aV2lrb_high_ref",20,33);
+    V2lrs_high_ref = hsignalPeak_high_ref->ProjectionY("V2lrs_high_ref",1,10);
+    TH1D* aV2lrs_high_ref = hsignalPeak_high_ref->ProjectionY("aV2lrs_high_ref",24,33);
+    V2lrb_high_ref = hbackgroundPeak_high_ref->ProjectionY("V2lrb_high_ref",1,10);
+    TH1D* aV2lrb_high_ref = hbackgroundPeak_high_ref->ProjectionY("aV2lrb_high_ref",24,33);
     V2lrs_high_ref->Add(aV2lrs_high_ref);
     V2lrb_high_ref->Add(aV2lrb_high_ref);
     V2lrs_high_ref->Divide(V2lrb_high_ref);
@@ -451,14 +459,14 @@ void PeriSubObs(ParticleData PD)
 
         int arraySize_ks = PD.PtBin_ks.size();
 
-        TH1D* hsPeaksr_low_ks[arraySize_ks];
-        TH1D* hbPeaksr_low_ks[arraySize_ks];
-        TH1D* hsPeaklr_low_ks[arraySize_ks];
-        TH1D* hbPeaklr_low_ks[arraySize_ks];
-        TH1D* V2lrs_low_ks[arraySize_ks];
-        TH1D* V2lrb_low_ks[arraySize_ks];
-        TH2D* hbackgroundPeak_low_ks[arraySize_ks];
-        TH2D* hsignalPeak_low_ks[arraySize_ks];
+        TH1D* hsPeaksr_low_ks[3*arraySize_ks];
+        TH1D* hbPeaksr_low_ks[3*arraySize_ks];
+        TH1D* hsPeaklr_low_ks[3*arraySize_ks];
+        TH1D* hbPeaklr_low_ks[3*arraySize_ks];
+        TH1D* V2lrs_low_ks[3*arraySize_ks];
+        TH1D* V2lrb_low_ks[3*arraySize_ks];
+        TH2D* hbackgroundPeak_low_ks[3*arraySize_ks];
+        TH2D* hsignalPeak_low_ks[3*arraySize_ks];
 
 
         //Calculate Nassoc, Jet yield, Peak region Low N
@@ -475,6 +483,14 @@ void PeriSubObs(ParticleData PD)
             TF1* quadFit13 = new TF1("quadFit13","[0]*x^2+[1]*x+[2]",0.6,2.2);
             quadFit13->SetParameters(1,1,1);
 
+            //csPeaklr_low_2Dks->cd(i+1);
+            //TH2D* hPeak_low_2Dks = hsignalPeak_low_ks[i];
+            //hPeak_low_2Dks->Divide(hbackgroundPeak_low_ks[i]);
+
+            //hPeak_low_2Dks->Draw();
+            //hbackgroundPeak_low_ks[i]->Draw();
+            //c->cd();
+
 
             //nEvent_low_ks.push_back(mult_low_ks->Integral(0,100000));
             nEvent_low_ks.push_back(mult_low_ks->Integral(2,100000));
@@ -482,19 +498,22 @@ void PeriSubObs(ParticleData PD)
 
             hsPeaksr_low_ks[i]->Divide(hbPeaksr_low_ks[i]);
             hsPeaksr_low_ks[i]->Scale(Bz_low_ks[i]/nEvent_low_ks[i]/BW2D);
+            //hsPeaksr_low_ks[i]->Scale(Bz_low_ks[i]/BW2D);
 
             hsPeaksr_low_ks[i]->Fit("quadFit13","R");
             hsPeaksr_low_ks[i]->Fit("quadFit13","R");
             hsPeaksr_low_ks[i]->Fit("quadFit13","R");
 
+            csPeaksr_low_ks->cd(i+1);
             double minVal_sr = quadFit13->GetMinimum(0.6,2.2);
             double minVal_srX = quadFit13->GetMinimumX(0.6,2.2);
             TF1* minConst_sr = new TF1("minConst_sr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
             minConst_sr->SetParameter(0,-minVal_sr);
             TH1D* hsPeaksr_zeroed_low_ks = (TH1D*)hsPeaksr_low_ks[i]->Clone();
+            TH1D* hsPeaksr_drawed_low_ks = (TH1D*)hsPeaksr_low_ks[i]->Clone();
+            hsPeaksr_drawed_low_ks->Draw();
             hsPeaksr_zeroed_low_ks->Add(minConst_sr);
-            csPeaksr_low_ks->cd(i+1);
-            hsPeaksr_low_ks[i]->Draw();
+            //hsPeaksr_low_ks[i]->Draw();
             double xcoor = 0.52;
             double ycoor = 0.90;
             double increment = 0.07;
@@ -508,31 +527,36 @@ void PeriSubObs(ParticleData PD)
             double bin0yield = hsPeaksr_zeroed_low_ks->GetBinContent(hsPeaksr_zeroed_low_ks->FindBin(0.0))*0.19635;
             Jyieldsr_low_ks[i] = Jyieldsr_low_ks[i]*2 - bin0yield;
 
-            hbPeaklr_low_ks[i] = hbackgroundPeak_low_ks[i]->ProjectionY("hbPeaklr_low_ks",1,14);
-            TH1D* ahbPeaklr_low_ks = hbackgroundPeak_low_ks[i]->ProjectionY("ahbPeaklr_low_ks",20,33);
-            hsPeaklr_low_ks[i] = hsignalPeak_low_ks[i]->ProjectionY("hsPeaklr_low_ks",1,14);
-            TH1D* ahsPeaklr_low_ks = hsignalPeak_low_ks[i]->ProjectionY("ahsPeaklr_low_ks",20,33);
+            hbPeaklr_low_ks[i] = hbackgroundPeak_low_ks[i]->ProjectionY("hbPeaklr_low_ks",1,10);
+            TH1D* ahbPeaklr_low_ks = hbackgroundPeak_low_ks[i]->ProjectionY("ahbPeaklr_low_ks",24,33);
+            //Here first bin works
+            csPeaklr_low_ks->cd(i+1);
+            hsPeaklr_low_ks[i] = hsignalPeak_low_ks[i]->ProjectionY("hsPeaklr_low_ks",1,10);
+            //Here broken
+            TH1D* ahsPeaklr_low_ks = hsignalPeak_low_ks[i]->ProjectionY("ahsPeaklr_low_ks",24,33);
 
             hbPeaklr_low_ks[i]->Add(ahbPeaklr_low_ks);
             hsPeaklr_low_ks[i]->Add(ahsPeaklr_low_ks);
             hsPeaklr_low_ks[i]->Divide(hbPeaklr_low_ks[i]);
             hsPeaklr_low_ks[i]->Scale(Bz_low_ks[i]/nEvent_low_ks[i]/BW2D);
+            //hsPeaklr_low_ks[i]->Scale(Bz_low_ks[i]/BW2D);
 
-            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.6,2.2);
+            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.0,2.0);
             quadFit2->SetParameters(1,1,1);
-            csPeaklr_low_ks->cd(i+1);
 
             hsPeaklr_low_ks[i]->Fit("quadFit2","R");
             //hsPeaklr_low_ks[i]->Fit("quadFit2","R");
             //hsPeaklr_low_ks[i]->Fit("quadFit2","R");
 
-            double minVal_lr = quadFit2->GetMinimum(0.6,2.2);
-            double minVal_lrX = quadFit2->GetMinimumX(0.6,2.2);
+            double minVal_lr = quadFit2->GetMinimum(0.0,2.0);
+            double minVal_lrX = quadFit2->GetMinimumX(0.0,2.0);
             TF1* minConst_lr = new TF1("minConst_lr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
             minConst_lr->SetParameter(0,-minVal_lr);
+            //hsPeaklr_low_ks[i]->Draw();
             TH1D* hsPeaklr_zeroed_low_ks = (TH1D*)hsPeaklr_low_ks[i]->Clone();
+            TH1D* hsPeaklr_drawed_low_ks = (TH1D*)hsPeaklr_low_ks[i]->Clone();
+            hsPeaklr_drawed_low_ks->Draw();
             hsPeaklr_zeroed_low_ks->Add(minConst_lr);
-            hsPeaklr_low_ks[i]->Draw();
             xcoor = 0.52;
             ycoor = 0.90;
             increment = 0.07;
@@ -540,28 +564,29 @@ void PeriSubObs(ParticleData PD)
             tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_ks[i],PD.PtBin_ks[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
-            c->cd();
+            tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
             Jyieldlr_low_ks.push_back(hsPeaklr_zeroed_low_ks->IntegralAndError(hsPeaklr_zeroed_low_ks->FindBin(0.0),hsPeaklr_zeroed_low_ks->FindBin(minVal_lrX),Jyieldlr_err_low_ks[i],"width"));
             bin0yield = hsPeaklr_zeroed_low_ks->GetBinContent(hsPeaklr_zeroed_low_ks->FindBin(0.0))*0.19635;
             Jyieldlr_low_ks[i] = Jyieldlr_low_ks[i]*2 - bin0yield;
 
             JyieldSub_low_ks.push_back(Jyieldsr_low_ks[i] - Jyieldlr_low_ks[i]);
             JyieldSub_err_low_ks.push_back(sqrt(Jyieldsr_err_low_ks[i]*Jyieldsr_err_low_ks[i] + Jyieldlr_err_low_ks[i]*Jyieldlr_err_low_ks[i]));
+            c->cd();
 
             TF1* fit1 = new TF1("fit1","[0]*(1.0+2.0*[1]*cos(x)+2.0*[2]*cos(2.0*x)+2.0*[3]*cos(3.0*x)+2.0*[4]*cos(4.0*x))",-0.5*TMath::Pi(),1.5*TMath::Pi());
             fit1->SetParNames("N","V1","V2","V3");
             fit1->SetParameters(10,1,1,1);
             fit1->SetLineColor(2);
 
-            V2lrs_low_ks[i] = hsignalPeak_low_ks[i]->ProjectionY(Form("V2lrs_low_ks%d",i),1,14);
-            TH1D* aV2lrs_low_ks = hsignalPeak_low_ks[i]->ProjectionY("aV2lrs_low_ks",20,33);
-            V2lrb_low_ks[i] = hbackgroundPeak_low_ks[i]->ProjectionY(Form("V2lrb_low_ks%d",i),1,14);
-            TH1D* aV2lrb_low_ks = hbackgroundPeak_low_ks[i]->ProjectionY("aV2lrb_low_ks",20,33);
+            V2lrs_low_ks[i] = hsignalPeak_low_ks[i]->ProjectionY(Form("V2lrs_low_ks%d",i),1,10);
+            TH1D* aV2lrs_low_ks = hsignalPeak_low_ks[i]->ProjectionY("aV2lrs_low_ks",24,33);
+            V2lrb_low_ks[i] = hbackgroundPeak_low_ks[i]->ProjectionY(Form("V2lrb_low_ks%d",i),1,10);
+            TH1D* aV2lrb_low_ks = hbackgroundPeak_low_ks[i]->ProjectionY("aV2lrb_low_ks",24,33);
             V2lrs_low_ks[i]->Add(aV2lrs_low_ks);
             V2lrb_low_ks[i]->Add(aV2lrb_low_ks);
             V2lrs_low_ks[i]->Divide(V2lrb_low_ks[i]);
             V2lrs_low_ks[i]->Scale(Bz_low_ks[i]/nEvent_low_ks[i]/BW2D);
+            //V2lrs_low_ks[i]->Scale(Bz_low_ks[i]/BW2D);
 
             V2lrs_low_ks[i]->Fit("fit1","R");
             //V2lrs_low_ks[i]->Fit("fit1","R");
@@ -574,6 +599,7 @@ void PeriSubObs(ParticleData PD)
 
             Nassoc_low_ks.push_back(fit1->GetParameter(0));
             c->cd();
+            //if(i==4) return;
         }
 
         //Lambda N low
@@ -624,6 +650,7 @@ void PeriSubObs(ParticleData PD)
 
             hsPeaksr_low_la[i]->Divide(hbPeaksr_low_la[i]);
             hsPeaksr_low_la[i]->Scale(Bz_low_la[i]/nEvent_low_la[i]/BW2D);
+            //hsPeaksr_low_la[i]->Scale(Bz_low_la[i]/BW2D);
 
             csPeaksr_low_la->cd(i+1);
 
@@ -636,8 +663,10 @@ void PeriSubObs(ParticleData PD)
             TF1* minConst_sr = new TF1("minConst_sr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
             minConst_sr->SetParameter(0,-minVal_sr);
             TH1D* hsPeaksr_zeroed_low_la = (TH1D*)hsPeaksr_low_la[i]->Clone();
+            TH1D* hsPeaksr_drawed_low_la = (TH1D*)hsPeaksr_low_la[i]->Clone();
+            hsPeaksr_drawed_low_la->Draw();
             hsPeaksr_zeroed_low_la->Add(minConst_sr);
-            hsPeaksr_low_la[i]->Draw();
+            //hsPeaksr_low_la[i]->Draw();
             double xcoor = 0.52;
             double ycoor = 0.90;
             double increment = 0.07;
@@ -651,31 +680,33 @@ void PeriSubObs(ParticleData PD)
             double bin0yield = hsPeaksr_zeroed_low_la->GetBinContent(hsPeaksr_zeroed_low_la->FindBin(0.0))*0.19635;
             Jyieldsr_low_la[i] = Jyieldsr_low_la[i]*2 - bin0yield;
 
-            hbPeaklr_low_la[i] = hbackgroundPeak_low_la[i]->ProjectionY("hbPeaklr_low_la",1,14);
-            TH1D* ahbPeaklr_low_la = hbackgroundPeak_low_la[i]->ProjectionY("ahbPeaklr_low_la",20,33);
-            hsPeaklr_low_la[i] = hsignalPeak_low_la[i]->ProjectionY("hsPeaklr_low_la",1,14);
-            TH1D* ahsPeaklr_low_la = hsignalPeak_low_la[i]->ProjectionY("ahsPeaklr_low_la",20,33);
+            hbPeaklr_low_la[i] = hbackgroundPeak_low_la[i]->ProjectionY("hbPeaklr_low_la",1,10);
+            TH1D* ahbPeaklr_low_la = hbackgroundPeak_low_la[i]->ProjectionY("ahbPeaklr_low_la",24,33);
+            hsPeaklr_low_la[i] = hsignalPeak_low_la[i]->ProjectionY("hsPeaklr_low_la",1,10);
+            TH1D* ahsPeaklr_low_la = hsignalPeak_low_la[i]->ProjectionY("ahsPeaklr_low_la",24,33);
 
             hbPeaklr_low_la[i]->Add(ahbPeaklr_low_la);
             hsPeaklr_low_la[i]->Add(ahsPeaklr_low_la);
             hsPeaklr_low_la[i]->Divide(hbPeaklr_low_la[i]);
             hsPeaklr_low_la[i]->Scale(Bz_low_la[i]/nEvent_low_la[i]/BW2D);
+            //hsPeaklr_low_la[i]->Scale(Bz_low_la[i]/BW2D);
 
-            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.6,2.2);
+            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.0,2.0);
             quadFit2->SetParameters(1,1,1);
 
             hsPeaklr_low_la[i]->Fit("quadFit2","R");
             //hsPeaklr_low_la[i]->Fit("quadFit2","R");
             //hsPeaklr_low_la[i]->Fit("quadFit2","R");
 
-            double minVal_lr = quadFit2->GetMinimum(0.6,2.2);
-            double minVal_lrX = quadFit2->GetMinimumX(0.6,2.2);
+            csPeaklr_low_la->cd(i+1);
+            double minVal_lr = quadFit2->GetMinimum(0.0,2.0);
+            double minVal_lrX = quadFit2->GetMinimumX(0.0,2.0);
             TF1* minConst_lr = new TF1("minConst_lr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
             minConst_lr->SetParameter(0,-minVal_lr);
             TH1D* hsPeaklr_zeroed_low_la = (TH1D*)hsPeaklr_low_la[i]->Clone();
+            TH1D* hsPeaklr_drawed_low_la = (TH1D*)hsPeaklr_low_la[i]->Clone();
+            hsPeaklr_drawed_low_la->Draw();
             hsPeaklr_zeroed_low_la->Add(minConst_lr);
-            csPeaklr_low_la->cd(i+1);
-            hsPeaklr_low_la[i]->Draw();
             xcoor = 0.52;
             ycoor = 0.90;
             increment = 0.07;
@@ -683,7 +714,7 @@ void PeriSubObs(ParticleData PD)
             tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_la[i],PD.PtBin_la[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
+            tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
             c->cd();
             Jyieldlr_low_la.push_back(hsPeaklr_zeroed_low_la->IntegralAndError(hsPeaklr_zeroed_low_la->FindBin(0.0),hsPeaklr_zeroed_low_la->FindBin(minVal_lrX),Jyieldlr_err_low_la[i],"width"));
             bin0yield = hsPeaklr_zeroed_low_la->GetBinContent(hsPeaklr_zeroed_low_la->FindBin(0.0))*0.19635;
@@ -697,14 +728,15 @@ void PeriSubObs(ParticleData PD)
             fit1->SetParameters(10,1,1,1);
             fit1->SetLineColor(2);
 
-            V2lrs_low_la[i] = hsignalPeak_low_la[i]->ProjectionY(Form("V2lrs_low_la%d",i),1,14);
-            TH1D* aV2lrs_low_la = hsignalPeak_low_la[i]->ProjectionY("aV2lrs_low_la",20,33);
-            V2lrb_low_la[i] = hbackgroundPeak_low_la[i]->ProjectionY(Form("V2lrb_low_la%d",i),1,14);
-            TH1D* aV2lrb_low_la = hbackgroundPeak_low_la[i]->ProjectionY("aV2lrb_low_la",20,33);
+            V2lrs_low_la[i] = hsignalPeak_low_la[i]->ProjectionY(Form("V2lrs_low_la%d",i),1,10);
+            TH1D* aV2lrs_low_la = hsignalPeak_low_la[i]->ProjectionY("aV2lrs_low_la",24,33);
+            V2lrb_low_la[i] = hbackgroundPeak_low_la[i]->ProjectionY(Form("V2lrb_low_la%d",i),1,10);
+            TH1D* aV2lrb_low_la = hbackgroundPeak_low_la[i]->ProjectionY("aV2lrb_low_la",24,33);
             V2lrs_low_la[i]->Add(aV2lrs_low_la);
             V2lrb_low_la[i]->Add(aV2lrb_low_la);
             V2lrs_low_la[i]->Divide(V2lrb_low_la[i]);
             V2lrs_low_la[i]->Scale(Bz_low_la[i]/nEvent_low_la[i]/BW2D);
+            //V2lrs_low_la[i]->Scale(Bz_low_la[i]/BW2D);
 
             V2lrs_low_la[i]->Fit("fit1","R");
             //V2lrs_low_la[i]->Fit("fit1","R");
@@ -796,10 +828,10 @@ void PeriSubObs(ParticleData PD)
             double bin0yield = hsPeaksr_zeroed_low_xi->GetBinContent(hsPeaksr_zeroed_low_xi->FindBin(0.0))*0.19635;
             Jyieldsr_low_xi[i] = Jyieldsr_low_xi[i]*2 - bin0yield;
 
-            hbPeaklr_low_xi[i] = hbackgroundPeak_low_xi[i]->ProjectionY("hbPeaklr_low_xi",1,14);
-            TH1D* ahbPeaklr_low_xi = hbackgroundPeak_low_xi[i]->ProjectionY("ahbPeaklr_low_xi",20,33);
-            hsPeaklr_low_xi[i] = hsignalPeak_low_xi[i]->ProjectionY("hsPeaklr_low_xi",1,14);
-            TH1D* ahsPeaklr_low_xi = hsignalPeak_low_xi[i]->ProjectionY("ahsPeaklr_low_xi",20,33);
+            hbPeaklr_low_xi[i] = hbackgroundPeak_low_xi[i]->ProjectionY("hbPeaklr_low_xi",1,10);
+            TH1D* ahbPeaklr_low_xi = hbackgroundPeak_low_xi[i]->ProjectionY("ahbPeaklr_low_xi",24,33);
+            hsPeaklr_low_xi[i] = hsignalPeak_low_xi[i]->ProjectionY("hsPeaklr_low_xi",1,10);
+            TH1D* ahsPeaklr_low_xi = hsignalPeak_low_xi[i]->ProjectionY("ahsPeaklr_low_xi",24,33);
 
             hbPeaklr_low_xi[i]->Add(ahbPeaklr_low_xi);
             hsPeaklr_low_xi[i]->Add(ahsPeaklr_low_xi);
@@ -808,15 +840,15 @@ void PeriSubObs(ParticleData PD)
 
             csPeaklr_low_xi->cd(i+1);
 
-            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.6,2.2);
+            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.0,2.0);
             quadFit2->SetParameters(1,1,1);
 
             hsPeaklr_low_xi[i]->Fit("quadFit2","R");
             //hsPeaklr_low_xi[i]->Fit("quadFit2","R");
             //hsPeaklr_low_xi[i]->Fit("quadFit2","R");
 
-            double minVal_lr = quadFit2->GetMinimum(0.6,2.2);
-            double minVal_lrX = quadFit2->GetMinimumX(0.6,2.2);
+            double minVal_lr = quadFit2->GetMinimum(0.0,2.0);
+            double minVal_lrX = quadFit2->GetMinimumX(0.0,2.0);
             TF1* minConst_lr = new TF1("minConst_lr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
             minConst_lr->SetParameter(0,-minVal_lr);
             TH1D* hsPeaklr_zeroed_low_xi = (TH1D*)hsPeaklr_low_xi[i]->Clone();
@@ -829,7 +861,7 @@ void PeriSubObs(ParticleData PD)
             tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_xi[i],PD.PtBin_xi[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
+            tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
             c->cd();
             Jyieldlr_low_xi.push_back(hsPeaklr_zeroed_low_xi->IntegralAndError(hsPeaklr_zeroed_low_xi->FindBin(0.0),hsPeaklr_zeroed_low_xi->FindBin(minVal_lrX),Jyieldlr_err_low_xi[i],"width"));
             bin0yield = hsPeaklr_zeroed_low_xi->GetBinContent(hsPeaklr_zeroed_low_xi->FindBin(0.0))*0.19635;
@@ -843,10 +875,10 @@ void PeriSubObs(ParticleData PD)
             fit1->SetParameters(10,1,1,1);
             fit1->SetLineColor(2);
 
-            V2lrs_low_xi[i] = hsignalPeak_low_xi[i]->ProjectionY(Form("V2lrs_low_xi%d",i),1,14);
-            TH1D* aV2lrs_low_xi = hsignalPeak_low_xi[i]->ProjectionY("aV2lrs_low_xi",20,33);
-            V2lrb_low_xi[i] = hbackgroundPeak_low_xi[i]->ProjectionY(Form("V2lrb_low_xi%d",i),1,14);
-            TH1D* aV2lrb_low_xi = hbackgroundPeak_low_xi[i]->ProjectionY("aV2lrb_low_xi",20,33);
+            V2lrs_low_xi[i] = hsignalPeak_low_xi[i]->ProjectionY(Form("V2lrs_low_xi%d",i),1,10);
+            TH1D* aV2lrs_low_xi = hsignalPeak_low_xi[i]->ProjectionY("aV2lrs_low_xi",24,33);
+            V2lrb_low_xi[i] = hbackgroundPeak_low_xi[i]->ProjectionY(Form("V2lrb_low_xi%d",i),1,10);
+            TH1D* aV2lrb_low_xi = hbackgroundPeak_low_xi[i]->ProjectionY("aV2lrb_low_xi",24,33);
             V2lrs_low_xi[i]->Add(aV2lrs_low_xi);
             V2lrb_low_xi[i]->Add(aV2lrb_low_xi);
             V2lrs_low_xi[i]->Divide(V2lrb_low_xi[i]);
@@ -914,6 +946,7 @@ void PeriSubObs(ParticleData PD)
 
             hsPeaksr_ks[i]->Divide(hbPeaksr_ks[i]);
             hsPeaksr_ks[i]->Scale(Bz_ks[i]/nEvent_ks[i]/BW2D);
+            //hsPeaksr_ks[i]->Scale(Bz_ks[i]/BW2D);
 
             csPeaksr_ks->cd(i+1);
 
@@ -926,8 +959,9 @@ void PeriSubObs(ParticleData PD)
             TF1* minConst_sr = new TF1("minConst_sr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
             minConst_sr->SetParameter(0,-minVal_sr);
             TH1D* hsPeaksr_zeroed_ks = (TH1D*)hsPeaksr_ks[i]->Clone();
+            TH1D* hsPeaksr_drawed_ks = (TH1D*)hsPeaksr_ks[i]->Clone();
+            hsPeaksr_drawed_ks->Draw();
             hsPeaksr_zeroed_ks->Add(minConst_sr);
-            hsPeaksr_ks[i]->Draw();
             double xcoor = 0.52;
             double ycoor = 0.90;
             double increment = 0.07;
@@ -941,32 +975,34 @@ void PeriSubObs(ParticleData PD)
             double bin0yield = hsPeaksr_zeroed_ks->GetBinContent(hsPeaksr_zeroed_ks->FindBin(0.0))*0.19635;
             Jyieldsr_ks[i] = Jyieldsr_ks[i]*2 - bin0yield;
 
-            hbPeaklr_ks[i] = hbackgroundPeak_ks[i]->ProjectionY("hbPeaklr_ks",1,14);
-            TH1D* ahbPeaklr_ks = hbackgroundPeak_ks[i]->ProjectionY("ahbPeaklr_ks",20,33);
-            hsPeaklr_ks[i] = hsignalPeak_ks[i]->ProjectionY("hsPeaklr_ks",1,14);
-            TH1D* ahsPeaklr_ks = hsignalPeak_ks[i]->ProjectionY("ahsPeaklr_ks",20,33);
+            hbPeaklr_ks[i] = hbackgroundPeak_ks[i]->ProjectionY("hbPeaklr_ks",1,10);
+            TH1D* ahbPeaklr_ks = hbackgroundPeak_ks[i]->ProjectionY("ahbPeaklr_ks",24,33);
+            hsPeaklr_ks[i] = hsignalPeak_ks[i]->ProjectionY("hsPeaklr_ks",1,10);
+            TH1D* ahsPeaklr_ks = hsignalPeak_ks[i]->ProjectionY("ahsPeaklr_ks",24,33);
 
             hbPeaklr_ks[i]->Add(ahbPeaklr_ks);
             hsPeaklr_ks[i]->Add(ahsPeaklr_ks);
             hsPeaklr_ks[i]->Divide(hbPeaklr_ks[i]);
             hsPeaklr_ks[i]->Scale(Bz_ks[i]/nEvent_ks[i]/BW2D);
+            //hsPeaklr_ks[i]->Scale(Bz_ks[i]/BW2D);
 
             csPeaklr_ks->cd(i+1);
 
-            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.6,2.2);
+            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.0,2.0);
             quadFit2->SetParameters(1,1,1);
 
             hsPeaklr_ks[i]->Fit("quadFit2","R");
             //hsPeaklr_ks[i]->Fit("quadFit2","R");
             //hsPeaklr_ks[i]->Fit("quadFit2","R");
 
-            double minVal_lr = quadFit2->GetMinimum(0.6,2.2);
-            double minVal_lrX = quadFit2->GetMinimumX(0.6,2.2);
+            double minVal_lr = quadFit2->GetMinimum(0.0,2.0);
+            double minVal_lrX = quadFit2->GetMinimumX(0.0,2.0);
             TF1* minConst_lr = new TF1("minConst_lr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
             minConst_lr->SetParameter(0,-minVal_lr);
             TH1D* hsPeaklr_zeroed_ks = (TH1D*)hsPeaklr_ks[i]->Clone();
+            TH1D* hsPeaklr_drawed_ks = (TH1D*)hsPeaklr_ks[i]->Clone();
+            hsPeaklr_drawed_ks->Draw();
             hsPeaklr_zeroed_ks->Add(minConst_lr);
-            hsPeaklr_ks[i]->Draw();
             xcoor = 0.52;
             ycoor = 0.90;
             increment = 0.07;
@@ -974,7 +1010,7 @@ void PeriSubObs(ParticleData PD)
             tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_ks[i],PD.PtBin_ks[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
+            tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
             c->cd();
             Jyieldlr_ks.push_back(hsPeaklr_zeroed_ks->IntegralAndError(hsPeaklr_zeroed_ks->FindBin(0.0),hsPeaklr_zeroed_ks->FindBin(minVal_lrX),Jyieldlr_err_ks[i],"width"));
             bin0yield = hsPeaklr_zeroed_ks->GetBinContent(hsPeaklr_zeroed_ks->FindBin(0.0))*0.19635;
@@ -988,14 +1024,15 @@ void PeriSubObs(ParticleData PD)
             fit1->SetParameters(10,1,1,1);
             fit1->SetLineColor(2);
 
-            V2lrs_ks[i] = hsignalPeak_ks[i]->ProjectionY(Form("V2lrs_ks%d",i),1,14);
-            TH1D* aV2lrs_ks = hsignalPeak_ks[i]->ProjectionY("aV2lrs_ks",20,33);
-            V2lrb_ks[i] = hbackgroundPeak_ks[i]->ProjectionY(Form("V2lrb_ks%d",i),1,14);
-            TH1D* aV2lrb_ks = hbackgroundPeak_ks[i]->ProjectionY("aV2lrb_ks",20,33);
+            V2lrs_ks[i] = hsignalPeak_ks[i]->ProjectionY(Form("V2lrs_ks%d",i),1,10);
+            TH1D* aV2lrs_ks = hsignalPeak_ks[i]->ProjectionY("aV2lrs_ks",24,33);
+            V2lrb_ks[i] = hbackgroundPeak_ks[i]->ProjectionY(Form("V2lrb_ks%d",i),1,10);
+            TH1D* aV2lrb_ks = hbackgroundPeak_ks[i]->ProjectionY("aV2lrb_ks",24,33);
             V2lrs_ks[i]->Add(aV2lrs_ks);
             V2lrb_ks[i]->Add(aV2lrb_ks);
             V2lrs_ks[i]->Divide(V2lrb_ks[i]);
             V2lrs_ks[i]->Scale(Bz_ks[i]/nEvent_ks[i]/BW2D);
+            //V2lrs_ks[i]->Scale(Bz_ks[i]/BW2D);
 
             V2lrs_ks[i]->Fit("fit1","R");
             //V2lrs_ks[i]->Fit("fit1","R");
@@ -1058,6 +1095,7 @@ void PeriSubObs(ParticleData PD)
 
             hsPeaksr_la[i]->Divide(hbPeaksr_la[i]);
             hsPeaksr_la[i]->Scale(Bz_la[i]/nEvent_la[i]/BW2D);
+            //hsPeaksr_la[i]->Scale(Bz_la[i]/BW2D);
 
             csPeaksr_la->cd(i+1);
 
@@ -1066,13 +1104,14 @@ void PeriSubObs(ParticleData PD)
             hsPeaksr_la[i]->Fit("quadFit16","R");
             //hsPeaksr_la[i]->Fit("quadFit16","R");
             //hsPeaksr_la[i]->Fit("quadFit16","R");
+            TH1D* hsPeaksr_drawed_la = (TH1D*)hsPeaksr_la[i]->Clone();
 
             double minVal_sr = quadFit16->GetMinimum(0.6,2.2);
             double minVal_srX = quadFit16->GetMinimumX(0.6,2.2);
             TF1* minConst_sr = new TF1("minConst_sr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
             minConst_sr->SetParameter(0,-minVal_sr);
+            hsPeaksr_drawed_la->Draw();
             hsPeaksr_zeroed_la->Add(minConst_sr);
-            hsPeaksr_la[i]->Draw();
             double xcoor = 0.52;
             double ycoor = 0.90;
             double increment = 0.07;
@@ -1086,32 +1125,34 @@ void PeriSubObs(ParticleData PD)
             double bin0yield = hsPeaksr_zeroed_la->GetBinContent(hsPeaksr_zeroed_la->FindBin(0.0))*0.19635;
             Jyieldsr_la[i] = Jyieldsr_la[i]*2 - bin0yield;
 
-            hbPeaklr_la[i] = hbackgroundPeak_la[i]->ProjectionY("hbPeaklr_la",1,14);
-            TH1D* ahbPeaklr_la = hbackgroundPeak_la[i]->ProjectionY("ahbPeaklr_la",20,33);
-            hsPeaklr_la[i] = hsignalPeak_la[i]->ProjectionY("hsPeaklr_la",1,14);
-            TH1D* ahsPeaklr_la = hsignalPeak_la[i]->ProjectionY("ahsPeaklr_la",20,33);
+            hbPeaklr_la[i] = hbackgroundPeak_la[i]->ProjectionY("hbPeaklr_la",1,10);
+            TH1D* ahbPeaklr_la = hbackgroundPeak_la[i]->ProjectionY("ahbPeaklr_la",24,33);
+            hsPeaklr_la[i] = hsignalPeak_la[i]->ProjectionY("hsPeaklr_la",1,10);
+            TH1D* ahsPeaklr_la = hsignalPeak_la[i]->ProjectionY("ahsPeaklr_la",24,33);
 
             hbPeaklr_la[i]->Add(ahbPeaklr_la);
             hsPeaklr_la[i]->Add(ahsPeaklr_la);
             hsPeaklr_la[i]->Divide(hbPeaklr_la[i]);
             hsPeaklr_la[i]->Scale(Bz_la[i]/nEvent_la[i]/BW2D);
+            //hsPeaklr_la[i]->Scale(Bz_la[i]/BW2D);
 
             csPeaklr_la->cd(i+1);
 
-            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.6,2.2);
+            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.0,2.0);
             quadFit2->SetParameters(1,1,1);
 
             hsPeaklr_la[i]->Fit("quadFit2","R");
             //hsPeaklr_la[i]->Fit("quadFit2","R");
             //hsPeaklr_la[i]->Fit("quadFit2","R");
 
-            double minVal_lr = quadFit2->GetMinimum(0.6,2.2);
-            double minVal_lrX = quadFit2->GetMinimumX(0.6,2.2);
+            double minVal_lr = quadFit2->GetMinimum(0.0,2.0);
+            double minVal_lrX = quadFit2->GetMinimumX(0.0,2.0);
             TF1* minConst_lr = new TF1("minConst_lr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
             minConst_lr->SetParameter(0,-minVal_lr);
             TH1D* hsPeaklr_zeroed_la = (TH1D*)hsPeaklr_la[i]->Clone();
+            TH1D* hsPeaklr_drawed_la = (TH1D*)hsPeaklr_la[i]->Clone();
+            hsPeaklr_drawed_la->Draw();
             hsPeaklr_zeroed_la->Add(minConst_lr);
-            hsPeaklr_la[i]->Draw();
             xcoor = 0.52;
             ycoor = 0.90;
             increment = 0.07;
@@ -1119,7 +1160,7 @@ void PeriSubObs(ParticleData PD)
             tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_la[i],PD.PtBin_la[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
+            tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
             c->cd();
             Jyieldlr_la.push_back(hsPeaklr_zeroed_la->IntegralAndError(hsPeaklr_zeroed_la->FindBin(0.0),hsPeaklr_zeroed_la->FindBin(minVal_lrX),Jyieldlr_err_la[i],"width"));
             bin0yield = hsPeaklr_zeroed_la->GetBinContent(hsPeaklr_zeroed_la->FindBin(0.0))*0.19635;
@@ -1133,14 +1174,15 @@ void PeriSubObs(ParticleData PD)
             fit1->SetParameters(10,1,1,1);
             fit1->SetLineColor(2);
 
-            V2lrs_la[i] = hsignalPeak_la[i]->ProjectionY(Form("V2lrs_la%d",i),1,14);
-            TH1D* aV2lrs_la = hsignalPeak_la[i]->ProjectionY("aV2lrs_la",20,33);
-            V2lrb_la[i] = hbackgroundPeak_la[i]->ProjectionY(Form("V2lrb_la%d",i),1,14);
-            TH1D* aV2lrb_la = hbackgroundPeak_la[i]->ProjectionY("aV2lrb_la",20,33);
+            V2lrs_la[i] = hsignalPeak_la[i]->ProjectionY(Form("V2lrs_la%d",i),1,10);
+            TH1D* aV2lrs_la = hsignalPeak_la[i]->ProjectionY("aV2lrs_la",24,33);
+            V2lrb_la[i] = hbackgroundPeak_la[i]->ProjectionY(Form("V2lrb_la%d",i),1,10);
+            TH1D* aV2lrb_la = hbackgroundPeak_la[i]->ProjectionY("aV2lrb_la",24,33);
             V2lrs_la[i]->Add(aV2lrs_la);
             V2lrb_la[i]->Add(aV2lrb_la);
             V2lrs_la[i]->Divide(V2lrb_la[i]);
             V2lrs_la[i]->Scale(Bz_la[i]/nEvent_la[i]/BW2D);
+            //V2lrs_la[i]->Scale(Bz_la[i]/BW2D);
 
             V2lrs_la[i]->Fit("fit1","R");
             //V2lrs_la[i]->Fit("fit1","R");
@@ -1232,10 +1274,10 @@ void PeriSubObs(ParticleData PD)
             double bin0yield = hsPeaksr_zeroed_xi->GetBinContent(hsPeaksr_zeroed_xi->FindBin(0.0))*0.19635;
             Jyieldsr_xi[i] = Jyieldsr_xi[i]*2 - bin0yield;
 
-            hbPeaklr_xi[i] = hbackgroundPeak_xi[i]->ProjectionY("hbPeaklr_xi",1,14);
-            TH1D* ahbPeaklr_xi = hbackgroundPeak_xi[i]->ProjectionY("ahbPeaklr_xi",20,33);
-            hsPeaklr_xi[i] = hsignalPeak_xi[i]->ProjectionY("hsPeaklr_xi",1,14);
-            TH1D* ahsPeaklr_xi = hsignalPeak_xi[i]->ProjectionY("ahsPeaklr_xi",20,33);
+            hbPeaklr_xi[i] = hbackgroundPeak_xi[i]->ProjectionY("hbPeaklr_xi",1,10);
+            TH1D* ahbPeaklr_xi = hbackgroundPeak_xi[i]->ProjectionY("ahbPeaklr_xi",24,33);
+            hsPeaklr_xi[i] = hsignalPeak_xi[i]->ProjectionY("hsPeaklr_xi",1,10);
+            TH1D* ahsPeaklr_xi = hsignalPeak_xi[i]->ProjectionY("ahsPeaklr_xi",24,33);
 
             hbPeaklr_xi[i]->Add(ahbPeaklr_xi);
             hsPeaklr_xi[i]->Add(ahsPeaklr_xi);
@@ -1245,15 +1287,15 @@ void PeriSubObs(ParticleData PD)
 
             csPeaklr_xi->cd(i+1);
 
-            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.6,2.2);
+            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.0,2.0);
             quadFit2->SetParameters(1,1,1);
 
             hsPeaklr_xi[i]->Fit("quadFit2","R");
             //hsPeaklr_xi[i]->Fit("quadFit2","R");
             //hsPeaklr_xi[i]->Fit("quadFit2","R");
 
-            double minVal_lr = quadFit2->GetMinimum(0.6,2.2);
-            double minVal_lrX = quadFit2->GetMinimumX(0.6,2.2);
+            double minVal_lr = quadFit2->GetMinimum(0.0,2.0);
+            double minVal_lrX = quadFit2->GetMinimumX(0.0,2.0);
             TF1* minConst_lr = new TF1("minConst_lr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
             minConst_lr->SetParameter(0,-minVal_lr);
             TH1D* hsPeaklr_zeroed_xi = (TH1D*)hsPeaklr_xi[i]->Clone();
@@ -1266,7 +1308,7 @@ void PeriSubObs(ParticleData PD)
             tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_xi[i],PD.PtBin_xi[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
+            tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
             c->cd();
             Jyieldlr_xi.push_back(hsPeaklr_zeroed_xi->IntegralAndError(hsPeaklr_zeroed_xi->FindBin(0.0),hsPeaklr_zeroed_xi->FindBin(minVal_lrX),Jyieldlr_err_xi[i],"width"));
             bin0yield = hsPeaklr_zeroed_xi->GetBinContent(hsPeaklr_zeroed_xi->FindBin(0.0))*0.19635;
@@ -1280,10 +1322,10 @@ void PeriSubObs(ParticleData PD)
             fit1->SetParameters(10,1,1,1);
             fit1->SetLineColor(2);
 
-            V2lrs_xi[i] = hsignalPeak_xi[i]->ProjectionY(Form("V2lrs_xi%d",i),1,14);
-            TH1D* aV2lrs_xi = hsignalPeak_xi[i]->ProjectionY("aV2lrs_xi",20,33);
-            V2lrb_xi[i] = hbackgroundPeak_xi[i]->ProjectionY(Form("V2lrb_xi%d",i),1,14);
-            TH1D* aV2lrb_xi = hbackgroundPeak_xi[i]->ProjectionY("aV2lrb_xi",20,33);
+            V2lrs_xi[i] = hsignalPeak_xi[i]->ProjectionY(Form("V2lrs_xi%d",i),1,10);
+            TH1D* aV2lrs_xi = hsignalPeak_xi[i]->ProjectionY("aV2lrs_xi",24,33);
+            V2lrb_xi[i] = hbackgroundPeak_xi[i]->ProjectionY(Form("V2lrb_xi%d",i),1,10);
+            TH1D* aV2lrb_xi = hbackgroundPeak_xi[i]->ProjectionY("aV2lrb_xi",24,33);
             V2lrs_xi[i]->Add(aV2lrs_xi);
             V2lrb_xi[i]->Add(aV2lrb_xi);
             V2lrs_xi[i]->Divide(V2lrb_xi[i]);
@@ -3277,11 +3319,11 @@ void PeriSubSigDirect(ParticleData PD)
     {
         bkgfrac_ks.push_back(1 - PD.fsig_ks[i]);
         bkgfrac_MB_ks.push_back(1 - PD.fsig_ks_MB[i]);
-        DirectSubYield_ks.push_back((YieldPlot_obs_ks[i] - bkgfrac_MB_ks[i]*YieldPlot_bkg_ks[i])/PD.fsig_ks_MB[i]);
-        DirectSubYield_err_ks.push_back(sqrt(TMath::Power((YieldPlot_bkg_err_ks[i]*bkgfrac_MB_ks[i]),2) + TMath::Power(YieldPlot_obs_err_ks[i],2))/PD.fsig_ks_MB[i]);
+        DirectSubYield_ks.push_back((YieldPlot_obs_ks[i] - bkgfrac_ks[i]*YieldPlot_bkg_ks[i])/PD.fsig_ks[i]);
+        DirectSubYield_err_ks.push_back(sqrt(TMath::Power((YieldPlot_bkg_err_ks[i]*bkgfrac_ks[i]),2) + TMath::Power(YieldPlot_obs_err_ks[i],2))/PD.fsig_ks[i]);
         DirectSubYield_low_ks.push_back((YieldPlot_low_obs_ks[i] - bkgfrac_MB_ks[i]*YieldPlot_low_bkg_ks[i])/PD.fsig_ks_MB[i]);
         DirectSubYield_low_err_ks.push_back(sqrt(TMath::Power((YieldPlot_low_bkg_err_ks[i]*bkgfrac_MB_ks[i]),2) + TMath::Power(YieldPlot_low_obs_err_ks[i],2))/PD.fsig_ks_MB[i]);
-        DirectSubNass_ks.push_back((Nassoc_obs_ks[i] - bkgfrac_MB_ks[i]*Nassoc_bkg_ks[i])/PD.fsig_ks_MB[i]);
+        DirectSubNass_ks.push_back((Nassoc_obs_ks[i] - bkgfrac_ks[i]*Nassoc_bkg_ks[i])/PD.fsig_ks[i]);
         DirectSubNass_low_ks.push_back((Nassoc_low_obs_ks[i] - bkgfrac_MB_ks[i]*Nassoc_low_bkg_ks[i])/PD.fsig_ks_MB[i]);
 
         v2true_DirectSub_ks.push_back(ksv2true_Y[i] - ksv2_MB_Y[i]*DirectSubNass_low_ks[i]/DirectSubNass_ks[i]*DirectSubYield_ks[i]/DirectSubYield_low_ks[i]);
@@ -3292,11 +3334,11 @@ void PeriSubSigDirect(ParticleData PD)
     {
         bkgfrac_la.push_back(1 - PD.fsig_la[i]);
         bkgfrac_MB_la.push_back(1 - PD.fsig_la_MB[i]);
-        DirectSubYield_la.push_back((YieldPlot_obs_la[i] - bkgfrac_MB_la[i]*YieldPlot_bkg_la[i])/PD.fsig_la_MB[i]);
-        DirectSubYield_err_la.push_back(sqrt(TMath::Power((YieldPlot_bkg_err_la[i]*bkgfrac_MB_la[i]),2) + TMath::Power(YieldPlot_obs_err_la[i],2))/PD.fsig_la_MB[i]);
+        DirectSubYield_la.push_back((YieldPlot_obs_la[i] - bkgfrac_la[i]*YieldPlot_bkg_la[i])/PD.fsig_la[i]);
+        DirectSubYield_err_la.push_back(sqrt(TMath::Power((YieldPlot_bkg_err_la[i]*bkgfrac_la[i]),2) + TMath::Power(YieldPlot_obs_err_la[i],2))/PD.fsig_la[i]);
         DirectSubYield_low_la.push_back((YieldPlot_low_obs_la[i] - bkgfrac_MB_la[i]*YieldPlot_low_bkg_la[i])/PD.fsig_la_MB[i]);
         DirectSubYield_low_err_la.push_back(sqrt(TMath::Power((YieldPlot_low_bkg_err_la[i]*bkgfrac_MB_la[i]),2) + TMath::Power(YieldPlot_low_obs_err_la[i],2))/PD.fsig_la_MB[i]);
-        DirectSubNass_la.push_back((Nassoc_obs_la[i] - bkgfrac_MB_la[i]*Nassoc_bkg_la[i])/PD.fsig_la_MB[i]);
+        DirectSubNass_la.push_back((Nassoc_obs_la[i] - bkgfrac_la[i]*Nassoc_bkg_la[i])/PD.fsig_la[i]);
         DirectSubNass_low_la.push_back((Nassoc_low_obs_la[i] - bkgfrac_MB_la[i]*Nassoc_low_bkg_la[i])/PD.fsig_la_MB[i]);
 
         v2true_DirectSub_la.push_back(lav2true_Y[i] - lav2_MB_Y[i]*DirectSubNass_low_la[i]/DirectSubNass_la[i]*DirectSubYield_la[i]/DirectSubYield_low_la[i]);
@@ -3335,6 +3377,12 @@ void PeriSubSigDirect(ParticleData PD)
     TGraphErrors* TGDirectSubYield_low_la = new TGraphErrors(numPtBins_la,pt_la,&DirectSubYield_low_la[0],0,&DirectSubYield_low_err_la[0]);
     TGraphErrors* TGDirectSubYield_xi = new TGraphErrors(numPtBins_xi,pt_xi,&DirectSubYield_xi[0],0,&DirectSubYield_err_xi[0]);
     TGraphErrors* TGDirectSubYield_low_xi = new TGraphErrors(numPtBins_xi,pt_xi,&DirectSubYield_low_xi[0],0,&DirectSubYield_low_err_xi[0]);
+    TGraphErrors* TGDirectSubNass_ks = new TGraphErrors(numPtBins_ks,pt_ks,&DirectSubNass_ks[0],0,0);
+    TGraphErrors* TGDirectSubNass_low_ks = new TGraphErrors(numPtBins_ks,pt_ks,&DirectSubNass_low_ks[0],0,0);
+    TGraphErrors* TGDirectSubNass_la = new TGraphErrors(numPtBins_la,pt_la,&DirectSubNass_la[0],0,0);
+    TGraphErrors* TGDirectSubNass_low_la = new TGraphErrors(numPtBins_la,pt_la,&DirectSubNass_low_la[0],0,0);
+    TGraphErrors* TGDirectSubNass_xi = new TGraphErrors(numPtBins_xi,pt_xi,&DirectSubNass_xi[0],0,0);
+    TGraphErrors* TGDirectSubNass_low_xi = new TGraphErrors(numPtBins_xi,pt_xi,&DirectSubNass_low_xi[0],0,0);
 
     TFile output(PD.fn.c_str(),"UPDATE");
 
@@ -3352,6 +3400,12 @@ void PeriSubSigDirect(ParticleData PD)
     TGDirectSubYield_low_la->Write("DirectSubYield_low_la",TObject::kOverwrite);
     TGDirectSubYield_xi->Write("DirectSubYield_la",TObject::kOverwrite);
     TGDirectSubYield_low_xi->Write("DirectSubYield_low_la",TObject::kOverwrite);
+    TGDirectSubNass_ks->Write("DirectSubNass_ks",TObject::kOverwrite);
+    TGDirectSubNass_low_ks->Write("DirectSubNass_low_ks",TObject::kOverwrite);
+    TGDirectSubNass_la->Write("DirectSubNass_la",TObject::kOverwrite);
+    TGDirectSubNass_low_la->Write("DirectSubNass_low_la",TObject::kOverwrite);
+    TGDirectSubNass_xi->Write("DirectSubNass_xi",TObject::kOverwrite);
+    TGDirectSubNass_low_xi->Write("DirectSubNass_low_xi",TObject::kOverwrite);
 }
 
 int main()
