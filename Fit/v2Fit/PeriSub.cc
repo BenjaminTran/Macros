@@ -17,11 +17,11 @@ struct ParticleData{
     std::string fn_V0 = "v0CorrelationRapidity";
     std::string fn_Xi = "xiCorrelationRapidity";
     std::string fn_v0cas = "v0CasCorrelationRapidityPeriSub";
-    std::vector<double> fsig_ks = {0.989638, 0.992109, 0.992861, 0.992984, 0.992159, 0.989499, 0.986445, 0.982275, 0.976946, 0.970546, 0.964845, 0.958563, 0.969557};
-    std::vector<double> fsig_la = {0.908266, 0.96779, 0.979912, 0.981899, 0.982888, 0.982854, 0.980766, 0.97569, 0.97569, 0.964048};
+    std::vector<double> fsig_ks = {0.989638 , 0.992109 , 0.992861 , 0.992984 , 0.992159 , 0.989499 , 0.986445 , 0.982275 , 0.976946 , 0.970546 , 0.964845 , 0.958563 , 0.969557};
+    std::vector<double> fsig_ks_MB = {0.999 , 0.999    , 0.995    , 0.996    , 0.995    , 0.992    , 0.990    , 0.987    , 0.983    , 0.980    , 0.976    , 0.965    , 0.965};
+    std::vector<double> fsig_la = {0.908266 , 0.96779 , 0.979912 , 0.981899 , 0.982888 , 0.982854 , 0.980766 , 0.97569 , 0.97569 , 0.964048};
+    std::vector<double> fsig_la_MB = {0.990 , 0.995   , 0.995    , 0.999    , 0.992    , 0.989    , 0.985    , 0.998   , 0.998   , 0.995};
     std::vector<double> fsig_xi = {0.959427 ,0.976239 ,0.979161 ,0.980678 ,0.980661 ,0.981534 ,0.981502 ,0.979289 ,0.979192};
-    std::vector<double> fsig_ks_MB = {0.999 ,0.999 ,0.995 ,0.996 ,0.995 ,0.992 ,0.990 ,0.987 ,0.983 ,0.980 ,0.976 ,0.965 ,0.965};
-    std::vector<double> fsig_la_MB = {0.990,0.995,0.995,0.999,0.992,0.989,0.985 ,0.998,0.998 ,0.995};
     std::vector<double> PtBin_ks = {0.2, 0.4, 0.6, 0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5};//, 10.0, 15.0, 20.0}; 
     std::vector<double> PtBin_la = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5};//, 10.0, 15.0, 20.0}; 
     std::vector<double> PtBin_xi = {1.0,1.4,1.8,2.2,2.8,3.6,4.6,6.0,7.2,10.0};
@@ -59,9 +59,9 @@ void PeriSubObs(ParticleData PD)
     TCanvas* csPeaklr_low_xi = new TCanvas("csPeaklr_low_xi","csPeaklr_low_xi",1200,900);
     TCanvas* csPeaksr_xi = new TCanvas("csPeaksr_xi","csPeaksr_xi",1200,900);
     TCanvas* csPeaklr_xi = new TCanvas("csPeaklr_xi","csPeaklr_xi",1200,900);
-    TCanvas* c = new TCanvas("c","c",400,400);
 
     TCanvas* csPeaklr_low_2Dks = new TCanvas("csPeaklr_low_2Dks","csPeaklr_low_2Dks",1200,900);
+    TCanvas* c = new TCanvas("c","c",400,400);
 
     csPeaklr_low_2Dks->Divide(2,2);
 
@@ -306,15 +306,15 @@ void PeriSubObs(ParticleData PD)
     hsPeaklr_high_ref->Divide(hbPeaklr_high_ref);
     hsPeaklr_high_ref->Scale(Bz_high_ref[0]/nEvent_high_ref[0]/BW2D);
 
-    TF1* quadFit21 = new TF1("quadFit21","[0]*x^2+[1]*x+[2]",0.0,2.0);
+    TF1* quadFit21 = new TF1("quadFit21","[0]*x^2+[1]*x+[2]",0.6,2.0);
     quadFit21->SetParameters(1,1,1);
 
     hsPeaklr_high_ref->Fit("quadFit21","R");
     hsPeaklr_high_ref->Fit("quadFit21","R");
     hsPeaklr_high_ref->Fit("quadFit21","R");
 
-    minVal_lr = quadFit21->GetMinimum(0.0,2.0);
-    minVal_lrX = quadFit21->GetMinimumX(0.0,2.0);
+    minVal_lr = quadFit21->GetMinimum(0.6,2.0);
+    minVal_lrX = quadFit21->GetMinimumX(0.6,2.0);
     TF1* minConst_lr2 = new TF1("minConst_lr2","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
     minConst_lr2->SetParameter(0,-minVal_lr);
     TH1D* hsPeaklr_zeroed_high_ref = (TH1D*)hsPeaklr_high_ref->Clone();
@@ -477,19 +477,22 @@ void PeriSubObs(ParticleData PD)
             PD.f_perisub->GetObject(Form(PathSignal_low_ks.c_str(),i),hsignalPeak_low_ks[i]);
             TH1D* mult_low_ks = (TH1D*) PD.f_perisub->Get(Form(PathMult_low_ks.c_str(),i));
 
-            hbPeaksr_low_ks[i] = hbackgroundPeak_low_ks[i]->ProjectionY("hbPeaksr_low_ks", 14, 20);
-            hsPeaksr_low_ks[i] = hsignalPeak_low_ks[i]->ProjectionY("hsPeaksr_low_ks", 14, 20);
+            hbPeaksr_low_ks[i] = hbackgroundPeak_low_ks[i]->ProjectionY(Form("hbPeaksr_low_ks%d",i), 14, 20);
+            hsPeaksr_low_ks[i] = hsignalPeak_low_ks[i]->ProjectionY(Form("hsPeaksr_low_ks%d",i), 14, 20);
 
             TF1* quadFit13 = new TF1("quadFit13","[0]*x^2+[1]*x+[2]",0.6,2.2);
             quadFit13->SetParameters(1,1,1);
 
-            //csPeaklr_low_2Dks->cd(i+1);
-            //TH2D* hPeak_low_2Dks = hsignalPeak_low_ks[i];
-            //hPeak_low_2Dks->Divide(hbackgroundPeak_low_ks[i]);
+            if(i<4)
+            {
+                csPeaklr_low_2Dks->cd(i+1);
+                TH2D* hPeak_low_2Dks = (TH2D*)PD.f_perisub->Get(Form(PathSignal_low_ks.c_str(),i));
+                hPeak_low_2Dks->Divide(hbackgroundPeak_low_ks[i]);
 
-            //hPeak_low_2Dks->Draw();
-            //hbackgroundPeak_low_ks[i]->Draw();
-            //c->cd();
+                hPeak_low_2Dks->Draw();
+                //hbackgroundPeak_low_ks[i]->Draw();
+            }
+            c->cd();
 
 
             //nEvent_low_ks.push_back(mult_low_ks->Integral(0,100000));
@@ -988,15 +991,15 @@ void PeriSubObs(ParticleData PD)
 
             csPeaklr_ks->cd(i+1);
 
-            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.0,2.0);
+            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.5,2.0);
             quadFit2->SetParameters(1,1,1);
 
             hsPeaklr_ks[i]->Fit("quadFit2","R");
             //hsPeaklr_ks[i]->Fit("quadFit2","R");
             //hsPeaklr_ks[i]->Fit("quadFit2","R");
 
-            double minVal_lr = quadFit2->GetMinimum(0.0,2.0);
-            double minVal_lrX = quadFit2->GetMinimumX(0.0,2.0);
+            double minVal_lr = quadFit2->GetMinimum(0.5,2.0);
+            double minVal_lrX = quadFit2->GetMinimumX(0.5,2.0);
             TF1* minConst_lr = new TF1("minConst_lr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
             minConst_lr->SetParameter(0,-minVal_lr);
             TH1D* hsPeaklr_zeroed_ks = (TH1D*)hsPeaklr_ks[i]->Clone();
@@ -1138,15 +1141,15 @@ void PeriSubObs(ParticleData PD)
 
             csPeaklr_la->cd(i+1);
 
-            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.0,2.0);
+            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.5,2.0);
             quadFit2->SetParameters(1,1,1);
 
             hsPeaklr_la[i]->Fit("quadFit2","R");
             //hsPeaklr_la[i]->Fit("quadFit2","R");
             //hsPeaklr_la[i]->Fit("quadFit2","R");
 
-            double minVal_lr = quadFit2->GetMinimum(0.0,2.0);
-            double minVal_lrX = quadFit2->GetMinimumX(0.0,2.0);
+            double minVal_lr = quadFit2->GetMinimum(0.5,2.0);
+            double minVal_lrX = quadFit2->GetMinimumX(0.5,2.0);
             TF1* minConst_lr = new TF1("minConst_lr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
             minConst_lr->SetParameter(0,-minVal_lr);
             TH1D* hsPeaklr_zeroed_la = (TH1D*)hsPeaklr_la[i]->Clone();
@@ -1287,15 +1290,15 @@ void PeriSubObs(ParticleData PD)
 
             csPeaklr_xi->cd(i+1);
 
-            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.0,2.0);
+            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.5,2.0);
             quadFit2->SetParameters(1,1,1);
 
             hsPeaklr_xi[i]->Fit("quadFit2","R");
             //hsPeaklr_xi[i]->Fit("quadFit2","R");
             //hsPeaklr_xi[i]->Fit("quadFit2","R");
 
-            double minVal_lr = quadFit2->GetMinimum(0.0,2.0);
-            double minVal_lrX = quadFit2->GetMinimumX(0.0,2.0);
+            double minVal_lr = quadFit2->GetMinimum(0.5,2.0);
+            double minVal_lrX = quadFit2->GetMinimumX(0.5,2.0);
             TF1* minConst_lr = new TF1("minConst_lr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
             minConst_lr->SetParameter(0,-minVal_lr);
             TH1D* hsPeaklr_zeroed_xi = (TH1D*)hsPeaklr_xi[i]->Clone();
@@ -1750,1185 +1753,6 @@ void PeriSubObs(ParticleData PD)
     }
 }
 
-/*
-void PeriSubBkg(ParticleData PD)
-{
-    TH1::SetDefaultSumw2();
-
-    //TFile *f_perisub = TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/PeripheralSubtractionMB.root");
-    //TFile *f_V0 = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityCorrectMultB_09_19_17.root");
-    //TFile *f_low_ref = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/Combine_MB0_corr_ref.root");
-    //TFile *f_high_ref = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/XiCorrelationRapidityTotal_08_20_2017.root");
-
-    double BW2D = (9.9/33)*((2-1.0/16)*3.1416/31);
-
-    TLatex* tex = new TLatex();
-    tex->SetNDC();
-
-    TCanvas* csSidesr_low_ref  = new TCanvas("csSidesr_low_ref","csSidesr_low_ref",600,600);
-    TCanvas* csSidelr_low_ref  = new TCanvas("csSidelr_low_ref","csSidelr_low_ref",600,600);
-    TCanvas* csSidesr_high_ref = new TCanvas("csSidesr_high_ref","csSidesr_high_ref",600,600);
-    TCanvas* csSidelr_high_ref = new TCanvas("csSidelr_high_ref","csSidelr_high_ref",600,600);
-    TCanvas* csSidesr_low_ks   = new TCanvas("csSidesr_low_ks","csSidesr_low_ks",1200,900);
-    TCanvas* csSidelr_low_ks   = new TCanvas("csSidelr_low_ks","csSidelr_low_ks",1200,900);
-    TCanvas* csSidesr_ks       = new TCanvas("csSidesr_ks","csSidesr_ks",1200,900);
-    TCanvas* csSidelr_ks       = new TCanvas("csSidelr_ks","csSidelr_ks",1200,900);
-    TCanvas* csSidesr_low_la   = new TCanvas("csSidesr_low_la","csSidesr_low_la",1200,900);
-    TCanvas* csSidelr_low_la   = new TCanvas("csSidelr_low_la","csSidelr_low_la",1200,900);
-    TCanvas* csSidesr_la       = new TCanvas("csSidesr_la","csSidesr_la",1200,900);
-    TCanvas* csSidelr_la       = new TCanvas("csSidelr_la","csSidelr_la",1200,900);
-    TCanvas* csSidesr_low_xi   = new TCanvas("csSidesr_low_xi","csSidesr_low_xi",1200,900);
-    TCanvas* csSidelr_low_xi   = new TCanvas("csSidelr_low_xi","csSidelr_low_xi",1200,900);
-    TCanvas* csSidesr_xi       = new TCanvas("csSidesr_xi","csSidesr_xi",1200,900);
-    TCanvas* csSidelr_xi       = new TCanvas("csSidelr_xi","csSidelr_xi",1200,900);
-    TCanvas* c                 = new TCanvas("c","c",400,400);
-
-    csSidesr_low_ks->Divide(4,4);
-    csSidelr_low_ks->Divide(4,4);
-    csSidesr_low_la->Divide(4,3);
-    csSidelr_low_la->Divide(4,3);
-    csSidesr_ks->Divide(4,4);
-    csSidelr_ks->Divide(4,4);
-    csSidesr_la->Divide(4,3);
-    csSidelr_la->Divide(4,3);
-
-    //Low N ref
-    //Containers
-    std::vector<double> Nassoc_low_ref;
-    std::vector<double> Jyieldsr_low_ref;
-    std::vector<double> Jyieldlr_low_ref;
-    double Jyieldsr_err_low_ref;
-    double Jyieldlr_err_low_ref;
-    std::vector<double> V2Values_low_ref;
-    std::vector<double> V2Values_err_low_ref;
-    std::vector<double> V3Values_low_ref;
-    std::vector<double> V3Values_err_low_ref;
-    std::vector<double> Bz_low_ref;
-    std::vector<double> nEvent_low_ref;
-
-    std::vector<double> JyieldSub_low_ref;
-    std::vector<double> JyieldSub_err_low_ref;
-
-
-    TH1D* hsSidesr_low_ref;
-    TH1D* hbSidesr_low_ref;
-    TH1D* hsSidelr_low_ref;
-    TH1D* hbSidelr_low_ref;
-    TH1D* V2lrs_low_ref;
-    TH1D* V2lrb_low_ref;
-    TH2D* hbackgroundSide_low_ref;
-    TH2D* hsignalSide_low_ref;
-
-    //Calculate Nassoc, Jet yield, Low N
-
-    PD.f_low_ref->GetObject("pPbCorr/background",hbackgroundSide_low_ref);
-    PD.f_low_ref->GetObject("pPbCorr/signal",hsignalSide_low_ref);
-    TH1D* mult_low_ref = (TH1D*) PD.f_low_ref->Get("pPbCorr/mult");
-
-    hbSidesr_low_ref = hbackgroundSide_low_ref->ProjectionY("hbSidesr_low_ref", 14, 20);
-    hsSidesr_low_ref = hsignalSide_low_ref->ProjectionY("hsSidesr_low_ref", 14, 20);
-
-    TF1* quadFit1 = new TF1("quadFit1","[0]*x^2+[1]*x+[2]",0.6,2.2);
-    quadFit1->SetParameters(1,1,1);
-
-    nEvent_low_ref.push_back(mult_low_ref->Integral(0,100000));
-    nEvent_low_ref.push_back(mult_low_ref->Integral(3,100000));
-    Bz_low_ref.push_back(hbackgroundSide_low_ref->GetBinContent(hbackgroundSide_low_ref->FindBin(0,0)));
-
-    hsSidesr_low_ref->Divide(hbSidesr_low_ref);
-    hsSidesr_low_ref->Scale(Bz_low_ref[0]/nEvent_low_ref[0]/BW2D);
-
-    hsSidesr_low_ref->Fit("quadFit1","R");
-    hsSidesr_low_ref->Fit("quadFit1","R");
-    hsSidesr_low_ref->Fit("quadFit1","R");
-
-
-    double minVal_sr = quadFit1->GetMinimum(0.6,2.2);
-    double minVal_srX = quadFit1->GetMinimumX(0.6,2.2);
-    TF1* minConst_sr = new TF1("minConst_sr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
-    minConst_sr->SetParameter(0,-minVal_sr);
-    TH1D* hsSidesr_zeroed_low_ref = (TH1D*)hsSidesr_low_ref->Clone();
-    hsSidesr_zeroed_low_ref->Add(minConst_sr);
-    csSidesr_low_ref->cd();
-    hsSidesr_low_ref->Draw();
-    double xcoor = 0.52;
-    double ycoor = 0.90;
-    double increment = 0.07;
-    tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-    tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
-    tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",0.3,3.0));
-    tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-    tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
-    c->cd();
-    Jyieldsr_low_ref.push_back(hsSidesr_zeroed_low_ref->IntegralAndError(hsSidesr_zeroed_low_ref->FindBin(0.0),hsSidesr_zeroed_low_ref->FindBin(minVal_srX),Jyieldsr_err_low_ref,"width"));
-    double bin0yield = hsSidesr_zeroed_low_ref->GetBinContent(hsSidesr_zeroed_low_ref->FindBin(0.0))*0.19635;
-    Jyieldsr_low_ref[0] = Jyieldsr_low_ref[0]*2 - bin0yield;
-
-    hbSidelr_low_ref = hbackgroundSide_low_ref->ProjectionY("hbSidelr_low_ref",1,14);
-    TH1D* ahbSidelr_low_ref = hbackgroundSide_low_ref->ProjectionY("ahbSidelr_low_ref",20,33);
-    hsSidelr_low_ref = hsignalSide_low_ref->ProjectionY("hsSidelr_low_ref",1,14);
-    TH1D* ahsSidelr_low_ref = hsignalSide_low_ref->ProjectionY("ahsSidelr_low_ref",20,33);
-
-    hbSidelr_low_ref->Add(ahbSidelr_low_ref);
-    hsSidelr_low_ref->Add(ahsSidelr_low_ref);
-    hsSidelr_low_ref->Divide(hbSidelr_low_ref);
-    hsSidelr_low_ref->Scale(Bz_low_ref[0]/nEvent_low_ref[0]/BW2D);
-
-    TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.6,2.2);
-    quadFit2->SetParameters(1,1,1);
-
-    hsSidelr_low_ref->Fit("quadFit2","R");
-    hsSidelr_low_ref->Fit("quadFit2","R");
-    hsSidelr_low_ref->Fit("quadFit2","R");
-
-    double minVal_lr = quadFit2->GetMinimum(0.6,2.2);
-    double minVal_lrX = quadFit2->GetMinimumX(0.6,2.2);
-    TF1* minConst_lr = new TF1("minConst_lr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
-    minConst_lr->SetParameter(0,-minVal_lr);
-    TH1D* hsSidelr_zeroed_low_ref = (TH1D*)hsSidelr_low_ref->Clone();
-    hsSidelr_zeroed_low_ref->Add(minConst_lr);
-    csSidelr_low_ref->cd();
-    hsSidelr_low_ref->Draw();
-    xcoor = 0.52;
-    ycoor = 0.90;
-    increment = 0.07;
-    tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-    tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
-    tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",0.3,3.0));
-    tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-    tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
-    c->cd();
-    Jyieldlr_low_ref.push_back(hsSidelr_zeroed_low_ref->IntegralAndError(hsSidelr_zeroed_low_ref->FindBin(0.0),hsSidelr_zeroed_low_ref->FindBin(minVal_srX),Jyieldlr_err_low_ref,"width"));
-    bin0yield = hsSidelr_zeroed_low_ref->GetBinContent(hsSidelr_zeroed_low_ref->FindBin(0.0))*0.19635;
-    Jyieldlr_low_ref[0] = Jyieldlr_low_ref[0]*2 - bin0yield;
-
-    JyieldSub_low_ref.push_back(Jyieldsr_low_ref[0] - Jyieldlr_low_ref[0]);
-    JyieldSub_err_low_ref.push_back(sqrt(Jyieldsr_err_low_ref*Jyieldsr_err_low_ref + Jyieldlr_err_low_ref*Jyieldlr_err_low_ref));
-
-    TF1* fit1 = new TF1("fit1","[0]*(1.0+2.0*[1]*cos(x)+2.0*[2]*cos(2.0*x)+2.0*[3]*cos(3.0*x)+2.0*[4]*cos(4.0*x))",-0.5*TMath::Pi(),1.5*TMath::Pi());
-    fit1->SetParNames("N","V1","V2","V3");
-    fit1->SetParameters(10,1,1,1);
-    fit1->SetLineColor(2);
-
-    V2lrs_low_ref = hsignalSide_low_ref->ProjectionY("V2lrs_low_ref",1,14);
-    TH1D* aV2lrs_low_ref = hsignalSide_low_ref->ProjectionY("aV2lrs_low_ref",20,33);
-    V2lrb_low_ref = hbackgroundSide_low_ref->ProjectionY("V2lrb_low_ref",1,14);
-    TH1D* aV2lrb_low_ref = hbackgroundSide_low_ref->ProjectionY("aV2lrb_low_ref",20,33);
-    V2lrs_low_ref->Add(aV2lrs_low_ref);
-    V2lrb_low_ref->Add(aV2lrb_low_ref);
-    V2lrs_low_ref->Divide(V2lrb_low_ref);
-    V2lrs_low_ref->Scale(Bz_low_ref[0]/nEvent_low_ref[0]/BW2D);
-
-    V2lrs_low_ref->Fit("fit1","R");
-    V2lrs_low_ref->Fit("fit1","R");
-    V2lrs_low_ref->Fit("fit1","R");
-
-    V2Values_low_ref.push_back(fit1->GetParameter(2));
-    V2Values_err_low_ref.push_back(fit1->GetParError(2));
-    V3Values_low_ref.push_back(fit1->GetParameter(3));
-    V3Values_err_low_ref.push_back(fit1->GetParError(3));
-
-    double v2_low_ref = sqrt(V2Values_low_ref[0]);
-    double v2e_low_ref = sqrt(V2Values_low_ref[0])*(V2Values_err_low_ref[0]/V2Values_low_ref[0])/2;
-    double v3_low_ref = sqrt(V3Values_low_ref[0]);
-    double v3e_low_ref = sqrt(V3Values_low_ref[0])*(V3Values_err_low_ref[0]/V3Values_low_ref[0])/2;
-
-    Nassoc_low_ref.push_back(fit1->GetParameter(0));
-    c->cd();
-
-    //High N ref
-    //Containers
-    std::vector<double> Nassoc_high_ref;
-    std::vector<double> Jyieldsr_high_ref;
-    std::vector<double> Jyieldlr_high_ref;
-    double Jyieldsr_err_high_ref;
-    double Jyieldlr_err_high_ref;
-    std::vector<double> V2Values_high_ref;
-    std::vector<double> V2Values_err_high_ref;
-    std::vector<double> V3Values_high_ref;
-    std::vector<double> V3Values_err_high_ref;
-    std::vector<double> Bz_high_ref;
-    std::vector<double> nEvent_high_ref;
-
-    std::vector<double> JyieldSub_high_ref;
-    std::vector<double> JyieldSub_err_high_ref;
-
-    TH1D* hsSidesr_high_ref;;
-    TH1D* hbSidesr_high_ref;
-    TH1D* hsSidelr_high_ref;
-    TH1D* hbSidelr_high_ref;
-    TH1D* V2lrs_high_ref;
-    TH1D* V2lrb_high_ref;
-    TH2D* hbackgroundSide_high_ref;
-    TH2D* hsignalSide_high_ref;
-
-    //Calculate Nassoc, Jet yield, High N
-
-    PD.f_high_ref->GetObject("xiCorrelationRapidity/BackgroundHad",hbackgroundSide_high_ref);
-    PD.f_high_ref->GetObject("xiCorrelationRapidity/SignalHad",hsignalSide_high_ref);
-    TH1D* mult_high_ref = (TH1D*) PD.f_high_ref->Get("xiCorrelationRapidity/nTrk");
-
-    hbSidesr_high_ref = hbackgroundSide_high_ref->ProjectionY("hbSidesr_high_ref", 14, 20);
-    hsSidesr_high_ref = hsignalSide_high_ref->ProjectionY("hsSidesr_high_ref", 14, 20);
-
-    TF1* quadFit12 = new TF1("quadFit12","[0]*x^2+[1]*x+[2]",0.6,2.2);
-    quadFit12->SetParameters(1,1,1);
-
-    nEvent_high_ref.push_back(mult_high_ref->Integral(0,100000));
-    nEvent_high_ref.push_back(mult_high_ref->Integral(3,100000));
-    Bz_high_ref.push_back(hbackgroundSide_high_ref->GetBinContent(hbackgroundSide_high_ref->FindBin(0,0)));
-
-    hsSidesr_high_ref->Divide(hbSidesr_high_ref);
-    hsSidesr_high_ref->Scale(Bz_high_ref[0]/nEvent_high_ref[0]/BW2D);
-
-    hsSidesr_high_ref->Fit("quadFit12","R");
-    hsSidesr_high_ref->Fit("quadFit12","R");
-    hsSidesr_high_ref->Fit("quadFit12","R");
-
-    minVal_sr = quadFit12->GetMinimum(0.6,2.2);
-    minVal_srX = quadFit12->GetMinimumX(0.6,2.2);
-    TF1* minConst_sr2 = new TF1("minConst_sr2","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
-    minConst_sr2->SetParameter(0,-minVal_sr);
-    TH1D* hsSidesr_zeroed_high_ref = (TH1D*)hsSidesr_high_ref->Clone();
-    hsSidesr_zeroed_high_ref->Add(minConst_sr2);
-    csSidesr_high_ref->cd();
-    hsSidesr_high_ref->Draw();
-    xcoor = 0.52;
-    ycoor = 0.90;
-    increment = 0.07;
-    tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-    tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
-    tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",0.3,3.0));
-    tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-    tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
-    c->cd();
-    Jyieldsr_high_ref.push_back(hsSidesr_zeroed_high_ref->IntegralAndError(hsSidesr_zeroed_high_ref->FindBin(0.0),hsSidesr_zeroed_high_ref->FindBin(minVal_srX),Jyieldsr_err_high_ref,"width"));
-    bin0yield = hsSidesr_zeroed_high_ref->GetBinContent(hsSidesr_zeroed_high_ref->FindBin(0.0))*0.19635;
-    Jyieldsr_high_ref[0] = Jyieldsr_high_ref[0]*2 - bin0yield;
-
-    hbSidelr_high_ref = hbackgroundSide_high_ref->ProjectionY("hbSidelr_high_ref",1,14);
-    TH1D* ahbSidelr_high_ref = hbackgroundSide_high_ref->ProjectionY("ahbSidelr_high_ref",20,33);
-    hsSidelr_high_ref = hsignalSide_high_ref->ProjectionY("hsSidelr_high_ref",1,14);
-    TH1D* ahsSidelr_high_ref = hsignalSide_high_ref->ProjectionY("ahsSidelr_high_ref",20,33);
-
-    hbSidelr_high_ref->Add(ahbSidelr_high_ref);
-    hsSidelr_high_ref->Add(ahsSidelr_high_ref);
-    hsSidelr_high_ref->Divide(hbSidelr_high_ref);
-    hsSidelr_high_ref->Scale(Bz_high_ref[0]/nEvent_high_ref[0]/BW2D);
-
-    TF1* quadFit21 = new TF1("quadFit21","[0]*x^2+[1]*x+[2]",0.6,2.2);
-    quadFit21->SetParameters(1,1,1);
-
-    hsSidelr_high_ref->Fit("quadFit21","R");
-    hsSidelr_high_ref->Fit("quadFit21","R");
-    hsSidelr_high_ref->Fit("quadFit21","R");
-
-    minVal_lr = quadFit21->GetMinimum(0.6,2.2);
-    minVal_lrX = quadFit21->GetMinimumX(0.6,2.2);
-    TF1* minConst_lr2 = new TF1("minConst_lr2","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
-    minConst_lr2->SetParameter(0,-minVal_lr);
-    TH1D* hsSidelr_zeroed_high_ref = (TH1D*)hsSidelr_high_ref->Clone();
-    hsSidelr_zeroed_high_ref->Add(minConst_lr2);
-    csSidelr_high_ref->cd();
-    hsSidelr_high_ref->Draw();
-    xcoor = 0.52;
-    ycoor = 0.90;
-    increment = 0.07;
-    tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-    tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
-    tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",0.3,3.0));
-    tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-    tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
-    c->cd();
-    Jyieldlr_high_ref.push_back(hsSidelr_zeroed_high_ref->IntegralAndError(hsSidelr_zeroed_high_ref->FindBin(0.0),hsSidelr_zeroed_high_ref->FindBin(minVal_srX),Jyieldlr_err_high_ref,"width"));
-    bin0yield = hsSidelr_zeroed_high_ref->GetBinContent(hsSidelr_zeroed_high_ref->FindBin(0.0))*0.19635;
-    Jyieldlr_high_ref[0] = Jyieldlr_high_ref[0]*2 - bin0yield;
-
-    JyieldSub_high_ref.push_back(Jyieldsr_high_ref[0] - Jyieldlr_high_ref[0]);
-    JyieldSub_err_high_ref.push_back(sqrt(Jyieldsr_err_high_ref*Jyieldsr_err_high_ref + Jyieldlr_err_high_ref*Jyieldlr_err_high_ref));
-
-    TF1* fit2 = new TF1("fit2","[0]*(1.0+2.0*[1]*cos(x)+2.0*[2]*cos(2.0*x)+2.0*[3]*cos(3.0*x)+2.0*[4]*cos(4.0*x))",-0.5*TMath::Pi(),1.5*TMath::Pi());
-    fit2->SetParNames("N","V1","V2","V3");
-    fit2->SetParameters(10,1,1,1);
-    fit2->SetLineColor(2);
-
-    V2lrs_high_ref = hsignalSide_high_ref->ProjectionY("V2lrs_high_ref",1,14);
-    TH1D* aV2lrs_high_ref = hsignalSide_high_ref->ProjectionY("aV2lrs_high_ref",20,33);
-    V2lrb_high_ref = hbackgroundSide_high_ref->ProjectionY("V2lrb_high_ref",1,14);
-    TH1D* aV2lrb_high_ref = hbackgroundSide_high_ref->ProjectionY("aV2lrb_high_ref",20,33);
-    V2lrs_high_ref->Add(aV2lrs_high_ref);
-    V2lrb_high_ref->Add(aV2lrb_high_ref);
-    V2lrs_high_ref->Divide(V2lrb_high_ref);
-    V2lrs_high_ref->Scale(Bz_high_ref[0]/nEvent_high_ref[0]/BW2D);
-
-    V2lrs_high_ref->Fit("fit2","R");
-    V2lrs_high_ref->Fit("fit2","R");
-    V2lrs_high_ref->Fit("fit2","R");
-
-    V2Values_high_ref.push_back(fit2->GetParameter(2));
-    V2Values_err_high_ref.push_back(fit2->GetParError(2));
-    V3Values_high_ref.push_back(fit2->GetParameter(3));
-    V3Values_err_high_ref.push_back(fit2->GetParError(3));
-
-    double v2_high_ref = sqrt(V2Values_high_ref[0]);
-    double v2e_high_ref = sqrt(V2Values_high_ref[0])*(V2Values_err_high_ref[0]/V2Values_high_ref[0])/2;
-    double v3_high_ref = sqrt(V3Values_high_ref[0]);
-    double v3e_high_ref = sqrt(V3Values_high_ref[0])*(V3Values_err_high_ref[0]/V3Values_high_ref[0])/2;
-
-    Nassoc_high_ref.push_back(fit2->GetParameter(0));
-    c->cd();
-
-    //Low N
-//KSHORT
-    //Containers
-    std::vector<double> Nassoc_low_ks;
-    std::vector<double> Jyieldsr_low_ks;
-    std::vector<double> Jyieldlr_low_ks;
-    std::vector<double> Jyieldsr_err_low_ks(18);
-    std::vector<double> Jyieldlr_err_low_ks(18);
-    std::vector<double> V2Values_low_ks;
-    std::vector<double> V2Values_err_low_ks;
-    std::vector<double> V3Values_low_ks;
-    std::vector<double> V3Values_err_low_ks;
-    std::vector<double> Bz_low_ks;
-    std::vector<double> nEvent_low_ks;
-
-    std::vector<double> JyieldSub_low_ks;
-    std::vector<double> JyieldSub_err_low_ks;
-
-    int arraySize_ks = PD.PtBin_ks.size();
-
-    TH1D* hsSidesr_low_ks[arraySize_ks];
-    TH1D* hbSidesr_low_ks[arraySize_ks];
-    TH1D* hsSidelr_low_ks[arraySize_ks];
-    TH1D* hbSidelr_low_ks[arraySize_ks];
-    TH1D* V2lrs_low_ks[arraySize_ks];
-    TH1D* V2lrb_low_ks[arraySize_ks];
-    TH2D* hbackgroundSide_low_ks[arraySize_ks];
-    TH2D* hsignalSide_low_ks[arraySize_ks];
-
-
-    //Calculate Nassoc, Jet yield, Side region Low N
-
-    for(int i=0; i<PD.PtBin_ks.size(); i++)
-    {
-        PD.f_perisub->GetObject(Form((PD.fn_v0cas + "/backgroundkshort_bkg_pt%d").c_str(),i),hbackgroundSide_low_ks[i]);
-        PD.f_perisub->GetObject(Form((PD.fn_v0cas + "/signalkshort_bkg_pt%d").c_str(),i),hsignalSide_low_ks[i]);
-        TH1D* mult_low_ks = (TH1D*) PD.f_perisub->Get(Form((PD.fn_v0cas + "/mult_ks_bkg_pt%d").c_str(),i));
-
-        hbSidesr_low_ks[i] = hbackgroundSide_low_ks[i]->ProjectionY("hbSidesr_low_ks", 14, 20);
-        hsSidesr_low_ks[i] = hsignalSide_low_ks[i]->ProjectionY("hsSidesr_low_ks", 14, 20);
-
-        TF1* quadFit13 = new TF1("quadFit13","[0]*x^2+[1]*x+[2]",0.6,2.2);
-        quadFit13->SetParameters(1,1,1);
-
-
-        nEvent_low_ks.push_back(mult_low_ks->Integral(0,100000));
-        //nEvent_low_ks.push_back(mult_low_ks->Integral(2,100000));
-        Bz_low_ks.push_back(hbackgroundSide_low_ks[i]->GetBinContent(hbackgroundSide_low_ks[i]->FindBin(0,0)));
-
-        hsSidesr_low_ks[i]->Divide(hbSidesr_low_ks[i]);
-        hsSidesr_low_ks[i]->Scale(Bz_low_ks[i]/nEvent_low_ks[i]/BW2D);
-
-        hsSidesr_low_ks[i]->Fit("quadFit13","R");
-        hsSidesr_low_ks[i]->Fit("quadFit13","R");
-        hsSidesr_low_ks[i]->Fit("quadFit13","R");
-
-        double minVal_sr = quadFit13->GetMinimum(0.6,2.2);
-        double minVal_srX = quadFit13->GetMinimumX(0.6,2.2);
-        TF1* minConst_sr = new TF1("minConst_sr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
-        minConst_sr->SetParameter(0,-minVal_sr);
-        TH1D* hsSidesr_zeroed_low_ks = (TH1D*)hsSidesr_low_ks[i]->Clone();
-        hsSidesr_zeroed_low_ks->Add(minConst_sr);
-        csSidesr_low_ks->cd(i+1);
-        hsSidesr_low_ks[i]->Draw();
-        double xcoor = 0.52;
-        double ycoor = 0.90;
-        double increment = 0.07;
-        tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-        tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
-        tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_ks[i],PD.PtBin_ks[i+1]));
-        tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-        tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
-        c->cd();
-        Jyieldsr_low_ks.push_back(hsSidesr_zeroed_low_ks->IntegralAndError(hsSidesr_zeroed_low_ks->FindBin(0),hsSidesr_zeroed_low_ks->FindBin(minVal_srX),Jyieldsr_err_low_ks[i],"width"));
-        double bin0yield = hsSidesr_zeroed_low_ks->GetBinContent(hsSidesr_zeroed_low_ks->FindBin(0.0))*0.19635;
-        Jyieldsr_low_ks[i] = Jyieldsr_low_ks[i]*2 - bin0yield;
-
-        hbSidelr_low_ks[i] = hbackgroundSide_low_ks[i]->ProjectionY("hbSidelr_low_ks",1,14);
-        TH1D* ahbSidelr_low_ks = hbackgroundSide_low_ks[i]->ProjectionY("ahbSidelr_low_ks",20,33);
-        hsSidelr_low_ks[i] = hsignalSide_low_ks[i]->ProjectionY("hsSidelr_low_ks",1,14);
-        TH1D* ahsSidelr_low_ks = hsignalSide_low_ks[i]->ProjectionY("ahsSidelr_low_ks",20,33);
-
-        hbSidelr_low_ks[i]->Add(ahbSidelr_low_ks);
-        hsSidelr_low_ks[i]->Add(ahsSidelr_low_ks);
-        hsSidelr_low_ks[i]->Divide(hbSidelr_low_ks[i]);
-        hsSidelr_low_ks[i]->Scale(Bz_low_ks[i]/nEvent_low_ks[i]/BW2D);
-
-        TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.6,2.2);
-        quadFit2->SetParameters(1,1,1);
-
-
-        hsSidelr_low_ks[i]->Fit("quadFit2","R");
-        hsSidelr_low_ks[i]->Fit("quadFit2","R");
-        hsSidelr_low_ks[i]->Fit("quadFit2","R");
-
-        double minVal_lr = quadFit2->GetMinimum(0.6,2.2);
-        double minVal_lrX = quadFit2->GetMinimumX(0.6,2.2);
-        TF1* minConst_lr = new TF1("minConst_lr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
-        minConst_lr->SetParameter(0,-minVal_lr);
-        TH1D* hsSidelr_zeroed_low_ks = (TH1D*)hsSidelr_low_ks[i]->Clone();
-        hsSidelr_zeroed_low_ks->Add(minConst_lr);
-        csSidelr_low_ks->cd(i+1);
-        hsSidelr_low_ks[i]->Draw();
-        xcoor = 0.52;
-        ycoor = 0.90;
-        increment = 0.07;
-        tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-        tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
-        tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_ks[i],PD.PtBin_ks[i+1]));
-        tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-        tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
-        c->cd();
-        Jyieldlr_low_ks.push_back(hsSidelr_zeroed_low_ks->IntegralAndError(hsSidelr_zeroed_low_ks->FindBin(0.0),hsSidelr_zeroed_low_ks->FindBin(minVal_srX),Jyieldlr_err_low_ks[i],"width"));
-        bin0yield = hsSidelr_zeroed_low_ks->GetBinContent(hsSidelr_zeroed_low_ks->FindBin(0.0))*0.19635;
-        Jyieldlr_low_ks[i] = Jyieldlr_low_ks[i]*2 - bin0yield;
-
-        JyieldSub_low_ks.push_back(Jyieldsr_low_ks[i] - Jyieldlr_low_ks[i]);
-        JyieldSub_err_low_ks.push_back(sqrt(Jyieldsr_err_low_ks[i]*Jyieldsr_err_low_ks[i] + Jyieldlr_err_low_ks[i]*Jyieldlr_err_low_ks[i]));
-
-        TF1* fit1 = new TF1("fit1","[0]*(1.0+2.0*[1]*cos(x)+2.0*[2]*cos(2.0*x)+2.0*[3]*cos(3.0*x)+2.0*[4]*cos(4.0*x))",-0.5*TMath::Pi(),1.5*TMath::Pi());
-        fit1->SetParNames("N","V1","V2","V3");
-        fit1->SetParameters(10,1,1,1);
-        fit1->SetLineColor(2);
-
-        V2lrs_low_ks[i] = hsignalSide_low_ks[i]->ProjectionY(Form("V2lrs_low_ks%d",i),1,14);
-        TH1D* aV2lrs_low_ks = hsignalSide_low_ks[i]->ProjectionY("aV2lrs_low_ks",20,33);
-        V2lrb_low_ks[i] = hbackgroundSide_low_ks[i]->ProjectionY(Form("V2lrb_low_ks%d",i),1,14);
-        TH1D* aV2lrb_low_ks = hbackgroundSide_low_ks[i]->ProjectionY("aV2lrb_low_ks",20,33);
-        V2lrs_low_ks[i]->Add(aV2lrs_low_ks);
-        V2lrb_low_ks[i]->Add(aV2lrb_low_ks);
-        V2lrs_low_ks[i]->Divide(V2lrb_low_ks[i]);
-        V2lrs_low_ks[i]->Scale(Bz_low_ks[i]/nEvent_low_ks[i]/BW2D);
-
-        V2lrs_low_ks[i]->Fit("fit1","R");
-        V2lrs_low_ks[i]->Fit("fit1","R");
-        V2lrs_low_ks[i]->Fit("fit1","R");
-
-        V2Values_low_ks.push_back(fit1->GetParameter(2));
-        V2Values_err_low_ks.push_back(fit1->GetParError(2));
-        V3Values_low_ks.push_back(fit1->GetParameter(3));
-        V3Values_err_low_ks.push_back(fit1->GetParError(3));
-
-        Nassoc_low_ks.push_back(fit1->GetParameter(0));
-        c->cd();
-    }
-
-//Lambda N low
-    //Containers
-    std::vector<double> Nassoc_low_la;
-    std::vector<double> Jyieldsr_low_la;
-    std::vector<double> Jyieldlr_low_la;
-    std::vector<double> Jyieldsr_err_low_la(18);
-    std::vector<double> Jyieldlr_err_low_la(18);
-    std::vector<double> V2Values_low_la;
-    std::vector<double> V2Values_err_low_la;
-    std::vector<double> V3Values_low_la;
-    std::vector<double> V3Values_err_low_la;
-    std::vector<double> Bz_low_la;
-    std::vector<double> nEvent_low_la;
-
-    std::vector<double> JyieldSub_low_la;
-    std::vector<double> JyieldSub_err_low_la;
-
-    int arraySize_la = PD.PtBin_la.size();
-
-    TH1D* hsSidesr_low_la[arraySize_la];
-    TH1D* hbSidesr_low_la[arraySize_la];
-    TH1D* hsSidelr_low_la[arraySize_la];
-    TH1D* hbSidelr_low_la[arraySize_la];
-    TH1D* V2lrs_low_la[arraySize_la];
-    TH1D* V2lrb_low_la[arraySize_la];
-    TH2D* hbackgroundSide_low_la[arraySize_la];
-    TH2D* hsignalSide_low_la[arraySize_la];
-
-    //Calculate Nassoc, Jet yield, Side region Low N
-
-    for(int i=0; i<PD.PtBin_la.size(); i++)
-    {
-        PD.f_perisub->GetObject(Form((PD.fn_v0cas + "/backgroundlambda_bkg_pt%d").c_str(),i),hbackgroundSide_low_la[i]);
-        PD.f_perisub->GetObject(Form((PD.fn_v0cas + "/signallambda_bkg_pt%d").c_str(),i),hsignalSide_low_la[i]);
-        TH1D* mult_low_la = (TH1D*) PD.f_perisub->Get(Form((PD.fn_v0cas + "/mult_la_bkg_pt%d").c_str(),i));
-
-        hbSidesr_low_la[i] = hbackgroundSide_low_la[i]->ProjectionY("hbSidesr_low_la", 14, 20);
-        hsSidesr_low_la[i] = hsignalSide_low_la[i]->ProjectionY("hsSidesr_low_la", 14, 20);
-
-        TF1* quadFit14 = new TF1("quadFit14","[0]*x^2+[1]*x+[2]",0.6,2.2);
-        quadFit14->SetParameters(1,1,1);
-
-        nEvent_low_la.push_back(mult_low_la->Integral(0,100000));
-        //nEvent_low_la.push_back(mult_low_la->Integral(2,100000));
-        Bz_low_la.push_back(hbackgroundSide_low_la[i]->GetBinContent(hbackgroundSide_low_la[i]->FindBin(0,0)));
-
-        hsSidesr_low_la[i]->Divide(hbSidesr_low_la[i]);
-        hsSidesr_low_la[i]->Scale(Bz_low_la[i]/nEvent_low_la[i]/BW2D);
-
-        hsSidesr_low_la[i]->Fit("quadFit14","R");
-        hsSidesr_low_la[i]->Fit("quadFit14","R");
-        hsSidesr_low_la[i]->Fit("quadFit14","R");
-
-        double minVal_sr = quadFit14->GetMinimum(0.6,2.2);
-        double minVal_srX = quadFit14->GetMinimumX(0.6,2.2);
-        TF1* minConst_sr = new TF1("minConst_sr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
-        minConst_sr->SetParameter(0,-minVal_sr);
-        TH1D* hsSidesr_zeroed_low_la = (TH1D*)hsSidesr_low_la[i]->Clone();
-        hsSidesr_zeroed_low_la->Add(minConst_sr);
-        csSidesr_low_la->cd(i+1);
-        hsSidesr_low_la[i]->Draw();
-        double xcoor = 0.52;
-        double ycoor = 0.90;
-        double increment = 0.07;
-        tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-        tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
-        tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_la[i],PD.PtBin_la[i+1]));
-        tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-        tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
-        c->cd();
-        Jyieldsr_low_la.push_back(hsSidesr_zeroed_low_la->IntegralAndError(hsSidesr_zeroed_low_la->FindBin(0.0),hsSidesr_zeroed_low_la->FindBin(minVal_srX),Jyieldsr_err_low_la[i],"width"));
-        double bin0yield = hsSidesr_zeroed_low_la->GetBinContent(hsSidesr_zeroed_low_la->FindBin(0.0))*0.19635;
-        Jyieldsr_low_la[i] = Jyieldsr_low_la[i]*2 - bin0yield;
-
-        hbSidelr_low_la[i] = hbackgroundSide_low_la[i]->ProjectionY("hbSidelr_low_la",1,14);
-        TH1D* ahbSidelr_low_la = hbackgroundSide_low_la[i]->ProjectionY("ahbSidelr_low_la",20,33);
-        hsSidelr_low_la[i] = hsignalSide_low_la[i]->ProjectionY("hsSidelr_low_la",1,14);
-        TH1D* ahsSidelr_low_la = hsignalSide_low_la[i]->ProjectionY("ahsSidelr_low_la",20,33);
-
-        hbSidelr_low_la[i]->Add(ahbSidelr_low_la);
-        hsSidelr_low_la[i]->Add(ahsSidelr_low_la);
-        hsSidelr_low_la[i]->Divide(hbSidelr_low_la[i]);
-        hsSidelr_low_la[i]->Scale(Bz_low_la[i]/nEvent_low_la[i]/BW2D);
-
-        TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.6,2.2);
-        quadFit2->SetParameters(1,1,1);
-
-        hsSidelr_low_la[i]->Fit("quadFit2","R");
-        hsSidelr_low_la[i]->Fit("quadFit2","R");
-        hsSidelr_low_la[i]->Fit("quadFit2","R");
-
-        double minVal_lr = quadFit2->GetMinimum(0.6,2.2);
-        double minVal_lrX = quadFit2->GetMinimumX(0.6,2.2);
-        TF1* minConst_lr = new TF1("minConst_lr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
-        minConst_lr->SetParameter(0,-minVal_lr);
-        TH1D* hsSidelr_zeroed_low_la = (TH1D*)hsSidelr_low_la[i]->Clone();
-        hsSidelr_zeroed_low_la->Add(minConst_lr);
-        csSidelr_low_la->cd(i+1);
-        hsSidelr_low_la[i]->Draw();
-        xcoor = 0.52;
-        ycoor = 0.90;
-        increment = 0.07;
-        tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-        tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
-        tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_la[i],PD.PtBin_la[i+1]));
-        tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-        tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
-        c->cd();
-        Jyieldlr_low_la.push_back(hsSidelr_zeroed_low_la->IntegralAndError(hsSidelr_zeroed_low_la->FindBin(0.0),hsSidelr_zeroed_low_la->FindBin(minVal_srX),Jyieldlr_err_low_la[i],"width"));
-        bin0yield = hsSidelr_zeroed_low_la->GetBinContent(hsSidelr_zeroed_low_la->FindBin(0.0))*0.19635;
-        Jyieldlr_low_la[i] = Jyieldlr_low_la[i]*2 - bin0yield;
-
-        JyieldSub_low_la.push_back(Jyieldsr_low_la[i] - Jyieldlr_low_la[i]);
-        JyieldSub_err_low_la.push_back(sqrt(Jyieldsr_err_low_la[i]*Jyieldsr_err_low_la[i] + Jyieldlr_err_low_la[i]*Jyieldlr_err_low_la[i]));
-
-        TF1* fit1 = new TF1("fit1","[0]*(1.0+2.0*[1]*cos(x)+2.0*[2]*cos(2.0*x)+2.0*[3]*cos(3.0*x)+2.0*[4]*cos(4.0*x))",-0.5*TMath::Pi(),1.5*TMath::Pi());
-        fit1->SetParNames("N","V1","V2","V3");
-        fit1->SetParameters(10,1,1,1);
-        fit1->SetLineColor(2);
-
-        V2lrs_low_la[i] = hsignalSide_low_la[i]->ProjectionY(Form("V2lrs_low_la%d",i),1,14);
-        TH1D* aV2lrs_low_la = hsignalSide_low_la[i]->ProjectionY("aV2lrs_low_la",20,33);
-        V2lrb_low_la[i] = hbackgroundSide_low_la[i]->ProjectionY(Form("V2lrb_low_la%d",i),1,14);
-        TH1D* aV2lrb_low_la = hbackgroundSide_low_la[i]->ProjectionY("aV2lrb_low_la",20,33);
-        V2lrs_low_la[i]->Add(aV2lrs_low_la);
-        V2lrb_low_la[i]->Add(aV2lrb_low_la);
-        V2lrs_low_la[i]->Divide(V2lrb_low_la[i]);
-        V2lrs_low_la[i]->Scale(Bz_low_la[i]/nEvent_low_la[i]/BW2D);
-
-        V2lrs_low_la[i]->Fit("fit1","R");
-        V2lrs_low_la[i]->Fit("fit1","R");
-        V2lrs_low_la[i]->Fit("fit1","R");
-
-        V2Values_low_la.push_back(fit1->GetParameter(2));
-        V2Values_err_low_la.push_back(fit1->GetParError(2));
-        V3Values_low_la.push_back(fit1->GetParameter(3));
-        V3Values_err_low_la.push_back(fit1->GetParError(3));
-
-        Nassoc_low_la.push_back(fit1->GetParameter(0));
-        c->cd();
-    }
-
-    //High N
-//KSHORT
-    //Containers
-    std::vector<double> Nassoc_ks;
-    std::vector<double> Jyieldsr_ks;
-    std::vector<double> Jyieldlr_ks;
-    std::vector<double> Jyieldsr_err_ks(18);
-    std::vector<double> Jyieldlr_err_ks(18);
-    std::vector<double> V2Values_ks;
-    std::vector<double> V2Values_err_ks;
-    std::vector<double> V3Values_ks;
-    std::vector<double> V3Values_err_ks;
-    std::vector<double> Bz_ks;
-    std::vector<double> nEvent_ks;
-
-    std::vector<double> JyieldSub_ks;
-    std::vector<double> JyieldSub_err_ks;
-
-    //std::vector<double> PtBin_ks = {0.2, 0.4, 0.6, 0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5};//, 10.0, 15.0, 20.0}; 
-
-    TH1D* hsSidesr_ks[arraySize_ks];
-    TH1D* hbSidesr_ks[arraySize_ks];
-    TH1D* hsSidelr_ks[arraySize_ks];
-    TH1D* hbSidelr_ks[arraySize_ks];
-    TH1D* V2lrs_ks[arraySize_ks];
-    TH1D* V2lrb_ks[arraySize_ks];
-    TH2D* hbackgroundSide_ks[arraySize_ks];
-    TH2D* hsignalSide_ks[arraySize_ks];
-
-    //Calculate Nassoc, Jet yield, Side region
-    //Jet Yield
-
-    for(int i=0; i<PD.PtBin_ks.size(); i++)
-    {
-        PD.f_V0->GetObject(Form((PD.fn_V0 + "/backgroundkshort_bkg_pt%d").c_str(),i),hbackgroundSide_ks[i]);
-        PD.f_V0->GetObject(Form((PD.fn_V0 + "/signalkshort_bkg_pt%d").c_str(),i),hsignalSide_ks[i]);
-        TH1D* mult_ks = (TH1D*) PD.f_V0->Get(Form((PD.fn_V0 + "/mult_ks_bkg_pt%d").c_str(),i));
-
-        hbSidesr_ks[i] = hbackgroundSide_ks[i]->ProjectionY("hbSidesr_ks", 14, 20);
-        hsSidesr_ks[i] = hsignalSide_ks[i]->ProjectionY("hsSidesr_ks", 14, 20);
-
-        TF1* quadFit15 = new TF1("quadFit15","[0]*x^2+[1]*x+[2]",0.6,2.2);
-        quadFit15->SetParameters(1,1,1);
-
-        nEvent_ks.push_back(mult_ks->Integral(0,100000));
-        //nEvent_ks.push_back(mult_ks->Integral(2,100000));
-        Bz_ks.push_back(hbackgroundSide_ks[i]->GetBinContent(hbackgroundSide_ks[i]->FindBin(0,0)));
-
-        hsSidesr_ks[i]->Divide(hbSidesr_ks[i]);
-        hsSidesr_ks[i]->Scale(Bz_ks[i]/nEvent_ks[i]/BW2D);
-
-        hsSidesr_ks[i]->Fit("quadFit15","R");
-        hsSidesr_ks[i]->Fit("quadFit15","R");
-        hsSidesr_ks[i]->Fit("quadFit15","R");
-
-        double minVal_sr = quadFit15->GetMinimum(0.6,2.2);
-        double minVal_srX = quadFit15->GetMinimumX(0.6,2.2);
-        TF1* minConst_sr = new TF1("minConst_sr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
-        minConst_sr->SetParameter(0,-minVal_sr);
-        TH1D* hsSidesr_zeroed_ks = (TH1D*)hsSidesr_ks[i]->Clone();
-        hsSidesr_zeroed_ks->Add(minConst_sr);
-        csSidesr_ks->cd(i+1);
-        hsSidesr_ks[i]->Draw();
-        double xcoor = 0.52;
-        double ycoor = 0.90;
-        double increment = 0.07;
-        tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-        tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
-        tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_ks[i],PD.PtBin_ks[i+1]));
-        tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-        tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
-        c->cd();
-        Jyieldsr_ks.push_back(hsSidesr_zeroed_ks->IntegralAndError(hsSidesr_zeroed_ks->FindBin(0.0),hsSidesr_zeroed_ks->FindBin(minVal_srX),Jyieldsr_err_ks[i],"width"));
-        double bin0yield = hsSidesr_zeroed_ks->GetBinContent(hsSidesr_zeroed_ks->FindBin(0.0))*0.19635;
-        Jyieldsr_ks[i] = Jyieldsr_ks[i]*2 - bin0yield;
-
-        hbSidelr_ks[i] = hbackgroundSide_ks[i]->ProjectionY("hbSidelr_ks",1,14);
-        TH1D* ahbSidelr_ks = hbackgroundSide_ks[i]->ProjectionY("ahbSidelr_ks",20,33);
-        hsSidelr_ks[i] = hsignalSide_ks[i]->ProjectionY("hsSidelr_ks",1,14);
-        TH1D* ahsSidelr_ks = hsignalSide_ks[i]->ProjectionY("ahsSidelr_ks",20,33);
-
-        hbSidelr_ks[i]->Add(ahbSidelr_ks);
-        hsSidelr_ks[i]->Add(ahsSidelr_ks);
-        hsSidelr_ks[i]->Divide(hbSidelr_ks[i]);
-        hsSidelr_ks[i]->Scale(Bz_ks[i]/nEvent_ks[i]/BW2D);
-
-        TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.6,2.2);
-        quadFit2->SetParameters(1,1,1);
-
-        hsSidelr_ks[i]->Fit("quadFit2","R");
-        hsSidelr_ks[i]->Fit("quadFit2","R");
-        hsSidelr_ks[i]->Fit("quadFit2","R");
-
-        double minVal_lr = quadFit2->GetMinimum(0.6,2.2);
-        double minVal_lrX = quadFit2->GetMinimumX(0.6,2.2);
-        TF1* minConst_lr = new TF1("minConst_lr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
-        minConst_lr->SetParameter(0,-minVal_lr);
-        TH1D* hsSidelr_zeroed_ks = (TH1D*)hsSidelr_ks[i]->Clone();
-        hsSidelr_zeroed_ks->Add(minConst_lr);
-        csSidelr_ks->cd(i+1);
-        hsSidelr_ks[i]->Draw();
-        xcoor = 0.52;
-        ycoor = 0.90;
-        increment = 0.07;
-        tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-        tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
-        tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_ks[i],PD.PtBin_ks[i+1]));
-        tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-        tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
-        c->cd();
-        Jyieldlr_ks.push_back(hsSidelr_zeroed_ks->IntegralAndError(hsSidelr_zeroed_ks->FindBin(0.0),hsSidelr_zeroed_ks->FindBin(minVal_srX),Jyieldlr_err_ks[i],"width"));
-        bin0yield = hsSidelr_zeroed_ks->GetBinContent(hsSidelr_zeroed_ks->FindBin(0.0))*0.19635;
-        Jyieldlr_ks[i] = Jyieldlr_ks[i]*2 - bin0yield;
-
-        JyieldSub_ks.push_back(Jyieldsr_ks[i] - Jyieldlr_ks[i]);
-        JyieldSub_err_ks.push_back(sqrt(Jyieldsr_err_ks[i]*Jyieldsr_err_ks[i] + Jyieldlr_err_ks[i]*Jyieldlr_err_ks[i]));
-
-        TF1* fit1 = new TF1("fit1","[0]*(1.0+2.0*[1]*cos(x)+2.0*[2]*cos(2.0*x)+2.0*[3]*cos(3.0*x)+2.0*[4]*cos(4.0*x))",-0.5*TMath::Pi(),1.5*TMath::Pi());
-        fit1->SetParNames("N","V1","V2","V3");
-        fit1->SetParameters(10,1,1,1);
-        fit1->SetLineColor(2);
-
-        V2lrs_ks[i] = hsignalSide_ks[i]->ProjectionY(Form("V2lrs_ks%d",i),1,14);
-        TH1D* aV2lrs_ks = hsignalSide_ks[i]->ProjectionY("aV2lrs_ks",20,33);
-        V2lrb_ks[i] = hbackgroundSide_ks[i]->ProjectionY(Form("V2lrb_ks%d",i),1,14);
-        TH1D* aV2lrb_ks = hbackgroundSide_ks[i]->ProjectionY("aV2lrb_ks",20,33);
-        V2lrs_ks[i]->Add(aV2lrs_ks);
-        V2lrb_ks[i]->Add(aV2lrb_ks);
-        V2lrs_ks[i]->Divide(V2lrb_ks[i]);
-        V2lrs_ks[i]->Scale(Bz_ks[i]/nEvent_ks[i]/BW2D);
-
-        V2lrs_ks[i]->Fit("fit1","R");
-        V2lrs_ks[i]->Fit("fit1","R");
-        V2lrs_ks[i]->Fit("fit1","R");
-
-        V2Values_ks.push_back(fit1->GetParameter(2));
-        V2Values_err_ks.push_back(fit1->GetParError(2));
-        V3Values_ks.push_back(fit1->GetParameter(3));
-        V3Values_err_ks.push_back(fit1->GetParError(3));
-
-        Nassoc_ks.push_back(fit1->GetParameter(0));
-        c->cd();
-    }
-
-//LAMBDA
-    std::vector<double> Nassoc_la;
-    std::vector<double> Jyieldsr_la;
-    std::vector<double> Jyieldlr_la;
-    std::vector<double> Jyieldsr_err_la(18);
-    std::vector<double> Jyieldlr_err_la(18);
-    std::vector<double> V2Values_la;
-    std::vector<double> V2Values_err_la;
-    std::vector<double> V3Values_la;
-    std::vector<double> V3Values_err_la;
-    std::vector<double> Bz_la;
-    std::vector<double> nEvent_la;
-
-    std::vector<double> JyieldSub_la;
-    std::vector<double> JyieldSub_err_la;
-
-    //std::vector<double> PD.PtBin_la = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5};//, 10.0, 15.0, 20.0}; 
-
-    TH1D* hsSidesr_la[arraySize_la];
-    TH1D* hbSidesr_la[arraySize_la];
-    TH1D* hsSidelr_la[arraySize_la];
-    TH1D* hbSidelr_la[arraySize_la];
-    TH1D* V2lrs_la[arraySize_la];
-    TH1D* V2lrb_la[arraySize_la];
-    TH2D* hbackgroundSide_la[arraySize_la];
-    TH2D* hsignalSide_la[arraySize_la];
-
-    //Calculate Nassoc, Jet yield, Side region
-    //Jet Yield
-
-    for(int i=0; i<PD.PtBin_la.size(); i++)
-    {
-        PD.f_V0->GetObject(Form((PD.fn_V0 + "/backgroundlambda_bkg_pt%d").c_str(),i),hbackgroundSide_la[i]);
-        PD.f_V0->GetObject(Form((PD.fn_V0 + "/signallambda_bkg_pt%d").c_str(),i),hsignalSide_la[i]);
-        TH1D* mult_la = (TH1D*) PD.f_V0->Get(Form((PD.fn_V0 + "/mult_la_bkg_pt%d").c_str(),i));
-
-        hbSidesr_la[i] = hbackgroundSide_la[i]->ProjectionY("hbSidesr_la", 14, 20);
-        hsSidesr_la[i] = hsignalSide_la[i]->ProjectionY("hsSidesr_la", 14, 20);
-
-        TF1* quadFit16 = new TF1("quadFit16","[0]*x^2+[1]*x+[2]",0.6,2.2);
-        quadFit16->SetParameters(1,1,1);
-
-        nEvent_la.push_back(mult_la->Integral(0,10000));
-        //nEvent_la.push_back(mult_la->Integral(2,10000));
-        Bz_la.push_back(hbackgroundSide_la[i]->GetBinContent(hbackgroundSide_la[i]->FindBin(0,0)));
-
-        hsSidesr_la[i]->Divide(hbSidesr_la[i]);
-        hsSidesr_la[i]->Scale(Bz_la[i]/nEvent_la[i]/BW2D);
-
-        hsSidesr_la[i]->Fit("quadFit16","R");
-        hsSidesr_la[i]->Fit("quadFit16","R");
-        hsSidesr_la[i]->Fit("quadFit16","R");
-
-        double minVal_sr = quadFit16->GetMinimum(0.6,2.2);
-        double minVal_srX = quadFit16->GetMinimumX(0.6,2.2);
-        TF1* minConst_sr = new TF1("minConst_sr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
-        minConst_sr->SetParameter(0,-minVal_sr);
-        TH1D* hsSidesr_zeroed_la = (TH1D*)hsSidesr_la[i]->Clone();
-        hsSidesr_zeroed_la->Add(minConst_sr);
-        csSidesr_la->cd(i+1);
-        hsSidesr_la[i]->Draw();
-        double xcoor = 0.52;
-        double ycoor = 0.90;
-        double increment = 0.07;
-        tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-        tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
-        tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_la[i],PD.PtBin_la[i+1]));
-        tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-        tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
-        c->cd();
-        Jyieldsr_la.push_back(hsSidesr_zeroed_la->IntegralAndError(hsSidesr_zeroed_la->FindBin(0.0),hsSidesr_zeroed_la->FindBin(minVal_srX),Jyieldsr_err_la[i],"width"));
-        double bin0yield = hsSidesr_zeroed_la->GetBinContent(hsSidesr_zeroed_la->FindBin(0.0))*0.19635;
-        Jyieldsr_la[i] = Jyieldsr_la[i]*2 - bin0yield;
-
-        hbSidelr_la[i] = hbackgroundSide_la[i]->ProjectionY("hbSidelr_la",1,14);
-        TH1D* ahbSidelr_la = hbackgroundSide_la[i]->ProjectionY("ahbSidelr_la",20,33);
-        hsSidelr_la[i] = hsignalSide_la[i]->ProjectionY("hsSidelr_la",1,14);
-        TH1D* ahsSidelr_la = hsignalSide_la[i]->ProjectionY("ahsSidelr_la",20,33);
-
-        hbSidelr_la[i]->Add(ahbSidelr_la);
-        hsSidelr_la[i]->Add(ahsSidelr_la);
-        hsSidelr_la[i]->Divide(hbSidelr_la[i]);
-        hsSidelr_la[i]->Scale(Bz_la[i]/nEvent_la[i]/BW2D);
-
-        TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.6,2.2);
-        quadFit2->SetParameters(1,1,1);
-
-        hsSidelr_la[i]->Fit("quadFit2","R");
-        hsSidelr_la[i]->Fit("quadFit2","R");
-        hsSidelr_la[i]->Fit("quadFit2","R");
-
-        double minVal_lr = quadFit2->GetMinimum(0.6,2.2);
-        double minVal_lrX = quadFit2->GetMinimumX(0.6,2.2);
-        TF1* minConst_lr = new TF1("minConst_lr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
-        minConst_lr->SetParameter(0,-minVal_lr);
-        TH1D* hsSidelr_zeroed_la = (TH1D*)hsSidelr_la[i]->Clone();
-        hsSidelr_zeroed_la->Add(minConst_lr);
-        csSidelr_la->cd(i+1);
-        hsSidelr_la[i]->Draw();
-        xcoor = 0.52;
-        ycoor = 0.90;
-        increment = 0.07;
-        tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-        tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
-        tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_la[i],PD.PtBin_la[i+1]));
-        tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-        tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
-        c->cd();
-        Jyieldlr_la.push_back(hsSidelr_zeroed_la->IntegralAndError(hsSidelr_zeroed_la->FindBin(0.0),hsSidelr_zeroed_la->FindBin(minVal_srX),Jyieldlr_err_la[i],"width"));
-        bin0yield = hsSidelr_zeroed_la->GetBinContent(hsSidelr_zeroed_la->FindBin(0.0))*0.19635;
-        Jyieldlr_la[i] = Jyieldlr_la[i]*2 - bin0yield;
-
-        JyieldSub_la.push_back(Jyieldsr_la[i] - Jyieldlr_la[i]);
-        JyieldSub_err_la.push_back(sqrt(Jyieldsr_err_la[i]*Jyieldsr_err_la[i] + Jyieldlr_err_la[i]*Jyieldlr_err_la[i]));
-
-        TF1* fit1 = new TF1("fit1","[0]*(1.0+2.0*[1]*cos(x)+2.0*[2]*cos(2.0*x)+2.0*[3]*cos(3.0*x)+2.0*[4]*cos(4.0*x))",-0.5*TMath::Pi(),1.5*TMath::Pi());
-        fit1->SetParNames("N","V1","V2","V3");
-        fit1->SetParameters(10,1,1,1);
-        fit1->SetLineColor(2);
-
-        V2lrs_la[i] = hsignalSide_la[i]->ProjectionY(Form("V2lrs_la%d",i),1,14);
-        TH1D* aV2lrs_la = hsignalSide_la[i]->ProjectionY("aV2lrs_la",20,33);
-        V2lrb_la[i] = hbackgroundSide_la[i]->ProjectionY(Form("V2lrb_la%d",i),1,14);
-        TH1D* aV2lrb_la = hbackgroundSide_la[i]->ProjectionY("aV2lrb_la",20,33);
-        V2lrs_la[i]->Add(aV2lrs_la);
-        V2lrb_la[i]->Add(aV2lrb_la);
-        V2lrs_la[i]->Divide(V2lrb_la[i]);
-        V2lrs_la[i]->Scale(Bz_la[i]/nEvent_la[i]/BW2D);
-
-        V2lrs_la[i]->Fit("fit1","R");
-        V2lrs_la[i]->Fit("fit1","R");
-        V2lrs_la[i]->Fit("fit1","R");
-
-        V2Values_la.push_back(fit1->GetParameter(2));
-        V2Values_err_la.push_back(fit1->GetParError(2));
-        V3Values_la.push_back(fit1->GetParameter(3));
-        V3Values_err_la.push_back(fit1->GetParError(3));
-
-        Nassoc_la.push_back(fit1->GetParameter(0));
-        c->cd();
-    }
-
-    // Reference Vn after corrections
-    double V2sub_ref = V2Values_high_ref[0] - V2Values_low_ref[0]*Nassoc_low_ref[0]/Nassoc_high_ref[0]*Jyieldsr_high_ref[0]/Jyieldsr_low_ref[0];
-    double V2sube_ref = sqrt(TMath::Power(V2Values_err_high_ref[0],2) + TMath::Power(V2Values_err_low_ref[0]*Nassoc_low_ref[0]/Nassoc_high_ref[0]*Jyieldsr_high_ref[0]/Jyieldsr_low_ref[0],2));
-
-    double V3sub_ref = V3Values_high_ref[0] - V3Values_low_ref[0]*Nassoc_low_ref[0]/Nassoc_high_ref[0]*Jyieldsr_high_ref[0]/Jyieldsr_low_ref[0];
-    double V3sube_ref = sqrt(TMath::Power(V3Values_err_high_ref[0],2) + TMath::Power(V3Values_err_low_ref[0]*Nassoc_low_ref[0]/Nassoc_high_ref[0]*Jyieldsr_high_ref[0]/Jyieldsr_low_ref[0],2));
-
-
-    double v2sub_ref = sqrt(V2sub_ref);
-    double v2sube_ref = sqrt(V2sub_ref)*(V2sube_ref/V2sub_ref)/2;
-
-    double v3sub_ref = sqrt(V3sub_ref);
-    double v3sube_ref = sqrt(V3sub_ref)*(V3sube_ref/V3sub_ref)/2;
-
-
-
-    //Ks Vn correction
-    std::vector<double> V2sub_ks;
-    std::vector<double> V2sube_ks;
-
-    std::vector<double> V3sub_ks;
-    std::vector<double> V3sube_ks;
-
-    std::vector<double> jetYfactor_ks;
-
-    for(unsigned i=0; i<PD.PtBin_ks.size(); i++){
-        V2sub_ks.push_back(V2Values_ks[i] - V2Values_low_ks[i]*Nassoc_low_ks[i]/Nassoc_ks[i]*JyieldSub_ks[i]/JyieldSub_low_ks[i]);
-        V2sube_ks.push_back(sqrt(TMath::Power(V2Values_err_ks[i],2) + sqrt(TMath::Power(V2Values_err_low_ks[i]/V2Values_low_ks[i],2) + TMath::Power(JyieldSub_err_ks[i]/JyieldSub_ks[i],2) + TMath::Power(JyieldSub_err_low_ks[i]/JyieldSub_low_ks[i],2))*V2Values_low_ks[i]*Nassoc_low_ks[i]/Nassoc_ks[i]*JyieldSub_ks[i]/JyieldSub_low_ks[i]*sqrt(TMath::Power(V2Values_err_low_ks[i]/V2Values_low_ks[i],2) + TMath::Power(JyieldSub_err_ks[i]/JyieldSub_ks[i],2) + TMath::Power(JyieldSub_err_low_ks[i]/JyieldSub_low_ks[i],2))*V2Values_low_ks[i]*Nassoc_low_ks[i]/Nassoc_ks[i]*JyieldSub_ks[i]/JyieldSub_low_ks[i]));
-
-        V3sub_ks.push_back(V3Values_ks[i] - V3Values_low_ks[i]*Nassoc_low_ks[i]/Nassoc_ks[i]*JyieldSub_ks[i]/JyieldSub_low_ks[i]);
-        V3sube_ks.push_back(sqrt(TMath::Power(V3Values_err_ks[i],2) + sqrt(TMath::Power(V3Values_err_low_ks[i]/V3Values_low_ks[i],2) + TMath::Power(JyieldSub_err_ks[i]/JyieldSub_ks[i],2) + TMath::Power(JyieldSub_err_low_ks[i]/JyieldSub_low_ks[i],2))*V3Values_low_ks[i]*Nassoc_low_ks[i]/Nassoc_ks[i]*JyieldSub_ks[i]/JyieldSub_low_ks[i]*sqrt(TMath::Power(V3Values_err_low_ks[i]/V3Values_low_ks[i],2) + TMath::Power(JyieldSub_err_ks[i]/JyieldSub_ks[i],2) + TMath::Power(JyieldSub_err_low_ks[i]/JyieldSub_low_ks[i],2))*V3Values_low_ks[i]*Nassoc_low_ks[i]/Nassoc_ks[i]*JyieldSub_ks[i]/JyieldSub_low_ks[i]));
-
-        jetYfactor_ks.push_back(JyieldSub_ks[i]/JyieldSub_low_ks[i]);
-    }
-
-    //La Vn correction
-    std::vector<double> V2sub_la;
-    std::vector<double> V2sube_la;
-
-    std::vector<double> V3sub_la;
-    std::vector<double> V3sube_la;
-
-    std::vector<double> jetYfactor_la;
-
-    for(unsigned i=0; i<PD.PtBin_la.size(); i++){
-        V2sub_la.push_back(V2Values_la[i] - V2Values_low_la[i]*Nassoc_low_la[i]/Nassoc_la[i]*JyieldSub_la[i]/JyieldSub_low_la[i]);
-        V2sube_la.push_back(sqrt(TMath::Power(V2Values_err_la[i],2) + sqrt(TMath::Power(V2Values_err_low_la[i]/V2Values_low_la[i],2) + TMath::Power(JyieldSub_err_la[i]/JyieldSub_la[i],2) + TMath::Power(JyieldSub_err_low_la[i]/JyieldSub_low_la[i],2))*V2Values_low_la[i]*Nassoc_low_la[i]/Nassoc_la[i]*JyieldSub_la[i]/JyieldSub_low_la[i]*sqrt(TMath::Power(V2Values_err_low_la[i]/V2Values_low_la[i],2) + TMath::Power(JyieldSub_err_la[i]/JyieldSub_la[i],2) + TMath::Power(JyieldSub_err_low_la[i]/JyieldSub_low_la[i],2))*V2Values_low_la[i]*Nassoc_low_la[i]/Nassoc_la[i]*JyieldSub_la[i]/JyieldSub_low_la[i]));
-
-        V3sub_la.push_back(V3Values_la[i] - V3Values_low_la[i]*Nassoc_low_la[i]/Nassoc_la[i]*JyieldSub_la[i]/JyieldSub_low_la[i]);
-        V3sube_la.push_back(sqrt(TMath::Power(V3Values_err_la[i],2) + sqrt(TMath::Power(V3Values_err_low_la[i]/V3Values_low_la[i],2) + TMath::Power(JyieldSub_err_la[i]/JyieldSub_la[i],2) + TMath::Power(JyieldSub_err_low_la[i]/JyieldSub_low_la[i],2))*V3Values_low_la[i]*Nassoc_low_la[i]/Nassoc_la[i]*JyieldSub_la[i]/JyieldSub_low_la[i]*sqrt(TMath::Power(V3Values_err_low_la[i]/V3Values_low_la[i],2) + TMath::Power(JyieldSub_err_la[i]/JyieldSub_la[i],2) + TMath::Power(JyieldSub_err_low_la[i]/JyieldSub_low_la[i],2))*V3Values_low_la[i]*Nassoc_low_la[i]/Nassoc_la[i]*JyieldSub_la[i]/JyieldSub_low_la[i]));
-
-        jetYfactor_la.push_back(JyieldSub_la[i]/JyieldSub_low_la[i]);
-    }
-
-
-    //Ks vn calculation
-    std::vector<double> v2sub_ks;
-    std::vector<double> v2sube_ks;
-    std::vector<double> v2_ks;
-    std::vector<double> v2e_ks;
-    std::vector<double> v2_low_ks;
-    std::vector<double> v2e_low_ks;
-
-    std::vector<double> v3sub_ks;
-    std::vector<double> v3sube_ks;
-    std::vector<double> v3_ks;
-    std::vector<double> v3e_ks;
-    std::vector<double> v3_low_ks;
-    std::vector<double> v3e_low_ks;
-
-    for(unsigned i=0; i<PD.PtBin_ks.size(); i++){
-        v2sub_ks.push_back(V2sub_ks[i]/v2sub_ref);
-        v2sube_ks.push_back(fabs(sqrt(V2sube_ks[i]/V2sub_ks[i]*V2sube_ks[i]/V2sub_ks[i] + v2sube_ref/v2sub_ref*v2sube_ref/v2sub_ref)*v2sub_ks[i]));
-
-        v2_ks.push_back(V2Values_ks[i]/v2_high_ref);
-        v2e_ks.push_back(sqrt(TMath::Power(V2Values_err_ks[i]/v2_high_ref,2) + TMath::Power(v2e_high_ref/v2_high_ref,2)*v2_ks[i]));
-
-        v2_low_ks.push_back(V2Values_low_ks[i]/v2_low_ref);
-        v2e_low_ks.push_back(sqrt(TMath::Power(V2Values_err_low_ks[i]/v2_low_ref,2) + TMath::Power(v2e_low_ref/v2_low_ref,2))*v2_low_ks[i]);
-
-        v3sub_ks.push_back(V3sub_ks[i]/v3sub_ref);
-        v3sube_ks.push_back(fabs(sqrt(V3sube_ks[i]/V3sub_ks[i]*V3sube_ks[i]/V3sub_ks[i] + v3sube_ref/v3sub_ref*v3sube_ref/v3sub_ref)*v3sub_ks[i]));
-
-        v3_ks.push_back(V3Values_ks[i]/v3_high_ref);
-        v3e_ks.push_back(sqrt(TMath::Power(V3Values_err_ks[i]/v3_high_ref,2) + TMath::Power(v3e_high_ref/v3_high_ref,2)*v3_ks[i]));
-
-        v3_low_ks.push_back(V3Values_low_ks[i]/v3_low_ref);
-        v3e_low_ks.push_back(sqrt(TMath::Power(V3Values_err_low_ks[i]/v3_low_ref,2) + TMath::Power(v3e_low_ref/v3_low_ref,2))*v3_low_ks[i]);
-        }
-
-    //La vn calculation
-    std::vector<double> v2sub_la;
-    std::vector<double> v2sube_la;
-    std::vector<double> v2_la;
-    std::vector<double> v2e_la;
-    std::vector<double> v2_low_la;
-    std::vector<double> v2e_low_la;
-
-    std::vector<double> v3sub_la;
-    std::vector<double> v3sube_la;
-    std::vector<double> v3_la;
-    std::vector<double> v3e_la;
-    std::vector<double> v3_low_la;
-    std::vector<double> v3e_low_la;
-
-    for(unsigned i=0; i<PD.PtBin_la.size(); i++){
-        v2sub_la.push_back(V2sub_la[i]/v2sub_ref);
-        v2sube_la.push_back(fabs(sqrt(V2sube_la[i]/V2sub_la[i]*V2sube_la[i]/V2sub_la[i] + v2sube_ref/v2sub_ref*v2sube_ref/v2sub_ref)*v2sub_la[i]));
-
-        v2_la.push_back(V2Values_la[i]/v2_high_ref);
-        v2e_la.push_back(sqrt(TMath::Power(V2Values_err_la[i]/v2_high_ref,2) + TMath::Power(v2e_high_ref/v2_high_ref,2)*v2_la[i]));
-
-        v2_low_la.push_back(V2Values_low_la[i]/v2_low_ref);
-        v2e_low_la.push_back(sqrt(TMath::Power(V2Values_err_low_la[i]/v2_low_ref,2) + TMath::Power(v2e_low_ref/v2_low_ref,2))*v2_low_la[i]);
-
-        v3sub_la.push_back(V3sub_la[i]/v3sub_ref);
-        v3sube_la.push_back(fabs(sqrt(V3sube_la[i]/V3sub_la[i]*V3sube_la[i]/V3sub_la[i] + v3sube_ref/v3sub_ref*v3sube_ref/v3sub_ref)*v3sub_la[i]));
-
-        v3_la.push_back(V3Values_la[i]/v3_high_ref);
-        v3e_la.push_back(sqrt(TMath::Power(V3Values_err_la[i]/v3_high_ref,2) + TMath::Power(v3e_high_ref/v3_high_ref,2)*v3_la[i]));
-
-       v3_low_la.push_back(V3Values_low_la[i]/v3_low_ref);
-       v3e_low_la.push_back(sqrt(TMath::Power(V3Values_err_low_la[i]/v3_low_ref,2) + TMath::Power(v3e_low_ref/v3_low_ref,2))*v3_low_la[i]);
-    }
-
-    //Produce RootFiles
-    TFile output(PD.fn.c_str(),"UPDATE");
-
-    //Get Mean Pt and KET of High N
-    std::vector<double> pt_ks;
-    std::vector<double> Ket_ks;
-    for(unsigned i=0; i<PD.PtBin_ks.size(); i++){
-        TH1D* hpt = (TH1D*)PD.f_V0->Get(Form((PD.fn_V0 + "/Ptkshort_pt%d").c_str(),i));
-        TH1D* hket = (TH1D*)PD.f_V0->Get(Form((PD.fn_V0 + "/KETkshort_pt%d").c_str(),i));
-
-        pt_ks.push_back(hpt->GetMean(1));
-        Ket_ks.push_back(hket->GetMean(1));
-    }
-
-    std::vector<double> pt_la;
-    std::vector<double> Ket_la;
-    for(unsigned i=0; i<PD.PtBin_la.size(); i++){
-        TH1D* hpt = (TH1D*)PD.f_V0->Get(Form((PD.fn_V0 + "/Ptlambda_pt%d").c_str(),i));
-        TH1D* hket = (TH1D*)PD.f_V0->Get(Form((PD.fn_V0 + "/KETlambda_pt%d").c_str(),i));
-
-        pt_la.push_back(hpt->GetMean(1));
-        Ket_la.push_back(hket->GetMean(1));
-    }
-
-    std::vector<double> perisubfactor_ks;
-    std::vector<double> perisubfactore_ks;
-    for(int i=0; i<arraySize_ks; i++){
-        perisubfactor_ks.push_back(V2Values_low_ks[i]*Nassoc_low_ks[i]/JyieldSub_low_ks[i]);
-        perisubfactore_ks.push_back(sqrt(TMath::Power(V2Values_err_low_ks[i]/V2Values_low_ks[i],2) + TMath::Power(JyieldSub_err_low_ks[i]/JyieldSub_low_ks[i],2))*perisubfactor_ks[i]);
-    }
-    std::vector<double> perisubfactor_la;
-    std::vector<double> perisubfactore_la;
-    for(int i=0; i<arraySize_la; i++){
-        perisubfactor_la.push_back(V2Values_low_la[i]*Nassoc_low_la[i]/JyieldSub_low_la[i]);
-        perisubfactore_la.push_back(sqrt(TMath::Power(V2Values_err_low_la[i]/V2Values_low_la[i],2) + TMath::Power(JyieldSub_err_low_la[i]/JyieldSub_low_la[i],2))*perisubfactor_la[i]);
-    }
-
-    
-
-    //Obs v2 values
-    TGraphErrors* v2plot_ks        = new TGraphErrors(arraySize_ks,&pt_ks[0] ,&v2_ks[0]      ,0,&v2e_ks[0]);
-    TGraphErrors* v2plot_KET_ks    = new TGraphErrors(arraySize_ks,&Ket_ks[0],&v2_ks[0]      ,0,&v2e_ks[0]);
-    TGraphErrors* v2subplot_ks     = new TGraphErrors(arraySize_ks,&pt_ks[0] ,&v2sub_ks[0]   ,0,&v2sube_ks[0]);
-    TGraphErrors* v2subplot_KET_ks = new TGraphErrors(arraySize_ks,&Ket_ks[0],&v2sub_ks[0]   ,0,&v2sube_ks[0]);
-    TGraphErrors* v3plot_ks        = new TGraphErrors(arraySize_ks,&pt_ks[0] ,&v3_ks[0]      ,0,&v3e_ks[0]);
-    TGraphErrors* v3plot_KET_ks    = new TGraphErrors(arraySize_ks,&Ket_ks[0],&v3_ks[0]      ,0,&v3e_ks[0]);
-    TGraphErrors* v3subplot_ks     = new TGraphErrors(arraySize_ks,&pt_ks[0] ,&v3sub_ks[0]   ,0,&v3sube_ks[0]);
-    TGraphErrors* v3subplot_KET_ks = new TGraphErrors(arraySize_ks,&Ket_ks[0],&v3sub_ks[0]   ,0,&v3sube_ks[0]);
-
-    TGraphErrors* v2plot_la        = new TGraphErrors(arraySize_la,&pt_la[0] ,&v2_la[0]      ,0,&v2e_la[0]);
-    TGraphErrors* v2plot_KET_la    = new TGraphErrors(arraySize_la,&Ket_la[0],&v2_la[0]      ,0,&v2e_la[0]);
-    TGraphErrors* v2subplot_la     = new TGraphErrors(arraySize_la,&pt_la[0] ,&v2sub_la[0]   ,0,&v2sube_la[0]);
-    TGraphErrors* v2subplot_KET_la = new TGraphErrors(arraySize_la,&Ket_la[0],&v2sub_la[0]   ,0,&v2sube_la[0]);
-    TGraphErrors* v3plot_la        = new TGraphErrors(arraySize_la,&pt_la[0] ,&v3_la[0]      ,0,&v3e_la[0]);
-    TGraphErrors* v3plot_KET_la    = new TGraphErrors(arraySize_la,&Ket_la[0],&v3_la[0]      ,0,&v3e_la[0]);
-    TGraphErrors* v3subplot_la     = new TGraphErrors(arraySize_la,&pt_la[0] ,&v3sub_la[0]   ,0,&v3sube_la[0]);
-    TGraphErrors* v3subplot_KET_la = new TGraphErrors(arraySize_la,&Ket_la[0],&v3sub_la[0]   ,0,&v3sube_la[0]);
-
-    //Obs V2 values
-    TGraphErrors* V2plot_ks        = new TGraphErrors(arraySize_ks,&pt_ks[0] ,&V2Values_ks[0],0,&V2Values_err_ks[0]);
-    TGraphErrors* V2plot_KET_ks    = new TGraphErrors(arraySize_ks,&Ket_ks[0],&V2Values_ks[0],0,&V2Values_err_ks[0]);
-    TGraphErrors* V2subplot_ks     = new TGraphErrors(arraySize_ks,&pt_ks[0] ,&V2sub_ks[0]   ,0,&V2sube_ks[0]);
-    TGraphErrors* V2subplot_KET_ks = new TGraphErrors(arraySize_ks,&Ket_ks[0],&V2sub_ks[0]   ,0,&V2sube_ks[0]);
-    TGraphErrors* V3plot_ks        = new TGraphErrors(arraySize_ks,&pt_ks[0] ,&V3Values_ks[0],0,&V3Values_err_ks[0]);
-    TGraphErrors* V3plot_KET_ks    = new TGraphErrors(arraySize_ks,&Ket_ks[0],&V3Values_ks[0],0,&V3Values_err_ks[0]);
-    TGraphErrors* V3subplot_ks     = new TGraphErrors(arraySize_ks,&pt_ks[0] ,&V3sub_ks[0]   ,0,&V3sube_ks[0]);
-    TGraphErrors* V3subplot_KET_ks = new TGraphErrors(arraySize_ks,&Ket_ks[0],&V3sub_ks[0]   ,0,&V3sube_ks[0]);
-
-    TGraphErrors* V2plot_la        = new TGraphErrors(arraySize_la,&pt_la[0] ,&V2Values_la[0],0,&V2Values_err_la[0]);
-    TGraphErrors* V2plot_KET_la    = new TGraphErrors(arraySize_la,&Ket_la[0],&V2Values_la[0],0,&V2Values_err_la[0]);
-    TGraphErrors* V2subplot_la     = new TGraphErrors(arraySize_la,&pt_la[0] ,&V2sub_la[0]   ,0,&V2sube_la[0]);
-    TGraphErrors* V2subplot_KET_la = new TGraphErrors(arraySize_la,&Ket_la[0],&V2sub_la[0]   ,0,&V2sube_la[0]);
-    TGraphErrors* V3plot_la        = new TGraphErrors(arraySize_la,&pt_la[0] ,&V3Values_la[0],0,&V3Values_err_la[0]);
-    TGraphErrors* V3plot_KET_la    = new TGraphErrors(arraySize_la,&Ket_la[0],&V3Values_la[0],0,&V3Values_err_la[0]);
-    TGraphErrors* V3subplot_la     = new TGraphErrors(arraySize_la,&pt_la[0] ,&V3sub_la[0]   ,0,&V3sube_la[0]);
-    TGraphErrors* V3subplot_KET_la = new TGraphErrors(arraySize_la,&Ket_la[0],&V3sub_la[0]   ,0,&V3sube_la[0]);
-
-    //Yields
-    TGraphErrors* srYieldPlot_ks       = new TGraphErrors(arraySize_ks,&pt_ks[0],&Jyieldsr_ks[0]     ,0,&Jyieldsr_err_ks[0]);
-    TGraphErrors* lrYieldPlot_ks       = new TGraphErrors(arraySize_ks,&pt_ks[0],&Jyieldlr_ks[0]     ,0,&Jyieldlr_err_ks[0]);
-    TGraphErrors* subYieldPlot_ks      = new TGraphErrors(arraySize_ks,&pt_ks[0],&JyieldSub_ks[0]    ,0,&JyieldSub_err_ks[0]);
-    TGraphErrors* perisubfactorplot_ks = new TGraphErrors(arraySize_ks,&pt_ks[0],&perisubfactor_ks[0],0,&perisubfactore_ks[0]);
-
-    TGraphErrors* srYieldPlot_la       = new TGraphErrors(arraySize_la,&pt_la[0],&Jyieldsr_la[0]     ,0,&Jyieldsr_err_la[0]);
-    TGraphErrors* lrYieldPlot_la       = new TGraphErrors(arraySize_la,&pt_la[0],&Jyieldlr_la[0]     ,0,&Jyieldlr_err_la[0]);
-    TGraphErrors* subYieldPlot_la      = new TGraphErrors(arraySize_la,&pt_la[0],&JyieldSub_la[0]    ,0,&JyieldSub_err_la[0]);
-    TGraphErrors* perisubfactorplot_la = new TGraphErrors(arraySize_la,&pt_la[0],&perisubfactor_la[0],0,&perisubfactore_la[0]);
-
-    //For Direct subtraction method
-    TGraphErrors* Nasslow_ks = new TGraphErrors(arraySize_ks,&pt_ks[0],&Nassoc_low_ks[0],0,0);
-    TGraphErrors* Nasslow_la = new TGraphErrors(arraySize_la,&pt_la[0],&Nassoc_low_la[0],0,0);
-    TGraphErrors* Nass_ks = new TGraphErrors(arraySize_ks,&pt_ks[0],&Nassoc_ks[0],0,0);
-    TGraphErrors* Nass_la = new TGraphErrors(arraySize_la,&pt_la[0],&Nassoc_la[0],0,0);
-    TGraphErrors* subYieldPlot_low_ks = new TGraphErrors(arraySize_ks,&pt_ks[0],&JyieldSub_low_ks[0],0,&JyieldSub_err_low_ks[0]);
-    TGraphErrors* subYieldPlot_low_la = new TGraphErrors(arraySize_la,&pt_la[0],&JyieldSub_low_la[0],0,&JyieldSub_err_low_la[0]);
-
-    TGraphErrors* bz_ks = new TGraphErrors(arraySize_ks,&pt_ks[0],&Bz_ks[0],0,0);
-    TGraphErrors* bz_la = new TGraphErrors(arraySize_la,&pt_la[0],&Bz_la[0],0,0);
-
-    v2plot_ks       ->Write("v2plot_bkg_ks"       ,TObject::kOverwrite);
-    v2plot_KET_ks   ->Write("v2plot_KET_bkg_ks"   ,TObject::kOverwrite);
-    v2subplot_ks    ->Write("v2subplot_bkg_ks"    ,TObject::kOverwrite);
-    v2subplot_KET_ks->Write("v2subplot_KET_bkg_ks",TObject::kOverwrite);
-    v3plot_ks       ->Write("v3plot_bkg_ks"       ,TObject::kOverwrite);
-    v3plot_KET_ks   ->Write("v3plot_KET_bkg_ks"   ,TObject::kOverwrite);
-    v3subplot_ks    ->Write("v3subplot_bkg_ks"    ,TObject::kOverwrite);
-    v3subplot_KET_ks->Write("v3subplot_KET_bkg_ks",TObject::kOverwrite);
-
-    v2plot_la       ->Write("v2plot_bkg_la"       ,TObject::kOverwrite);
-    v2plot_KET_la   ->Write("v2plot_KET_bkg_la"   ,TObject::kOverwrite);
-    v2subplot_la    ->Write("v2subplot_bkg_la"    ,TObject::kOverwrite);
-    v2subplot_KET_la->Write("v2subplot_KET_bkg_la",TObject::kOverwrite);
-    v3plot_la       ->Write("v3plot_bkg_la"       ,TObject::kOverwrite);
-    v3plot_KET_la   ->Write("v3plot_KET_bkg_la"   ,TObject::kOverwrite);
-    v3subplot_la    ->Write("v3subplot_bkg_la"    ,TObject::kOverwrite);
-    v3subplot_KET_la->Write("v3subplot_KET_bkg_la",TObject::kOverwrite);
-
-    V2plot_ks       ->Write("V2plot_bkg_ks"       ,TObject::kOverwrite);
-    V2plot_KET_ks   ->Write("V2plot_KET_bkg_ks"   ,TObject::kOverwrite);
-    V2subplot_ks    ->Write("V2subplot_bkg_ks"    ,TObject::kOverwrite);
-    V2subplot_KET_ks->Write("V2subplot_KET_bkg_ks",TObject::kOverwrite);
-    V3plot_ks       ->Write("V3plot_bkg_ks"       ,TObject::kOverwrite);
-    V3plot_KET_ks   ->Write("V3plot_KET_bkg_ks"   ,TObject::kOverwrite);
-    V3subplot_ks    ->Write("V3subplot_bkg_ks"    ,TObject::kOverwrite);
-    V3subplot_KET_ks->Write("V3subplot_KET_bkg_ks",TObject::kOverwrite);
-
-    V2plot_la       ->Write("V2plot_bkg_la"       ,TObject::kOverwrite);
-    V2plot_KET_la   ->Write("V2plot_KET_bkg_la"   ,TObject::kOverwrite);
-    V2subplot_la    ->Write("V2subplot_bkg_la"    ,TObject::kOverwrite);
-    V2subplot_KET_la->Write("V2subplot_KET_bkg_la",TObject::kOverwrite);
-    V3plot_la       ->Write("V3plot_bkg_la"       ,TObject::kOverwrite);
-    V3plot_KET_la   ->Write("V3plot_KET_bkg_la"   ,TObject::kOverwrite);
-    V3subplot_la    ->Write("V3subplot_bkg_la"    ,TObject::kOverwrite);
-    V3subplot_KET_la->Write("V3subplot_KET_bkg_la",TObject::kOverwrite);
-
-    perisubfactorplot_ks->Write("perisubfactor_bkg_ks",TObject::kOverwrite);
-    perisubfactorplot_la->Write("perisubfactor_bkg_la",TObject::kOverwrite);
-
-    Nass_ks        ->Write("Nassoc_bkg_ks"      ,TObject::kOverwrite);
-    Nasslow_ks     ->Write("Nassoc_low_bkg_ks"  ,TObject::kOverwrite);
-    Nass_la        ->Write("Nassoc_bkg_la"      ,TObject::kOverwrite);
-    Nasslow_la     ->Write("Nassoc_low_bkg_la"  ,TObject::kOverwrite);
-    subYieldPlot_low_ks->Write("YieldPlot_low_bkg_ks",TObject::kOverwrite);
-    subYieldPlot_low_la->Write("YieldPlot_low_bkg_la",TObject::kOverwrite);
-    subYieldPlot_ks->Write("YieldPlot_bkg_ks"   ,TObject::kOverwrite);
-    subYieldPlot_la->Write("YieldPlot_bkg_la"   ,TObject::kOverwrite);
-
-    bz_ks ->Write("bz_bkg_ks",TObject::kOverwrite);
-    bz_la ->Write("bz_bkg_la",TObject::kOverwrite);
-}
-*/
-
 void PeriSubSigIndirect(ParticleData PD)
 {
     TH1::SetDefaultSumw2();
@@ -3332,8 +2156,12 @@ void PeriSubSigDirect(ParticleData PD)
 
     for(unsigned i=0; i<PD.PtBin_la.size(); i++)
     {
+        cout<< "Y obs " << i << ": " << YieldPlot_obs_la[i] << endl;
+        cout<< " Y bkg " << i << ": " << YieldPlot_bkg_la[i] << endl;
         bkgfrac_la.push_back(1 - PD.fsig_la[i]);
         bkgfrac_MB_la.push_back(1 - PD.fsig_la_MB[i]);
+        cout << "bkgfrac " << i << ": " << bkgfrac_la[i] << endl;
+        cout << "bkgfrac MB" << i << ": " <<  bkgfrac_MB_la[i] << endl;
         DirectSubYield_la.push_back((YieldPlot_obs_la[i] - bkgfrac_la[i]*YieldPlot_bkg_la[i])/PD.fsig_la[i]);
         DirectSubYield_err_la.push_back(sqrt(TMath::Power((YieldPlot_bkg_err_la[i]*bkgfrac_la[i]),2) + TMath::Power(YieldPlot_obs_err_la[i],2))/PD.fsig_la[i]);
         DirectSubYield_low_la.push_back((YieldPlot_low_obs_la[i] - bkgfrac_MB_la[i]*YieldPlot_low_bkg_la[i])/PD.fsig_la_MB[i]);
@@ -3345,7 +2173,7 @@ void PeriSubSigDirect(ParticleData PD)
         v2true_DirectSub_err_la.push_back(sqrt(TMath::Power(lav2true_err[i],2) + (TMath::Power(lav2_MB_err[i]/lav2_MB_Y[i],2) + TMath::Power(DirectSubYield_err_la[i]/DirectSubYield_la[i],2) + TMath::Power(DirectSubYield_low_err_la[i]/DirectSubYield_low_la[i],2))*TMath::Power(lav2_MB_Y[i]*DirectSubNass_low_la[i]/DirectSubNass_la[i]*DirectSubYield_la[i]/DirectSubYield_low_la[i],2)));
     }
 
-    for(unsigned i=0; i<PD.PtBin_xi.size(); i++)
+    for(unsigned i=0; i<PD.PtBin_xi.size(): i++)
     {
         bkgfrac_xi.push_back(1 - PD.fsig_xi[i]);
         DirectSubYield_xi.push_back((YieldPlot_obs_xi[i] - bkgfrac_xi[i]*YieldPlot_bkg_xi[i])/PD.fsig_xi[i]);
@@ -3398,14 +2226,18 @@ void PeriSubSigDirect(ParticleData PD)
     TGDirectSubYield_low_ks->Write("DirectSubYield_low_ks",TObject::kOverwrite);
     TGDirectSubYield_la->Write("DirectSubYield_la",TObject::kOverwrite);
     TGDirectSubYield_low_la->Write("DirectSubYield_low_la",TObject::kOverwrite);
-    TGDirectSubYield_xi->Write("DirectSubYield_la",TObject::kOverwrite);
-    TGDirectSubYield_low_xi->Write("DirectSubYield_low_la",TObject::kOverwrite);
+    TGDirectSubYield_xi->Write("DirectSubYield_xi",TObject::kOverwrite);
+    TGDirectSubYield_low_xi->Write("DirectSubYield_low_xi",TObject::kOverwrite);
     TGDirectSubNass_ks->Write("DirectSubNass_ks",TObject::kOverwrite);
     TGDirectSubNass_low_ks->Write("DirectSubNass_low_ks",TObject::kOverwrite);
     TGDirectSubNass_la->Write("DirectSubNass_la",TObject::kOverwrite);
     TGDirectSubNass_low_la->Write("DirectSubNass_low_la",TObject::kOverwrite);
     TGDirectSubNass_xi->Write("DirectSubNass_xi",TObject::kOverwrite);
     TGDirectSubNass_low_xi->Write("DirectSubNass_low_xi",TObject::kOverwrite);
+    for(int i =0; i<PD.PtBin_la.size()-1; i++)
+    {
+        cout << "DirectSubYield_la " << i << ": " << DirectSubYield_la[i] << endl;
+    }
 }
 
 int main()
