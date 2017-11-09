@@ -240,6 +240,66 @@ std::map<std::string, std::vector<double> > vnCalculateMap(int degree, std::stri
     return returnContainer;
 }
 
+std::map<std::string, std::vector<double> > vnCalculateMapGen(int degree, std::string V0IDname, std::vector<double> vnvalues_peak, std::vector<double> vnerrors_peak, std::vector<double> vnvalues_h, std::vector<double> vnerrors_h, std::vector<double> fsig)
+{
+    std::map<std::string, std::vector<double> > returnContainer;
+    std::vector<double> sigvalues;
+    std::vector<double> sigvalues_nq;
+    std::vector<double> sigerrors;
+    std::vector<double> sigerrors_nq;
+
+    std::vector<double> vnObs;
+    std::vector<double> vnObs_errors;
+    std::vector<double> vnObs_nq;
+    std::vector<double> vnObs_errors_nq;
+
+    std::vector<double> vnBkg;
+    std::vector<double> vnBkg_errors;
+    std::vector<double> vnBkg_nq;
+    std::vector<double> vnBkg_errors_nq;
+    std::vector<double> vnRefError;
+
+    for(unsigned i=0; i<fsig.size(); i++)
+    {
+        double vnObs_ = vnvalues_peak[i]/TMath::Sqrt(vnvalues_h[degree]);
+        vnObs.push_back(vnObs_);
+        double sig = vnObs_;
+
+        double vnObsError = vnObs_*TMath::Sqrt(TMath::Power(vnerrors_peak[i]/vnvalues_peak[i],2) + TMath::Power(0.5*vnerrors_h[degree]/vnvalues_h[degree],2));
+        double sigError = vnObsError;
+
+        vnRefError.push_back(0.5*vnerrors_h[degree]/TMath::Sqrt(vnvalues_h[degree]));
+
+        sigvalues.push_back(sig);
+        sigerrors.push_back(sigError);
+        vnObs_errors.push_back(vnObsError);
+    }
+
+    int divFactor = 1;
+    if(V0IDname == "Kshort") divFactor = 2;
+    if(V0IDname == "Lambda" || V0IDname == "Xi" || V0IDname == "Omega") divFactor = 3;
+
+    for(unsigned i=0; i<sigvalues.size(); i++   ) sigvalues_nq.push_back(sigvalues[i]/divFactor);
+    for(unsigned i=0; i<sigerrors.size(); i++   ) sigerrors_nq.push_back(sigerrors[i]/divFactor);
+    for(unsigned i=0; i<vnObs.size(); i++       ) vnObs_nq.push_back(vnObs[i]/divFactor);
+    for(unsigned i=0; i<vnObs_errors.size(); i++) vnObs_errors_nq.push_back(vnObs_errors[i]/divFactor);
+
+    returnContainer["sig"]           = sigvalues;
+    returnContainer["sig_errors"]    = sigerrors;
+    returnContainer["sig_nq"]        = sigvalues_nq;
+    returnContainer["sig_errors_nq"] = sigerrors_nq;
+    returnContainer["obs"]           = vnObs;
+    returnContainer["obs_errors"]    = vnObs_errors;
+    returnContainer["obs_nq"]        = vnObs_nq;
+    returnContainer["obs_errors_nq"] = vnObs_errors_nq;
+    returnContainer["bkg"]           = vnBkg;
+    returnContainer["bkg_errors"]    = vnBkg_errors;
+    returnContainer["bkg_nq"]        = vnBkg_nq;
+    returnContainer["bkg_errors_nq"] = vnBkg_errors_nq;
+
+    return returnContainer;
+}
+
 std::vector<double> AvgX(TFile* file, std::string branch, std::string branch_bkg, int numPtBins)
 {
     std::vector<double> AvgXcoor;
@@ -415,17 +475,46 @@ void V0vnFit()
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/LooseAndTight/V0CorrelationTightMCTotal_08_23_2017.root");
 
     //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/PeripheralSubtractionMB.root");
-    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityCorrectMultB_09_19_17.root"); //For V0s only
-    TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/hi57.root"); //PbPb
-    //TFile *f_Xi = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root" );
-    //TFile *f_Om = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/OmCorr/OmCorrelationRapidityTotal_09_24_17.root" );
-    //TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root" ); //pPb
-    TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/PbPb_Cent3050_ref.root" ); //PbPb
-    //TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/Combine_MB0_corr_ref.root" ); //MB peripheral subtraction
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/V0CasCorrelationPbPbTotal_10_30_17.root"); //PbPb
+    //TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/PbPb_Cent3050_ref.root" ); //PbPb
+    //TFile *f_Xi = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root" );
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityCorrectMultB_09_19_17.root"); //For V0s only pPb Directory not called v0CasCorrelationRapidity Dont use
+    //
+    //Newest Files
+    //TFile *f_V0 = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityHM185_250.root"); //For V0s only pPb
+    //TFile *f_Xi = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationHM_11_07_17.root" ); //pPb
+    //TFile *f_Om = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/OmCorr/OmegaCorrelationRapidityHM185_250.root" ); //pPb
+    //TFile *fhad = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/Combine_HM185_corr_ref_PUrej.root" ); //pPb
+    //
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/OmCorr/OmegaCorrelationRapidityFixedSideband_84percentStats_10_30_17.root" );
+    //TFile *f = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/V0CasCorrelationRapidityMerged.root"); // Merged pPb file
+    //TFile *fhad = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root" ); //pPb
+    //
+    TFile *f_V0 = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/PeripheralSubtractionMB.root"); //MB PeriSub
+    //TFile *f_Xi = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/PeripheralSubtractionMB.root"); //MB PeriSub BadMult Xi
+    TFile *f_Xi = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/XiOmegaMB_0_N_20_Partial_11_8_17.root"); //MB PeriSub
+    TFile *f_Om = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/XiOmegaMB_0_N_20_Partial_11_8_17.root"); //MB PeriSub
+    TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/Combine_MB0_corr_ref.root" ); //MB peripheral subtraction
+    //
+    //Closure
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationRapidityClosureNoEff_09_11_17.root"); //No Eff closure for D0 study
-    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureTotal_08_28_2017.root"); //Normal Closure for D0 study
-    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/MatchV0ClosureBpPb_09_20_17.root"); //Match Closure for D0 study
-    //TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureHadronRecoFix_09_10_17.root"); //For vn of hadron in closure
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureTotal_08_28_2017.root"); //Normal Closure Reco level for D0 study
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureGenTotal_08_28_2017.root"); //Normal Closure Gen level for D0 study
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/MatchV0ClosureBpPb_09_20_17.root"); //Match Closure for D0 study using reco ref
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0ClosureReco_GenRef_10_24_17.root"); //Closure normal reco with genRef
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0ClosureGenNoStrange_10_25_17.root"); //Closure Gen reco with genRef NoStrange
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0ClosureGen_RecoRef_10_23_17.root"); //Closure Gen w/ reco ref to compare with Match w/ reco ref for D0 study
+    //TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureHadronRecoFix_09_10_17.root"); //For vn of hadron in closure (USE FOR GEN ONLY / RECO HAS NO EFF CORRECTION)
+    //
+    //Newer Closure Files 11_8_17
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0ClosureReco_GenRef_NoV0Eff_11_8_17.root"); //Closure normal reco No V0 Eff with genRef
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0ClosureReco_GenRef_11_8_17.root"); //Closure normal reco with genRef
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0ClosureGen_RecoRef_11_8_17.root"); //Closure Gen w/ reco ref
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0ClosureReco_RecoRef_11_8_17.root"); //Normal Closure Reco level for D0 study
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0ClosureReco_RecoRef_NoV0Eff_Total_11_8_17.root"); //Normal Closure Reco level No V0 Eff for D0 study
+    //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0ClosureGen_GenRef_AllParticles_Total_11_8_17.root"); //Normal Closure Gen level for D0 study
+    //TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0ClosureRefReco_wEff_11_8_17.root"); //For vn of hadron in closure (FOR RECO ONLY)
+    //TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/V0/V0CorrelationClosureHadronRecoFix_09_10_17.root"); //For vn of hadron in closure (USE FOR GEN ONLY / RECO HAS NO EFF CORRECTION)
 
 	//Txt files
 	ofstream vnPeak;
@@ -436,21 +525,33 @@ void V0vnFit()
     bool doLa = true;
     bool doXi = true;
     bool doOm = true;
-    //std::string fn = "v0CasCorrelationRapidityPeriSub";
+    bool doGen = false;
+    std::string fn = "v0CasCorrelationRapidityPeriSub";
     //std::string fn = "v0CorrelationRapidity";
-    std::string fn = "v0CasCorrelationRapidityPbPb";
+    //std::string fn = "xiCorrelationRapidity";
+    //std::string fn = "v0CasCorrelationRapidity";
+    //std::string fn = "v0CasCorrelationRapidityPbPb";
+    //std::string fn = "v0CorrelationRapidityMatchMC";
+    //std::string fn = "v0CorrelationRapidityMC";//Normal Reco Closure
+    //std::string fn = "v0CorrelationMCRapidity";//Normal Gen Closure
+    //std::string fn = "v0CorrelationRapidityMCGenRef";//Normal Reco w/ genRef Closure
+    //std::string fn = "v0CorrelationMCRapidityRecoRef";//Normal gen w/ RecoRef Closure
+    //std::string fn = "v0CorrelationRapidityMatchMC";//Match Reco w/ RecoRef Closure
     //std::string vnPeakName = "vnPeakPeriSub.txt";
     //std::string vnSideName = "vnPeakPeriSub.txt";
     //std::string vnPeakName = "vnPeak.txt";
     //std::string vnSideName = "vnPeak.txt";
-    std::string vnPeakName = "vnPeakPbPb.txt";
-    std::string vnSideName = "vnPeakPbPb.txt";
+    //std::string vnPeakName = "vnPeak_V0ClosureGenRef_10_24_17.txt";
+    std::string vnPeakName = "vnPeak_V0ClosureGenNoStrange_10_25_17.txt";
+    //std::string vnPeakName = "vnPeak_V0ClosureGen_RecoRef_10_23_17.txt";
+    std::string vnSideName = vnPeakName;
     //std::string vnHName = "vnHadronMB.txt";
     //std::string vnHName = "vnHadron.txt";
-    std::string vnHName = "vnHadronPbPb.txt";
+    std::string vnHName = "vnHadron.txt";
     //std::string vnCalculatorName = "vnSignalPeriSub.txt";
     //std::string vnCalculatorName = "vnSignal.txt";
-    std::string vnCalculatorName = "vnSignalPbPb.txt";
+    std::string vnCalculatorName = "vnSignal_V0ClosureGenNoStrange_10_25_17.txt"; //Normal Reco w/ GenRef
+    //std::string vnCalculatorName = "vnSignal_V0ClosureGen_RecoRef_10_23_17.txt"; //Normal Reco w/ GenRef
     std::string branchname_ks         = fn + "/Ptkshort_pt";
     std::string branchname_ks_bkg     = fn + "/Ptkshort_bkg_pt";
     std::string branchname_la         = fn + "/Ptlambda_pt";
@@ -467,10 +568,17 @@ void V0vnFit()
     std::string branchname_om_bkg     = fn + "/Pt_om_bkg_pt";
     std::string branchname_ket_om     = fn + "/KET_om_pt";
     std::string branchname_ket_om_bkg = fn + "/KET_om_bkg_pt";
+    //std::string graphName = "FitRootFiles/v2valuesRapidityClosureReco_RecoRef_Total_11_8_17.root";
+    //std::string graphName = "FitRootFiles/HM/v2valuesRapidityHM_185_250_EtaGap2_11_9_17.root"; //HM
+    std::string graphName = "FitRootFiles/MB/v2valuesRapidityMB_0_20_EtaGap2_11_9_17.root"; //MB
     //std::string graphName = "v2valuesRapidityPeripheralSub.root";
-    std::string graphName = "v2valuesRapidityPbPb.root";
-    int binlow = 13;
-    int binhigh = 20;
+    //std::string graphName = "v2valuesRapidityClosure_V0CorrelationClosureGenTotal_08_28_17.root";//Normal Gen Closure
+    //std::string graphName = "v2valuesRapidityClosure_V0ClosureReco_GenRef_10_24_17.root";//Normal Reco w/ GenRef
+    //std::string graphName = "v2valuesRapidityClosure_V0ClosureGenNoStrange_10_25_17.root";//Normal Reco w/ GenRef
+    //std::string graphName = "v2valuesRapidityClosure_MatchV0ClosureBpPb_09_20_17.root";//Match Reco w/ GenRef
+    //std::string graphName = "v2valuesRapidityClosure_V0ClosureGen_RecoRef_10_23_17.root";//Gen w/ RecoRef
+    int binlow = 10;
+    int binhigh = 24;
 	vnPeak.open(vnPeakName);
 	vnSide.open(vnSideName);
     vnH.open(vnHName);
@@ -480,11 +588,13 @@ void V0vnFit()
     TH1::SetDefaultSumw2();
     std::vector<double> PtBin_ks = {0.2, 0.4, 0.6, 0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5};//, 10.0, 15.0, 20.0}; 
     std::vector<double> PtBin_la = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5};//, 10.0, 15.0, 20.0};
-    //std::vector<double> PtBin_xi = {1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.2, 10.0};//, 20.0};
-    std::vector<double> PtBin_xi = {1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.2};//, 20.0}; // PbPb
+    std::vector<double> PtBin_xi = {1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.2, 10.0};//, 20.0};
+    //std::vector<double> PtBin_xi = {1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.2};//, 20.0}; // PbPb
     //std::vector<double> PtBin_om = {1.0, 1.5, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.2, 10.0};//, 20.0}; //pPb
+    //std::vector<double> PtBin_om = {1.5, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.2, 10.0};//, 20.0}; //pPb removed 1.0-1.5
+    std::vector<double> PtBin_om = {1.0, 1.8, 2.3, 3.0, 10.0};//pPb MB
     //std::vector<double> PtBin_om = {1.5, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.2, 10.0};//, 20.0}; // For Peripheral Subtraction removing 1-1.5
-    std::vector<double> PtBin_om = {1.5, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0};//, 20.0}; // PbPb
+    //std::vector<double> PtBin_om = {1.5, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0};//, 20.0}; // PbPb
     int numPtBins_ks = PtBin_ks.size() - 1;
     int numPtBins_la = PtBin_la.size() - 1;
     int numPtBins_xi = PtBin_xi.size() - 1;
@@ -547,15 +657,17 @@ void V0vnFit()
     //Fsig for vn calculations
     //std::vector<double> fsig_ks = {0.999666 ,0.999977 ,0.999972 ,0.999988 ,0.999998 ,0.999999 ,0.999999 ,0.999992 ,0.999994 ,0.999955, 0.999975};
     //std::vector<double> fsig_la = {0.988877 ,0.9967 ,0.99754 ,0.998939 ,0.999954 ,0.999951 ,0.999992 ,0.999842};
-    //std::vector<double> fsig_ks = {0.999476 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,0.999999 ,0.999999 ,0.999988 ,0.999997 ,0.992327};// ,0.99836};// ,0.890106 ,0.481433}; //Rapidity
-    //std::vector<double> fsig_la = {0.99882 ,0.999987 ,1 ,0.999524 ,0.999632 ,0.999855 ,0.999698 ,0.998783 ,0.999771 ,0.997088};// ,0.92718};// ,0.990913 ,0.421011}; //Rapidity
-    //std::vector<double> fsig_xi = {0.959427 ,0.976239 ,0.979161 ,0.980678 ,0.980661 ,0.981534 ,0.981502 ,0.979289 ,0.979192};// ,0.976012}; //Rapidity
-    //std::vector<double> fsig_om = {0.519579 ,0.664389 ,0.757589 ,0.820397 ,0.864778 ,0.903763 ,0.933867 ,0.928403 ,0.949529};// ,0.976012};
+    std::vector<double> fsig_ks = {0.999476 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,0.999999 ,0.999999 ,0.999988 ,0.999997 ,0.992327};// ,0.99836};// ,0.890106 ,0.481433}; //Rapidity pPb
+    std::vector<double> fsig_la = {0.99882 ,0.999987 ,1 ,0.999524 ,0.999632 ,0.999855 ,0.999698 ,0.998783 ,0.999771 ,0.997088};// ,0.92718};// ,0.990913 ,0.421011}; //Rapidity pPb
+    std::vector<double> fsig_xi = {0.959427 ,0.976239 ,0.979161 ,0.980678 ,0.980661 ,0.981534 ,0.981502 ,0.979289 ,0.979192};// ,0.976012}; //Rapidity pPb
+    //std::vector<double> fsig_om = {0.519579 ,0.664389 ,0.757589 ,0.820397 ,0.864778 ,0.903763 ,0.933867 ,0.928403 ,0.949529};// ,0.976012}; Rapidity pPb
+    //std::vector<double> fsig_om = {0.721825, 0.807658, 0.861617, 0.908762, 0.937818, 0.970699, 0.966515, 0.96482};// ,0.976012}; Rapidity pPb removed 1.0-1.5
+    std::vector<double> fsig_om = {0.817472, 0.911707, 0.943929, 0.962094};// ,0.976012}; Rapidity pPb removed 1.0-1.5
     //std::vector<double> fsig_om = {0.664389 ,0.757589 ,0.820397 ,0.864778 ,0.903763 ,0.933867 ,0.928403 ,0.949529};// ,0.976012}; //For Peripheral Sub
-    std::vector<double> fsig_ks = {0.88371 ,0.921642 ,0.933393 ,0.944669 ,0.957631 ,0.958982 ,0.949047 ,0.947948 ,0.91845 ,0.915206 ,0.913798 ,0.90336 ,0.889312};// ,0.99836};// ,0.890106 ,0.481433}; //PbPb
-    std::vector<double> fsig_la = {0.685977,0.851926 ,0.928584 ,0.944353 ,0.952072 ,0.951948 ,0.946417 ,0.931891 ,0.88348 ,0.872633};// ,0.92718};// ,0.990913 ,0.421011}; //PbPb
-    std::vector<double> fsig_xi = {0.869648 ,0.90817 ,0.939477 ,0.944172 ,0.940623 ,0.930704 ,0.936042 ,0.938471};//,0.976012}; //PbPb
-    std::vector<double> fsig_om = {0.647487 ,0.774924 ,0.872547 ,0.911986 ,0.937495 ,0.95909};// ,0.976012}; //For PbPb
+    //std::vector<double> fsig_ks = {0.88371 ,0.921642 ,0.933393 ,0.944669 ,0.957631 ,0.958982 ,0.949047 ,0.947948 ,0.91845 ,0.915206 ,0.913798 ,0.90336 ,0.889312}; //PbPb
+    //std::vector<double> fsig_la = {0.685977,0.851926 ,0.928584 ,0.944353 ,0.952072 ,0.951948 ,0.946417 ,0.931891 ,0.88348 ,0.872633}; //PbPb
+    //std::vector<double> fsig_xi = {0.869648 ,0.90817 ,0.939477 ,0.944172 ,0.940623 ,0.930704 ,0.936042 ,0.938471};//,0.976012}; //PbPb
+    //std::vector<double> fsig_om = {0.647487 ,0.774924 ,0.872547 ,0.911986 ,0.937495 ,0.95909};// ,0.976012}; //For PbPb
     //std::vector<double> fsig_ks = {0.991217 ,1 ,1 ,1 ,1 ,1 ,1 ,0.999988 ,0.99998 ,0.998263 ,0.942699 ,0.999827 ,0.99997};// ,0.99836};// ,0.890106 ,0.481433}; //MC
     //std::vector<double> fsig_la = {0.971604 ,0.985982 ,0.991208 ,0.989859 ,0.997168 ,0.996337 ,0.982485 ,0.953336 ,0.781606 ,0.596769};// ,0.92718};// ,0.990913 ,0.421011}; //MC
 
@@ -571,14 +683,14 @@ void V0vnFit()
     ltx2->SetNDC(kTRUE);
 
     //Vn hadron
-    //TH2D *hBackgroundHad  = (TH2D*) fhad->Get("xiCorrelationRapidity/BackgroundHad"); //pPb
-    //TH2D *hSignalHad      = (TH2D*) fhad->Get("xiCorrelationRapidity/SignalHad"); //pPb
-    //TH2D *hBackgroundHad  = (TH2D*) fhad->Get("pPbCorr/background"); //MB
-    //TH2D *hSignalHad      = (TH2D*) fhad->Get("pPbCorr/signal"); //MB
-    TH2D *hBackgroundHad  = (TH2D*) fhad->Get("PbPbCorr/background"); //PbPb
-    TH2D *hSignalHad      = (TH2D*) fhad->Get("PbPbCorr/signal"); //PbPb
+    TH2D *hBackgroundHad  = (TH2D*) fhad->Get("pPbCorr/background"); //pPb & MB
+    TH2D *hSignalHad      = (TH2D*) fhad->Get("pPbCorr/signal"); //pPb & MB
+    //TH2D *hBackgroundHad  = (TH2D*) fhad->Get("PbPbCorr/background"); //PbPb
+    //TH2D *hSignalHad      = (TH2D*) fhad->Get("PbPbCorr/signal"); //PbPb
     //TH2D *hBackgroundHad  = (TH2D*) fhad->Get("HadronCorrelation/BackgroundHadReco"); //Closure
     //TH2D *hSignalHad      = (TH2D*) fhad->Get("HadronCorrelation/SignalHadReco"); //Closure
+    //TH2D *hBackgroundHad  = (TH2D*) fhad->Get("HadronCorrelation/BackgroundHad"); //Closure Gen Ref
+    //TH2D *hSignalHad      = (TH2D*) fhad->Get("HadronCorrelation/SignalHad"); // Closure Gen Ref
     TH1D *dPhiHad = new TH1D("dPhiHad", "h^{#pm}- h^{#pm} ", 31, -(0.5 - 1.0/32)*PI, (1.5 - 1.0/32)*PI);
     TH1D* hbHadPhiTot = hBackgroundHad->ProjectionY("PhiBkgHadTot", 1, binlow);
     TH1D* hbHadPhiOth = hBackgroundHad->ProjectionY("PhiBkgHadOth", binhigh, -1);
@@ -601,6 +713,8 @@ void V0vnFit()
         vnValues_h.push_back(FourierFitHad->GetParameter(j));
         vnErrors_h.push_back(FourierFitHad->GetParError(j));
     }
+    //vnValues_h.push_back(6.8e-2); //For reasonable Closure results V2 would have to be around this 
+    //vnErrors_h.push_back(2e-6);
 
     if(doKs)
     {
@@ -620,8 +734,8 @@ void V0vnFit()
             //================================================================================
             dPhiPeak_ks[i] = new TH1D(Form("dPhiPeak_ks%d",i), "K_{S}^{0} - h^{#pm} ", 31, -(0.5 -1.0/32)*PI, (1.5 - 1.0/32)*PI);
             //Pull 2D Histograms
-            TH2D *hbackgroundPeak = (TH2D*) f->Get(Form((fn + "/backgroundkshort_pt%d").c_str(),i));
-            TH2D *hsignalPeak     = (TH2D*) f->Get(Form((fn + "/signalkshort_pt%d").c_str(),i));
+            TH2D *hbackgroundPeak = (TH2D*) f_V0->Get(Form((fn + "/backgroundkshort_pt%d").c_str(),i));
+            TH2D *hsignalPeak     = (TH2D*) f_V0->Get(Form((fn + "/signalkshort_pt%d").c_str(),i));
 
             //Project Phi
 
@@ -817,130 +931,134 @@ void V0vnFit()
                 //ltx2->DrawLatex(0.7, 0.74, "h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}");
             //}
 
-            //================================================================================
-            //Sideband Calculations
-            //================================================================================
-            dPhiSide_ks[i] = new TH1D(Form("dPhiSide_ks%d",i), "K_{S}^{0} - h^{#pm} ", 31, -(0.5 - 1.0/32)*PI, (1.5 - 1.0/32)*PI);
-            TH2D *hbackgroundSide = (TH2D*) f->Get(Form((fn + "/backgroundkshort_bkg_pt%d").c_str(),i));
-            TH2D *hsignalSide     = (TH2D*) f->Get(Form((fn + "/signalkshort_bkg_pt%d").c_str(),i));
-
-            //Project Phi
-            TH1D* hbPhiTotSide = hbackgroundSide->ProjectionY("PhiBkgTot", 0, binlow);
-            TH1D* hbPhiOthSide = hbackgroundSide->ProjectionY("PhiBkgOthPeak", binhigh, -1);
-            TH1D* hsPhiTotSide = hsignalSide->ProjectionY("PhiSigTot", 0, binlow);
-            TH1D* hsPhiOthSide = hsignalSide->ProjectionY("PhiSigOthPeak", binhigh, -1);
-
-            hbPhiTotSide->Add(hbPhiOthSide);
-            hsPhiTotSide->Add(hsPhiOthSide);
-
-            //Divide
-            dPhiSide_ks[i]->Divide(hsPhiTotSide, hbPhiTotSide);
-
-            //Clone histograms for display without fit functions
-            dPhiFourierSide_ks[i] = (TH1D*)dPhiSide_ks[i]->Clone();
-
-            FourierFit_ks[i] = new TF1(Form("FourierFit_ks%d",i) , FourierHad, -1.5, 5, numFourierParams);
-            FourierFit_ks[i]->SetNpx(250);
-            FourierFit_ks[i]->SetParNames("Scale", "V_{1}", "V_{2}", "V_{3}");
-
-            TCanvas *c4_ks_side = new TCanvas("c4_ks_side", "Fourier side trg_ks", 800,800);
-            c4_ks_side->cd();
-            gPad->SetTickx();
-            gPad->SetTicky();
-            //dPhiFourierSide_ks->Fit("FourierFit_ks","","",0,PI);
-            dPhiFourierSide_ks[i]->Fit(Form("FourierFit_ks%d",i));
-            dPhiFourierSide_ks[i]->SetStats(kFALSE);
-            for(int j=2; j<numFourierParams; j++)
+            if(!doGen)
             {
-                vnValues_ks_side[j].push_back(FourierFit_ks[i]->GetParameter(j));
-                vnErrors_ks_side[j].push_back(FourierFit_ks[i]->GetParError(j));
-            }
+                //================================================================================
+                //Sideband Calculations
+                //================================================================================
+                dPhiSide_ks[i] = new TH1D(Form("dPhiSide_ks%d",i), "K_{S}^{0} - h^{#pm} ", 31, -(0.5 - 1.0/32)*PI, (1.5 - 1.0/32)*PI);
+                TH2D *hbackgroundSide = (TH2D*) f_V0->Get(Form((fn + "/backgroundkshort_bkg_pt%d").c_str(),i));
+                TH2D *hsignalSide     = (TH2D*) f_V0->Get(Form((fn + "/signalkshort_bkg_pt%d").c_str(),i));
 
-            maxBinContent = dPhiFourierSide_ks[i]->GetBinContent(dPhiFourierSide_ks[i]->GetMaximumBin());
-            minBinContent = dPhiFourierSide_ks[i]->GetBinContent(dPhiFourierSide_ks[i]->GetMinimumBin());
-            minRange = minBinContent - minFact*minBinContent;
-            maxRange = minRange + maxFact*(maxBinContent - minBinContent);
+                //Project Phi
+                TH1D* hbPhiTotSide = hbackgroundSide->ProjectionY("PhiBkgTot", 0, binlow);
+                TH1D* hbPhiOthSide = hbackgroundSide->ProjectionY("PhiBkgOthPeak", binhigh, -1);
+                TH1D* hsPhiTotSide = hsignalSide->ProjectionY("PhiSigTot", 0, binlow);
+                TH1D* hsPhiOthSide = hsignalSide->ProjectionY("PhiSigOthPeak", binhigh, -1);
 
-            //ZYAM FITS
-            TCanvas *c2_ks_side = new TCanvas("c2_ks_side", "ZYAM Side trg_ks", 800,800);
-            c2_ks_side->cd();
+                hbPhiTotSide->Add(hbPhiOthSide);
+                hsPhiTotSide->Add(hsPhiOthSide);
 
-            gPad->SetTickx();
-            gPad->SetTicky();
-            dPhiSide_ks[i]->SetMarkerStyle(21);
-            dPhiSide_ks[i]->SetMarkerColor(4);
-            dPhiSide_ks[i]->SetTitleOffset(2, "Y");
-            dPhiSide_ks[i]->SetTitle("Sideband");
-            dPhiSide_ks[i]->GetYaxis()->SetRangeUser(mini , maxi);
-            dPhiSide_ks[i]->GetYaxis()->SetTitleSize(0.03);
-            dPhiSide_ks[i]->GetYaxis()->CenterTitle(true);
-            dPhiSide_ks[i]->GetYaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} ");
-            dPhiSide_ks[i]->SetTitleOffset(1.5, "X");
-            dPhiSide_ks[i]->GetXaxis()->SetTitleSize(0.035);
-            dPhiSide_ks[i]->GetXaxis()->CenterTitle(true);
-            dPhiSide_ks[i]->GetXaxis()->SetTitle("#Delta#phi (radians)");
-            dPhiSide_ks[i]->Fit("pol2","","", 0.4,2.4);
-            dPhiSide_ks[i]->SetStats(!publish);
+                //Divide
+                dPhiSide_ks[i]->Divide(hsPhiTotSide, hbPhiTotSide);
 
-            if(publish)
-            {
-                os << "CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = " << fixed << std::setprecision(2) << SNN << " TeV";
-                ltx3->DrawLatex(0.2, 0.82, os.str().c_str());
+                //Clone histograms for display without fit functions
+                dPhiFourierSide_ks[i] = (TH1D*)dPhiSide_ks[i]->Clone();
+
+                FourierFit_ks[i] = new TF1(Form("FourierFit_ks%d",i) , FourierHad, -1.5, 5, numFourierParams);
+                FourierFit_ks[i]->SetNpx(250);
+                FourierFit_ks[i]->SetParNames("Scale", "V_{1}", "V_{2}", "V_{3}");
+
+                TCanvas *c4_ks_side = new TCanvas("c4_ks_side", "Fourier side trg_ks", 800,800);
+                c4_ks_side->cd();
+                gPad->SetTickx();
+                gPad->SetTicky();
+                //dPhiFourierSide_ks->Fit("FourierFit_ks","","",0,PI);
+                dPhiFourierSide_ks[i]->Fit(Form("FourierFit_ks%d",i));
+                dPhiFourierSide_ks[i]->SetStats(kFALSE);
+                for(int j=2; j<numFourierParams; j++)
+                {
+                    vnValues_ks_side[j].push_back(FourierFit_ks[i]->GetParameter(j));
+                    vnErrors_ks_side[j].push_back(FourierFit_ks[i]->GetParError(j));
+                }
+
+                maxBinContent = dPhiFourierSide_ks[i]->GetBinContent(dPhiFourierSide_ks[i]->GetMaximumBin());
+                minBinContent = dPhiFourierSide_ks[i]->GetBinContent(dPhiFourierSide_ks[i]->GetMinimumBin());
+                minRange = minBinContent - minFact*minBinContent;
+                maxRange = minRange + maxFact*(maxBinContent - minBinContent);
+
+                //ZYAM FITS
+                TCanvas *c2_ks_side = new TCanvas("c2_ks_side", "ZYAM Side trg_ks", 800,800);
+                c2_ks_side->cd();
+
+                gPad->SetTickx();
+                gPad->SetTicky();
+                dPhiSide_ks[i]->SetMarkerStyle(21);
+                dPhiSide_ks[i]->SetMarkerColor(4);
+                dPhiSide_ks[i]->SetTitleOffset(2, "Y");
+                dPhiSide_ks[i]->SetTitle("Sideband");
+                dPhiSide_ks[i]->GetYaxis()->SetRangeUser(mini , maxi);
+                dPhiSide_ks[i]->GetYaxis()->SetTitleSize(0.03);
+                dPhiSide_ks[i]->GetYaxis()->CenterTitle(true);
+                dPhiSide_ks[i]->GetYaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} ");
+                dPhiSide_ks[i]->SetTitleOffset(1.5, "X");
+                dPhiSide_ks[i]->GetXaxis()->SetTitleSize(0.035);
+                dPhiSide_ks[i]->GetXaxis()->CenterTitle(true);
+                dPhiSide_ks[i]->GetXaxis()->SetTitle("#Delta#phi (radians)");
+                dPhiSide_ks[i]->Fit("pol2","","", 0.4,2.4);
+                dPhiSide_ks[i]->SetStats(!publish);
+
+                if(publish)
+                {
+                    os << "CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = " << fixed << std::setprecision(2) << SNN << " TeV";
+                    ltx3->DrawLatex(0.2, 0.82, os.str().c_str());
+                    os.str(std::string());
+                    os << "L_{#lower[-0.25]{int}} = " << Lint << " nb^{-1}";
+                    ltx3->DrawLatex(0.2, 0.74, os.str().c_str());
+                    os.str(std::string());
+                    os << Nmin << "  #leq  N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< " << Nmax;
+                    ltx3->DrawLatex(0.2, 0.67, os.str().c_str());
+                    os.str(std::string());
+                    os << pTassMin << " < p_{T}#kern[-0.3]{#lower[0.1]{{}^{assoc}}} < " << pTassMax << " GeV";
+                    ltx3->DrawLatex(0.2, 0.60, os.str().c_str());
+                    os.str(std::string());
+                    os << "Long range (|#Delta#eta| > " <<  longRange << ")";
+                    ltx3->DrawLatex(0.2, 0.53, os.str().c_str());
+                    os.str(std::string());
+                    ltx2->DrawLatex(0.7, 0.74, "#Xi#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}");
+                }
+
+                TF1 *dPhiFitSide = dPhiSide_ks[i]->GetFunction("pol2");
+
+                double dPhiFitMinSide = dPhiFitSide->GetMinimum();
+
+                for(int j = 1; j < 32; j++)
+                {
+                    dPhiFourierSide_ks[i]->AddBinContent(j, -dPhiFitMinSide);
+                }
+
+                c4_ks_side->cd();
+                dPhiFourierSide_ks[i]->SetMarkerStyle(21);
+                dPhiFourierSide_ks[i]->SetMarkerColor(4);
+                //dPhiFourierSide_ks[i]->Draw("E1");
+                dPhiFourierSide_ks[i]->SetStats(kFALSE);
+                dPhiFourierSide_ks[i]->Fit(Form("FourierFit_ks%d",i));
+                os << "SideBand " << PtBin_ks[i] << "_Pt_" << PtBin_ks[i+1];
+                dPhiFourierSide_ks[i]->SetTitle(os.str().c_str());
                 os.str(std::string());
-                os << "L_{#lower[-0.25]{int}} = " << Lint << " nb^{-1}";
-                ltx3->DrawLatex(0.2, 0.74, os.str().c_str());
-                os.str(std::string());
-                os << Nmin << "  #leq  N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< " << Nmax;
-                ltx3->DrawLatex(0.2, 0.67, os.str().c_str());
-                os.str(std::string());
-                os << pTassMin << " < p_{T}#kern[-0.3]{#lower[0.1]{{}^{assoc}}} < " << pTassMax << " GeV";
-                ltx3->DrawLatex(0.2, 0.60, os.str().c_str());
-                os.str(std::string());
-                os << "Long range (|#Delta#eta| > " <<  longRange << ")";
-                ltx3->DrawLatex(0.2, 0.53, os.str().c_str());
-                os.str(std::string());
-                ltx2->DrawLatex(0.7, 0.74, "#Xi#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}");
-            }
+                dPhiFourierSide_ks[i]->SetTitleOffset(2, "Y");
+                dPhiFourierSide_ks[i]->GetYaxis()->CenterTitle(true);
+                dPhiFourierSide_ks[i]->GetYaxis()->SetTitleSize(0.03);
+                dPhiFourierSide_ks[i]->GetYaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} - C_{#lower[-0.3]{ZYAM}}");
+                //dPhiFourierSide_ks[i]->GetYaxis()->SetRangeUser(-0.0004, 0.008);
+                dPhiFourierSide_ks[i]->GetYaxis()->SetRangeUser(mini, maxi);
+                dPhiFourierSide_ks[i]->SetTitleOffset(1.5, "X");
+                dPhiFourierSide_ks[i]->GetXaxis()->SetTitleSize(0.035);
+                dPhiFourierSide_ks[i]->GetXaxis()->CenterTitle(true);
+                dPhiFourierSide_ks[i]->GetXaxis()->SetTitle("#Delta#phi (radians)");
 
-            TF1 *dPhiFitSide = dPhiSide_ks[i]->GetFunction("pol2");
-
-            double dPhiFitMinSide = dPhiFitSide->GetMinimum();
-
-            for(int j = 1; j < 32; j++)
-            {
-                dPhiFourierSide_ks[i]->AddBinContent(j, -dPhiFitMinSide);
-            }
-
-            c4_ks_side->cd();
-            dPhiFourierSide_ks[i]->SetMarkerStyle(21);
-            dPhiFourierSide_ks[i]->SetMarkerColor(4);
-            //dPhiFourierSide_ks[i]->Draw("E1");
-            dPhiFourierSide_ks[i]->SetStats(kFALSE);
-            dPhiFourierSide_ks[i]->Fit(Form("FourierFit_ks%d",i));
-            os << "SideBand " << PtBin_ks[i] << "_Pt_" << PtBin_ks[i+1];
-            dPhiFourierSide_ks[i]->SetTitle(os.str().c_str());
-            os.str(std::string());
-            dPhiFourierSide_ks[i]->SetTitleOffset(2, "Y");
-            dPhiFourierSide_ks[i]->GetYaxis()->CenterTitle(true);
-            dPhiFourierSide_ks[i]->GetYaxis()->SetTitleSize(0.03);
-            dPhiFourierSide_ks[i]->GetYaxis()->SetTitle("#frac{1}{N_{#lower[-0.3]{trig}}} #frac{dN^{pair}}{d#Delta#phi} - C_{#lower[-0.3]{ZYAM}}");
-            //dPhiFourierSide_ks[i]->GetYaxis()->SetRangeUser(-0.0004, 0.008);
-            dPhiFourierSide_ks[i]->GetYaxis()->SetRangeUser(mini, maxi);
-            dPhiFourierSide_ks[i]->SetTitleOffset(1.5, "X");
-            dPhiFourierSide_ks[i]->GetXaxis()->SetTitleSize(0.035);
-            dPhiFourierSide_ks[i]->GetXaxis()->CenterTitle(true);
-            dPhiFourierSide_ks[i]->GetXaxis()->SetTitle("#Delta#phi (radians)");
-
-            if(publish)
-            {
-                ltx3->DrawLatex(0.2, 0.82, "CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 5.02 TeV");
-                ltx3->DrawLatex(0.2, 0.74, "L_{#lower[-0.25]{int}} = 35 nb^{-1}");
-                ltx3->DrawLatex(0.2, 0.67,"185  #leq  N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 220");
-                ltx3->DrawLatex(0.2, 0.60, "1 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{assoc}}} < 3 GeV");
-                ltx3->DrawLatex(0.2, 0.53, "Long range (|#Delta#eta| > 2)");
-                ltx2->DrawLatex(0.7, 0.74, "#Xi#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}");
+                if(publish)
+                {
+                    ltx3->DrawLatex(0.2, 0.82, "CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 5.02 TeV");
+                    ltx3->DrawLatex(0.2, 0.74, "L_{#lower[-0.25]{int}} = 35 nb^{-1}");
+                    ltx3->DrawLatex(0.2, 0.67,"185  #leq  N_{#lower[-0.3]{trk}}#kern[-0.47]{#lower[0.1]{{}^{offline}}}< 220");
+                    ltx3->DrawLatex(0.2, 0.60, "1 < p_{T}#kern[-0.3]{#lower[0.1]{{}^{assoc}}} < 3 GeV");
+                    ltx3->DrawLatex(0.2, 0.53, "Long range (|#Delta#eta| > 2)");
+                    ltx2->DrawLatex(0.7, 0.74, "#Xi#kern[-0.3]{#lower[0.2]{{}^{#pm}}}- h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}");
+                }
             }
         }
+        cout << "1" << endl;
         TCanvas* Fourier_ks_peak = new TCanvas("Fourier_ks_peak", "Fourier_ks_peak", 1600,800);
         Fourier_ks_peak->Divide(5,3);
         for(int i=0; i<numPtBins_ks; i++){
@@ -948,22 +1066,45 @@ void V0vnFit()
             gPad->SetTickx();
             gPad->SetTicky();
             dPhiFourierPeak_ks[i]->Draw("E1");
+            cout << i << endl;
         }
-        TCanvas* Fourier_ks_side = new TCanvas("Fourier_ks_side","Fourier_ks_side",1600,800);
-        Fourier_ks_side->Divide(5,3);
-        for(int i=0; i<numPtBins_ks; i++){
-            Fourier_ks_side->cd(i+1);
-            gPad->SetTickx();
-            gPad->SetTicky();
-            dPhiFourierSide_ks[i]->Draw("E1");
+        if(!doGen)
+        {
+            TCanvas* Fourier_ks_side = new TCanvas("Fourier_ks_side","Fourier_ks_side",1600,800);
+            Fourier_ks_side->Divide(5,3);
+            for(int i=0; i<numPtBins_ks; i++){
+                Fourier_ks_side->cd(i+1);
+                gPad->SetTickx();
+                gPad->SetTicky();
+                dPhiFourierSide_ks[i]->Draw("E1");
+            }
         }
 
-        for(int i=2; i<numFourierParams; i++) vnCalculate(i,"Kshort",vnValues_ks_peak[i],vnErrors_ks_peak[i],vnValues_ks_side[i],vnErrors_ks_side[i],vnValues_h,vnErrors_h,fsig_ks,vnCalculatorName);
-        std::map<std::string, std::vector<double> > results_ks = vnCalculateMap(2,"Kshort",vnValues_ks_peak[2],vnErrors_ks_peak[2],vnValues_ks_side[2],vnErrors_ks_side[2],vnValues_h,vnErrors_h,fsig_ks);
-        std::vector<double> AvgX_ks = AvgX(f,branchname_ks,branchname_ks_bkg,numPtBins_ks);
-        std::vector<double> AvgX_ket_ks = AvgX(f,branchname_ket_ks,branchname_ket_ks_bkg,numPtBins_ks);
-        vnGraph(results_ks,AvgX_ks,AvgX_ket_ks,"Kshort",graphName);
-        for(int i=0; i<numPtBins_ks; i++) vnCalculator << "Kshort ptbin " << i << " "  << FourierScale_ks[i] << "\n";
+        std::map<std::string, std::vector<double> > results_ks;
+        std::map<std::string, std::vector<double> > gen_results_ks;
+        if(doGen)
+        {
+            std::vector<double> AvgX_ks;
+            std::vector<double> AvgX_ket_ks;
+            std::string branch_pt = branchname_ks += "%d";
+            std::string branch_ket = branchname_ket_ks += "%d";
+            for(int i=0; i<numPtBins_ks; i++)
+            {
+                AvgX_ks.push_back(((TH1D*)f_V0->Get(Form(branch_pt.c_str(),i)))->GetMean(1));
+                AvgX_ket_ks.push_back(((TH1D*)f_V0->Get(Form((branch_ket).c_str(),i)))->GetMean(1));
+            }
+            gen_results_ks = vnCalculateMapGen(2,"Kshort",vnValues_ks_peak[2],vnErrors_ks_peak[2],vnValues_h,vnErrors_h,fsig_ks);
+            vnGraph(gen_results_ks,AvgX_ks,AvgX_ket_ks,"Kshort",graphName);
+        }
+        else
+        {
+            std::vector<double> AvgX_ks = AvgX(f_V0,branchname_ks,branchname_ks_bkg,numPtBins_ks);
+            std::vector<double> AvgX_ket_ks = AvgX(f_V0,branchname_ket_ks,branchname_ket_ks_bkg,numPtBins_ks);
+            for(int i=2; i<numFourierParams; i++) vnCalculate(i,"Kshort",vnValues_ks_peak[i],vnErrors_ks_peak[i],vnValues_ks_side[i],vnErrors_ks_side[i],vnValues_h,vnErrors_h,fsig_ks,vnCalculatorName);
+            results_ks = vnCalculateMap(2,"Kshort",vnValues_ks_peak[2],vnErrors_ks_peak[2],vnValues_ks_side[2],vnErrors_ks_side[2],vnValues_h,vnErrors_h,fsig_ks);
+            vnGraph(results_ks,AvgX_ks,AvgX_ket_ks,"Kshort",graphName);
+        }
+
     }
 
     if(doLa)
@@ -983,8 +1124,8 @@ void V0vnFit()
             //================================================================================
             dPhiPeak_la[i] = new TH1D(Form("dPhiPeak_la%d",i), "K_{S}^{0} - h^{#pm} ", 31, -(0.5 -1.0/32)*PI, (1.5 - 1.0/32)*PI);
             //Pull 2D Histograms
-            TH2D *hbackgroundPeak = (TH2D*) f->Get(Form((fn + "/backgroundlambda_pt%d").c_str(),i));
-            TH2D *hsignalPeak     = (TH2D*) f->Get(Form((fn + "/signallambda_pt%d").c_str(),i));
+            TH2D *hbackgroundPeak = (TH2D*) f_V0->Get(Form((fn + "/backgroundlambda_pt%d").c_str(),i));
+            TH2D *hsignalPeak     = (TH2D*) f_V0->Get(Form((fn + "/signallambda_pt%d").c_str(),i));
 
             //Project Phi
 
@@ -1112,58 +1253,61 @@ void V0vnFit()
             }
 
 
-            //================================================================================
-            //Sideband Calculations
-            //================================================================================
-            dPhiSide_la[i] = new TH1D(Form("dPhiSide_la%d",i), "K_{S}^{0} - h^{#pm} ", 31, -(0.5 - 1.0/32)*PI, (1.5 - 1.0/32)*PI);
-            TH2D *hbackgroundSide = (TH2D*) f->Get(Form((fn + "/backgroundlambda_bkg_pt%d").c_str(),i));
-            TH2D *hsignalSide     = (TH2D*) f->Get(Form((fn + "/signallambda_bkg_pt%d").c_str(),i));
-
-            //Project Phi
-            TH1D* hbPhiTotSide = hbackgroundSide->ProjectionY("PhiBkgTot", 0, binlow);
-            TH1D* hbPhiOthSide = hbackgroundSide->ProjectionY("PhiBkgOthPeak", binhigh, -1);
-            TH1D* hsPhiTotSide = hsignalSide->ProjectionY("PhiSigTot", 0, binlow);
-            TH1D* hsPhiOthSide = hsignalSide->ProjectionY("PhiSigOthPeak", binhigh, -1);
-
-            hbPhiTotSide->Add(hbPhiOthSide);
-            hsPhiTotSide->Add(hsPhiOthSide);
-
-            //Divide
-            dPhiSide_la[i]->Divide(hsPhiTotSide, hbPhiTotSide);
-
-            //Clone histograms for display without fit functions
-            dPhiFourierSide_la[i] = (TH1D*)dPhiSide_la[i]->Clone();
-
-            FourierFit_la[i] = new TF1(Form("FourierFit_la%d",i) , FourierHad, -1.5, 5, numFourierParams);
-            FourierFit_la[i]->SetNpx(250);
-            FourierFit_la[i]->SetParNames("Scale", "V_{1}", "V_{2}", "V_{3}");
-
-            dPhiFourierSide_la[i]->Fit(Form("FourierFit_la%d",i));
-            for(int j=2; j<numFourierParams; j++)
+            if(!doGen)
             {
-                vnValues_la_side[j].push_back(FourierFit_la[i]->GetParameter(j));
-                vnErrors_la_side[j].push_back(FourierFit_la[i]->GetParError(j));
+                //================================================================================
+                //Sideband Calculations
+                //================================================================================
+                dPhiSide_la[i] = new TH1D(Form("dPhiSide_la%d",i), "K_{S}^{0} - h^{#pm} ", 31, -(0.5 - 1.0/32)*PI, (1.5 - 1.0/32)*PI);
+                TH2D *hbackgroundSide = (TH2D*) f_V0->Get(Form((fn + "/backgroundlambda_bkg_pt%d").c_str(),i));
+                TH2D *hsignalSide     = (TH2D*) f_V0->Get(Form((fn + "/signallambda_bkg_pt%d").c_str(),i));
+
+                //Project Phi
+                TH1D* hbPhiTotSide = hbackgroundSide->ProjectionY("PhiBkgTot", 0, binlow);
+                TH1D* hbPhiOthSide = hbackgroundSide->ProjectionY("PhiBkgOthPeak", binhigh, -1);
+                TH1D* hsPhiTotSide = hsignalSide->ProjectionY("PhiSigTot", 0, binlow);
+                TH1D* hsPhiOthSide = hsignalSide->ProjectionY("PhiSigOthPeak", binhigh, -1);
+
+                hbPhiTotSide->Add(hbPhiOthSide);
+                hsPhiTotSide->Add(hsPhiOthSide);
+
+                //Divide
+                dPhiSide_la[i]->Divide(hsPhiTotSide, hbPhiTotSide);
+
+                //Clone histograms for display without fit functions
+                dPhiFourierSide_la[i] = (TH1D*)dPhiSide_la[i]->Clone();
+
+                FourierFit_la[i] = new TF1(Form("FourierFit_la%d",i) , FourierHad, -1.5, 5, numFourierParams);
+                FourierFit_la[i]->SetNpx(250);
+                FourierFit_la[i]->SetParNames("Scale", "V_{1}", "V_{2}", "V_{3}");
+
+                dPhiFourierSide_la[i]->Fit(Form("FourierFit_la%d",i));
+                for(int j=2; j<numFourierParams; j++)
+                {
+                    vnValues_la_side[j].push_back(FourierFit_la[i]->GetParameter(j));
+                    vnErrors_la_side[j].push_back(FourierFit_la[i]->GetParError(j));
+                }
+
+                maxBinContent = dPhiFourierSide_la[i]->GetBinContent(dPhiFourierSide_la[i]->GetMaximumBin());
+                minBinContent = dPhiFourierSide_la[i]->GetBinContent(dPhiFourierSide_la[i]->GetMinimumBin());
+                minRange = minBinContent - minFact*minBinContent;
+                maxRange = minRange + maxFact*(maxBinContent - minBinContent);
+
+                //ZYAM FITS
+                dPhiSide_la[i]->Fit("pol2","","", 0.4,2.4);
+                dPhiSide_la[i]->SetStats(!publish);
+
+                TF1 *dPhiFitSide = dPhiSide_la[i]->GetFunction("pol2");
+
+                double dPhiFitMinSide = dPhiFitSide->GetMinimum();
+
+                for(int j = 1; j < 32; j++)
+                {
+                    dPhiFourierSide_la[i]->AddBinContent(j, -dPhiFitMinSide);
+                }
+
+                dPhiFourierSide_la[i]->Fit(Form("FourierFit_la%d",i));
             }
-
-            maxBinContent = dPhiFourierSide_la[i]->GetBinContent(dPhiFourierSide_la[i]->GetMaximumBin());
-            minBinContent = dPhiFourierSide_la[i]->GetBinContent(dPhiFourierSide_la[i]->GetMinimumBin());
-            minRange = minBinContent - minFact*minBinContent;
-            maxRange = minRange + maxFact*(maxBinContent - minBinContent);
-
-            //ZYAM FITS
-            dPhiSide_la[i]->Fit("pol2","","", 0.4,2.4);
-            dPhiSide_la[i]->SetStats(!publish);
-
-            TF1 *dPhiFitSide = dPhiSide_la[i]->GetFunction("pol2");
-
-            double dPhiFitMinSide = dPhiFitSide->GetMinimum();
-
-            for(int j = 1; j < 32; j++)
-            {
-                dPhiFourierSide_la[i]->AddBinContent(j, -dPhiFitMinSide);
-            }
-
-            dPhiFourierSide_la[i]->Fit(Form("FourierFit_la%d",i));
         }
 
         TCanvas* Fourier_la_peak = new TCanvas("Fourier_la_peak", "Fourier_la_peak", 1600,800);
@@ -1174,21 +1318,42 @@ void V0vnFit()
             gPad->SetTicky();
             dPhiFourierPeak_la[i]->Draw("E1");
         }
-        TCanvas* Fourier_la_side = new TCanvas("Fourier_la_side","Fourier_la_side",1600,800);
-        Fourier_la_side->Divide(5,3);
-        for(int i=0; i<numPtBins_la; i++){
-            Fourier_la_side->cd(i+1);
-            gPad->SetTickx();
-            gPad->SetTicky();
-            dPhiFourierSide_la[i]->Draw("E1");
+        if(!doGen)
+        {
+            TCanvas* Fourier_la_side = new TCanvas("Fourier_la_side","Fourier_la_side",1600,800);
+            Fourier_la_side->Divide(5,3);
+            for(int i=0; i<numPtBins_la; i++){
+                Fourier_la_side->cd(i+1);
+                gPad->SetTickx();
+                gPad->SetTicky();
+                dPhiFourierSide_la[i]->Draw("E1");
+            }
         }
 
-        for(int i=2; i<numFourierParams; i++) vnCalculate(i,"Lambda",vnValues_la_peak[i],vnErrors_la_peak[i],vnValues_la_side[i],vnErrors_la_side[i],vnValues_h,vnErrors_h,fsig_la,vnCalculatorName);
-        std::map<std::string, std::vector<double> > results_la = vnCalculateMap(2,"Lambda",vnValues_la_peak[2],vnErrors_la_peak[2],vnValues_la_side[2],vnErrors_la_side[2],vnValues_h,vnErrors_h,fsig_la);
-        std::vector<double> AvgX_la = AvgX(f,branchname_la,branchname_la_bkg,numPtBins_la);
-        std::vector<double> AvgX_ket_la = AvgX(f,branchname_ket_la,branchname_ket_la_bkg,numPtBins_la);
-        vnGraph(results_la,AvgX_la,AvgX_ket_la,"Lambda",graphName);
-        for(int i=0; i<numPtBins_la; i++) vnCalculator << "lambda ptbin " << i << " "  << FourierScale_la[i] << "\n";
+        std::map<std::string, std::vector<double> > results_la;
+        std::map<std::string, std::vector<double> > gen_results_la;
+        if(doGen)
+        {
+            std::vector<double> AvgX_la;
+            std::vector<double> AvgX_ket_la;
+            std::string branch_pt = branchname_la += "%d";
+            std::string branch_ket = branchname_ket_la += "%d";
+            for(int i=0; i<numPtBins_la; i++)
+            {
+                AvgX_la.push_back(((TH1D*)f_V0->Get(Form(branch_pt.c_str(),i)))->GetMean(1));
+                AvgX_ket_la.push_back(((TH1D*)f_V0->Get(Form((branch_ket).c_str(),i)))->GetMean(1));
+            }
+            gen_results_la = vnCalculateMapGen(2,"Lambda",vnValues_la_peak[2],vnErrors_la_peak[2],vnValues_h,vnErrors_h,fsig_la);
+            vnGraph(gen_results_la,AvgX_la,AvgX_ket_la,"Lambda",graphName);
+        }
+        else
+        {
+            std::vector<double> AvgX_la = AvgX(f_V0,branchname_la,branchname_la_bkg,numPtBins_la);
+            std::vector<double> AvgX_ket_la = AvgX(f_V0,branchname_ket_la,branchname_ket_la_bkg,numPtBins_la);
+            for(int i=2; i<numFourierParams; i++) vnCalculate(i,"Lambda",vnValues_la_peak[i],vnErrors_la_peak[i],vnValues_la_side[i],vnErrors_la_side[i],vnValues_h,vnErrors_h,fsig_la,vnCalculatorName);
+            results_la = vnCalculateMap(2,"Lambda",vnValues_la_peak[2],vnErrors_la_peak[2],vnValues_la_side[2],vnErrors_la_side[2],vnValues_h,vnErrors_h,fsig_la);
+            vnGraph(results_la,AvgX_la,AvgX_ket_la,"Lambda",graphName);
+        }
     }
 
     if(doXi)
@@ -1206,8 +1371,10 @@ void V0vnFit()
             dPhiPeak_xi[i] = new TH1D( Form( "dPhiPeak_xi%d",i ), "#Xi - h^{#pm} ", 31, -( 0.5 -
                         1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
             //Pull 2D Histograms
-            TH2D *hbackgroundPeak = (TH2D*) f->Get( Form((fn + "/BackgroundXiPeak_pt%d").c_str(),i ) );
-            TH2D *hsignalPeak     = (TH2D*) f->Get( Form((fn + "/SignalXiPeak_pt%d").c_str(),i ) );
+            TH2D *hbackgroundPeak = (TH2D*) f_Xi->Get( Form((fn + "/BackgroundXiPeak_pt%d").c_str(),i ) );
+            TH2D *hsignalPeak     = (TH2D*) f_Xi->Get( Form((fn + "/SignalXiPeak_pt%d").c_str(),i ) );
+            //TH2D *hbackgroundPeak = (TH2D*) f_Xi->Get( Form((fn + "/BackgroundPeak_pt%d").c_str(),i ) );
+            //TH2D *hsignalPeak     = (TH2D*) f_Xi->Get( Form((fn + "/SignalPeak_pt%d").c_str(),i ) );
 
             TH1::SetDefaultSumw2(  );
             //Project Phi
@@ -1345,8 +1512,10 @@ void V0vnFit()
 
             //side
             dPhiSide_xi[i] = new TH1D( Form( "dPhiSide%d",i ), "#Xi - h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
-            TH2D *hbackgroundSide = (TH2D*) f->Get( Form( (fn + "/BackgroundXiSide_pt%d").c_str(),i ) );
-            TH2D *hsignalSide     = (TH2D*) f->Get( Form( (fn + "/SignalXiSide_pt%d").c_str(),i ) );
+            //TH2D *hbackgroundSide = (TH2D*) f_Xi->Get( Form( (fn + "/BackgroundSide_pt%d").c_str(),i ) );
+            //TH2D *hsignalSide     = (TH2D*) f_Xi->Get( Form( (fn + "/SignalSide_pt%d").c_str(),i ) );
+            TH2D *hbackgroundSide = (TH2D*) f_Xi->Get( Form( (fn + "/BackgroundXiSide_pt%d").c_str(),i ) );
+            TH2D *hsignalSide     = (TH2D*) f_Xi->Get( Form( (fn + "/SignalXiSide_pt%d").c_str(),i ) );
 
             TH1::SetDefaultSumw2(  );
 
@@ -1473,8 +1642,8 @@ void V0vnFit()
         }
         vnCalculate(2,"Xi",v2values_xi_peak,v2errors_xi_peak,v2values_xi_side,v2errors_xi_side,vnValues_h,vnErrors_h,fsig_xi,vnCalculatorName);
         std::map<std::string, std::vector<double> > results_xi = vnCalculateMap(2,"Xi",v2values_xi_peak,v2errors_xi_peak,v2values_xi_side,v2errors_xi_side,vnValues_h,vnErrors_h,fsig_xi);
-        std::vector<double> AvgX_xi = AvgX(f,branchname_xi,branchname_xi_bkg,numPtBins_xi);
-        std::vector<double> AvgX_ket_xi = AvgX(f,branchname_ket_xi,branchname_ket_xi_bkg,numPtBins_xi);
+        std::vector<double> AvgX_xi = AvgX(f_Xi,branchname_xi,branchname_xi_bkg,numPtBins_xi);
+        std::vector<double> AvgX_ket_xi = AvgX(f_Xi,branchname_ket_xi,branchname_ket_xi_bkg,numPtBins_xi);
         vnGraph(results_xi,AvgX_xi,AvgX_ket_xi,"Xi",graphName);
         OutputVnValues(2,"Peak","Xi",v2values_xi_peak,PtBin_xi,vnPeakName);
         TCanvas* Fourier_xi_peak = new TCanvas("Fourier_xi_peak", "Fourier_xi_peak", 1600,800);
@@ -1511,8 +1680,8 @@ void V0vnFit()
             dPhiPeak_om[i] = new TH1D( Form( "dPhiPeak_om%d",i ), "#Xi - h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
             TH1D *dPhiHad = new TH1D( "dPhiHad", "h^{#pm}- h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI );
             //Pull 2D Histograms
-            TH2D *hbackgroundPeak = (TH2D*) f->Get( Form((fn + "/BackgroundOmPeak_pt%d").c_str(),i ) );
-            TH2D *hsignalPeak     = (TH2D*) f->Get( Form((fn + "/SignalOmPeak_pt%d").c_str(),i ) );
+            TH2D *hbackgroundPeak = (TH2D*) f_Om->Get( Form((fn + "/BackgroundOmPeak_pt%d").c_str(),i ) );
+            TH2D *hsignalPeak     = (TH2D*) f_Om->Get( Form((fn + "/SignalOmPeak_pt%d").c_str(),i ) );
 
             TH1::SetDefaultSumw2(  );
             //Project Phi
@@ -1647,8 +1816,8 @@ void V0vnFit()
 
             //side
             dPhiSide_om[i] = new TH1D( Form( "dPhiSide_om%d",i ), "#Xi - h^{#pm} ", 31, -( 0.5 - 1.0/32 )*PI, ( 1.5 - 1.0/32 )*PI  );
-            TH2D *hbackgroundSide = (TH2D*) f->Get( Form( (fn + "/BackgroundOmSide_pt%d").c_str(),i ) );
-            TH2D *hsignalSide     = (TH2D*) f->Get( Form( (fn + "/SignalOmSide_pt%d").c_str(),i ) );
+            TH2D *hbackgroundSide = (TH2D*) f_Om->Get( Form( (fn + "/BackgroundOmSide_pt%d").c_str(),i ) );
+            TH2D *hsignalSide     = (TH2D*) f_Om->Get( Form( (fn + "/SignalOmSide_pt%d").c_str(),i ) );
 
             TH1::SetDefaultSumw2(  );
 
@@ -1780,8 +1949,8 @@ void V0vnFit()
         }
         vnCalculate(2,"Omega",v2values_om_peak,v2errors_om_peak,v2values_om_side,v2errors_om_side,vnValues_h,vnErrors_h,fsig_om,vnCalculatorName);
         std::map<std::string, std::vector<double> > results_om = vnCalculateMap(2,"Omega",v2values_om_peak,v2errors_om_peak,v2values_om_side,v2errors_om_side,vnValues_h,vnErrors_h,fsig_om);
-        std::vector<double> AvgX_om = AvgX(f,branchname_om,branchname_om_bkg,numPtBins_om);
-        std::vector<double> AvgX_ket_om = AvgX(f,branchname_ket_om,branchname_ket_om_bkg,numPtBins_om);
+        std::vector<double> AvgX_om = AvgX(f_Om,branchname_om,branchname_om_bkg,numPtBins_om);
+        std::vector<double> AvgX_ket_om = AvgX(f_Om,branchname_ket_om,branchname_ket_om_bkg,numPtBins_om);
         vnGraph(results_om,AvgX_om,AvgX_ket_om,"Omega",graphName);
         TCanvas* Fourier_om_peak = new TCanvas("Fourier_om_peak", "Fourier_om_peak", 1600,800);
         Fourier_om_peak->Divide(5,3);

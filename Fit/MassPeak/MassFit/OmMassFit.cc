@@ -61,28 +61,38 @@ void OmMassFit()
     std::vector<double> fsig_xi;
     std::vector<double> covQual_xi;
     bool doRap = true;
+    bool doPbPb = false;
 
     //std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,72, 73,85, 86,100, 101,200, 201,300};
     //std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,100, 101,200};//, 201,300};
     //std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,72, 73,100, 101,200};//, 201,300};
     //std::vector<double> pxi = {11,15, 16,19, 20,23, 24,27, 28,33, 34,41, 42,50 ,51,60, 61,72, 73,100};//, 81,100, 101,200};//, 201,300};
-    std::vector<double> pxi = {11,15, 16,18, 19,22, 23,28, 29,36, 37,46, 47,60 ,61,72, 73,100};//, 81,100, 101,200};//, 201,300};
+    //std::vector<double> pxi = {16,18, 19,22, 23,28, 29,36, 37,46, 47,60 ,61,72, 73,100}; //pPb
+    std::vector<double> pxi = {11,18, 19,23, 24,30, 31,100}; //pPb MB
+    //std::vector<double> pxi = {16,18, 19,22, 23,28, 29,36, 37,46, 47,60};; //PbPb
 
-    TCanvas* cc1 = new TCanvas("cc1","cc1",1200,1200);
-    cc1->Divide(3,3);
+    TCanvas* cc1 = new TCanvas("cc1","cc1",1600,900);
+    if(!doPbPb)cc1->Divide(3,3);
+    else cc1->Divide(3,2);
+
+    TCanvas* c_om = new TCanvas("c_om","c_om",800,600);
 
     //File Creation
-    myfile.open("OmPeakParam.txt");
+    myfile.open("OmPeakParam_10_23_17.txt");
     TFile* file = nullptr;
     //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/CascadeV2pPb/RootFiles/Flow/CasCutLoose/CasCutLooseJL40.root");
     //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/Thesis/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root");
     //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Composites/V0CasMassPtPD5JL12.root"); //only one PD
-    if(doRap) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Omega/OmMassPtD0Ana.root");
-    else  file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Omega/OmMassPt.root"); //only one PD
+    file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/XiOmegaMB_0_N_20_Partial_11_8_17.root"); //pPb Full Stats
+    //if(doRap && !doPbPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/OmCorr/OmCorrelationRapidityTotal_09_24_17.root"); //pPb Full Stats
+    //else if(doRap && doPbPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/V0CasCorrelationPbPbTotal_10_30_17.root"); //PbPb Full Stats
+    //else  file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Omega/OmMassPt.root"); //only one PD
 
     //MassXi = (TH2D*)file->Get("XiMassPt/MassPt");
     //MassXi = (TH2D*)file->Get("xiCorrelation/MassPt");
-    MassXi = (TH2D*)file->Get("hom_Default");
+    MassXi = (TH2D*)file->Get("v0CasCorrelationRapidityPeriSub/MassPtOm");//pPb MB
+    //if(doRap && !doPbPb)MassXi = (TH2D*)file->Get("omCorrelationRapidity/MassPt");//pPb
+    //else if(doRap && doPbPb)MassXi = (TH2D*)file->Get("v0CasCorrelationRapidityPbPb/MassPtOm"); //PbPb
 
     //Fit
     int pxicounter = 0; //for correct bin counting
@@ -92,7 +102,8 @@ void OmMassFit()
     {
         TCanvas* cc2 = new TCanvas("cc2","",600,450);
         int index = (i+2)/2;
-        massxi = (TH1D*)MassXi->ProjectionX("massxi", pxi[i],pxi[i+1])->Rebin(2);
+        massxi = (TH1D*)MassXi->ProjectionX("massxi", pxi[i],pxi[i+1]);
+        massxi->GetXaxis()->SetRangeUser(1.60, 1.75);
 
         gStyle->SetOptTitle(kFALSE);
 
@@ -102,10 +113,10 @@ void OmMassFit()
         tex->SetTextSize(0.04);
         //tex->SetTextAlign(10);
 
-        RooRealVar x("x","mass",1.62,1.73);
-        RooPlot* xframe_ = x.frame(50);
+        RooRealVar x("x","mass",1.60,1.75);
+        RooPlot* xframe_ = x.frame(150);
         xframe_->GetXaxis()->SetTitle("#Lambda K Invariant mass (GeV)");
-        xframe_->GetYaxis()->SetTitle("Candidates / 0.002 GeV");
+        xframe_->GetYaxis()->SetTitle("Candidates / 1 MeV");
         xframe_->GetXaxis()->CenterTitle(1);
         xframe_->GetYaxis()->CenterTitle(1);
         xframe_->GetXaxis()->SetTickSize(0.02);
@@ -122,23 +133,21 @@ void OmMassFit()
         //xframe_->GetYaxis()->SetLabelSize(xframe_->GetYaxis()->GetLabelSize()*2.0);
         RooDataHist data("data","dataset",x,massxi);
         data.plotOn(xframe_,Name("data"));
-        RooRealVar mean("mean","mean",1.67,1.29,1.99);
+        RooRealVar mean("mean","mean",1.67,1.65,1.69);
         RooRealVar sigma1("sigma1","sigma1",0.004,0.001,0.04);
-        RooRealVar sigma2("sigma2","sigma2",0.006,0.001,0.04);
-        RooRealVar sig1("sig1","signal1",50,0,10000);
-        RooRealVar sig2("sig2","signal2",50,0,10000);
-        RooRealVar qsig("qsig","qsig",500,0,1000000);
+        RooRealVar sigma2("sigma2","sigma2",0.005,0.001,0.04);
+        RooRealVar sig1("sig1","signal1",4500,-100,1000000);
+        RooRealVar sig2("sig2","signal2",4500,-100,1000000);
+        RooRealVar qsig("qsig","qsig",8000,0,1000000);
         RooRealVar alpha("alpha","alpha",0.001,-1,10);
         RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
         RooGaussian gaus2("gaus2","gaus2",x,mean,sigma2);
-        //RooRealVar a("a","a",0,-100000,100000);
-        //RooRealVar b("b","b",0,-100000,100000);
-        //RooRealVar cp("cp","cp",0,-100000,100000);
-        //RooRealVar d("d","d",0,-100000,100000);
-        //RooPolynomial background("poly","poly",x,RooArgList(a,b,cp,d));
-        //RooPolynomial background("poly","poly",x,RooArgList(a,b,cp));
-        //RooRealVar qsig("polysig","polysig",10,0,1000000000);
-        RooGenericPdf background("background", "x - (1.115683 + 0.493677)^alpha", RooArgList(x,alpha));
+        RooRealVar ap("ap","ap",-0.1,-1,1);
+        RooRealVar bp("bp","bp",-0.1,-1,1);
+        RooRealVar cp("cp","cp",-0.1,-1,1);
+        RooRealVar dp("dp","dp",-0.1,-1,1);
+        RooChebychev background("background","background",x,RooArgList(ap,bp,cp,dp));
+        //RooGenericPdf background("background", "x - (1.115683 + 0.493677)^alpha", RooArgList(x,alpha));
         RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,background),RooArgList(sig1,sig2,qsig));
 
         if(!doRap)
@@ -149,11 +158,11 @@ void OmMassFit()
                 //x.setRange("cut",1.645,1.71);
             //else
                 //x.setRange("cut",1.645,1.7);
-            x.setRange("cut",1.635,1.715);
+            x.setRange("cut",1.62,1.75);
         }
         else
         {
-            x.setRange("cut",1.63,1.72);
+            x.setRange("cut",1.60,1.75);
         }
 
         RooFitResult* r_xi = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
@@ -210,8 +219,8 @@ void OmMassFit()
 
         cout << "covQual (xi)" << covQual << endl;
 
-        sum.plotOn(xframe_,Name("sum"),NormRange("cut"),LineWidth(1),LineColor(kBlue));
-        sum.plotOn(xframe_,Components(background),NormRange("cut"),LineStyle(kDashed),LineWidth(1),LineColor(kBlue));
+        sum.plotOn(xframe_,Name("sum"),NormRange("cut"),LineWidth(2),LineColor(kBlue));
+        sum.plotOn(xframe_,Components(background),NormRange("cut"),LineStyle(kDashed),LineWidth(2),LineColor(kBlue));
         cc1->cd(index);
         gPad->SetBottomMargin(0.15); //gives more space for titles
         gPad->SetLeftMargin(0.15);
@@ -220,6 +229,78 @@ void OmMassFit()
         xframe.push_back(xframe_);
         xframe_->Draw();
         cc1->Update();
+        /*
+        if(i==6)
+        {
+            RooPlot* xframe_sxi = x.frame(150);
+            xframe_sxi->GetXaxis()->SetTitle("m_{#Lambda K} (GeV/c^{2})");
+            xframe_sxi->GetYaxis()->SetTitle("Candidates / 1 MeV");
+            xframe_sxi->GetXaxis()->CenterTitle(1);
+            xframe_sxi->GetYaxis()->CenterTitle(1);
+            xframe_sxi->GetXaxis()->SetTickSize(0.02);
+            xframe_sxi->GetYaxis()->SetTickSize(0.02);
+            xframe_sxi->GetXaxis()->SetNdivisions(407);
+            xframe_sxi->GetYaxis()->SetNdivisions(410);
+            xframe_sxi->GetXaxis()->SetTitleSize(0.05);
+            xframe_sxi->GetYaxis()->SetTitleSize(0.05);
+            xframe_sxi->GetYaxis()->SetTitleOffset(0.9);
+            xframe_sxi->GetXaxis()->SetTitleOffset(0.9);
+            //xframe_sxi->GetXaxis()->SetLabelSize(xframe_sxi->GetXaxis()->GetLabelSize()*2.0);
+            xframe_sxi->GetYaxis()->SetLabelSize(0.04);
+            xframe_sxi->GetXaxis()->SetLabelSize(0.04);
+            data.plotOn(xframe_sxi,Name("data"));
+            sum.plotOn(xframe_sxi,Name("sum"),NormRange("cut"),LineWidth(2),LineColor(kBlue));
+            sum.plotOn(xframe_sxi,Name("poly"),Components(background),NormRange("cut"),LineStyle(kDashed),LineWidth(2),LineColor(kBlue));
+            c_om->cd();
+            gPad->SetTickx();
+            gPad->SetTicky();
+            xframe_sxi->Draw();
+            c_om->Update();
+            TLine* t1_xi = new TLine(mean.getVal() - 2*rms_true_xi, 0, mean.getVal() - 2*rms_true_xi, gPad->GetUymax());
+            TLine* t2_xi = new TLine(mean.getVal() + 2*rms_true_xi, 0, mean.getVal() + 2*rms_true_xi, gPad->GetUymax());
+            t1_xi->SetLineStyle(2);
+            t1_xi->SetLineColor(kGreen+1);
+            t2_xi->SetLineStyle(2);
+            t2_xi->SetLineColor(kGreen+1);
+            t1_xi->Draw();
+            t2_xi->Draw();
+
+            double xstart_xi = 0.13;
+            double ystart_xi = 0.82;
+            double xpos = xstart_xi;
+            double ypos = ystart_xi;
+            double increment = 0.07;
+            tex->SetTextSize(0.05);
+            os << "CMS pPb #sqrt{S_{NN}} = 8.16 TeV";
+            tex->DrawLatex(0.513,0.918,os.str().c_str());
+            os.str(std::string());
+            tex->SetTextSize(0.045);
+            os << "185 #leq N_{trk}^{offline} < 250 ";
+            tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+            os.str(std::string());
+            os << (pxi[i]-1)/10 << " < p_{T} < " << pxi[i+1]/10  << " GeV/c";
+            tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+            os.str(std::string());
+            os << "|y| < 1";
+            tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+            os.str(std::string());
+
+            TLegend* leg = new TLegend(0.58,0.61,0.75,0.8);
+            leg->SetFillColor(10);
+            leg->SetFillStyle(0);
+            leg->SetBorderSize(0);
+            leg->SetTextFont(62);
+            leg->SetTextSize(0.045);
+            leg->AddEntry(xframe_sxi->findObject("data"),"Data","P");
+            leg->AddEntry(xframe_sxi->findObject("sum"),"Fit","l");
+            leg->AddEntry("poly","Background","l");
+            leg->AddEntry(t1_xi,"#pm 2#sigma","l");
+            leg->Draw();
+
+            c_om->Print("OmPlotForZhenyu.pdf");
+        }
+        cc1->cd();
+        */
         double chi2_xi = xframe_->chiSquare("sum","data",4);
 
         TLine* t1 = new TLine(mean.getVal() - 2*rms_true_xi, 0, mean.getVal() - 2*rms_true_xi, gPad->GetUymax());
@@ -235,14 +316,28 @@ void OmMassFit()
         double increment = 0.07;
         if(i==0)
         {
-            os << "CMS pPb";
-            tex->SetTextSize(0.06);
-            tex->DrawLatex(0.17,ypos-increment,os.str().c_str());
-            tex->SetTextSize(0.04);
-            os.str(std::string());
-            os << "185 #leq N_{trk}^{offline} < 220";
-            tex->DrawLatex(0.17,ypos-2*increment,os.str().c_str());
-            os.str(std::string());
+            if(!doPbPb)
+            {
+                os << "CMS pPb";
+                tex->SetTextSize(0.06);
+                tex->DrawLatex(0.17,ypos-increment,os.str().c_str());
+                tex->SetTextSize(0.04);
+                os.str(std::string());
+                os << "185 #leq N_{trk}^{offline} < 250";
+                tex->DrawLatex(0.17,ypos-2*increment,os.str().c_str());
+                os.str(std::string());
+            }
+            else
+            {
+                os << "CMS PbPb";
+                tex->SetTextSize(0.06);
+                tex->DrawLatex(0.17,ypos-increment,os.str().c_str());
+                tex->SetTextSize(0.04);
+                os.str(std::string());
+                os << "Centrality 30 - 50%";
+                tex->DrawLatex(0.17,ypos-2*increment,os.str().c_str());
+                os.str(std::string());
+            }
         }
         os  << (pxi[i]-1)/10 << " < P_{t} < "  << pxi[i+1]/10 << " GeV";
         tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
@@ -262,6 +357,9 @@ void OmMassFit()
         osYield << "Yield: " << std::setprecision(2) << Yield_xi;
         tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
         osYield.str(std::string());
+        //os.str(std::string());
+        os << "Fsig: " << Fsig_xi;
+        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
         os.str(std::string());
 
 

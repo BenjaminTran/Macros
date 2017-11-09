@@ -981,7 +981,7 @@ void readSparse(std::string name, std::string PID, int version)
     if(PID == "Omega" || PID == "Xi")
     {
         //for(int a=1; a<VvarBins_pt.size()-1; a++)
-            for(int a=1; a<2; a++)
+            for(int a=8; a<9; a++)
         {
             //if(a == 3) continue;
             pTBin = a;
@@ -992,8 +992,8 @@ void readSparse(std::string name, std::string PID, int version)
             File << "\n";
             h->GetAxis(1)->SetRange(a,a);
             //for(int b=1; b<Vcas3dipsig.size(); b++)
-            //for(int b=5; b<6; b++)
-            for(int b=1; b<2; b++)
+            //for(int b=1; b<2; b++)
+            for(int b=3; b<4; b++)
             {
                 h->GetAxis(3)->SetRange(0,b);
                 //for(int c=1; c<h->GetAxis(4)->GetNbins()+1; c++)
@@ -1056,7 +1056,7 @@ void readSparse(std::string name, std::string PID, int version)
                                         //mean.setVal(1.32);
                                         //mean.setRange(1.29,1.33);
                                         s1=0.003;
-                                        s2=0.003;
+                                        s2=0.004;
                                     }
                                     RooPlot* xframe_ = x.frame(150);
                                     if(PID == "Omega") 
@@ -1070,24 +1070,24 @@ void readSparse(std::string name, std::string PID, int version)
                                     data.plotOn(xframe_,Name("data"));
                                     RooRealVar sigma1("sigma1","sigma1",s1,0.001,0.04);
                                     RooRealVar sigma2("sigma2","sigma2",s2,0.001,0.04);
-                                    RooRealVar sig1("sig1","signal1",10,-100,10000000);
-                                    RooRealVar sig2("sig2","signal2",10,-100,10000000);
-                                    RooRealVar qsig("qsig","qsig",10,0,1000000);
+                                    RooRealVar sig1("sig1","signal1",1000,-100,10000000);
+                                    RooRealVar sig2("sig2","signal2",1000,-100,10000000);
+                                    RooRealVar qsig("qsig","qsig",1000,0,1000000);
                                     RooRealVar alpha("alpha","alpha",0.5,0,2);
                                     RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
                                     RooGaussian gaus2("gaus2","gaus2",x,mean,sigma2);
                                     //Omega
-                                    RooRealVar ap("ap","ap",-0.1,-1,1);
-                                    RooRealVar bp("bp","bp",-0.1,-1,1);
-                                    RooRealVar cp("cp","cp",-0.1,-1,1);
-                                    RooRealVar dp("dp","dp",-0.1,-1,1);
+                                    //RooRealVar ap("ap","ap",-0.1,-1,1);
+                                    //RooRealVar bp("bp","bp",-0.1,-1,1);
+                                    //RooRealVar cp("cp","cp",-0.1,-1,1);
+                                    //RooRealVar dp("dp","dp",-0.1,-1,1);
                                     //RooRealVar ep("dp","dp",-0.1,-1,1);
                                     //RooRealVar fp("dp","dp",-0.1,-1,1);
                                     //Xi
-                                    //RooRealVar ap("ap","ap",0,-5,10);
-                                    //RooRealVar bp("bp","bp",0.1,-5,10);
-                                    //RooRealVar cp("cp","cp",-0.1,-5,10);
-                                    //RooRealVar dp("dp","dp",0.1,-5,10);
+                                    RooRealVar ap("ap","ap",0.0,-5,10);
+                                    RooRealVar bp("bp","bp",0.1,-5,10);
+                                    RooRealVar cp("cp","cp",-0.1,-5,10);
+                                    RooRealVar dp("dp","dp",0.1,-5,10);
                                     //RooRealVar ap("ap","ap",0,-100000,100000);
                                     //RooRealVar bp("bp","bp",0,-100000,100000);
                                     //RooRealVar cp("cp","cp",0,-100000,100000);
@@ -1114,7 +1114,7 @@ void readSparse(std::string name, std::string PID, int version)
                                         s1+=0.004;
                                         s2+=0.003;
                                         //r_xi = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
-                                        r_xi = sum.fitTo(data,Save(),Range("cut"));
+                                        r_xi = sum.fitTo(data,Save(),Range("cut"),PrintLevel(-1));
                                         //if(r_xi->covQual() == 3) break;
                                         //s2+=0.001;
                                         //r_xi = sum.fitTo(data,Save(),Range("cut"));
@@ -1172,8 +1172,8 @@ void readSparse(std::string name, std::string PID, int version)
                                     //cout << "Signal Sig (xi)" << significance << endl;
 
 
-                                    sum.plotOn(xframe_,Name("sum"),NormRange("cut"),LineWidth(1),LineColor(kBlue));
-                                    sum.plotOn(xframe_,Components(background),NormRange("cut"),LineStyle(kDashed),LineWidth(1),LineColor(kBlue));
+                                    sum.plotOn(xframe_,Name("sum"),NormRange("cut"),LineWidth(2),LineColor(kBlue));
+                                    sum.plotOn(xframe_,Components(background),NormRange("cut"),LineStyle(kDashed),LineWidth(2),LineColor(kBlue));
                                     c2->cd();
                                     gPad->SetBottomMargin(0.15); //gives more space for titles
                                     gPad->SetLeftMargin(0.15);
@@ -1192,10 +1192,25 @@ void readSparse(std::string name, std::string PID, int version)
                                     t1->Draw("same");
                                     t2->Draw("same");
 
-                                    double xpos = 0.7;
+                                    double xpos = 0.6;
                                     double ypos = 0.85;
                                     double increment = 0.07;
-                                    os << "Fsig: " << Fsig_xi;
+                                    //os << "Fsig: " << Fsig_xi;
+                                    //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                                    //os.str(std::string());
+                                    if(a==1)
+                                    {
+                                        os << "CMS PbPb";
+                                        tex->SetTextSize(0.05);
+                                        tex->DrawLatex(0.17,0.78,os.str().c_str());
+                                        tex->SetTextSize(0.04);
+                                        os.str(std::string());
+                                        os << "Cent: 30 - 50%";
+                                        tex->DrawLatex(0.17,0.71,os.str().c_str());
+                                        os.str(std::string());
+                                    }
+                                    tex->SetTextSize(0.04);
+                                    os << VvarBins_pt[a-1] << " < Pt < " << VvarBins_pt[a];
                                     tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
                                     os.str(std::string());
                                     os << "Mean: " << std::setprecision(5) << mean_xi << " GeV" << std::setprecision(6);
@@ -1207,45 +1222,45 @@ void readSparse(std::string name, std::string PID, int version)
                                     os << "CovQual: " << covQual;
                                     tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
                                     os.str(std::string());
-                                    osYield << "S: " << std::setprecision(2) << Yield_xi;
-                                    tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
-                                    osYield.str(std::string());
-                                    osYield << "B: " << std::setprecision(2) << IntbackgroundE_xi;
-                                    tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
-                                    osYield.str(std::string());
-                                    osYield << "S-B: " << std::setprecision(2) << Yield_xi - IntbackgroundE_xi;
-                                    tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
-                                    osYield.str(std::string());
-                                    os.str(std::string());
-                                    os << "Sig: " << significance;
-                                    tex->DrawLatex(xpos,0.85,os.str().c_str());
-                                    os.str(std::string());
+                                    //osYield << "S: " << std::setprecision(2) << Yield_xi;
+                                    //tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
+                                    //osYield.str(std::string());
+                                    //osYield << "B: " << std::setprecision(2) << IntbackgroundE_xi;
+                                    //tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
+                                    //osYield.str(std::string());
+                                    //osYield << "S-B: " << std::setprecision(2) << Yield_xi - IntbackgroundE_xi;
+                                    //tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
+                                    //osYield.str(std::string());
+                                    //os.str(std::string());
+                                    //os << "Sig: " << significance;
+                                    //tex->DrawLatex(xpos,0.85,os.str().c_str());
+                                    //os.str(std::string());
 
                                     xpos = 0.20;
                                     ypos = 0.85;
-                                    os << VvarBins_pt[a-1] << " < Pt < " << VvarBins_pt[a];
-                                    tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                                    os.str(std::string());
-                                    if(PID == "Omega") os << "#Omega DCA < " << Vcas3dipsig[b-1];
-                                    if(PID == "Xi") os << "#Xi DCA < " << Vcas3dipsig[b];
-                                    tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                                    os.str(std::string());
-                                    os << "Bat DCA > " << VBat3dipsig[c-1];
-                                    tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                                    os.str(std::string());
-                                    os << "#pi DCA > " << Vvtrkpi3dipsig[d-1];
-                                    tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                                    os.str(std::string());
-                                    os << "proton DCA > " << Vvtrkp3dipsig[e-1];
-                                    tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                                    os.str(std::string());
-                                    if(PID == "Omega") os << "#Omega DecayL > " << Vflightsig[f-1];
-                                    if(PID == "Xi") os << "#Xi DecayL > " << Vflightsig[f-1];
-                                    tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                                    os.str(std::string());
-                                    os << "#Lambda DecayL > " << Vdistancesig[i-1];
-                                    tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                                    os.str(std::string());
+                                    //os << VvarBins_pt[a-1] << " < Pt < " << VvarBins_pt[a];
+                                    //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                                    //os.str(std::string());
+                                    //if(PID == "Omega") os << "#Omega DCA < " << Vcas3dipsig[b-1];
+                                    //if(PID == "Xi") os << "#Xi DCA < " << Vcas3dipsig[b];
+                                    //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                                    //os.str(std::string());
+                                    //os << "Bat DCA > " << VBat3dipsig[c-1];
+                                    //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                                    //os.str(std::string());
+                                    //os << "#pi DCA > " << Vvtrkpi3dipsig[d-1];
+                                    //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                                    //os.str(std::string());
+                                    //os << "proton DCA > " << Vvtrkp3dipsig[e-1];
+                                    //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                                    //os.str(std::string());
+                                    //if(PID == "Omega") os << "#Omega DecayL > " << Vflightsig[f-1];
+                                    //if(PID == "Xi") os << "#Xi DecayL > " << Vflightsig[f-1];
+                                    //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                                    //os.str(std::string());
+                                    //os << "#Lambda DecayL > " << Vdistancesig[i-1];
+                                    //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                                    //os.str(std::string());
 
 
                                     if(covQual < 3)
@@ -1312,7 +1327,7 @@ void readSparse(std::string name, std::string PID, int version)
     }
     else
     {
-        for(int a=1; a<VvarBins_pt.size(); a++)
+        for(int a=10; a<VvarBins_pt.size(); a++)
             //for(int a=1; a<2; a++)
         {
             //if(a == 3) continue;
@@ -1332,12 +1347,12 @@ void readSparse(std::string name, std::string PID, int version)
                 h->GetAxis(5)->SetRange(b,h->GetAxis(5)->GetNbins()+1);
                 h->GetAxis(6)->SetRange(b,h->GetAxis(6)->GetNbins()+1);
                 //for(int d=5; d<h->GetAxis(7)->GetNbins()+2; d++)
-                for(int d=2; d<3; d++)
+                for(int d=9; d<10; d++)
                 //for(int d=vdls.size(); d<vdls.size()+1; d++)
                 {
                     h->GetAxis(7)->SetRange(d,h->GetAxis(7)->GetNbins()+1);
                     //for(int e=h->GetAxis(8)->GetNbins()-2; e<h->GetAxis(8)->GetNbins()+2; e++)
-                    for(int e=4; e<5;e++)
+                    for(int e=8; e<9;e++)
                     //for(int e=6; e<10;e++)
                     {
                         h->GetAxis(8)->SetRange(e,h->GetAxis(8)->GetNbins()+1);
@@ -1382,8 +1397,8 @@ void readSparse(std::string name, std::string PID, int version)
                         xframe_->GetYaxis()->SetTitle("Candidates / 0.0005 GeV");
                         RooDataHist data("data","dataset",x,h1);
                         data.plotOn(xframe_,Name("data"));
-                        //RooRealVar mean("mean","mean",1.115,1.11,1.12);
-                        RooRealVar mean("mean","mean",0.5,0.49,0.51);
+                        RooRealVar mean("mean","mean",1.115,1.11,1.12);
+                        //RooRealVar mean("mean","mean",0.5,0.49,0.51);
                         RooRealVar sigma1("sigma1","sigma1",s1,0.001,0.01);
                         RooRealVar sigma2("sigma2","sigma2",s2,0.0001,0.01);
                         RooRealVar sig1("sig1","signal1",1e5,0,100000000);
@@ -1422,6 +1437,9 @@ void readSparse(std::string name, std::string PID, int version)
                             else
                             {
                                 x.setRange("cut",1.095, 1.155);
+                                sig1.setVal(1e3);
+                                sig2.setVal(1e3);
+                                qsig.setVal(1e4);
                             }
                         }
 
@@ -1501,8 +1519,8 @@ void readSparse(std::string name, std::string PID, int version)
                         //cout << "Signal Sig (xi)" << significance << endl;
 
 
-                        sum.plotOn(xframe_,Name("sum"),NormRange("cut"),LineWidth(1),LineColor(kBlue));
-                        sum.plotOn(xframe_,Components(background),NormRange("cut"),LineStyle(kDashed),LineWidth(1),LineColor(kBlue));
+                        sum.plotOn(xframe_,Name("sum"),NormRange("cut"),LineWidth(2),LineColor(kBlue));
+                        sum.plotOn(xframe_,Components(background),NormRange("cut"),LineStyle(kDashed),LineWidth(2),LineColor(kBlue));
                         c2->cd();
                         gPad->SetBottomMargin(0.15); //gives more space for titles
                         gPad->SetLeftMargin(0.15);
@@ -1521,58 +1539,89 @@ void readSparse(std::string name, std::string PID, int version)
                         t1->Draw("same");
                         t2->Draw("same");
 
-                        double xpos = 0.7;
-                        double ypos = 0.85;
-                        double increment = 0.07;
-                        os << "Fsig: " << Fsig_xi;
-                        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                        os.str(std::string());
-                        os << "Count: " << count;
-                        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                        os.str(std::string());
-                        os << "Mean: " << std::setprecision(5) << mean_xi << " GeV" << std::setprecision(6);
-                        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                        os.str(std::string());
-                        os << "#sigma :" << std::setprecision(2) << rms_true_xi << " GeV" << std::setprecision(6);
-                        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                        os.str(std::string());
-                        os << "CovQual: " << covQual;
-                        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                        os.str(std::string());
-                        osYield << "Yield: " << std::setprecision(2) << Yield_xi;
-                        tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
-                        osYield.str(std::string());
-                        os.str(std::string());
-                        os << "Sig: " << significance;
-                        tex->DrawLatex(xpos,0.85,os.str().c_str());
-                        os.str(std::string());
-                        os << "EDM: " << edm;
-                        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                        os.str(std::string());
+                                    double xpos = 0.6;
+                                    double ypos = 0.85;
+                                    double increment = 0.07;
+                                    //os << "Fsig: " << Fsig_xi;
+                                    //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                                    //os.str(std::string());
+                                    if(a==1)
+                                    {
+                                        os << "CMS PbPb";
+                                        tex->SetTextSize(0.05);
+                                        tex->DrawLatex(0.17,0.78,os.str().c_str());
+                                        tex->SetTextSize(0.04);
+                                        os.str(std::string());
+                                        os << "Cent: 30 - 50%";
+                                        tex->DrawLatex(0.17,0.71,os.str().c_str());
+                                        os.str(std::string());
+                                    }
+                                    tex->SetTextSize(0.04);
+                                    os << VvarBins_pt[a-1] << " < Pt < " << VvarBins_pt[a];
+                                    tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                                    os.str(std::string());
+                                    os << "Mean: " << std::setprecision(5) << mean_xi << " GeV" << std::setprecision(6);
+                                    tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                                    os.str(std::string());
+                                    os << "#sigma :" << std::setprecision(2) << rms_true_xi << " GeV" << std::setprecision(6);
+                                    tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                                    os.str(std::string());
+                                    os << "CovQual: " << covQual;
+                                    tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                                    os.str(std::string());
 
-                        xpos = 0.20;
-                        ypos = 0.85;
-                        os << VvarBins_pt[a-1] << " < Pt < " << VvarBins_pt[a];
-                        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                        os.str(std::string());
-                        os << "dz1 > " << vdz1[b-1];
-                        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                        os.str(std::string());
-                        os << "dz2 > " << vdz2[b-1];
-                        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                        os.str(std::string());
-                        os << "dxy1 > " << vdxy1[b-1];
-                        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                        os.str(std::string());
-                        os << "dxy2 > " << vdxy2[b-1];
-                        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                        os.str(std::string());
-                        os << "DecayL > " << vdls[d-1];
-                        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                        os.str(std::string());
-                        os << "Cos#theta > " << vagl[e-1];
-                        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
-                        os.str(std::string());
+                        //double xpos = 0.7;
+                        //double ypos = 0.85;
+                        //double increment = 0.07;
+                        //os << "Fsig: " << Fsig_xi;
+                        //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                        //os.str(std::string());
+                        //os << "Count: " << count;
+                        //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                        //os.str(std::string());
+                        //os << "Mean: " << std::setprecision(5) << mean_xi << " GeV" << std::setprecision(6);
+                        //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                        //os.str(std::string());
+                        //os << "#sigma :" << std::setprecision(2) << rms_true_xi << " GeV" << std::setprecision(6);
+                        //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                        //os.str(std::string());
+                        //os << "CovQual: " << covQual;
+                        //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                        //os.str(std::string());
+                        //osYield << "Yield: " << std::setprecision(2) << Yield_xi;
+                        //tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
+                        //osYield.str(std::string());
+                        //os.str(std::string());
+                        //os << "Sig: " << significance;
+                        //tex->DrawLatex(xpos,0.85,os.str().c_str());
+                        //os.str(std::string());
+                        //os << "EDM: " << edm;
+                        //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                        //os.str(std::string());
+
+                        //xpos = 0.20;
+                        //ypos = 0.85;
+                        //os << VvarBins_pt[a-1] << " < Pt < " << VvarBins_pt[a];
+                        //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                        //os.str(std::string());
+                        //os << "dz1 > " << vdz1[b-1];
+                        //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                        //os.str(std::string());
+                        //os << "dz2 > " << vdz2[b-1];
+                        //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                        //os.str(std::string());
+                        //os << "dxy1 > " << vdxy1[b-1];
+                        //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                        //os.str(std::string());
+                        //os << "dxy2 > " << vdxy2[b-1];
+                        //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                        //os.str(std::string());
+                        //os << "DecayL > " << vdls[d-1];
+                        //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                        //os.str(std::string());
+                        //os << "Cos#theta > " << vagl[e-1];
+                        //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+                        //os.str(std::string());
 
 
                         if(covQual < 3)
