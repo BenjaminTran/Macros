@@ -58,7 +58,7 @@ void V0MassFitFromHist()
     TH2D* MassLa;
     TH3D* MassKs3D;
     TH3D* MassLa3D;
-    bool doPbPb = false;
+    bool doPbPb = true;
     bool lambda;
 
     std::vector<RooPlot*> Xframe_Ks;
@@ -147,15 +147,21 @@ void V0MassFitFromHist()
         RooRealVar bp("bp","bp",0.1,-5,5);
         RooRealVar cp("cp","cp",-0.1,-5,5);
         RooRealVar dp("dp","dp",0.1,-5,5);
+        //RooRealVar ap("ap","ap",1,-100,100);
+        //RooRealVar bp("bp","bp",1,-100,100);
+        //RooRealVar cp("cp","cp",1,-100,100);
+        //RooRealVar dp("dp","dp",1,-100,100);
         RooChebychev poly("poly","poly",x,RooArgList(ap,bp,cp,dp));
-        RooRealVar polysig("polysig","polysig",5e6,0,10000000);
+        //RooPolynomial poly("poly","poly",x,RooArgList(ap,bp,cp,dp));
+        RooRealVar polysig("polysig","polysig",4e6,0,10000000);
         RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,poly),RooArgList(sig1,sig2,polysig));
 
         x.setRange("cut",0.43,0.565);
 
-        RooFitResult* r_ks = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
+        //RooFitResult* r_ks = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
 
-        double covQuality_ks = r_ks->covQual();
+        //double covQuality_ks = r_ks->covQual();
+        double covQuality_ks = 0;
         double mean_ks = mean.getVal();
 
         double gaus1F_ks = sig1.getVal();
@@ -335,9 +341,9 @@ void V0MassFitFromHist()
         osYield << "Yield: " << std::setprecision(2) << yield_ks;
         tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
         osYield.str(std::string());
-        //osYield << "fsig: " << std::setprecision(6) << Fsig_ks;
-        //tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
-        //osYield.str(std::string());
+        osYield << "fsig: " << std::setprecision(6) << Fsig_ks;
+        tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
+        osYield.str(std::string());
 
         Composite_Ks->cd(i+1);
         gPad->SetBottomMargin(0.15);
@@ -402,9 +408,9 @@ void V0MassFitFromHist()
         osYield << "Yield: " << std::setprecision(2) << yield_ks;
         tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
         osYield.str(std::string());
-        //osYield << "fsig: " << std::setprecision(6) << Fsig_ks;
-        //tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
-        //osYield.str(std::string());
+        osYield << "fsig: " << std::setprecision(6) << Fsig_ks;
+        tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
+        osYield.str(std::string());
 
         if(lambda)
         {
@@ -415,23 +421,57 @@ void V0MassFitFromHist()
             RooRealVar mean("mean","mean",1.115,1.11,1.12);
             RooRealVar sigma1("sigma1","sigma1",0.005,0.001,0.01);
             RooRealVar sigma2("sigma2","sigma2",0.005,0.001,0.01);
-            RooRealVar sig1("sig1","signal1",4e5,0,100000000);
-            RooRealVar sig2("sig2","signal2",4e5,0,100000000);
+            //RooRealVar sig2("sig1","signal1",1e6,0,10000000); //pPb
+            //RooRealVar sig2("sig2","signal2",8e6,0,10000000);
+            RooRealVar sig1("sig1","signal1",1e6,0,10000000); //pbpb
+            RooRealVar sig2("sig2","signal2",5e6,0,10000000);
             RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
             RooGaussian gaus2("gaus2","gaus2",x,mean,sigma2);
-            RooRealVar ap("ap","ap",0,-5,5);
-            RooRealVar bp("bp","bp",0.1,-5,5);
-            RooRealVar cp("cp","cp",-0.1,-5,5);
-            RooRealVar dp("dp","dp",0.1,-5,5);
+            RooRealVar ap("ap" , "ap" , 0    , -5 , 2);
+            RooRealVar bp("bp" , "bp" , 0.1  , -5 , 2);
+            RooRealVar cp("cp" , "cp" , -0.1 , -5 , 2);
+            RooRealVar dp("dp" , "dp" , 0.1  , -5 , 2);
+            //RooRealVar ap("ap","ap",10,0,1000000);
+            //RooRealVar bp("bp","bp",10,0,1000000);
+            //RooRealVar cp("cp","cp",10,0,1000000);
+            //RooRealVar dp("dp","dp",10,0,1000000);
+            //RooPolynomial poly("poly","poly",x,RooArgList(ap,bp,cp,dp));
             RooChebychev poly("poly","poly",x,RooArgList(ap,bp,cp,dp));
-            RooRealVar polysig("polysig","polysig",1e6,0,10000000);
+            RooRealVar polysig("polysig","polysig",8.0e6,0,1e7);
+            //RooRealVar polysig("polysig","polysig",2e3,1e3,1e6);
             RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,poly),RooArgList(sig1,sig2,polysig));
 
-            if(i == 0)x.setRange("cut",1.082,1.15);
-            else x.setRange("cut", 1.08, 1.16);
+            if(i==10 && !doPbPb)
+            {
+                sig1.setVal(5e5);
+                sig2.setVal(5e5);
+                polysig.setVal(5e5);
+            }
+            if(i==0 && doPbPb)
+            {
+                sig1.setVal(1e6);
+                sig2.setVal(4e5);
+                polysig.setVal(4e6);
+            }
+            if(i==8 && doPbPb)
+            {
+                sig1.setVal(3e5);
+                sig2.setVal(3e5);
+                polysig.setVal(8e6);
+            }
+            if(i==9 && doPbPb)
+            {
+                sig1.setVal(2e3);
+                sig2.setVal(2e3);
+                polysig.setVal(4.5e6);
+            }
+            if(!doPbPb) x.setRange("cut",1.08,1.159);
+            //else x.setRange("cut",1.0920,1.1565);
+            else x.setRange("cut",1.091,1.159);
             //if(i == pks.size()-2) polysig.setVal(4e7);
 
             RooFitResult* r_la = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
+            cout << "UID:" << i << endl;
             RooChi2Var chi2_laVar("chi2_laVar","chi2",sum,data);
 
             double covQuality_la = r_la->covQual();
@@ -611,9 +651,9 @@ void V0MassFitFromHist()
             osYield << "Yield: " << std::setprecision(2) << yield_la;
             tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
             osYield.str(std::string());
-            //osYield << "fsig: " << std::setprecision(6) << Fsig_la;
-            //tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
-            //osYield.str(std::string());
+            osYield << "fsig: " << std::setprecision(6) << Fsig_la;
+            tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
+            osYield.str(std::string());
 
             Composite_La->cd(i+1);
             gPad->SetBottomMargin(0.15);
@@ -682,9 +722,9 @@ void V0MassFitFromHist()
             osYield << "Yield: " << std::setprecision(2) << yield_la;
             tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
             osYield.str(std::string());
-            //osYield << "fsig: " << std::setprecision(6) << Fsig_la;
-            //tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
-            //osYield.str(std::string());
+            osYield << "fsig: " << std::setprecision(6) << Fsig_la;
+            tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
+            osYield.str(std::string());
         }
 
         if(i==0) cc1->Print("V0MassFitInd.pdf(","pdf");
@@ -692,9 +732,16 @@ void V0MassFitFromHist()
         else cc1->Print("V0MassFitInd.pdf)","pdf");
         hbincounter++;
     }
-    Composite_Ks->Print("KsMassFitComposite.pdf");
-    Composite_La->Print("LaMassFitComposite.pdf");
-
+    if(doPbPb)
+    {
+        Composite_Ks->Print("KsMassFitCompositePbPb.pdf");
+        Composite_La->Print("LaMassFitCompositePbPb.pdf");
+    }
+    else
+    {
+        Composite_Ks->Print("KsMassFitComposite.pdf");
+        Composite_La->Print("LaMassFitComposite.pdf");
+    }
     //Output
     pkscounter = 0;
     myfile << "KSHORT KSHORT KSHORT\n";
