@@ -33,6 +33,7 @@
 #include "RooGaussian.h"
 #include "RooChebychev.h"
 #include "RooPolynomial.h"
+#include "RooExtendPdf.h"
 #include "RooAddPdf.h"
 #include "RooFitResult.h"
 #include "RooFormulaVar.h"
@@ -53,6 +54,7 @@ void OmMassFit()
     std::ostringstream osYield;
     std::ofstream myfile;
 
+    TH1D* massom_proj;
     TH1D* massom;
     TH2D* MassXi;
     TH3D* MassPtRapXi;
@@ -62,20 +64,25 @@ void OmMassFit()
     std::vector<double> fsig_om;
     std::vector<double> covQual_om;
     bool doRap = true;
-    bool doPbPb = true;
+    bool doPbPb = false;
+    bool mb = false;
 
     //std::vector<double> pom = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,72, 73,85, 86,100, 101,200, 201,300};
     //std::vector<double> pom = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,100, 101,200};//, 201,300};
     //std::vector<double> pom = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,72, 73,100, 101,200};//, 201,300};
     //std::vector<double> pom = {11,15, 16,19, 20,23, 24,27, 28,33, 34,41, 42,50 ,51,60, 61,72, 73,100};//, 81,100, 101,200};//, 201,300};
-    std::vector<double> pom = {16,18, 19,22, 23,28, 29,36, 37,46, 47,60 ,61,72, 73,100}; //pPb
+    //std::vector<double> pom = {16,18, 19,22, 23,28, 29,36, 37,46, 47,60 ,61,72, 73,100}; //pPb
     //std::vector<double> pom = {16,18, 19,22, 23,28, 29,36, 37,50, 51,80}; //pPb MB 0-35
-    //std::vector<double> pom = {11,18, 19,23, 24,30, 31,100}; //pPb MB 0-20
-    //std::vector<double> pom = {16,18, 19,22, 23,28, 29,36, 37,46, 47,60};; //PbPb
+    std::vector<double> pom = {16,22, 23,28, 29,36, 37,50, 51,80}; //pPb MB 0-35 Merged 1-2
+    //std::vector<double> pom = {16,18, 19,22, 23,28, 29,36, 37,46, 47,60}; //PbPb
 
     TCanvas* cc1 = new TCanvas("cc1","cc1",1600,900);
     if(!doPbPb)cc1->Divide(3,3);
     else cc1->Divide(3,2);
+
+    TCanvas* cc3 = new TCanvas("cc3","cc3",1600,900);
+    if(!doPbPb)cc3->Divide(3,3);
+    else cc3->Divide(3,2);
 
     TCanvas* c_om_NF = new TCanvas("c_om_NF","c_om_NoFit",1600,900);
     c_om_NF->Divide(3,3);
@@ -89,10 +96,13 @@ void OmMassFit()
     //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Composites/V0CasMassPtPD5JL12.root"); //only one PD
     //file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/XiOmegaMB_0_N_20_Partial_11_8_17.root"); //MB 0-20 Full Stats
     //file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/MinBias/Comparison/XiOmegaCompPD1_0_20_11_10_17.root"); //MB one PD for comp to 0-35
+    //file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/OmegaMB0_35_11_22_17.root"); //MB 0-35
+    //file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/OmegaMB0_35_MergedBin1-2_11_22_17.root"); //MB 0-35 Merged bin 1-2
     //file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/MinBias/Comparison/XiOmegaMassPtMBPD1_0_35_11_10_17.root"); //MB one PD for comp to 0-35
     //file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/MinBias/Comparison/OmegaHMPD1Comparison_11_14_17.root"); //HM one PD for comp to 0-35
-    if(doRap && !doPbPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/OmCorr/OmCorrelationRapidityTotal_09_24_17.root"); //pPb Full Stats
-    else if(doRap && doPbPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/V0CasCorrelationPbPbTotal_10_30_17.root"); //PbPb Full Stats
+    if(doRap && !doPbPb && !mb)     file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/OmCorr/OmCorrelationRapidityTotal_09_24_17.root"); //pPb Full Stats
+    else if(doRap && doPbPb && !mb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/V0CasCorrelationPbPbTotal_10_30_17.root"); //PbPb Full Stats
+    else if(doRap && !doPbPb && mb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/OmegaMB0_35_MergedBin1-2_11_22_17.root"); //MB 0-35
     //else  file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Omega/OmMassPt.root"); //only one PD
 
     //MassXi = (TH2D*)file->Get("XiMassPt/MassPt");
@@ -100,14 +110,16 @@ void OmMassFit()
     //MassXi = (TH2D*)file->Get("v0CasCorrelationRapidityPeriSub/MassPtOm");//pPb MB
     //MassPtRapXi = (TH3D*)file->Get("MassPtRapidityMB/OmMassPt");
     //MassXi = (TH2D*)MassPtRapXi->Project3D("yx");
-    if(doRap && !doPbPb)MassXi = (TH2D*)file->Get("omCorrelationRapidity/MassPt");//pPb
-    else if(doRap && doPbPb)MassXi = (TH2D*)file->Get("v0CasCorrelationRapidityPbPb/MassPtOm"); //PbPb
+    if(doRap && !doPbPb && !mb)     MassXi = (TH2D*)file->Get("omCorrelationRapidity/MassPt");//pPb
+    else if(doRap && doPbPb && !mb) MassXi = (TH2D*)file->Get("v0CasCorrelationRapidityPbPb/MassPtOm"); //PbPb
+    else if(doRap && !doPbPb && mb) MassXi = (TH2D*)file->Get("v0CasCorrelationRapidityPeriSub/MassPtOm"); //mb
 
     //Fit
     int pomcounter = 0; //for correct bin counting
     int hbincounter =1; //histogram bin counting
     //for(unsigned i=0; i<6; i++)
     for(unsigned i=0; i<pom.size(); i++)
+    //for(unsigned i=0; i<1; i++)
     {
         double xpos = 0.60;
         double ypos = 0.85;
@@ -119,7 +131,8 @@ void OmMassFit()
         //tex->SetTextAlign(10);
         TCanvas* cc2 = new TCanvas("cc2","",600,450);
         int index = (i+2)/2;
-        massom = (TH1D*)MassXi->ProjectionX("massom", pom[i],pom[i+1]);
+        massom_proj = (TH1D*)MassXi->ProjectionX("massom", pom[i],pom[i+1]);
+        TH1D* massom = (TH1D*)massom_proj->Rebin(1);
         massom->GetXaxis()->SetRangeUser(1.60, 1.75);
 
         //TH1D* massom_clone = (TH1D*)massom->Clone("massom_clone");
@@ -142,8 +155,8 @@ void OmMassFit()
         xframe_->GetYaxis()->CenterTitle(1);
         xframe_->GetXaxis()->SetTickSize(0.02);
         xframe_->GetYaxis()->SetTickSize(0.02);
-        xframe_->GetXaxis()->SetNdivisions(407);
-        xframe_->GetYaxis()->SetNdivisions(410);
+        xframe_->GetXaxis()->SetNdivisions(410);
+        xframe_->GetYaxis()->SetNdivisions(505);
         xframe_->GetXaxis()->SetTitleSize(0.06);
         xframe_->GetYaxis()->SetTitleSize(0.06);
         xframe_->GetYaxis()->SetTitleOffset(1.05);
@@ -171,8 +184,12 @@ void OmMassFit()
         RooRealVar cp("cp","cp",-0.1,-1,1);
         RooRealVar dp("dp","dp",-0.1,-1,1);
         RooChebychev background("background","background",x,RooArgList(ap,bp,cp,dp));
+        RooExtendPdf egaus1("egaus1","egaus1",gaus1,sig1);
+        RooExtendPdf egaus2("egaus2","egaus2",gaus2,sig2);
+        RooExtendPdf ebackground("ebackground","ebackground",background,qsig);
         //RooGenericPdf background("background", "x - (1.115683 + 0.493677)^alpha", RooArgList(x,alpha));
-        RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,background),RooArgList(sig1,sig2,qsig));
+        //RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,background),RooArgList(sig1,sig2,qsig));
+        RooAddPdf sum("sum","sum",RooArgList(egaus1,egaus2,ebackground));
 
         if(!doRap)
         {
@@ -189,8 +206,9 @@ void OmMassFit()
             x.setRange("cut",1.61,1.75);
         }
 
-        RooFitResult* r_om = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
+        RooFitResult* r_om = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"),Extended());
         //RooChi2Var chi2_omVar("chi2_om","chi2",sum,data);
+
 
         double covQual = r_om->covQual();
         double mean_om = mean.getVal();
@@ -198,6 +216,7 @@ void OmMassFit()
         double gaus1F_om = sig1.getVal();
         double gaus2F_om = sig2.getVal();
         double qsig_om   = qsig.getVal();
+        double Norm = (gaus2F_om + gaus1F_om + qsig_om)*0.001;
 
         //set ranges for individual gaussian yield determination
         x.setRange("g1", mean.getVal() - 2*sigma1.getVal(), mean.getVal() + 2*sigma1.getVal());
@@ -245,14 +264,44 @@ void OmMassFit()
 
         sum.plotOn(xframe_,Name("sum"),NormRange("cut"),LineWidth(2),LineColor(kBlue));
         sum.plotOn(xframe_,Components(background),NormRange("cut"),LineStyle(kDashed),LineWidth(2),LineColor(kBlue));
+        RooArgSet s(ap,bp,cp,dp,mean,qsig,sig1,sig2,sigma1);
+        s.add(sigma2);
+        TF1* func = (TF1*)sum.asTF(RooArgList(x),RooArgList(s),x);
+        std::vector<double> pull_om;
+        std::vector<double> pull_om_x;
+        std::vector<double> ratio_om;
+        for(int j=1; j<141; j++)
+        {
+            double data_point = massom->GetBinContent(360+j);
+            double data_error = massom->GetBinError(360+j);
+            double fit_point = Norm*func->Eval(massom->GetBinCenter(360+j));
+            if(data_point == 0) data_error = 1;
+            pull_om.push_back((data_point - fit_point)/data_error);
+            pull_om_x.push_back(massom->GetBinCenter(360+j));
+            ratio_om.push_back(data_point/fit_point);
+        }
+
+        TGraphErrors* TGpull = new TGraphErrors(140,&pull_om_x[0],&pull_om[0],0,0);
+        TGraphErrors* TGratio= new TGraphErrors(140,&pull_om_x[0],&ratio_om[0],0,0);
+
+        double chisquare = 0;
+
+        for(int j=0; j<pull_om.size(); j++)
+        {
+            chisquare+=TMath::Power(pull_om[j],2);
+        }
+
+        int ndf = 140 - (10 - 1);
+
         cc1->cd(index);
         gPad->SetBottomMargin(0.15); //gives more space for titles
         gPad->SetLeftMargin(0.15);
-        gPad->SetTickx(  );
-        gPad->SetTicky(  );
+        gPad->SetTickx();
+        gPad->SetTicky();
         xframe.push_back(xframe_);
         xframe_->Draw();
         cc1->Update();
+
         /*
         if(i==6)
         {
@@ -325,7 +374,7 @@ void OmMassFit()
         }
         cc1->cd();
         */
-        double chi2_om = xframe_->chiSquare("sum","data",4);
+        //double chi2_om = xframe_->chiSquare("sum","data",10);
 
         TLine* t1 = new TLine(mean.getVal() - 2*rms_true_om, 0, mean.getVal() - 2*rms_true_om, gPad->GetUymax());
         TLine* t2 = new TLine(mean.getVal() + 2*rms_true_om, 0, mean.getVal() + 2*rms_true_om, gPad->GetUymax());
@@ -372,6 +421,8 @@ void OmMassFit()
         os << "CovQual: " << covQual;
         tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
         os.str(std::string());
+        //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+        //os.str(std::string());
         //os << "#chi^{2}/ndf: " << std::setprecision(3) << chi2_om << std::setprecision(6);
         //tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
         //os.str(std::string());
@@ -387,76 +438,186 @@ void OmMassFit()
         //tex->SetTextSize(tex->GetTextSize()*0.95);
 
         cc2->cd();
-        gPad->SetTickx(  );
-        gPad->SetTicky(  );
+        gPad->SetTickx();
+        gPad->SetTicky();
         xframe_->GetXaxis()->SetTitleOffset(1);
         xframe_->GetXaxis()->SetTitleSize(xframe_->GetXaxis()->GetTitleSize()*0.8);
         //xframe_->GetYaxis()->SetTitleSize(xframe_->GetYaxis()->GetTitleSize()*1.3);
         xframe_->GetXaxis()->SetLabelSize(xframe_->GetXaxis()->GetLabelSize()*0.5);
         xframe_->GetYaxis()->SetLabelSize(xframe_->GetYaxis()->GetLabelSize()*0.5);
+        TPad* pad1 = new TPad("pad1","top pad",0.0,0.4,1.0,1.0);
+        TPad* pad2 = new TPad("pad3","middle pad",0.0,0.0,1.0,0.25);
+        TPad* pad3 = new TPad("pad2","bottom pad",0.0,0.25,1.0,0.4);
+        pad1->SetTopMargin(0.1);
+        pad1->SetBottomMargin(0.0);
+        pad1->SetRightMargin(0.038);
+        pad1->SetLeftMargin(0.17);
+        pad1->Draw();
+
+        pad2->SetFrameFillStyle(4000);
+        pad2->SetTopMargin(0.0);
+        pad2->SetBottomMargin(0.37);
+        pad2->SetRightMargin(0.038);
+        pad2->SetLeftMargin(0.17);
+        pad2->Draw();
+
+        pad3->SetFrameFillStyle(4000);
+        pad3->SetTopMargin(0.0);
+        pad3->SetBottomMargin(0.0);
+        pad3->SetRightMargin(0.038);
+        pad3->SetLeftMargin(0.17);
+        pad3->Draw();
+
+        pad1->cd();
+        gPad->SetTickx();
+        gPad->SetTicky();
         xframe_->Draw();
         cc2->Update();
 
         t1->Draw("same");
         t2->Draw("same");
+        xpos = 0.72;
+        ypos = 0.85;
+        if(i==0)
+        {
+            if(!doPbPb)
+            {
+                os << "CMS pPb";
+                tex->SetTextSize(0.06);
+                tex->DrawLatex(0.25,0.78,os.str().c_str());
+                tex->SetTextSize(0.04);
+                os.str(std::string());
+                os << "185 #leq N_{trk}^{offline} < 250";
+                tex->DrawLatex(0.25,0.71,os.str().c_str());
+                os.str(std::string());
+            }
+            else
+            {
+                os << "CMS PbPb";
+                tex->SetTextSize(0.06);
+                tex->DrawLatex(0.25,0.78,os.str().c_str());
+                tex->SetTextSize(0.04);
+                os.str(std::string());
+                os << "Centrality 30 - 50%";
+                tex->DrawLatex(0.25,0.71,os.str().c_str());
+                os.str(std::string());
+            }
+        }
         os << "P_{t} Bin: " << (pom[i]-1)/10 << " - " << pom[i+1]/10;
-        tex->DrawLatex(xpos,0.8,os.str().c_str());
+        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
         os.str(std::string());
         os << "Mean: " << mean_om;
-        tex->DrawLatex(xpos,0.75,os.str().c_str());
+        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
         os.str(std::string());
         os << "#sigma :" << rms_true_om;
-        tex->DrawLatex(xpos,0.70,os.str().c_str());
+        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
         os.str(std::string());
         os << "CovQual: " << covQual;
-        tex->DrawLatex(xpos,0.65,os.str().c_str());
+        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
         os.str(std::string());
         osYield << "Yield: " << std::setprecision(2) << Yield_om;
-        tex->DrawLatex(xpos,0.60,osYield.str().c_str());
+        tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
         osYield.str(std::string());
-        //os << "#chi^{2}/ndf: " << chi2_om;
-        //tex->DrawLatex(xpos,0.60,os.str().c_str());
-        //os.str(std::string());
+        os << "#chi^{2}/ndf: " << chisquare << "/" << ndf;
+        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+        os.str(std::string());
 
+        pad2->cd();
+        gPad->SetTickx();
+        gPad->SetTicky();
+        TH1F* frame = pad2->cd()->DrawFrame(1.6,-5,1.75,5);
+        frame->GetXaxis()->SetTitle("#Lambda K Invariant mass (GeV)");
+        frame->GetYaxis()->SetTitle("Pull");
+        frame->GetXaxis()->CenterTitle(1);
+        frame->GetYaxis()->CenterTitle(1);
+        frame->GetXaxis()->SetTickSize(0.02);
+        frame->GetYaxis()->SetTickSize(0.02);
+        frame->GetXaxis()->SetNdivisions(410);
+        frame->GetYaxis()->SetNdivisions(407);
+        frame->GetXaxis()->SetTitleSize(0.12);
+        frame->GetYaxis()->SetTitleSize(0.12);
+        frame->GetYaxis()->SetTitleOffset(0.5);
+        frame->GetXaxis()->SetTitleOffset(1.2);
+        frame->GetYaxis()->SetLabelSize(0.1);
+        frame->GetXaxis()->SetLabelSize(0.1);
+        TGpull->SetMarkerStyle(20);
+        TGpull->Draw("P");
+        TLine* line = new TLine(1.6, 0, 1.75, 0);
+        line->SetLineStyle(2);
+        line->Draw("same");
+
+        pad3->cd();
+        gPad->SetTickx();
+        gPad->SetTicky();
+        double low = 0.1;
+        double high = 2.75;
+        if(doPbPb)
+        {
+            low = 0.5;
+            high= 1.5;
+        }
+        frame = pad3->cd()->DrawFrame(1.60,low,1.75,high);
+        frame->GetYaxis()->SetTitle("Ratio data/fit");
+        frame->GetXaxis()->CenterTitle(1);
+        frame->GetYaxis()->CenterTitle(1);
+        frame->GetXaxis()->SetTickSize(0.02);
+        frame->GetYaxis()->SetTickSize(0.02);
+        frame->GetXaxis()->SetNdivisions(410);
+        frame->GetYaxis()->SetNdivisions(407);
+        frame->GetXaxis()->SetTitleSize(0.12);
+        frame->GetYaxis()->SetTitleSize(0.12);
+        frame->GetYaxis()->SetTitleOffset(0.5);
+        frame->GetXaxis()->SetTitleOffset(1.2);
+        frame->GetYaxis()->SetLabelSize(0.1);
+        frame->GetXaxis()->SetLabelSize(0.1);
+        TGratio->SetMarkerStyle(20);
+        TGratio->Draw("P");
+        TLine* line2 = new TLine(1.60, 1, 1.75, 1);
+        line2->SetLineStyle(2);
+        line2->Draw("same");
 
         hbincounter++;
-        if(i==0) cc2->Print("OmMassFitInd.pdf(","pdf");
-        else if(i < pom.size() - 2) cc2->Print("OmMassFitInd.pdf","pdf");
-        else cc2->Print("OmMassFitInd.pdf)","pdf");
+        //if(!doPbPb) cc2->Print(Form("OmMassFit_Pull_pPb%d.pdf",i/2));
+        //else cc2->Print(Form("OmMassFit_Pull_PbPb%d.pdf",i/2));
+        if(!doPbPb) cc2->Print(Form("OmMassFit_Pull_pPb%d.pdf",i/2));
+        else cc2->Print(Form("OmMassFit_Pull_pPb%d.pdf",i/2));
+        //if(i==0) cc2->Print("OmMassFitInd.pdf(","pdf");
+        //else if(i < pom.size() - 2) cc2->Print("OmMassFitInd.pdf","pdf");
+        //else cc2->Print("OmMassFitInd.pdf)","pdf");
         i++; //to access correct bins
     }
-    if(!doRap)
-    {
-        cc1->Print("OmMassFitComposite.pdf");
-        cc1->Print("OmMassFitComposite.png");
-    }
-    else
-    {
-        cc1->Print("OmMassFitCompositeD0Ana.pdf");
-        cc1->Print("OmMassFitCompositeD0Ana.png");
-    }
+    //if(!doRap)
+    //{
+        //cc1->Print("OmMassFitComposite.pdf");
+        //cc1->Print("OmMassFitComposite.png");
+    //}
+    //else
+    //{
+        //cc1->Print("OmMassFitCompositeD0Ana.pdf");
+        //cc1->Print("OmMassFitCompositeD0Ana.png");
+    //}
     //c_om_NF->Print("OmMassFitHM185_250.pdf");
 
     //Output
-    pomcounter = 0;
-    for(unsigned i=0; i<mass_om.size(); i++)
-    {
-        cout <<  "====================" << endl;
-        cout << "Pt Bin: " << (pom[pomcounter]-1)/10 << " - " << pom[pomcounter+1]/10 << endl;
-        cout <<  "====================" << endl;
-        cout << "Mass_om: "   << mass_om[i]    << endl;
-        cout << "Fsig_om: "   << fsig_om[i]    << endl;
-        cout << "std_om: "    << std_om[i]     << endl;
-        cout << "covQual_om " << covQual_om[i] << endl;
+    //pomcounter = 0;
+    //for(unsigned i=0; i<mass_om.size(); i++)
+    //{
+        //cout <<  "====================" << endl;
+        //cout << "Pt Bin: " << (pom[pomcounter]-1)/10 << " - " << pom[pomcounter+1]/10 << endl;
+        //cout <<  "====================" << endl;
+        //cout << "Mass_om: "   << mass_om[i]    << endl;
+        //cout << "Fsig_om: "   << fsig_om[i]    << endl;
+        //cout << "std_om: "    << std_om[i]     << endl;
+        //cout << "covQual_om " << covQual_om[i] << endl;
 
-        myfile <<  "====================" << "\n";
-        myfile << "Pt Bin: " << (pom[pomcounter]-1)/10 << " - " << pom[pomcounter+1]/10 << "\n";
-        myfile <<  "====================" << "\n";
-        myfile << "Mass_om: "   << mass_om[i]    << "\n";
-        myfile << "Fsig_om: "   << fsig_om[i]    << "\n";
-        myfile << "std_om: "    << std_om[i]     << "\n";
-        myfile << "covQual_om " << covQual_om[i] << "\n";
+        //myfile <<  "====================" << "\n";
+        //myfile << "Pt Bin: " << (pom[pomcounter]-1)/10 << " - " << pom[pomcounter+1]/10 << "\n";
+        //myfile <<  "====================" << "\n";
+        //myfile << "Mass_om: "   << mass_om[i]    << "\n";
+        //myfile << "Fsig_om: "   << fsig_om[i]    << "\n";
+        //myfile << "std_om: "    << std_om[i]     << "\n";
+        //myfile << "covQual_om " << covQual_om[i] << "\n";
 
-        pomcounter+=2;
-    }
+        //pomcounter+=2;
+    //}
 }

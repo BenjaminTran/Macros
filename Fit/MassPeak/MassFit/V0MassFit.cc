@@ -84,6 +84,8 @@ void V0MassFit()
     TCanvas* Composite_La = new TCanvas("Composite_La","",1000,1200);
     Composite_La->Divide(3,4);
 
+    TCanvas* cc1 = new TCanvas("cc1","cc1",600,600);
+
     //File Creation
     myfile.open("V0PeakParam.txt");
     //TFile* file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Ksla/kslaMassPtJL1.root");
@@ -97,8 +99,8 @@ void V0MassFit()
 
     MassKs = (TH2D*)file_ks->Get("MassPt/KsMassPt");
     MassLa = (TH2D*)file_la->Get("LaMassPt/LaMassPt");
-    MassKs3D = (TH3D*)file_ks->Get("MassPtRapidityMC/KsMassPtRap");
-    MassLa3D = (TH3D*)file_la->Get("MassPtRapidityMC/LaMassPtRap");
+    //MassKs3D = (TH3D*)file_ks->Get("MassPtRapidityMC/KsMassPtRap");
+    //MassLa3D = (TH3D*)file_la->Get("MassPtRapidityMC/LaMassPtRap");
     //MassKs = (TH2D*)MassKs3D->Project3D("yx"); //For Gen
     //MassLa = (TH2D*)MassLa3D->Project3D("yx"); //For Gen
 
@@ -116,8 +118,6 @@ void V0MassFit()
         massks = (TH1D*)MassKs->ProjectionX("massks", pks[i],pks[i+1]);
         massla = (TH1D*)MassLa->ProjectionX("massla", pla[i],pla[i+1]);
 
-        TCanvas* cc1 = new TCanvas("cc1","cc1",1000,450);
-        cc1->Divide(2,1);
 
         TLatex* tex = new TLatex();
         tex->SetNDC();
@@ -147,6 +147,7 @@ void V0MassFit()
         x.setRange("cut",0.44,0.56);
 
         RooFitResult* r_ks = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
+        RooChi2Var chi2_ksVar("chi2_ks","chi2",sum,data);
 
         double covQuality_ks = r_ks->covQual();
         double mean_ks = mean.getVal();
@@ -154,6 +155,7 @@ void V0MassFit()
         double gaus1F_ks = sig1.getVal();
         double gaus2F_ks = sig2.getVal();
         double polyF_ks  = polysig.getVal();
+        double Norm = (gaus2F_ks + gaus1F_ks + polyF_ks)*0.0005;
 
         //set ranges for individual gaussian yield determination
         x.setRange("g1", mean.getVal() - 2*sigma1.getVal(), mean.getVal() + 2*sigma1.getVal());
@@ -199,7 +201,7 @@ void V0MassFit()
 
         RooPlot* xframe_ks = x.frame(270);
         xframe_ks->GetXaxis()->SetTitle("Invariant mass (GeV)");
-        xframe_ks->GetYaxis()->SetTitle("Candidates / 0.0005 GeV");
+        xframe_ks->GetYaxis()->SetTitle("Candidates / 0.5 MeV");
         xframe_ks->GetXaxis()->CenterTitle(1);
         xframe_ks->GetYaxis()->CenterTitle(1);
         xframe_ks->GetXaxis()->SetTickSize(0.02);
@@ -215,9 +217,36 @@ void V0MassFit()
         xframe_ks->GetXaxis()->SetLabelSize(0.1);
         //xframe_ks->GetYaxis()->SetLabelSize(xframe_ks->GetYaxis()->GetLabelSize()*2.0);
         data.plotOn(xframe_ks,Name("data"));
-        sum.plotOn(xframe_ks,Name("sum"),NormRange("cut"),LineWidth(1),LineColor(kBlue));
-        sum.plotOn(xframe_ks,Components(poly),NormRange("cut"),LineStyle(kDashed),LineWidth(1),LineColor(kBlue));
-        cc1->cd(1);
+        sum.plotOn(xframe_ks,Name("sum"),NormRange("cut"),LineWidth(2),LineColor(kBlue));
+        sum.plotOn(xframe_ks,Components(poly),NormRange("cut"),LineStyle(kDashed),LineWidth(2),LineColor(kBlue));
+
+        RooArgSet s(ap,bp,cp,dp,mean,polysig,sig1,sig2,sigma1);
+        s.add(sigma2);
+        TF1* func = (TF1*)sum.asTF(RooArgList(x),RooArgList(s),x);
+        std::vector<double> pull;
+        std::vector<double> pull_x;
+        for(int j=1; j<131; j++)
+        {
+            double data_point = massks->GetBinContent(10+j);
+            double data_error = massks->GetBinError(10+j);
+            double fit_point = Norm*func->Eval(massks->GetBinCenter(10+j));
+            if(data_point == 0) data_error = 1;
+            pull.push_back((data_point - fit_point)/data_error);
+            pull_x.push_back(massks->GetBinCenter(10+j));
+        }
+
+        TGraphErrors* TGpull = new TGraphErrors(130,&pull_x[0],&pull[0],0,0);
+
+        double chisquare = 0;
+
+        for(int j=0; j<pull.size(); j++)
+        {
+            chisquare+=TMath::Power(pull[j],2);
+        }
+
+        int ndf = 130 - (10 - 1);
+
+        cc1->cd();
         gPad->SetTickx();
         gPad->SetTicky();
         Xframe_Ks.push_back(xframe_ks);

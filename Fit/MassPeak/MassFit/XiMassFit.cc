@@ -80,12 +80,13 @@ void XiMassFit()
     //file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/Thesis/XiAnalysisCorrelationPtCut8TeVPD1_4_ForFinal.root");
     //file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Composites/V0CasMassPtPD11_16.root");
     //file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/PeripheralSubtractionMB.root"); //MB
-    if(!doPbPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root"); //pPb
+    //if(!doPbPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root"); //pPb old
+    if(!doPbPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationHM_11_07_17.root"); //pPb
     else file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/V0CasCorrelationPbPbTotal_10_30_17.root"); //PbPb
     //file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Composites/V0CasMassPtPD5JL12.root"); //only one PD
 
     //MassXi = (TH2D*)file->Get("XiMassPt/MassPt");
-    if(!doPbPb && !doMB)MassXi = (TH2D*)file->Get("xiCorrelationRapidity/MassPt"); //pPb
+    if(!doPbPb && !doMB)MassXi = (TH2D*)file->Get("v0CasCorrelationRapidity/MassPtXi"); //pPb
     else if(doPbPb && !doMB) MassXi = (TH2D*)file->Get("v0CasCorrelationRapidityPbPb/MassPtXi"); //PbPb
     else if(doMB) MassXi = (TH2D*)file->Get("v0CasCorrelationRapidityPeriSub/MassPtXi"); //MB
     //MassXi = (TH2D*)file->Get("t/MassPt");
@@ -93,7 +94,7 @@ void XiMassFit()
     //Fit
     int pxicounter = 0; //for correct bin counting
     int hbincounter =1; //histogram bin counting
-    //for(unsigned i=0; i<6; i++)
+    //for(unsigned i=0; i<1; i++)
     for(unsigned i=0; i<pxi.size(); i++)
     {
         TCanvas* cc2 = new TCanvas("cc2","",600,450);
@@ -109,7 +110,7 @@ void XiMassFit()
         tex->SetTextSize(0.04);
         //tex->SetTextAlign(10);
 
-        RooRealVar x("x","mass",1.26,1.39);
+        RooRealVar x("x","mass",1.25,1.40);
         RooPlot* xframe_ = x.frame(150);
         xframe_->GetXaxis()->SetTitle("Invariant mass (GeV)");
         xframe_->GetYaxis()->SetTitle("Candidates / 1 MeV");
@@ -158,6 +159,7 @@ void XiMassFit()
         double gaus1F_xi = sig1.getVal();
         double gaus2F_xi = sig2.getVal();
         double qsig_xi   = qsig.getVal();
+        double Norm = (gaus2F_xi + gaus1F_xi + qsig_xi)*0.001;
 
         //set ranges for individual gaussian yield determination
         x.setRange("g1", mean.getVal() - 2*sigma1.getVal(), mean.getVal() + 2*sigma1.getVal());
@@ -205,6 +207,36 @@ void XiMassFit()
 
         sum.plotOn(xframe_,Name("sum"),NormRange("cut"),LineWidth(2),LineColor(kBlue));
         sum.plotOn(xframe_,Components(background),NormRange("cut"),LineStyle(kDashed),LineWidth(2),LineColor(kBlue));
+
+        RooArgSet s(ap,bp,cp,dp,mean,qsig,sig1,sig2,sigma1);
+        s.add(sigma2);
+        TF1* func = (TF1*)sum.asTF(RooArgList(x),RooArgList(s),x);
+        std::vector<double> pull_xi;
+        std::vector<double> pull_xi_x;
+        std::vector<double> ratio_xi;
+        for(int j=1; j<131; j++)
+        {
+            double data_point = massxi->GetBinContent(10+j);
+            double data_error = massxi->GetBinError(10+j);
+            double fit_point = Norm*func->Eval(massxi->GetBinCenter(10+j));
+            if(data_point == 0) data_error = 1;
+            pull_xi.push_back((data_point - fit_point)/data_error);
+            pull_xi_x.push_back(massxi->GetBinCenter(10+j));
+            ratio_xi.push_back(data_point/fit_point);
+        }
+
+        TGraphErrors* TGpull = new TGraphErrors(130,&pull_xi_x[0],&pull_xi[0],0,0);
+        TGraphErrors* TGratio= new TGraphErrors(130,&pull_xi_x[0],&ratio_xi[0],0,0);
+
+        double chisquare = 0;
+
+        for(int j=0; j<pull_xi.size(); j++)
+        {
+            chisquare+=TMath::Power(pull_xi[j],2);
+        }
+
+        int ndf = 130 - (10 - 1);
+
         cc1->cd(index);
         gPad->SetBottomMargin(0.15); //gives more space for titles
         gPad->SetLeftMargin(0.15);
@@ -349,41 +381,149 @@ void XiMassFit()
         //tex->SetTextSize(tex->GetTextSize()*0.95);
 
         cc2->cd();
-        gPad->SetTickx(  );
-        gPad->SetTicky(  );
+        gPad->SetTickx();
+        gPad->SetTicky();
         xframe_->GetXaxis()->SetTitleOffset(1);
         xframe_->GetXaxis()->SetTitleSize(xframe_->GetXaxis()->GetTitleSize()*0.8);
         //xframe_->GetYaxis()->SetTitleSize(xframe_->GetYaxis()->GetTitleSize()*1.3);
         xframe_->GetXaxis()->SetLabelSize(xframe_->GetXaxis()->GetLabelSize()*0.5);
         xframe_->GetYaxis()->SetLabelSize(xframe_->GetYaxis()->GetLabelSize()*0.5);
+        TPad* pad1 = new TPad("pad1","top pad",0.0,0.4,1.0,1.0);
+        TPad* pad2 = new TPad("pad3","middle pad",0.0,0.0,1.0,0.25);
+        TPad* pad3 = new TPad("pad2","bottom pad",0.0,0.25,1.0,0.4);
+        pad1->SetTopMargin(0.1);
+        pad1->SetBottomMargin(0.0);
+        pad1->SetRightMargin(0.038);
+        pad1->SetLeftMargin(0.17);
+        pad1->Draw();
+
+        pad2->SetFrameFillStyle(4000);
+        pad2->SetTopMargin(0.0);
+        pad2->SetBottomMargin(0.37);
+        pad2->SetRightMargin(0.038);
+        pad2->SetLeftMargin(0.17);
+        pad2->Draw();
+
+        pad3->SetFrameFillStyle(4000);
+        pad3->SetTopMargin(0.0);
+        pad3->SetBottomMargin(0.0);
+        pad3->SetRightMargin(0.038);
+        pad3->SetLeftMargin(0.17);
+        pad3->Draw();
+        pad1->cd();
+        gPad->SetTickx();
+        gPad->SetTicky();
         xframe_->Draw();
         cc2->Update();
 
         t1->Draw("same");
         t2->Draw("same");
+        xpos = 0.72;
+        ypos = 0.85;
+        if(i==0)
+        {
+            if(!doPbPb)
+            {
+                os << "CMS pPb";
+                tex->SetTextSize(0.06);
+                tex->DrawLatex(0.25,0.78,os.str().c_str());
+                tex->SetTextSize(0.04);
+                os.str(std::string());
+                os << "185 #leq N_{trk}^{offline} < 250";
+                tex->DrawLatex(0.25,0.71,os.str().c_str());
+                os.str(std::string());
+            }
+            else
+            {
+                os << "CMS PbPb";
+                tex->SetTextSize(0.06);
+                tex->DrawLatex(0.25,0.78,os.str().c_str());
+                tex->SetTextSize(0.04);
+                os.str(std::string());
+                os << "Centrality 30 - 50%";
+                tex->DrawLatex(0.25,0.71,os.str().c_str());
+                os.str(std::string());
+            }
+        }
         os << "P_{t} Bin: " << (pxi[i]-1)/10 << " - " << pxi[i+1]/10;
-        tex->DrawLatex(xpos,0.8,os.str().c_str());
+        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
         os.str(std::string());
         os << "Mean: " << mean_xi;
-        tex->DrawLatex(xpos,0.75,os.str().c_str());
+        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
         os.str(std::string());
         os << "#sigma :" << rms_true_xi;
-        tex->DrawLatex(xpos,0.70,os.str().c_str());
+        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
         os.str(std::string());
         os << "CovQual: " << covQual;
-        tex->DrawLatex(xpos,0.65,os.str().c_str());
+        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
         os.str(std::string());
         osYield << "Yield: " << std::setprecision(2) << Yield_xi;
-        tex->DrawLatex(xpos,0.60,osYield.str().c_str());
+        tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
         osYield.str(std::string());
-        //os << "#chi^{2}/ndf: " << chi2_xi;
-        //tex->DrawLatex(xpos,0.60,os.str().c_str());
-        //os.str(std::string());
+        os << "#chi^{2}/ndf: " << chisquare << "/" << ndf;
+        tex->DrawLatex(xpos,ypos-=increment,os.str().c_str());
+        os.str(std::string());
+
+        pad2->cd();
+        gPad->SetTickx();
+        gPad->SetTicky();
+        TH1F* frame = pad2->cd()->DrawFrame(1.25,-6,1.40,6);
+        frame->GetXaxis()->SetTitle("#Lambda #pi Invariant mass (GeV)");
+        frame->GetYaxis()->SetTitle("Pull");
+        frame->GetXaxis()->CenterTitle(1);
+        frame->GetYaxis()->CenterTitle(1);
+        frame->GetXaxis()->SetTickSize(0.02);
+        frame->GetYaxis()->SetTickSize(0.02);
+        frame->GetXaxis()->SetNdivisions(410);
+        frame->GetYaxis()->SetNdivisions(407);
+        frame->GetXaxis()->SetTitleSize(0.12);
+        frame->GetYaxis()->SetTitleSize(0.12);
+        frame->GetYaxis()->SetTitleOffset(0.5);
+        frame->GetXaxis()->SetTitleOffset(1.2);
+        frame->GetYaxis()->SetLabelSize(0.1);
+        frame->GetXaxis()->SetLabelSize(0.1);
+        TGpull->SetMarkerStyle(20);
+        TGpull->Draw("P");
+        TLine* line = new TLine(1.25, 0, 1.40, 0);
+        line->SetLineStyle(2);
+        line->Draw("same");
+
+        pad3->cd();
+        gPad->SetTickx();
+        gPad->SetTicky();
+        double low = 0.1;
+        double high = 2.75;
+        //if(doPbPb)
+        //{
+            //low = 0.5;
+            //high= 1.5;
+        //}
+        frame = pad3->cd()->DrawFrame(1.25,low,1.40,high);
+        frame->GetYaxis()->SetTitle("Ratio data/fit");
+        frame->GetXaxis()->CenterTitle(1);
+        frame->GetYaxis()->CenterTitle(1);
+        frame->GetXaxis()->SetTickSize(0.02);
+        frame->GetYaxis()->SetTickSize(0.02);
+        frame->GetXaxis()->SetNdivisions(410);
+        frame->GetYaxis()->SetNdivisions(407);
+        frame->GetXaxis()->SetTitleSize(0.12);
+        frame->GetYaxis()->SetTitleSize(0.12);
+        frame->GetYaxis()->SetTitleOffset(0.5);
+        frame->GetXaxis()->SetTitleOffset(1.2);
+        frame->GetYaxis()->SetLabelSize(0.1);
+        frame->GetXaxis()->SetLabelSize(0.1);
+        TGratio->SetMarkerStyle(20);
+        TGratio->Draw("P");
+        TLine* line2 = new TLine(1.25, 1, 1.40, 1);
+        line2->SetLineStyle(2);
+        line2->Draw("same");
 
         hbincounter++;
-        if(i==0) cc2->Print("XiMassFitInd.pdf(","pdf");
-        else if(i < pxi.size() - 2) cc2->Print("XiMassFitInd.pdf","pdf");
-        else cc2->Print("XiMassFitInd.pdf)","pdf");
+        if(!doPbPb) cc2->Print(Form("XiMassFit_Pull_pPb%d.pdf",i/2));
+        else cc2->Print(Form("XiMassFit_Pull_PbPb%d.pdf",i/2));
+        //if(i==0) cc2->Print("XiMassFitInd.pdf(","pdf");
+        //else if(i < pxi.size() - 2) cc2->Print("XiMassFitInd.pdf","pdf");
+        //else cc2->Print("XiMassFitInd.pdf)","pdf");
         i++; //to access correct bins
     }
     cc1->Print("XiMassFitComposite.pdf");
