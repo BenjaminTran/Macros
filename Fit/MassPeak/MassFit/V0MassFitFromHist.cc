@@ -100,7 +100,7 @@ void V0MassFitFromHist()
     TFile* file = 0;
     if(doPbPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/V0CasCorrelationPbPbTotal_10_30_17.root");
     else if(mc) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/All/MCMassPtTotal_08_23_2017.root");
-    else if(mb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/PeripheralSubtractionMB_0_n_20_V0Only.root");
+    else if(mb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/V0MB0_35_partial_11_28_17.root");
     else if(pPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityCorrectMultB_09_19_17.root");
 
     if(mc)
@@ -599,9 +599,10 @@ void V0MassFitFromHist()
         osYield << "fsig: " << std::setprecision(6) << Fsig_ks;
         tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
         osYield.str(std::string());
-        if(!doPbPb && !mc) cc1->Print(Form("KsMassFit_Pull_pPb%d.pdf",i));
+        if(pPb) cc1->Print(Form("KsMassFit_Pull_pPb%d.pdf",i));
         else if(mc) cc1->Print(Form("KsMassFit_Pull_MC%d.pdf",i));
-        else cc1->Print(Form("KsMassFit_Pull_PbPb%d.pdf",i));
+        else if(doPbPb) cc1->Print(Form("KsMassFit_Pull_PbPb%d.pdf",i));
+        else if(mb) cc1->Print(Form("KsMassFit_Pull_MB%d.pdf",i));
 
         if(lambda)
         {
@@ -1116,9 +1117,10 @@ void V0MassFitFromHist()
             osYield.str(std::string());
         }
 
-        if(!doPbPb && !mc) cc2->Print(Form("LaMassFit_Pull_pPb%d.pdf",i));
+        if(pPb) cc2->Print(Form("LaMassFit_Pull_pPb%d.pdf",i));
         else if(mc)cc2->Print(Form("LaMassFit_Pull_MC%d.pdf",i));
-        else cc2->Print(Form("LaMassFit_Pull_PbPb%d.pdf",i));
+        else if(doPbPb) cc2->Print(Form("LaMassFit_Pull_PbPb%d.pdf",i));
+        else if(mb) cc2->Print(Form("LaMassFit_Pull_MB%d.pdf",i));
         //if(i==0) cc1->Print("V0MassFitInd.pdf(","pdf");
         //else if(i < pks.size() - 2) cc1->Print("V0MassFitInd.pdf","pdf");
         //else cc1->Print("V0MassFitInd.pdf)","pdf");
