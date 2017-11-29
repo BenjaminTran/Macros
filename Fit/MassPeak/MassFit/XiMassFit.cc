@@ -60,8 +60,9 @@ void XiMassFit()
     std::vector<double> std_xi;
     std::vector<double> fsig_xi;
     std::vector<double> covQual_xi;
-    bool doPbPb = true;
-    bool doMB = false;
+    bool doPbPb = false;
+    bool doMB = true;
+    bool pPb = false;
 
     //std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,72, 73,85, 86,100, 101,200, 201,300};
     //std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,100, 101,200};//, 201,300};
@@ -81,14 +82,16 @@ void XiMassFit()
     //file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Composites/V0CasMassPtPD11_16.root");
     //file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/PeripheralSubtractionMB.root"); //MB
     //if(!doPbPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root"); //pPb old
-    if(!doPbPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationHM_11_07_17.root"); //pPb
-    else file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/V0CasCorrelationPbPbTotal_10_30_17.root"); //PbPb
+    if(doPbPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/V0CasCorrelationPbPbTotal_10_30_17.root"); //PbPb
+    else if(doMB) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/XiOmegaMB_0_N_20_Partial_11_8_17.root");
+    else if(pPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationHM_11_07_17.root"); //pPb
+
     //file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Composites/V0CasMassPtPD5JL12.root"); //only one PD
 
     //MassXi = (TH2D*)file->Get("XiMassPt/MassPt");
-    if(!doPbPb && !doMB)MassXi = (TH2D*)file->Get("v0CasCorrelationRapidity/MassPtXi"); //pPb
-    else if(doPbPb && !doMB) MassXi = (TH2D*)file->Get("v0CasCorrelationRapidityPbPb/MassPtXi"); //PbPb
-    else if(doMB) MassXi = (TH2D*)file->Get("v0CasCorrelationRapidityPeriSub/MassPtXi"); //MB
+    if(doMB) MassXi = (TH2D*)file->Get("v0CasCorrelationRapidityPeriSub/MassPtXi"); //MB
+    else if(doPbPb) MassXi = (TH2D*)file->Get("v0CasCorrelationRapidityPbPb/MassPtXi"); //PbPb
+    else if(pPb)   MassXi = (TH2D*)file->Get("v0CasCorrelationRapidity/MassPtXi"); //pPb
     //MassXi = (TH2D*)file->Get("t/MassPt");
 
     //Fit
@@ -520,6 +523,7 @@ void XiMassFit()
 
         hbincounter++;
         if(!doPbPb) cc2->Print(Form("XiMassFit_Pull_pPb%d.pdf",i/2));
+        else if(doMB) cc2->Print(Form("XiMassFit_Pull_MB%d.pdf",i/2));
         else cc2->Print(Form("XiMassFit_Pull_PbPb%d.pdf",i/2));
         //if(i==0) cc2->Print("XiMassFitInd.pdf(","pdf");
         //else if(i < pxi.size() - 2) cc2->Print("XiMassFitInd.pdf","pdf");

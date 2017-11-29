@@ -59,7 +59,9 @@ void V0MassFitFromHist()
     TH3D* MassKs3D;
     TH3D* MassLa3D;
     bool doPbPb = false;
-    bool mc = true;
+    bool pPb = false;
+    bool mc = false;
+    bool mb = true;
     bool lambda;
 
     std::vector<RooPlot*> Xframe_Ks;
@@ -96,9 +98,10 @@ void V0MassFitFromHist()
     //File Creation
     myfile.open("V0PeakParam.txt");
     TFile* file = 0;
-    if(!doPbPb && !mc) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityCorrectMultB_09_19_17.root");
+    if(doPbPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/V0CasCorrelationPbPbTotal_10_30_17.root");
     else if(mc) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/All/MCMassPtTotal_08_23_2017.root");
-    else file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/V0CasCorrelationPbPbTotal_10_30_17.root");
+    else if(mb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/PeripheralSubtractionMB_0_n_20_V0Only.root");
+    else if(pPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityCorrectMultB_09_19_17.root");
 
     if(mc)
     {
@@ -115,7 +118,7 @@ void V0MassFitFromHist()
     int placounter  = 0;
     int hbincounter = 1;
     int Rebin = 1;
-    for(unsigned i=0; i<13; i++)
+    for(unsigned i=0; i<14; i++)
     //for(unsigned i=0; i<1; i++)
     {
         TCanvas* cc1 = new TCanvas("cc1","cc1",600,600);
@@ -123,20 +126,25 @@ void V0MassFitFromHist()
         //i = pks.size()-2;
         if(i >= pla.size()-1) lambda = false;
         else lambda= true;
-        if(!doPbPb && !mc)
+        if(doPbPb)
         {
-            massks[i] = (TH1D*)file->Get(Form("v0CorrelationRapidity/masskshort_pt%d",i));
-            massla[i] = (TH1D*)file->Get(Form("v0CorrelationRapidity/masslambda_pt%d",i));
+            massks[i] = (TH1D*)file->Get(Form("v0CasCorrelationRapidityPbPb/masskshort_pt%d",i));
+            massla[i] = (TH1D*)file->Get(Form("v0CasCorrelationRapidityPbPb/masslambda_pt%d",i));
         }
         else if(mc)
         {
             massks[i] = (TH1D*)MassKs->ProjectionX(Form("massks%d",i),pks[i]*10,pks[i+1]*10);
             massla[i] = (TH1D*)MassLa->ProjectionX(Form("massla%d",i),pla[i]*10,pla[i+1]*10);
         }
-        else
+        else if(mb)
         {
-            massks[i] = (TH1D*)file->Get(Form("v0CasCorrelationRapidityPbPb/masskshort_pt%d",i));
-            massla[i] = (TH1D*)file->Get(Form("v0CasCorrelationRapidityPbPb/masslambda_pt%d",i));
+            massks[i]= (TH1D*)file->Get(Form("v0CasCorrelationRapidityPeriSub/masskshort_pt%d",i)); //mb
+            massla[i]= (TH1D*)file->Get(Form("v0CasCorrelationRapidityPeriSub/masslambda_pt%d",i)); //mb
+        }
+        else if(pPb)
+        {
+            massks[i] = (TH1D*)file->Get(Form("v0CorrelationRapidity/masskshort_pt%d",i));
+            massla[i] = (TH1D*)file->Get(Form("v0CorrelationRapidity/masslambda_pt%d",i));
         }
         massks[i]->Rebin(1);
         massla[i]->Rebin(1);
@@ -627,11 +635,17 @@ void V0MassFitFromHist()
             //RooRealVar polysig("polysig","polysig",2e3,1e3,1e6);
             RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,poly),RooArgList(sig1,sig2,polysig));
 
-            if(i>=7 && i<10 && !doPbPb && !mc)
+            if(i>=7 && i<10 && pPb)
             {
                 sig1.setVal(1e6);
                 sig2.setVal(1e6);
                 polysig.setVal(2.3e5);
+            }
+            if(i==9 && mb)
+            {
+                sig1.setVal(1e4);
+                sig2.setVal(1e4);
+                polysig.setVal(2.3e4);
             }
             if((i==8) && mc)
             {
