@@ -17,9 +17,14 @@
 std::string v2RootFileName = "v2V0sGraphs185_250D0Ana.root";
 using namespace RooFit;
 std::string PKzS = "K_{S}^{0}";
-std::string PgL_PagL = "#Lambda / #bar{#Lambda}";
+std::string PgL_PagL = "#Lambda/#bar{#Lambda}";
 std::string PgXm = "#Xi^{#pm}";
 std::string PgOm = "#Omega^{#pm}";
+std::string HM_ntrk = "185 #leq N_{trk}^{offline} < 250";
+std::string MB_ntrk_20 = "0 < N_{trk}^{offline} < 20";
+std::string MB_ntrk_20_small = "N_{trk}^{offline} < 20";
+std::string MB_ntrk_35 = "0 < N_{trk}^{offline} < 35";
+std::string MB_ntrk_35_small = "N_{trk}^{offline} < 35";
 
 TGraphErrors* TGDivideSameX(TGraphErrors* TG1, TGraphErrors* TG2, bool useAbs = false) // For dividing tgraph 1 by tgraph2. Need to have the same X axis.
 {
@@ -64,7 +69,7 @@ void MakePanel(TH1F* frame, TVirtualPad* pad, double x1=0, double y1=0, double x
     //pad->SetRightMargin(margin-0.08);
     //pad->SetTopMargin(margin-0.08);
     pad->SetRightMargin(0.01);
-    pad->SetTopMargin(0.01);
+    //pad->SetTopMargin(0.012);
     frame = pad->DrawFrame(x1,y1,x2,y2);
     gPad->SetTickx();
     gPad->SetTicky();
@@ -76,6 +81,23 @@ void MakePanel(TH1F* frame, TVirtualPad* pad, double x1=0, double y1=0, double x
     frame->SetTitleOffset(1.2,"X");
     frame->GetXaxis()->SetTitle(XaxisTitle.c_str());
     frame->GetYaxis()->SetTitle(YaxisTitle.c_str());
+}
+
+void MakePanelPad(TH1F* frame, TVirtualPad* pad, double x1=0, double y1=0, double x2=0, double y2=0, std::string XaxisTitle = "", std::string YaxisTitle = "", double XlabSize = 0.04, double YlabSize = 0.04, double XTitleSize = 0.05, double YTitleSize = 0.05, double YTitleOff = 1.1)
+{
+    frame = pad->DrawFrame(x1,y1,x2,y2);
+    gPad->SetTickx();
+    gPad->SetTicky();
+    frame->GetXaxis()->CenterTitle(1);
+    frame->GetYaxis()->CenterTitle(1);
+    frame->GetXaxis()->SetTitleSize(XTitleSize);
+    frame->GetYaxis()->SetTitleSize(YTitleSize);
+    frame->SetTitleOffset(YTitleOff,"Y");
+    frame->SetTitleOffset(1.2,"X");
+    frame->GetXaxis()->SetTitle(XaxisTitle.c_str());
+    frame->GetYaxis()->SetTitle(YaxisTitle.c_str());
+    frame->GetXaxis()->SetLabelSize(XlabSize);
+    frame->GetYaxis()->SetLabelSize(YlabSize);
 }
 
 TLegend* MakeTLegend(double x1, double y1, double x2, double y2, int TextFont=42, double TextSize=0.04)
@@ -873,8 +895,7 @@ void Rap_v2sig_pPb()
     //frame->GetYaxis()->SetTitle("v_{2}^{sig}");
 
     // Pull TGraph for Kshort and lambda
-    TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidity_pPb_185_250_10_31_17.root"); //Already have v2 with corrected signal fraction. Listed as v2valuesRapidityHM_185_250_EtaGap1_11_9_17.root
-    TFile* file_pidv2_Omega = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityOmegaCheck.root");
+    TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_FixedGap_12_05_17.root");
 
 
     //TGraphErrors* om8_v2_Fixed = (TGraphErrors*)file_pidv2_Omega->Get("v2omega");
@@ -888,73 +909,30 @@ void Rap_v2sig_pPb()
     TGraphErrors* ks8_v2kn = (TGraphErrors*)file_pidv2->Get("v2kshort_ket_nq");
     TGraphErrors* la8_v2kn = (TGraphErrors*)file_pidv2->Get("v2lambda_ket_nq");
 
-    ks8_v2->SetMarkerColor(kRed);
-    ks8_v2->SetMarkerStyle(20);
-    ks8_v2->SetMarkerSize(1.5);
-    ks8_v2->SetLineColor(kRed);
+    SetTGattributes(ks8_v2,kRed,20,1.5);
+    SetTGattributes(la8_v2,kBlue,22,1.5);
+    SetTGattributes(xi8_v2,kGreen+2,21,1.5);
+    SetTGattributes(om8_v2,kMagenta,29,1.5);
 
-    xi8_v2->SetMarkerColor(kGreen+2);
-    xi8_v2->SetMarkerStyle(21);
-    xi8_v2->SetMarkerSize(1.5);
-    xi8_v2->SetLineColor(kGreen+2);
-
-    la8_v2->SetMarkerColor(kBlue-4);
-    la8_v2->SetMarkerStyle(22);
-    la8_v2->SetMarkerSize(1.5);
-    la8_v2->SetLineColor(kBlue-4);
-
-    om8_v2->SetMarkerColor(kMagenta);
-    om8_v2->SetMarkerStyle(29);
-    om8_v2->SetMarkerSize(1.5);
-    om8_v2->SetLineColor(kMagenta);
-
-    //om8_v2_Fixed->SetMarkerColor(kBlack);
-    //om8_v2_Fixed->SetMarkerStyle(29);
-    //om8_v2_Fixed->SetMarkerSize(1.5);
-    //om8_v2_Fixed->SetLineColor(kBlack);
-
-    ks8_v2kn->SetMarkerColor(kRed);
-    ks8_v2kn->SetMarkerStyle(20);
-    ks8_v2kn->SetMarkerSize(1.5);
-    ks8_v2kn->SetLineColor(kRed);
-
-    xi8_v2kn->SetMarkerColor(kGreen+2);
-    xi8_v2kn->SetMarkerStyle(21);
-    xi8_v2kn->SetMarkerSize(1.5);
-    xi8_v2kn->SetLineColor(kGreen+2);
-
-    la8_v2kn->SetMarkerColor(kBlue-4);
-    la8_v2kn->SetMarkerStyle(22);
-    la8_v2kn->SetMarkerSize(1.5);
-    la8_v2kn->SetLineColor(kBlue-4);
-
-    om8_v2kn->SetMarkerColor(kMagenta);
-    om8_v2kn->SetMarkerStyle(29);
-    om8_v2kn->SetMarkerSize(1.5);
-    om8_v2kn->SetLineColor(kMagenta);
+    SetTGattributes(ks8_v2kn,kRed,20,1.5);
+    SetTGattributes(la8_v2kn,kBlue,22,1.5);
+    SetTGattributes(xi8_v2kn,kGreen+2,21,1.5);
+    SetTGattributes(om8_v2kn,kMagenta,29,1.5);
 
     c1->cd();
 
-    TLegend* leg = new TLegend(0.15,0.55,0.27,0.75);
-    leg->SetFillColor(10);
-    leg->SetFillStyle(0);
-    leg->SetBorderSize(0);
-    leg->SetTextFont(42);
-    leg->SetTextSize(0.05);
-    //leg->AddEntry(ha_v2, "h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}", "P");
-    leg->AddEntry(ks8_v2, "K_{S}^{0}", "P");
-    leg->AddEntry(la8_v2, "#Lambda / #bar{#Lambda}", "P");
-    leg->AddEntry(xi8_v2, "#Xi^{#pm}", "P");
-    leg->AddEntry(om8_v2, "#Omega^{#pm}", "P");
+    TLegend* leg = MakeTLegend(0.15,0.55,0.27,0.75);
+    leg->AddEntry(ks8_v2 , PKzS.c_str()     , "P");
+    leg->AddEntry(la8_v2 , PgL_PagL.c_str() , "P");
+    leg->AddEntry(xi8_v2 , PgXm.c_str()     , "P");
+    leg->AddEntry(om8_v2 , PgOm.c_str()     , "P");
     leg->Draw();
 
 
-    //ha_v2->Draw("PESAME");
     ks8_v2->Draw("P");
     la8_v2->Draw("P");
     xi8_v2->Draw("P");
     om8_v2->Draw("P");
-    //om8_v2_Fixed->Draw("P");
 
     TLatex *tex = new TLatex();
     tex->SetNDC();
@@ -963,9 +941,7 @@ void Rap_v2sig_pPb()
     tex->DrawLatex(0.15,0.8,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
     tex->SetTextSize(0.045);
     tex->SetTextFont(42);
-    tex->DrawLatex(0.34,0.72,"185 #leq N_{trk}^{offline} < 250");
-    /*tex->DrawLatex(0.15,0.74,"|y| < 1");*/
-    //tex->DrawLatex(0.4,0.7, "L_{#lower[-0.25]{int}} = 35 nb^{#font[122]{\55}1}, 185 nb^{#font[122]{\55}1}");
+    tex->DrawLatex(0.34,0.72,HM_ntrk.c_str());
 
     c2->cd();
 
@@ -1008,10 +984,10 @@ void Rap_v2sig_pPb()
     /*tex->DrawLatex(0.15,0.74,"|y| < 1");*/
     //tex->DrawLatex(0.4,0.7, "L_{#lower[-0.25]{int}} = 35 nb^{#font[122]{\55}1}, 185 nb^{#font[122]{\55}1}");
 
-    c1->Print("v2SigRapiditypPb.pdf");
+    c1->Print("Image/Rap_v2sig_pPb/v2SigRapiditypPb.pdf");
     c1->Print("v2SigRapiditypPb.png");
     //c1->Print("v2SigRapidityKET.pdf");
-    c2->Print("v2SigRapidityDividednqpPb.pdf");
+    c2->Print("Image/Rap_v2sig_pPb/v2SigRapidityDividednqpPb.pdf");
     c2->Print("v2SigRapidityDividednqpPb.png");
 }
 void Rap_v2sig_pPb_MB()
@@ -1201,6 +1177,9 @@ void Rap_v2sig_pPb_MB_0_35()
     /*c1->SetLogy();*/
     c1->SetLeftMargin(0.12);
 
+    TCanvas* c3 = MakeCanvas("c3", "35Only");
+    c3->SetLeftMargin(0.12);
+
     TCanvas* c2 = MakeCanvas("c2", "Plot");
     c2->SetLeftMargin(0.12);
 
@@ -1209,6 +1188,7 @@ void Rap_v2sig_pPb_MB_0_35()
     // draw the frame using a histogram frame
     TH1F* frame1;
     TH1F* frame2;
+    TH1F* frame3;
 
     frame1 = c1->DrawFrame(0,-0.1,9,1.3);
     gPad->SetTickx();
@@ -1239,93 +1219,112 @@ void Rap_v2sig_pPb_MB_0_35()
     //frame->GetYaxis()->SetTitle("v_{2}^{sig}");
 
     // Pull TGraph for Kshort and lambda
-    TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0Casv2LowMult.root"); //Not actually plotted or needed just to keep everything happy
-    TFile* file_pidv2_V0 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/lrgraphv2_v3_pPb_0-35.root");
-    TFile* file_pidv2_Omega = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityMB_0_35_Omega_EtaGap1_11_22_17.root");
+    //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0Casv2LowMult.root"); //Not actually plotted or needed just to keep everything happy
+    TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityMB_AllStrange_0_35_EtaGap1_12_05_17.root");
+    TFile* file_pidv2_20 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0Casv2LowMult.root"); // 0-20
 
 
-    TGraphErrors* om8_v2 = (TGraphErrors*)file_pidv2_Omega->Get("v2omega");
+    TGraphErrors* om8_v2 = (TGraphErrors*)file_pidv2->Get("v2omega");
     TGraphErrors* xi8_v2 = (TGraphErrors*)file_pidv2->Get("v2xi");
-    TGraphErrors* ks8_v2 = (TGraphErrors*)file_pidv2_V0->Get("kshortv2true");
-    TGraphErrors* la8_v2 = (TGraphErrors*)file_pidv2_V0->Get("lambdav2true");
+    TGraphErrors* ks8_v2 = (TGraphErrors*)file_pidv2->Get("v2kshort");
+    TGraphErrors* la8_v2 = (TGraphErrors*)file_pidv2->Get("v2lambda");
 
-    TGraphErrors* om8_v2kn = (TGraphErrors*)file_pidv2_Omega->Get("v2omega_ket_nq");
+    TGraphErrors* xi8_v2_20 = (TGraphErrors*)file_pidv2_20->Get("v2xi");
+    TGraphErrors* ks8_v2_20 = (TGraphErrors*)file_pidv2_20->Get("v2kshort");
+    TGraphErrors* la8_v2_20 = (TGraphErrors*)file_pidv2_20->Get("v2lambda");
+
+    TGraphErrors* om8_v2kn = (TGraphErrors*)file_pidv2->Get("v2omega_ket_nq");
     TGraphErrors* xi8_v2kn = (TGraphErrors*)file_pidv2->Get("v2xi_ket_nq");
     TGraphErrors* ks8_v2kn = (TGraphErrors*)file_pidv2->Get("v2kshort_ket_nq");
     TGraphErrors* la8_v2kn = (TGraphErrors*)file_pidv2->Get("v2lambda_ket_nq");
 
-    ks8_v2->SetMarkerColor(kRed);
-    ks8_v2->SetMarkerStyle(20);
-    ks8_v2->SetMarkerSize(1.5);
-    ks8_v2->SetLineColor(kRed);
+    TGraphErrors* xi8_v2kn_20 = (TGraphErrors*)file_pidv2_20->Get("v2xi_ket_nq");
+    TGraphErrors* ks8_v2kn_20 = (TGraphErrors*)file_pidv2_20->Get("v2kshort_ket_nq");
+    TGraphErrors* la8_v2kn_20 = (TGraphErrors*)file_pidv2_20->Get("v2lambda_ket_nq");
 
-    xi8_v2->SetMarkerColor(kGreen+2);
-    xi8_v2->SetMarkerStyle(21);
-    xi8_v2->SetMarkerSize(1.5);
-    xi8_v2->SetLineColor(kGreen+2);
+    SetTGattributes(ks8_v2      , kRed     , 20 , 1.5);
+    SetTGattributes(la8_v2      , kBlue-4  , 22 , 1.5);
+    SetTGattributes(xi8_v2      , kGreen+2 , 21 , 1.5);
+    SetTGattributes(om8_v2      , kMagenta , 29 , 1.5);
 
-    la8_v2->SetMarkerColor(kBlue-4);
-    la8_v2->SetMarkerStyle(22);
-    la8_v2->SetMarkerSize(1.5);
-    la8_v2->SetLineColor(kBlue-4);
+    SetTGattributes(ks8_v2kn    , kRed     , 20 , 1.5);
+    SetTGattributes(la8_v2kn    , kBlue-4  , 22 , 1.5);
+    SetTGattributes(xi8_v2kn    , kGreen+2 , 21 , 1.5);
+    SetTGattributes(om8_v2kn    , kMagenta , 29 , 1.5);
 
-    om8_v2->SetMarkerColor(kMagenta);
-    om8_v2->SetMarkerStyle(29);
-    om8_v2->SetMarkerSize(1.5);
-    om8_v2->SetLineColor(kMagenta);
+    SetTGattributes(ks8_v2_20   , kRed     , 20+4 , 1.5);
+    SetTGattributes(la8_v2_20   , kBlue-4  , 22+4 , 1.5);
+    SetTGattributes(xi8_v2_20   , kGreen+2 , 21+4 , 1.5);
 
-    ks8_v2kn->SetMarkerColor(kRed);
-    ks8_v2kn->SetMarkerStyle(20);
-    ks8_v2kn->SetMarkerSize(1.5);
-    ks8_v2kn->SetLineColor(kRed);
-
-    xi8_v2kn->SetMarkerColor(kGreen+2);
-    xi8_v2kn->SetMarkerStyle(21);
-    xi8_v2kn->SetMarkerSize(1.5);
-    xi8_v2kn->SetLineColor(kGreen+2);
-
-    la8_v2kn->SetMarkerColor(kBlue-4);
-    la8_v2kn->SetMarkerStyle(22);
-    la8_v2kn->SetMarkerSize(1.5);
-    la8_v2kn->SetLineColor(kBlue-4);
-
-    om8_v2kn->SetMarkerColor(kMagenta);
-    om8_v2kn->SetMarkerStyle(29);
-    om8_v2kn->SetMarkerSize(1.5);
-    om8_v2kn->SetLineColor(kMagenta);
+    SetTGattributes(ks8_v2kn_20 , kRed     , 20+4 , 1.5);
+    SetTGattributes(la8_v2kn_20 , kBlue-4  , 22+4 , 1.5);
+    SetTGattributes(xi8_v2kn_20 , kGreen+2 , 21+4 , 1.5);
 
     c1->cd();
 
-    TLegend* leg = new TLegend(0.15,0.55,0.27,0.75);
-    leg->SetFillColor(10);
-    leg->SetFillStyle(0);
-    leg->SetBorderSize(0);
-    leg->SetTextFont(42);
-    leg->SetTextSize(0.05);
-    //leg->AddEntry(ha_v2, "h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}", "P");
-    leg->AddEntry(ks8_v2, "K_{S}^{0} 14-002", "P");
-    leg->AddEntry(la8_v2, "#Lambda / #bar{#Lambda} 14-002", "P");
-    //leg->AddEntry(xi8_v2, "#Xi^{#pm}", "P");
-    leg->AddEntry(om8_v2, "#Omega^{#pm}", "P");
-    leg->Draw();
+    TLegend* leg_35 = MakeTLegend(0.35,0.60,0.47,0.78);
+    leg_35->SetHeader(MB_ntrk_35_small.c_str());
+    leg_35->AddEntry(ks8_v2,PKzS.c_str(), "P");
+    leg_35->AddEntry(la8_v2,PgL_PagL.c_str(), "P");
+    leg_35->AddEntry(xi8_v2,PgXm.c_str(), "P");
+    leg_35->Draw();
+
+    TLegend* leg_20 = MakeTLegend(0.19,0.60,0.30,0.78);
+    leg_20->SetHeader(MB_ntrk_20_small.c_str());
+    leg_20->AddEntry(ks8_v2_20,PKzS.c_str(), "P");
+    leg_20->AddEntry(la8_v2_20,PgL_PagL.c_str(), "P");
+    leg_20->AddEntry(xi8_v2_20,PgXm.c_str(), "P");
+    leg_20->Draw();
 
     //ha_v2->Draw("PESAME");
     ks8_v2->Draw("P");
     la8_v2->Draw("P");
-    //xi8_v2->Draw("P");
-    om8_v2->Draw("P");
+    xi8_v2->Draw("P");
+    ks8_v2_20->Draw("P");
+    la8_v2_20->Draw("P");
+    xi8_v2_20->Draw("P");
+    //om8_v2->Draw("P");
     //om8_v2_Fixed->Draw("P");
 
     TLatex *tex = new TLatex();
     tex->SetNDC();
-    tex->SetTextFont(62);
-    tex->SetTextSize(0.05);
-    tex->DrawLatex(0.15,0.8,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
-    tex->SetTextSize(0.045);
     tex->SetTextFont(42);
-    tex->DrawLatex(0.67,0.80,"0 #leq N_{trk}^{offline} < 35");
-    /*tex->DrawLatex(0.15,0.74,"|y| < 1");*/
-    //tex->DrawLatex(0.4,0.7, "L_{#lower[-0.25]{int}} = 35 nb^{#font[122]{\55}1}, 185 nb^{#font[122]{\55}1}");
+    tex->SetTextSize(0.045);
+    tex->DrawLatex(0.71,0.9,"pPb 8.16 TeV");
+    tex->DrawLatex(0.54,0.75,"|y| < 1");
+    //tex->SetTextSize(0.035);
+    //tex->DrawLatex(0.34,0.781,MB_ntrk_35_small.c_str());
+    //tex->DrawLatex(0.184,0.781,MB_ntrk_20_small.c_str());
+
+    c3->cd();
+
+    frame3 = c3->DrawFrame(0,-0.1,9.0,0.7);
+    gPad->SetTickx();
+    gPad->SetTicky();
+    frame3->GetXaxis()->CenterTitle(1);
+    frame3->GetYaxis()->CenterTitle(1);
+    frame3->GetXaxis()->SetTitleSize(0.05);
+    frame3->GetYaxis()->SetTitleSize(0.05);
+    frame3->SetTitleOffset(1.1,"Y");
+    frame3->SetTitleOffset(1.2,"X");
+    frame3->GetXaxis()->SetTitle("p_{T} (GeV)");
+    frame3->GetYaxis()->SetTitle("v_{2}^{sig}");
+
+    TLegend* leg_35_1 = MakeTLegend(0.164,0.613,0.284,0.78);
+    leg_35_1->AddEntry(ks8_v2 , PKzS    .c_str() , "P");
+    leg_35_1->AddEntry(la8_v2 , PgL_PagL.c_str() , "P");
+    leg_35_1->AddEntry(xi8_v2 , PgXm    .c_str() , "P");
+    leg_35_1->AddEntry(om8_v2 , PgOm    .c_str() , "P");
+    ks8_v2->Draw("P");
+    la8_v2->Draw("P");
+    xi8_v2->Draw("P");
+    om8_v2->Draw("P");
+    leg_35_1->Draw();
+    tex->DrawLatex(0.15,0.8,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
+    tex->DrawLatex(0.32,0.73,MB_ntrk_35.c_str());
+    //tex->DrawLatex(0.167,0.823,MB_ntrk_35.c_str());
+    //tex->DrawLatex(0.71,0.9,"pPb 8.16 TeV");
+    //tex->DrawLatex(0.53,0.83,"|y| < 1");
 
     c2->cd();
 
@@ -1365,14 +1364,12 @@ void Rap_v2sig_pPb_MB_0_35()
     tex->SetTextSize(0.045);
     tex->SetTextFont(42);
     tex->DrawLatex(0.40,0.24,"0 #leq N_{trk}^{offline} < 20");
-    /*tex->DrawLatex(0.15,0.74,"|y| < 1");*/
-    //tex->DrawLatex(0.4,0.7, "L_{#lower[-0.25]{int}} = 35 nb^{#font[122]{\55}1}, 185 nb^{#font[122]{\55}1}");
 
-    c1->Print("v2SigRapiditypPb_MB.pdf");
-    c1->Print("v2SigRapiditypPb_MB.png");
-    //c1->Print("v2SigRapidityKET.pdf");
-    c2->Print("v2SigRapidityDividednqpPb_MB.pdf");
-    c2->Print("v2SigRapidityDividednqpPb_MB.png");
+    c1->Print("Image/Rap_v2sig_pPb_MB_0_35/v2SigRapiditypPb_MB_Comparison.pdf");
+    c1->Print("Image/Rap_v2sig_pPb_MB_0_35/v2SigRapiditypPb_MB_Comparison.png");
+    c2->Print("Image/Rap_v2sig_pPb_MB_0_35/v2SigRapidityDividednqpPb_MB.pdf");
+    c2->Print("Image/Rap_v2sig_pPb_MB_0_35/v2SigRapidityDividednqpPb_MB.png");
+    c3->Print("Image/Rap_v2sig_pPb_MB_0_35/v2SigRapiditypPb_MB_35.pdf");
 }
 
 void Rap_v2sig_PbPb()
@@ -1409,8 +1406,10 @@ void Rap_v2sig_PbPb()
 
 
     // Pull TGraph for Kshort and lambda
-    TFile* file_pidv2 = TFile::Open("rootFiles/v2valuesRapidityPbPb.root"); //Fsig not from full stats
-    TFile* file_pidv2_la_fixed_fsig = TFile::Open("rootFiles/v2valuesRapidity_Cent_30_50perc_EtaGap1_11_9_17.root"); //Fsig from full stats
+    //TFile* file_pidv2 = TFile::Open("rootFiles/v2valuesRapidity_Cent_30_50perc_EtaGap1_11_9_17.root"); //Incorrect ref
+    //TFile* file_pidv2_la_fixed_fsig = TFile::Open("rootFiles/v2valuesRapidity_Cent_30_50perc_EtaGap1_11_9_17.root"); //Fsig from full stats
+    //TFile* file_pidv2_la_fixed_fsig = TFile::Open("rootFiles/v2valuesRapidity_Cent_30_50_EtaGap1_FixedRef_11_29_17.root"); //Correct Ref
+    TFile* file_pidv2_la_fixed_fsig = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidity_Cent_30_50_EtaGap1_FixedRef_FixedGap_12_05_17.root"); //Correct Gap
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidity_pPb_185_250_10_31_17.root");
     //TFile* file_pidv2_Omega = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityOmegaCheck.root");
 
@@ -1554,12 +1553,13 @@ void Rap_v2sig_PbPb()
     /*tex->DrawLatex(0.15,0.74,"|y| < 1");*/
     //tex->DrawLatex(0.4,0.7, "L_{#lower[-0.25]{int}} = 35 nb^{#font[122]{\55}1}, 185 nb^{#font[122]{\55}1}");
 
-    c1->Print("v2SigRapidityPbPb.pdf");
+    c1->Print("Image/Rap_v2sig_PbPb/v2SigRapidityPbPb.pdf");
     c1->Print("v2SigRapidityPbPb.png");
     //c1->Print("v2SigRapidityKET.pdf");
-    c2->Print("v2SigRapidityDividednqPbPb.pdf");
+    c2->Print("Image/Rap_v2sig_PbPb/v2SigRapidityDividednqPbPb.pdf");
     c2->Print("v2SigRapidityDividednqPbPb.png");
 
+    /*
     TCanvas* c3 = MakeCanvas("c3","c3");
     c3->SetTopMargin(0.12);
     TH1F* frame_la;
@@ -1586,10 +1586,11 @@ void Rap_v2sig_PbPb()
     //tex->DrawLatex(0.40,0.24,"185 #leq N_{trk}^{offline} < 250");
     tex->DrawLatex(0.69,0.9,"Cent: 30% - 50%");
     tex->DrawLatex(0.69,0.84,"|y| > 1");
-    /*tex->DrawLatex(0.15,0.74,"|y| < 1");*/
+    tex->DrawLatex(0.15,0.74,"|y| < 1");
     //tex->DrawLatex(0.4,0.7, "L_{#lower[-0.25]{int}} = 35 nb^{#font[122]{\55}1}, 185 nb^{#font[122]{\55}1}");
 
     c3->Print("LambdaPbPbComparisonFixedFitting.jpg");
+    */
 
 }
 void Rap_v2obsbkg()
@@ -1600,13 +1601,21 @@ void Rap_v2obsbkg()
     //TCanvas* c2[3];
     TCanvas* c1 = MakeCanvas("c1","c1");
     TCanvas* c2 = MakeCanvas("c2","c2");
+    TCanvas* c3 = MakeCanvas("c3","c3");
+    TCanvas* c4 = MakeCanvas("c4","c4");
+    TCanvas* c5 = MakeCanvas("c5","c5");
+    TCanvas* c6 = MakeCanvas("c6","c6");
+    TCanvas* c7 = MakeCanvas("c7","c7");
     double yMax[3];
 
-    f[0] = new TFile("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0Casv2LowMult.root");
-    f[1] = new TFile("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidity_pPb_185_250_10_31_17.root");
-    f[2] = new TFile("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityPbPb.root");
+    //f[0] = new TFile("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0Casv2LowMult.root");
+    f[0] = new TFile("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityMB_AllStrange_0_35_EtaGap1_12_05_17.root"); //MB
+    f[1] = new TFile("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_FixedGap_12_05_17.root"); // pPb
+    f[2] = new TFile("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidity_Cent_30_50_EtaGap1_FixedRef_FixedGap_12_05_17.root"); // PbPb
+    //f[1] = new TFile("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_11_9_17.root"); // pPb
+    //f[2] = new TFile("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2V0CasOmegaRapidityPbPb_Cent_30_50.root"); // PbPb
 
-    yMax[0] = 3.15;
+    yMax[0] = 1.15;
     yMax[1] = 0.45;
     yMax[2] = 0.75;
 
@@ -1642,7 +1651,22 @@ void Rap_v2obsbkg()
     Color_t color;
     int mstyle = 0;
 
+    //Make v2obs and v2bkg
+    TH1F* frame_ind;
+    MakePanel(frame_ind,c1->cd(),0,-0.05,9,1.25,bottomMargin,xaxis,"v_{2}^{obs}");
+    MakePanel(frame_ind,c3->cd(),0,-0.05,9,0.45,bottomMargin,xaxis,"v_{2}^{obs}");
+    MakePanel(frame_ind,c4->cd(),0,-0.05,9,0.75,bottomMargin,xaxis,"v_{2}^{obs}");
+    MakePanel(frame_ind,c5->cd(),0,-0.05,9,1.25,bottomMargin,xaxis,"v_{2}^{bkg}");
+    MakePanel(frame_ind,c6->cd(),0,-0.05,9,0.45,bottomMargin,xaxis,"v_{2}^{bkg}");
+    MakePanel(frame_ind,c7->cd(),0,-0.05,9,0.75,bottomMargin,xaxis,"v_{2}^{bkg}");
+    TLegend* leg_obs_1 = MakeTLegend(0.15,0.65,0.27,0.8);
+    TLegend* leg_obs_3 = MakeTLegend(0.15,0.65,0.27,0.8);
+    TLegend* leg_obs_4 = MakeTLegend(0.15,0.65,0.27,0.8);
+    TLegend* leg_bkg_5 = MakeTLegend(0.15,0.65,0.27,0.8);
+    TLegend* leg_bkg_6 = MakeTLegend(0.15,0.65,0.27,0.8);
+    TLegend* leg_bkg_7 = MakeTLegend(0.15,0.65,0.27,0.8);
 
+    //Make v2obs,bkg overlays
     for(int k=0; k<4; k++)
     {
         if(k==0)
@@ -1683,16 +1707,16 @@ void Rap_v2obsbkg()
         }
         for(int j=0; j<3; j++)
         {
-            coll_label = "CMS pPb #sqrt{S_{NN}} = 8.16 TeV";
-
-            if(j==0) 
+            if(j==0)
             {
-                mult_label = "0 #leq N_{trk}^{offline} < 20";
+                mult_label = MB_ntrk_35;
+                coll_label = "CMS pPb #sqrt{S_{NN}} = 8.16 TeV";
                 coll_name = "MB";
             }
-            if(j==1) 
+            if(j==1)
             {
-                mult_label = "185 #leq N_{trk}^{offline} < 250";
+                mult_label = HM_ntrk;
+                coll_label = "CMS pPb #sqrt{S_{NN}} = 8.16 TeV";
                 coll_name = "pPb";
             }
             if(j==2)
@@ -1703,7 +1727,6 @@ void Rap_v2obsbkg()
             }
 
             // draw the frame using a histogram frame
-            TH1F* frame_ind;
 
             c1->cd();
             TH1F* frame;
@@ -1712,69 +1735,157 @@ void Rap_v2obsbkg()
 
             for(int i=0; i<2; i++)
             {
-                if(k==3 && j ==0) break; //skip Omega MB
-                if(i==0)
+                if(i==0)//obs
                 {
                     v2 = (TGraphErrors*)f[j]->Get(PID_obs_v2.c_str());
-                    yaxis = "v_{2}^{obs}";
-                    MakePanel(frame_ind,c1->cd(),0,-0.05,9,yMax[j],bottomMargin,xaxis,yaxis);
+                    SetTGattributes(v2,color,mstyle,1.5);
+                    if(j==0)
+                    {
+                        c1->cd();
+                        leg_obs_1->AddEntry(v2, PID_leg_label.c_str(), "P");
+                        if(k==0)
+                        {
+                            tex->SetTextFont(62);
+                            tex->DrawLatex(0.15,0.81,coll_label.c_str());
+                            tex->SetTextSize(0.045);
+                            tex->SetTextFont(42);
+                            tex->DrawLatex(0.35,0.75,mult_label.c_str());
+                        }
+                    }
+                    if(j==1)
+                    {
+                        c3->cd();
+                        leg_obs_3->AddEntry(v2, PID_leg_label.c_str(), "P");
+                        if(k==0)
+                        {
+                            tex->SetTextFont(62);
+                            tex->DrawLatex(0.15,0.81,coll_label.c_str());
+                            tex->SetTextSize(0.045);
+                            tex->SetTextFont(42);
+                            tex->DrawLatex(0.35,0.75,mult_label.c_str());
+                        }
+                    }
+                    if(j==2)
+                    {
+                        c4->cd();
+                        leg_obs_4->AddEntry(v2, PID_leg_label.c_str(), "P");
+                        if(k==0)
+                        {
+                            tex->SetTextFont(62);
+                            tex->DrawLatex(0.15,0.81,coll_label.c_str());
+                            tex->SetTextSize(0.045);
+                            tex->SetTextFont(42);
+                            tex->DrawLatex(0.35,0.75,mult_label.c_str());
+                        }
+                    }
+                    v2->Draw("P");
+
                 }
-                else
+                else//bkg
                 {
                     v2 = (TGraphErrors*)f[j]->Get(PID_bkg_v2.c_str());
-                    yaxis = "v_{2}^{bkg}";
-                    MakePanel(frame_ind,c1->cd(),0,-0.05,9,yMax[j],bottomMargin,xaxis,yaxis);
-
-                    tex->SetTextFont(62);
-                    tex->DrawLatex(0.15,0.88,coll_label.c_str());
-                    tex->SetTextSize(0.045);
-                    tex->SetTextFont(42);
-                    tex->DrawLatex(0.317518,0.805263,mult_label.c_str());
-                    c1->cd();
+                    if(k!=3)
+                        SetTGattributes(v2,color,mstyle,1.5);
+                    else
+                        SetTGattributes(v2,color,mstyle,1.5);
+                    if(j==0)
+                    {
+                        c5->cd();
+                        leg_bkg_5->AddEntry(v2, PID_leg_label.c_str(),"P");
+                        if(k==0)
+                        {
+                            tex->SetTextFont(62);
+                            tex->DrawLatex(0.15,0.81,coll_label.c_str());
+                            tex->SetTextSize(0.045);
+                            tex->SetTextFont(42);
+                            tex->DrawLatex(0.35,0.75,mult_label.c_str());
+                        }
+                    }
+                    if(j==1)
+                    {
+                        c6->cd();
+                        leg_bkg_6->AddEntry(v2, PID_leg_label.c_str(),"P");
+                        if(k==0)
+                        {
+                            tex->SetTextFont(62);
+                            tex->DrawLatex(0.15,0.81,coll_label.c_str());
+                            tex->SetTextSize(0.045);
+                            tex->SetTextFont(42);
+                            tex->DrawLatex(0.35,0.75,mult_label.c_str());
+                        }
+                    }
+                    if(j==2)
+                    {
+                        c7->cd();
+                        leg_bkg_7->AddEntry(v2, PID_leg_label.c_str(),"P");
+                        if(k==0)
+                        {
+                            tex->SetTextFont(62);
+                            tex->DrawLatex(0.15,0.81,coll_label.c_str());
+                            tex->SetTextSize(0.045);
+                            tex->SetTextFont(42);
+                            tex->DrawLatex(0.35,0.75,mult_label.c_str());
+                        }
+                    }
+                    v2->Draw("P");
                 }
 
-                SetTGattributes(v2,color,mstyle,1.5);
-                // draw the frame using a histogram frame
-                TLegend* leg = MakeTLegend(0.15,0.65,0.27,0.8);
-                v2->Draw("P");
-                leg->AddEntry(v2, PID_leg_label.c_str(), "P");
-                leg->Draw();
-
-                if(i==0)
-                    c1->Print(("Image/Rap_v2obsbkg/v2ObsRapidity_" + PID_name + "_" + coll_name + ".pdf").c_str());
-                if(i==1)
-                    c1->Print(("Image/Rap_v2obsbkg/v2BkgRapidity_" + PID_name + "_" + coll_name + ".pdf").c_str());
+                TGraphErrors* v2_c = (TGraphErrors*)v2->Clone(Form("v2_c%d",(i+1)*(j+1)*(k+2)));
 
                 c2->cd();
+
+                    tex->SetTextFont(62);
+                    tex->DrawLatex(0.15,0.81,coll_label.c_str());
+                    tex->SetTextSize(0.045);
+                    tex->SetTextFont(42);
+                    tex->DrawLatex(0.35,0.75,mult_label.c_str());
                 if(i==1)
                 {
                     if(k!=3)
-                        v2->SetMarkerStyle(mstyle+4);
+                        v2_c->SetMarkerStyle(mstyle+4);
                     else
-                        v2->SetMarkerStyle(mstyle+1); //since hollow star is next to solid star
+                        v2_c->SetMarkerStyle(mstyle+1); //since hollow star is next to solid star
                 }
-                v2->Draw("P");
+                v2_c->Draw("P");
 
                 if(i==0)
                 {
-                    leg_co_spec->AddEntry(v2,(PID_leg_label + "Obs").c_str(),"P");
+                    leg_co_spec->AddEntry(v2_c,(PID_leg_label + "Obs").c_str(),"P");
                     tex->SetTextFont(62);
-                    tex->DrawLatex(0.15,0.88,coll_label.c_str());
+                    tex->DrawLatex(0.15,0.81,coll_label.c_str());
                     tex->SetTextSize(0.045);
                     tex->SetTextFont(42);
-                    tex->DrawLatex(0.317518,0.805263,mult_label.c_str());
+                    tex->DrawLatex(0.35,0.75,mult_label.c_str());
                 }
                 else
                 {
-                    leg_co_spec->AddEntry(v2,(PID_leg_label + "Bkg").c_str(),"P");
+                    leg_co_spec->AddEntry(v2_c,(PID_leg_label + "Bkg").c_str(),"P");
                     leg_co_spec->Draw();
                 }
-                c1->cd();
             }
 
             c2->Print(("Image/Rap_v2obsbkg/v2ObsBkgRapidity_" + PID_name + "_" + coll_name + ".pdf").c_str());
         }
     }
+    c1->cd();
+    leg_obs_1->Draw();
+    c1->Print("Image/Rap_v2obsbkg/v2ObsRapidity_MB.pdf");
+    c3->cd();
+    leg_obs_3->Draw();
+    c3->Print("Image/Rap_v2obsbkg/v2ObsRapidity_pPb.pdf");
+    c4->cd();
+    leg_obs_4->Draw();
+    c4->Print("Image/Rap_v2obsbkg/v2ObsRapidity_PbPb.pdf");
+    c5->cd();
+    leg_bkg_5->Draw();
+    c5->Print("Image/Rap_v2obsbkg/v2BkgRapidity_MB.pdf");
+    c6->cd();
+    leg_bkg_6->Draw();
+    c6->Print("Image/Rap_v2obsbkg/v2BkgRapidity_pPb.pdf");
+    c7->cd();
+    leg_bkg_7->Draw();
+    c7->Print("Image/Rap_v2obsbkg/v2BkgRapidity_PbPb.pdf");
+
 }
 void Rap_fsig_pPb()
 {
@@ -1901,7 +2012,7 @@ void Rap_fsig_pPb_MB()
 {
     MITStyle();
 
-    TFile* f = new TFile("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0Casv2LowMult.root");
+    TFile* f = new TFile("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityMB_AllStrange_0_35_EtaGap1_12_05_17.root");
     TGraphErrors* v2xi     = (TGraphErrors*)f->Get("v2xi");
     TGraphErrors* v2kshort = (TGraphErrors*)f->Get("v2kshort");
     TGraphErrors* v2lambda = (TGraphErrors*)f->Get("v2lambda");
@@ -1911,6 +2022,10 @@ void Rap_fsig_pPb_MB()
     std::vector<double> fsig_Xi8  = {0.97628, 0.981452, 0.982508, 0.9811, 0.982897, 0.983982, 0.990178, 0.984512, 0.956478};
     double* pTXi8  = v2xi->GetX();
     const int xi_npoints = fsig_Xi8.size();
+
+    std::vector<double> fsig_Om8  = {0.896448 ,0.941455 ,0.956581 ,0.966235 ,0.978242};
+    double* pTOm8  = v2omega->GetX();
+    const int om_npoints = fsig_Om8.size();
 
     //std::vector<double> fsig_Om8 = {0.721825, 0.807658, 0.861617, 0.908762, 0.937818, 0.970699, 0.966515, 0.96482};
     //double* pTOm8 = v2omega->GetX();
@@ -1927,29 +2042,14 @@ void Rap_fsig_pPb_MB()
     // Pull TGraph for Kshort and lambda
 
     TGraphErrors* xi8_fsig_ = new TGraphErrors(xi_npoints,pTXi8,&fsig_Xi8[0],0,0);
-    //TGraphErrors* om8_fsig_ = new TGraphErrors(om_npoints,pTOm8,&fsig_Om8[0],0,0);
+    TGraphErrors* om8_fsig_ = new TGraphErrors(om_npoints,pTOm8,&fsig_Om8[0],0,0);
     TGraphErrors* ks8_fsig_ = new TGraphErrors(ks_npoints,pTKs8,&fsig_Ks8[0],0,0);
 	TGraphErrors* la8_fsig_ = new TGraphErrors(la_npoints,pTLa8,&fsig_La8[0],0,0);
 
-    ks8_fsig_->SetMarkerColor(kRed);
-    ks8_fsig_->SetMarkerStyle(20);
-    ks8_fsig_->SetMarkerSize(1.5);
-    ks8_fsig_->SetLineColor(kRed);
-
-    xi8_fsig_->SetMarkerColor(kGreen+2);
-    xi8_fsig_->SetMarkerStyle(21);
-    xi8_fsig_->SetMarkerSize(1.5);
-    xi8_fsig_->SetLineColor(kGreen+2);
-
-    //om8_fsig_->SetMarkerColor(kMagenta);
-    //om8_fsig_->SetMarkerStyle(29);
-    //om8_fsig_->SetMarkerSize(1.5);
-    //om8_fsig_->SetLineColor(kMagenta);
-
-    la8_fsig_->SetMarkerColor(kBlue-4);
-    la8_fsig_->SetMarkerStyle(22);
-    la8_fsig_->SetMarkerSize(1.5);
-    la8_fsig_->SetLineColor(kBlue-4);
+    SetTGattributes(ks8_fsig_,kRed,20,1.5);
+    SetTGattributes(la8_fsig_,kBlue,22,1.5);
+    SetTGattributes(xi8_fsig_,kGreen+2,21,1.5);
+    SetTGattributes(om8_fsig_,kMagenta,29,1.5);
 
     TCanvas* c1 = MakeCanvas("c1", "Plot");
     c1->cd();
@@ -1958,24 +2058,14 @@ void Rap_fsig_pPb_MB()
 
     // draw the frame using a histogram frame
 
-    TH1F* frame = c1->DrawFrame(0,0.90,9,1.1);
-    /*TH1F* frame = c1->DrawFrame(0,0.01,20,1);*/
-    gPad->SetTickx();
-    gPad->SetTicky();
-    frame->GetXaxis()->CenterTitle(1);
-    frame->GetYaxis()->CenterTitle(1);
-    frame->GetXaxis()->SetTitleSize(0.05);
-    frame->GetXaxis()->SetTitle("p_{T} (GeV)");
-    frame->GetYaxis()->SetTitle("f_{sig}");
-    frame->GetYaxis()->SetTitleSize(0.05);
-    frame->SetTitleOffset(1.1,"Y");
-    frame->SetTitleOffset(1.2,"X");
+    TH1F* frame;
+    MakePanel(frame,c1->cd(),0,0.85,9,1.1,0.12,"p_{T} (GeV)","f_{sig}");
 
     //ha_fsig_->Draw("PESAME");
     ks8_fsig_->Draw("P");
     la8_fsig_->Draw("P");
     xi8_fsig_->Draw("P");
-    //om8_fsig_->Draw("P");
+    om8_fsig_->Draw("P");
 
     // Write points into rootfile
     TFile out("8TeVfsig_GraphpPb185-250.root","RECREATE");
@@ -1984,17 +2074,11 @@ void Rap_fsig_pPb_MB()
     xi8_fsig_->Write("cascadefsig");
     //om8_fsig_->Write("omegafsig");
 
-    TLegend* leg = new TLegend(0.70,0.65,0.90,0.85);
-    leg->SetFillColor(10);
-    leg->SetFillStyle(0);
-    leg->SetBorderSize(0);
-    leg->SetTextFont(42);
-    leg->SetTextSize(0.05);
-    //leg->AddEntry(ha_v2, "h#kern[-0.3]{#lower[0.2]{{}^{#pm}}}", "P");
+    TLegend* leg = MakeTLegend(0.70,0.65,0.90,0.85);
     leg->AddEntry(ks8_fsig_, "K_{S}^{0}", "P");
     leg->AddEntry(la8_fsig_, "#Lambda / #bar{#Lambda}", "P");
     leg->AddEntry(xi8_fsig_, "#Xi^{#pm}", "P");
-    //leg->AddEntry(om8_fsig_, "#Omega^{#pm}", "P");
+    leg->AddEntry(om8_fsig_, "#Omega^{#pm}", "P");
     leg->Draw();
 
     TLatex *tex = new TLatex();
@@ -2013,8 +2097,7 @@ void Rap_fsig_pPb_MB()
     line->SetLineStyle(2);
     line->Draw("same");
 
-    c1->Print("fsig_Rapidity_MB.pdf");
-
+    c1->Print("Image/Rap_fsig_pPb_MB/fsig_Rapidity_MB.pdf");
 }
 
 void Rap_fsig_PbPb()
@@ -2154,7 +2237,7 @@ void Rap_perisub()
 
     TCanvas* c4 = new TCanvas("c4","Combined", 1200,900);
     c4->SetLeftMargin(0.12);
-    c4->Divide(2,2);
+    c4->Divide(2,3);
 
     TCanvas* c5 = MakeCanvas("c5", "Plot");
     c5->SetLeftMargin(0.12);
@@ -2172,6 +2255,7 @@ void Rap_perisub()
     TH1F* frame4_2;
     TH1F* frame4_3;
     TH1F* frame4_4;
+    TH1F* frame4_5;
     TH1F* frame5;
     TH1F* frame6;
 
@@ -2200,7 +2284,8 @@ void Rap_perisub()
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubXiFake.root");
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubXiHighNoNorm.root");
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubXiFixedPartialStats.root");
-    TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubNormal.root");
+    //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_EG1_0_35_CorrectRef_12_04_17.root");
+    TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_AllStrange_EG1_0_35_CorrectRef_CorrectGap_12_05_17.root");
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_FullXiHM.root");
     TFile* file_pidv2_FixedWindow = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubFixedWindow.root");
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubFixedWindow.root");
@@ -2219,6 +2304,8 @@ void Rap_perisub()
     TGraphErrors* xi8_v2     = (TGraphErrors*)file_pidv2->Get("xiv2true");
     TGraphErrors* xi8_v2sub  = (TGraphErrors*)file_pidv2->Get("xiv2truesub");
     TGraphErrors* xi8_v2Dsub = (TGraphErrors*)file_pidv2->Get("xiv2trueDirectSub");
+    TGraphErrors* om8_v2     = (TGraphErrors*)file_pidv2->Get("omv2true");
+    TGraphErrors* om8_v2sub  = (TGraphErrors*)file_pidv2->Get("omv2truesub");
 
     TGraphErrors* ks8_v2_fw     = (TGraphErrors*)file_pidv2_FixedWindow->Get("kshortv2true");
     TGraphErrors* ks8_v2sub_fw  = (TGraphErrors*)file_pidv2_FixedWindow->Get("kshortv2truesub");
@@ -2257,6 +2344,8 @@ void Rap_perisub()
     TGraphErrors* xi8_v2kn      = (TGraphErrors*)file_pidv2->Get("xiv2true_KET");
     TGraphErrors* xi8_v2kn_sub  = (TGraphErrors*)file_pidv2->Get("xiv2truesub_KET");
     TGraphErrors* xi8_v2kn_Dsub = (TGraphErrors*)file_pidv2->Get("xiv2trueDirectSub_KET");
+    TGraphErrors* om8_v2kn      = (TGraphErrors*)file_pidv2->Get("omv2true_KET");
+    TGraphErrors* om8_v2kn_sub  = (TGraphErrors*)file_pidv2->Get("omv2truesub_KET");
 
     TGraphErrors* ks8_v2kn_fw      = (TGraphErrors*)file_pidv2_FixedWindow->Get("kshortv2true_KET");
     TGraphErrors* ks8_v2kn_sub_fw  = (TGraphErrors*)file_pidv2_FixedWindow->Get("kshortv2truesub_KET");
@@ -2312,6 +2401,10 @@ void Rap_perisub()
     SetTGattributes(xi8_v2kn      , kGreen-2 , 20 , 1.5);
     SetTGattributes(xi8_v2kn_sub  , kGreen-2 , 24 , 1.5);
     SetTGattributes(xi8_v2kn_Dsub , kGreen-2 , 29 , 1.5);
+    SetTGattributes(om8_v2        , kMagenta , 20 , 1.5);
+    SetTGattributes(om8_v2sub     , kMagenta , 24 , 1.5);
+    SetTGattributes(om8_v2kn      , kMagenta , 20 , 1.5);
+    SetTGattributes(om8_v2kn_sub  , kMagenta , 24 , 1.5);
 
     SetTGattributes(ks8_v2_fw       , kRed     , 24 , 1.5);
     SetTGattributes(ks8_v2sub_fw    , kRed     , 30 , 1.5);
@@ -2624,7 +2717,7 @@ void Rap_perisub()
     //xi8_v2Dsub->Draw("P");
     xi8_v2sub_fw->Draw("P");
 
-    frame4_4 = c4->cd(4)->DrawFrame(0,0.8,9,1.5);
+    frame4_4 = c4->cd(4)->DrawFrame(0,-0.01,9,0.3);
     gPad->SetTickx();
     gPad->SetTicky();
     frame4_4->GetXaxis()->CenterTitle(1);
@@ -2634,7 +2727,31 @@ void Rap_perisub()
     frame4_4->SetTitleOffset(1.1,"Y");
     frame4_4->SetTitleOffset(1.2,"X");
     frame4_4->GetXaxis()->SetTitle("p_{T} (GeV)");
-    frame4_4->GetYaxis()->SetTitle("v_{2}^{sig,Fixed}/ v_{2}^{sig,Default}");
+    frame4_4->GetYaxis()->SetTitle("v_{2}^{sig}");
+
+    TLegend* leg4_4 = new TLegend(0.20,0.65,0.34,0.90);
+    leg4_4->SetFillColor(10);
+    leg4_4->SetFillStyle(0);
+    leg4_4->SetBorderSize(0);
+    leg4_4->SetTextFont(42);
+    leg4_4->SetTextSize(0.04);
+    leg4_4->AddEntry(om8_v2, "#Omega^{-}", "P");
+    leg4_4->AddEntry(om8_v2sub, "#Omega^{-} Sub", "P");
+    leg4_4->Draw();
+    om8_v2->Draw("P");
+    om8_v2sub->Draw("P");
+
+    frame4_5 = c4->cd(5)->DrawFrame(0,0.8,9,1.5);
+    gPad->SetTickx();
+    gPad->SetTicky();
+    frame4_5->GetXaxis()->CenterTitle(1);
+    frame4_5->GetYaxis()->CenterTitle(1);
+    frame4_5->GetXaxis()->SetTitleSize(0.05);
+    frame4_5->GetYaxis()->SetTitleSize(0.05);
+    frame4_5->SetTitleOffset(1.1,"Y");
+    frame4_5->SetTitleOffset(1.2,"X");
+    frame4_5->GetXaxis()->SetTitle("p_{T} (GeV)");
+    frame4_5->GetYaxis()->SetTitle("v_{2}^{sig,Fixed}/ v_{2}^{sig,Default}");
 
     legr->Draw();
 
@@ -2705,10 +2822,12 @@ void Rap_perisub()
     TGraphErrors* ks8_v2sub_co = (TGraphErrors*)ks8_v2sub->Clone();
     TGraphErrors* la8_v2sub_co = (TGraphErrors*)la8_v2sub->Clone();
     TGraphErrors* xi8_v2sub_co = (TGraphErrors*)xi8_v2sub->Clone();
+    TGraphErrors* om8_v2sub_co = (TGraphErrors*)om8_v2sub->Clone();
 
     ks8_v2sub_co->SetMarkerStyle(20);
     la8_v2sub_co->SetMarkerStyle(22);
     xi8_v2sub_co->SetMarkerStyle(21);
+    om8_v2sub_co->SetMarkerStyle(29);
 
     TLegend* leg6 = new TLegend(0.16,0.6,0.3,0.86);
     leg6->SetFillColor(10);
@@ -2719,17 +2838,19 @@ void Rap_perisub()
     leg6->AddEntry(ks8_v2sub_co, "K_{S}^{0} Sub", "P");
     leg6->AddEntry(la8_v2sub_co, "#Lambda / #bar{#Lambda} Sub", "P");
     leg6->AddEntry(xi8_v2sub_co, "Xi^{-} Sub", "P");
+    leg6->AddEntry(om8_v2sub_co, "Xi^{-} Sub", "P");
     leg6->Draw();
     ks8_v2sub_co->Draw("P");
     la8_v2sub_co->Draw("P");
     xi8_v2sub_co->Draw("P");
+    om8_v2sub_co->Draw("P");
 
     c5->Print("v2SigRapiditySubtracted.pdf");
     c5->Print("v2SigRapiditySubtracted.png");
 
     TH1F* frame7;
     c6->cd();
-    frame7 = c6->DrawFrame(0,-0.01,5,0.3);
+    frame7 = c6->DrawFrame(0,-0.01,5,0.15);
     gPad->SetTickx();
     gPad->SetTicky();
     frame7->GetXaxis()->CenterTitle(1);
@@ -2745,32 +2866,51 @@ void Rap_perisub()
     TGraphErrors* ks8_v2knq_sub = new TGraphErrors(ks8_v2kn_sub->GetN());
     TGraphErrors* la8_v2knq_sub = new TGraphErrors(la8_v2kn_sub->GetN());
     TGraphErrors* xi8_v2knq_sub = new TGraphErrors(xi8_v2kn_sub->GetN());
+    TGraphErrors* om8_v2knq_sub = new TGraphErrors(om8_v2kn_sub->GetN());
 
     cout << "1" << endl;
 
     for(int i=0; i<ks8_v2kn_sub->GetN(); i++)
     {
         double x,y;
+        double yerr;
         ks8_v2kn_sub->GetPoint(i,x,y);
-        cout << i << endl;
+        yerr = ks8_v2kn_sub->GetErrorY(i);
         ks8_v2knq_sub->SetPoint(i,x/2,y/2);
+        ks8_v2knq_sub->SetPointError(i,0,yerr);
     }
     for(int i=0; i<la8_v2kn_sub->GetN(); i++)
     {
         double x,y;
+        double yerr;
+        yerr = la8_v2kn_sub->GetErrorY(i);
         la8_v2kn_sub->GetPoint(i,x,y);
         la8_v2knq_sub->SetPoint(i,x/3,y/3);
+        la8_v2knq_sub->SetPointError(i,0,yerr);
     }
     for(int i=0; i<xi8_v2kn_sub->GetN(); i++)
     {
         double x,y;
+        double yerr;
+        yerr = xi8_v2kn_sub->GetErrorY(i);
         xi8_v2kn_sub->GetPoint(i,x,y);
         xi8_v2knq_sub->SetPoint(i,x/3,y/3);
+        xi8_v2knq_sub->SetPointError(i,0,yerr);
+    }
+    for(int i=0; i<om8_v2kn_sub->GetN(); i++)
+    {
+        double x,y;
+        double yerr;
+        yerr = om8_v2kn_sub->GetErrorY(i);
+        om8_v2kn_sub->GetPoint(i,x,y);
+        om8_v2knq_sub->SetPoint(i,x/3,y/3);
+        om8_v2knq_sub->SetPointError(i,0,yerr);
     }
 
     SetTGattributes(ks8_v2knq_sub,kRed,20,1.5);
     SetTGattributes(la8_v2knq_sub,kBlue,22,1.5);
     SetTGattributes(xi8_v2knq_sub,kGreen-2,21,1.5);
+    SetTGattributes(om8_v2knq_sub,kMagenta,29,1.5);
 
     TLegend* leg7 = new TLegend(0.16,0.6,0.3,0.86);
     leg7->SetFillColor(10);
@@ -2780,11 +2920,13 @@ void Rap_perisub()
     leg7->SetTextSize(0.04);
     leg7->AddEntry(ks8_v2knq_sub, "K_{S}^{0} Sub", "P");
     leg7->AddEntry(la8_v2knq_sub, "#Lambda / #bar{#Lambda} Sub", "P");
-    leg7->AddEntry(xi8_v2knq_sub, "Xi^{-} Sub", "P");
+    leg7->AddEntry(xi8_v2knq_sub, "#Xi^{#pm} Sub", "P");
+    leg7->AddEntry(om8_v2knq_sub, "#Omega^{#pm} Sub", "P");
     leg7->Draw();
     ks8_v2knq_sub->Draw("P");
     la8_v2knq_sub->Draw("P");
     xi8_v2knq_sub->Draw("P");
+    om8_v2knq_sub->Draw("P");
 
     c6->Print("v2SigRapiditySubtractedNQS.pdf");
     c6->Print("v2SigRapiditySubtractedNQS.png");
@@ -2792,9 +2934,15 @@ void Rap_perisub()
 }
 void RapSys_perisub()
 {
+    TLatex* tex = new TLatex();
+    tex->SetNDC();
+    tex->SetTextFont(42);
+    tex->SetTextSize(0.042);
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubEG1.root");
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubXiFixedPartialStats.root");
+    //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_EG1.root");
     TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_EG1.root");
+    TFile* file_pidv2_0_35 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_AllStrange_EG1_0_35_CorrectRef_CorrectGap_12_05_17.root");
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_EG2.root");
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubFixedWindow.root");
 
@@ -3782,6 +3930,91 @@ void RapSys_perisub()
     Nassociated       ->Print("Image/RapSys_perisub/N_associated_AN_EG1.pdf");
     yieldhigh_yieldlow->Print("Image/RapSys_perisub/Yield_ratio_AN_EG1.pdf");
     Yield_c           ->Print("Image/RapSys_perisub/Yield_AN_EG1.pdf");
+
+    //Compare 0-20 to 0-35
+    TGraphErrors* ks8_v2_20 = (TGraphErrors*)file_pidv2->Get("kshortv2truesub");
+    TGraphErrors* ks8_v2_35 = (TGraphErrors*)file_pidv2_0_35->Get("kshortv2truesub");
+    TGraphErrors* la8_v2_20 = (TGraphErrors*)file_pidv2->Get("lambdav2truesub");
+    TGraphErrors* la8_v2_35 = (TGraphErrors*)file_pidv2_0_35->Get("lambdav2truesub");
+    TGraphErrors* xi8_v2_20 = (TGraphErrors*)file_pidv2->Get("xiv2truesub");
+    TGraphErrors* xi8_v2_35 = (TGraphErrors*)file_pidv2_0_35->Get("xiv2truesub");
+
+    SetTGattributes(ks8_v2_20,kRed,24,1.5);
+    SetTGattributes(ks8_v2_35,kRed,20,1.5);
+    SetTGattributes(la8_v2_20,kBlue,26,1.5);
+    SetTGattributes(la8_v2_35,kBlue,22,1.5);
+    SetTGattributes(xi8_v2_20,kGreen-2,25,1.5);
+    SetTGattributes(xi8_v2_35,kGreen-2,21,1.5);
+
+    TCanvas* c_20_v_35 = new TCanvas("c_20_v_35","c_20_v_35",600,600);
+
+    TH1F* frame_20_v_35;
+
+    TPad* pad1 = new TPad("pad1","top pad", 0.0,0.3,1.0,1.0);
+    TPad* pad2 = new TPad("pad2","bottom pad", 0.0,0.0,1.0,0.3);
+
+    pad1->SetTopMargin(0.1);
+    pad1->SetBottomMargin(0.0);
+    pad1->SetRightMargin(0.038);
+    pad1->SetLeftMargin(0.12);
+    pad1->Draw();
+
+    pad2->SetFrameFillStyle(4000);
+    pad2->SetTopMargin(0.0);
+    pad2->SetBottomMargin(0.2);
+    pad2->SetRightMargin(0.038);
+    pad2->SetLeftMargin(0.12);
+    pad2->Draw();
+
+
+    MakePanelPad(frame_20_v_35,pad1->cd(),0.0,-0.01,9.0,0.29,"p_{T} (GeV)","v_{2}^{sub}");
+    TLegend* leg_20_v_35_0 = MakeTLegend(0.19,0.6,0.29,0.75);
+    TLegend* leg_20_v_35_1 = MakeTLegend(0.32,0.6,0.42,0.75);
+    leg_20_v_35_0->AddEntry(ks8_v2_20,PKzS.c_str(),"P");
+    leg_20_v_35_0->AddEntry(la8_v2_20,PgL_PagL.c_str(),"P");
+    leg_20_v_35_0->AddEntry(xi8_v2_20,PgXm.c_str(),"P");
+    leg_20_v_35_1->AddEntry(ks8_v2_35,PKzS.c_str(),"P");
+    leg_20_v_35_1->AddEntry(la8_v2_35,PgL_PagL.c_str(),"P");
+    leg_20_v_35_1->AddEntry(xi8_v2_35,PgXm.c_str(),"P");
+    leg_20_v_35_0->Draw();
+    leg_20_v_35_1->Draw();
+    ks8_v2_35->Draw("P");
+    ks8_v2_20->Draw("P");
+    la8_v2_35->Draw("P");
+    la8_v2_20->Draw("P");
+    xi8_v2_35->Draw("P");
+    xi8_v2_20->Draw("P");
+    TLine* line_35 = new TLine(0.0,0.0,9.0,0.0);
+    line_35->SetLineWidth(2);
+    line_35->SetLineStyle(8);
+    line_35->Draw();
+
+    tex->DrawLatex(0.17,0.83,HM_ntrk.c_str());
+    tex->DrawLatex(0.17,0.76,"Sub 0-20");
+    tex->DrawLatex(0.31,0.76,"Sub 0-35");
+    tex->DrawLatex(0.55,0.83,"|y| < 1");
+    tex->DrawLatex(0.75,0.91,"pPb 8.16 TeV");
+
+    MakePanelPad(frame_20_v_35,pad2->cd(),0.0,0.1,9.0,2.09,"p_{T} (GeV)","ratio",0.07,0.07,0.08,0.08,0.7);
+    TLegend* leg_ratio_35 = MakeTLegend(0.17,0.70,0.28,0.95,42,0.07);
+    TGraphErrors* ks_ratio = TGDivideSameX(ks8_v2_35,ks8_v2_20);
+    TGraphErrors* la_ratio = TGDivideSameX(la8_v2_35,la8_v2_20);
+    TGraphErrors* xi_ratio = TGDivideSameX(xi8_v2_35,xi8_v2_20);
+    SetTGattributes(ks_ratio,kRed,20,1.2);
+    SetTGattributes(la_ratio,kBlue-4,22,1.2);
+    SetTGattributes(xi_ratio,kGreen-2,21,1.2);
+    leg_ratio_35->AddEntry(ks_ratio,PKzS.c_str(),"P");
+    leg_ratio_35->AddEntry(la_ratio,PgL_PagL.c_str(),"P");
+    leg_ratio_35->AddEntry(xi_ratio,PgXm.c_str(),"P");
+    ks_ratio->Draw("P");
+    la_ratio->Draw("P");
+    xi_ratio->Draw("P");
+    leg_ratio_35->Draw();
+    TLine* line_ratio_35 = new TLine(0.0,1.0,9.0,1.0);
+    line_ratio_35->SetLineStyle(2);
+    line_ratio_35->Draw();
+
+    c_20_v_35->Print("Image/RapSys_perisub/PeriSubComparison_20_v_35.pdf");
 }
 
 void RapSys_RecoCutsV0()
