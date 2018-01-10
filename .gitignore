@@ -11,4 +11,6 @@
 *.txt
 *.pcm
 *.py
+**/*Image
+*.zip
 tags
