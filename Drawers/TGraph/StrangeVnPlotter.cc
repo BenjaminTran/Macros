@@ -4716,32 +4716,8 @@ void RapSys_RecoCutsXi()
     c1_xi->Print("v2RecoSystematicsXi.pdf");
 
     //Calculate Ratios
-    std::vector<double> v2RatioLooseXi;
-    std::vector<double> v2RatioTightXi;
-
-    std::vector<double> v2ErrorRatioLooseXi;
-    std::vector<double> v2ErrorRatioTightXi;
-
-    //Xi
-    for(int i=0; i<xi_npoints; i++)
-    {
-        v2RatioLooseXi.push_back(v2loose_xi[i]/v2standard_xi[i]);
-        //v2ErrorRatioLooseXi.push_back(v2loose_xiE[i]/v2standard_xi[i]);
-        v2ErrorRatioLooseXi.push_back(sqrt(fabs(TMath::Power(v2loose_xiE[i],2) - TMath::Power(v2standard_xiE[i],2)))/v2standard_xi[i]);
-
-        v2RatioTightXi.push_back(v2tight_xi[i]/v2standard_xi[i]);
-        //v2ErrorRatioTightXi.push_back(v2tight_xiE[i]/v2standard_xi[i]);
-        v2ErrorRatioTightXi.push_back(sqrt(fabs(TMath::Power(v2tight_xiE[i],2) - TMath::Power(v2standard_xiE[i],2)))/v2standard_xi[i]);
-    }
-
-    double* av2RatioLooseXi = &v2RatioLooseXi[0];
-    double* av2RatioTightXi = &v2RatioTightXi[0];
-
-    double* av2ErrorRatioLooseXi = &v2ErrorRatioLooseXi[0];
-    double* av2ErrorRatioTightXi = &v2ErrorRatioTightXi[0];
-
-    TGraphErrors* Ratioloose_v2_xi = new TGraphErrors(xi_npoints,pTloose_xi,av2RatioLooseXi,0,av2ErrorRatioLooseXi);
-	TGraphErrors* Ratiotight_v2_xi = new TGraphErrors(xi_npoints,pTtight_xi,av2RatioTightXi,0,av2ErrorRatioTightXi);
+    TGraphErrors* Ratioloose_v2_xi = TGDivideSameXCorrErr(loose_v2_xi,standard_v2_xi);
+	TGraphErrors* Ratiotight_v2_xi = TGDivideSameXCorrErr(tight_v2_xi,standard_v2_xi);
     TGraphErrors* Ratioloose_v2_xi_ARC = TGDivideSameXCorrErr(loose_v2_xi_ARC,standard_v2_xi);
     TGraphErrors* Ratiotight_v2_xi_ARC = TGDivideSameXCorrErr(tight_v2_xi_ARC,standard_v2_xi);
 
