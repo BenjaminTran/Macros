@@ -98,9 +98,10 @@ void V0MassFitFromHist()
     //File Creation
     myfile.open("V0PeakParam.txt");
     TFile* file = 0;
+    //Get root files with mass distributions
     if(doPbPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/V0CasCorrelationPbPbTotal_10_30_17.root");
     else if(mc) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/All/MCMassPtTotal_08_23_2017.root");
-    else if(mb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/V0MB0_35_partial_11_28_17.root");
+    else if(mb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/V0MB_0_35_1_02_18.root");
     else if(pPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityCorrectMultB_09_19_17.root");
 
     if(mc)
@@ -113,7 +114,7 @@ void V0MassFitFromHist()
 
 
 
-    //Fit
+    //Do Fit and calculate values
     int pkscounter  = 0; //for correct bin counting
     int placounter  = 0;
     int hbincounter = 1;
@@ -166,7 +167,7 @@ void V0MassFitFromHist()
         RooRealVar sigma1("sigma1","sigma1",0.005,0.001,0.01);
         RooRealVar sigma2("sigma2","sigma2",0.005,0.0001,0.01);
         RooRealVar sig1("sig1","signal1",4e4,0,100000000);
-        RooRealVar sig2("sig2","signal2",4e4,0,100000000);
+        RooRealVar sig2("sig2","signal2",5e4,0,100000000);
         //RooRealVar sig1("sig1","signal1",1e4,0,100000000);
         //RooRealVar sig2("sig2","signal2",1e4,0,100000000);
         RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
@@ -647,6 +648,12 @@ void V0MassFitFromHist()
                 sig1.setVal(1e4);
                 sig2.setVal(1e4);
                 polysig.setVal(2.3e4);
+            }
+            if(i==10 && mb)
+            {
+                sig1.setVal(0.5e4);
+                sig2.setVal(0.5e4);
+                polysig.setVal(1.3e4);
             }
             if((i==8) && mc)
             {

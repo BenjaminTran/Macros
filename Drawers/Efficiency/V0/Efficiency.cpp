@@ -54,18 +54,17 @@ void Efficiency()
     std::ostringstream os;
     std::ostringstream osYield;
     std::ofstream myfile;
-    bool Xi = true;
 
     TH1D* massks;
     TH1D* massla;
-    TH1D* massxi;
+    //TH1D* massxi;
     //TH1D* massks_gen;
     //TH1D* massla_gen;
     //TH1D* massxi_gen;
 
     TCanvas* Composite_Ks[10];
     TCanvas* Composite_La[10];
-    TCanvas* Composite_Xi[8];
+    //TCanvas* Composite_Xi[8];
     //TCanvas* Composite_Ks_Gen[7];
     //TCanvas* Composite_La_Gen[7];
     //TCanvas* Composite_Xi_Gen[7];
@@ -102,8 +101,9 @@ void Efficiency()
     std::map<int,std::vector<double> > efficiency_la;
     std::map<int,std::vector<double> > efficiency_xi;
 
-    std::vector<double> pks = {0,5,6,7,8,9,11,13,15,17,19,22,25,28,31,34,37,40,44,50,60,70,100};
-    std::vector<double> pla = {0,8,11,14,17,20,23,26,29,32,36,40,44,48,52,56,64,80,100};
+    // The pt is given by the elements/10 e.g. for pks 0,5,6 translates to pt binning (0.0,0.5] , (0.5,0.6]
+    std::vector<double> pks = {0,5,6,7,8,9,11,13,15,17,19,22,25,28,31,34,37,40,44,50,60,70,100}; //Kshort binning
+    std::vector<double> pla = {0,8,11,14,17,20,23,26,29,32,36,40,44,48,52,56,64,80,100}; //Lambda binning
     std::vector<double> pxi = {10,13,15,17,19,21,23,25,27,29,32,34,37,40,44,60,100};
     std::vector<double> rap_bin_v0 = {2,6, 7,10, 11,14, 15,21};//, 19,21, 16,18, 19,21};
     std::vector<double> rap_bin_xi = {2,11, 12,21};//, 19,21, 16,18, 19,21};
@@ -130,13 +130,10 @@ void Efficiency()
         //Composite_La_Gen[i]->Divide(4,4);
     }
 
-    for(int i=0; i < pages_xi; i++){
-        Composite_Xi[i] = new TCanvas(Form("Composite_Xi_%d",i),Form("Composite_Xi_RapBin_%d",i),1000,1200);
-        Composite_Xi[i]->Divide(3,5);
-
-        //Composite_Xi_Gen[i] = new TCanvas(Form("Composite_Xi_Gen_%d",i),Form("Composite_Xi_Gen_RapBin_%d"),1000,1200);
-        //Composite_Xi_Gen[i]->Divide(4,4);
-    }
+    //for(int i=0; i < pages_xi; i++){
+        //Composite_Xi[i] = new TCanvas(Form("Composite_Xi_%d",i),Form("Composite_Xi_RapBin_%d",i),1000,1200);
+        //Composite_Xi[i]->Divide(3,5);
+    //}
 
     //File Creation
     myfile.open(FileName.c_str());
@@ -144,11 +141,11 @@ void Efficiency()
 
     TH3D* KsMassPtRap = (TH3D*)f1->Get("MassPtRapidityMC/KsMassPtRap");
     TH3D* LaMassPtRap = (TH3D*)f1->Get("MassPtRapidityMC/LaMassPtRap");
-    TH3D* XiMassPtRap = (TH3D*)f1->Get("MassPtRapidityMC/XiMassPtRap");
+    //TH3D* XiMassPtRap = (TH3D*)f1->Get("MassPtRapidityMC/XiMassPtRap");
 
     TH3D* KsMassPtRap_Gen = (TH3D*)f1->Get("MassPtRapidityMC/KsMassPtRap_Gen");
     TH3D* LaMassPtRap_Gen = (TH3D*)f1->Get("MassPtRapidityMC/LaMassPtRap_Gen");
-    TH3D* XiMassPtRap_Gen = (TH3D*)f1->Get("MassPtRapidityMC/XiMassPtRap_Gen");
+    //TH3D* XiMassPtRap_Gen = (TH3D*)f1->Get("MassPtRapidityMC/XiMassPtRap_Gen");
 
     //Fit
     int hcounter_ks = -1;
@@ -578,6 +575,7 @@ void Efficiency()
 
     }
 
+/*
     for(int j=0; j<numRapBins_xi*2; j+=2){
         for(int i=0; i<numXiBins; i++){
             cout << i << endl;
@@ -721,6 +719,7 @@ void Efficiency()
             index++;
         }
     }
+*/
 
     for(int j=0; j<numRapBins_v0; j++)
     {
@@ -728,10 +727,10 @@ void Efficiency()
         Composite_La[j]->Print(Form("RECOLaMassFitComposite_%d.pdf",j));
     }
 
-    for(int j=0; j<numRapBins_xi; j++)
-    {
-        Composite_Xi[j]->Print(Form("RECOXiMassFitComposite_%d.pdf",j));
-    }
+    //for(int j=0; j<numRapBins_xi; j++)
+    //{
+        //Composite_Xi[j]->Print(Form("RECOXiMassFitComposite_%d.pdf",j));
+    //}
 
 
     for(unsigned j=0; j<rap_bin_v0.size(); j+=2)
@@ -750,14 +749,14 @@ void Efficiency()
     //Composite_Ks_Gen->Print("Composite_Ks_Gen.pdf");
     //Composite_La_Gen->Print("Composite_La_Gen.pdf");
 
-    for(unsigned j=0; j<rap_bin_xi.size(); j+=2)
-    {
-        for(int i=0; i<numXiBins; i++)
-        {
-            TH1D* massxi_gen = (TH1D*)KsMassPtRap_Gen->ProjectionX(Form("massxi_gen_%d",(int)(j*pxi.size()+i)/2), pxi[i]+1,pxi[i+1],rap_bin_v0[j],rap_bin_v0[j+1]);
-            yield_xi_gen[j/2].push_back(massxi_gen->GetBinContent(massxi_gen->GetMaximumBin()));
-        }
-    }
+    //for(unsigned j=0; j<rap_bin_xi.size(); j+=2)
+    //{
+        //for(int i=0; i<numXiBins; i++)
+        //{
+            //TH1D* massxi_gen = (TH1D*)KsMassPtRap_Gen->ProjectionX(Form("massxi_gen_%d",(int)(j*pxi.size()+i)/2), pxi[i]+1,pxi[i+1],rap_bin_v0[j],rap_bin_v0[j+1]);
+            //yield_xi_gen[j/2].push_back(massxi_gen->GetBinContent(massxi_gen->GetMaximumBin()));
+        //}
+    //}
 
     //Calculate efficiency
     for(int j=0; j<numRapBins_v0; j++)
@@ -772,13 +771,13 @@ void Efficiency()
         }
     }
 
-    for(int j=0; j<numRapBins_xi; j++)
-    {
-        for(unsigned i=0; i<yield_xi_[j].size(); i++)
-        {
-            efficiency_xi[j].push_back(yield_xi_[j][i]/yield_xi_gen[j][i]);
-        }
-    }
+    //for(int j=0; j<numRapBins_xi; j++)
+    //{
+        //for(unsigned i=0; i<yield_xi_[j].size(); i++)
+        //{
+            //efficiency_xi[j].push_back(yield_xi_[j][i]/yield_xi_gen[j][i]);
+        //}
+    //}
 /*
 
     //Output
@@ -854,22 +853,22 @@ void Efficiency()
             myfile << efficiency_la[j][i] << "\n";
     }
 
-    myfile << "Efficiency Xi\n";
-    for(int j=0; j<numRapBins_xi; j++)
-    {
-        myfile << "Rap_bin " << j << "\n";
-        for(unsigned i=0; i<efficiency_xi[j].size(); i++)
-            myfile << efficiency_xi[j][i] << "\n";
-    }
+    //myfile << "Efficiency Xi\n";
+    //for(int j=0; j<numRapBins_xi; j++)
+    //{
+        //myfile << "Rap_bin " << j << "\n";
+        //for(unsigned i=0; i<efficiency_xi[j].size(); i++)
+            //myfile << efficiency_xi[j][i] << "\n";
+    //}
 
     const int rbinrap_v0 = 4;
-    const int rbinrap_xi = 2;
+    //const int rbinrap_xi = 2;
 
     double Rebin_ks[pks.size()];
     double Rebin_la[pla.size()];
-    double Rebin_xi[pxi.size()];
+    //double Rebin_xi[pxi.size()];
     double Rebin_rap_v0[] = {-1.0,-0.5,-0.1,0.3,1.0};
-    double Rebin_rap_xi[] = {-1.0,0,1.0};
+    //double Rebin_rap_xi[] = {-1.0,0,1.0};
 
     for(unsigned i=0; i<pks.size(); i++)
     {
@@ -883,16 +882,16 @@ void Efficiency()
         cout << Rebin_la[i] << ", ";
     }
     cout << endl;
-    for(unsigned i=0; i<pxi.size(); i++)
-    {
-        Rebin_xi[i] = pxi[i]/10;
-        cout << Rebin_xi[i] << ", ";
-    }
+    //for(unsigned i=0; i<pxi.size(); i++)
+    //{
+        //Rebin_xi[i] = pxi[i]/10;
+        //cout << Rebin_xi[i] << ", ";
+    //}
     cout << endl;
 
     TH2D* Effhisto_ks = new TH2D("EffHistoKs","EffHistoKs",rbinrap_v0,Rebin_rap_v0,numKsBins,Rebin_ks);
     TH2D* Effhisto_la = new TH2D("EffHistoLa","EffHistoLa",rbinrap_v0,Rebin_rap_v0,numLaBins,Rebin_la);
-    TH2D* Effhisto_xi = new TH2D("EffHistoXi","EffHistoXi",rbinrap_xi,Rebin_rap_xi,numXiBins,Rebin_xi);
+    //TH2D* Effhisto_xi = new TH2D("EffHistoXi","EffHistoXi",rbinrap_xi,Rebin_rap_xi,numXiBins,Rebin_xi);
 
     for(int j=0; j<numRapBins_v0; j++)
     {
@@ -906,11 +905,11 @@ void Efficiency()
             Effhisto_la->Fill(Rebin_rap_v0[j],Rebin_la[i]+0.01,efficiency_la[j][i]);
     }
 
-    for(int j=0; j<numRapBins_xi; j++)
-    {
-        for(unsigned i=0; i<efficiency_xi[j].size(); i++)
-            Effhisto_xi->Fill(Rebin_rap_xi[j],Rebin_xi[i]+0.01,efficiency_xi[j][i]);
-    }
+    //for(int j=0; j<numRapBins_xi; j++)
+    //{
+        //for(unsigned i=0; i<efficiency_xi[j].size(); i++)
+            //Effhisto_xi->Fill(Rebin_rap_xi[j],Rebin_xi[i]+0.01,efficiency_xi[j][i]);
+    //}
 
     TCanvas* Eff_v0 = new TCanvas("Eff_v0","",1200,800);
     Eff_v0->Divide(2,1);
@@ -924,15 +923,15 @@ void Efficiency()
     Effhisto_la->Write();
     histos_v0.Close();
 
-    TCanvas* Eff_xi = new TCanvas("Eff_xi","",800,800);
-    Eff_xi->cd(1);
-    Effhisto_xi->Draw("Lego2");
-    Eff_xi->cd(2);
-    Effhisto_xi->Draw("Lego2");
+    //TCanvas* Eff_xi = new TCanvas("Eff_xi","",800,800);
+    //Eff_xi->cd(1);
+    //Effhisto_xi->Draw("Lego2");
+    //Eff_xi->cd(2);
+    //Effhisto_xi->Draw("Lego2");
 
-    TFile histos_xi("EffhistoXi.root","RECREATE");
-    Effhisto_xi->Write();
-    histos_xi.Close();
+    //TFile histos_xi("EffhistoXi.root","RECREATE");
+    //Effhisto_xi->Write();
+    //histos_xi.Close();
 
     std::vector<double> eta_trg = {-0.9,-0.8,-0.4,-0.2,-0.1,0.2,0.5,0.9};
     std::vector<double> pt_trg = {0.1,1.2, 3.4, 4.0, 6.7, 8.6, 1.5, 2.0};
@@ -994,6 +993,7 @@ void Plotter()
 
     f->Close();
 
+    /*
     f = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/Efficiency/EffhistoXi.root");
 
     TH2D* effhistxi = (TH2D*)f->Get("EffHistoXi");
@@ -1014,4 +1014,5 @@ void Plotter()
     effhistxi->Draw("Lego2 FB");
 
     c2->Print("EffhistosXi.pdf");
+    */
 }

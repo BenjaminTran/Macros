@@ -14,220 +14,54 @@ using namespace std;
 
 struct ParticleData{
     //std::string fn = "V0v2perisubFixedWindow.root";
-    std::string fn = "V0v2perisub_Default_EG2_11_9_17.root";
+    std::string fn = "FitRootFiles/PeriSub/V0v2perisub_Default_AllStrange_EG1_0_35_CorrectRef_CorrectGap_FullStats_1_05_18.root";
+    //std::string fn = "FitRootFiles/PeriSub/V0v2perisub_Default_EG1_0_35_CorrectRef_InCorrectGap_12_05_17.root";
+    //std::string fn = "FitRootFiles/PeriSub/V0v2perisub_Default_EG1_60percXi_0_35_12_18_17.root";
+    //std::string fn = "FitRootFiles/PeriSub/V0v2perisub_Default_EG1_0_35_JetPeak1p64_12_17_17.root";
+    //std::string fn = "FitRootFiles/PeriSub/V0v2perisub_FixedWindow1p7_EG1_0_35_12_17_17.root";
+    //std::string fn = "FitRootFiles/PeriSub/V0v2perisub_FixedWindow1p2_EG1_0_35_12_17_17.root";
+    //std::string fn = "FitRootFiles/PeriSub/V0v2perisub_FixedWindow0p5_EG1_0_35_12_17_17.root";
+    //std::string fn = "JustForPrintingNassoc.root";
     std::string fn_V0 = "v0CorrelationRapidity";
     //std::string fn_Xi = "xiCorrelationRapidity";
     std::string fn_Xi = "v0CasCorrelationRapidity";
+    std::string fn_Om = "v0CasCorrelationRapidity";
     std::string fn_v0cas = "v0CasCorrelationRapidityPeriSub";
     std::vector<double> fsig_ks    = {0.989638 , 0.992109 , 0.992861 , 0.992984 , 0.992159 , 0.989499 , 0.986445 , 0.982275 , 0.976946 , 0.970546 , 0.964845 , 0.958563 , 0.969557};
-    std::vector<double> fsig_ks_MB = {0.999    , 0.999    , 0.995    , 0.996    , 0.995    , 0.992    , 0.990    , 0.987    , 0.983    , 0.980    , 0.976    , 0.965    , 0.965};
+    std::vector<double> fsig_ks_MB = {0.997    , 0.997    , 0.993    , 0.997    , 0.995    , 0.993    , 0.991    , 0.989    , 0.986    , 0.982    , 0.978    , 0.971    , 0.968};
     std::vector<double> fsig_la    = {0.908266 , 0.96779 , 0.979912 , 0.981899 , 0.982888 , 0.982854 , 0.980766 , 0.97569 , 0.97569 , 0.964048};
-    std::vector<double> fsig_la_MB = {0.990    , 0.995   , 0.995    , 0.999    , 0.992    , 0.989    , 0.985    , 0.998   , 0.998   , 0.995};
+    std::vector<double> fsig_la_MB = {0.996    , 0.994   , 0.995    , 0.994    , 0.992    , 0.990    , 0.987    , 0.981   , 0.973   , 0.963};
     std::vector<double> fsig_xi    = {0.959427 , 0.976239 , 0.979161 , 0.980678 , 0.980661 , 0.981534 , 0.981502 , 0.979289 , 0.979192};
-    std::vector<double> fsig_xi_MB = {0.97628  , 0.981452 , 0.982508 , 0.9811   , 0.982897 , 0.983982 , 0.990178 , 0.984512 , 0.956478};
-    std::vector<double> fsig_om    = {0.778226 ,0.874337, 0,922863, 0.953094, 0.966833};// ,0.976012}; //For Peripheral Sub
+    std::vector<double> fsig_xi_MB = {0.967  , 0.977 , 0.980 , 0.983   , 0.982 , 0.980 , 0.983 , 0.981 , 0.971};
+    std::vector<double> fsig_om    = {0.778226 ,0.874337, 0.922863, 0.953094, 0.966833};// ,0.976012}; //For Peripheral Sub
     std::vector<double> fsig_om_MB = {0.896448 ,0.941455 ,0.956581 ,0.966235 ,0.978242};// ,0.976012}; //For Peripheral Sub
     std::vector<double> PtBin_ks   = {0.2, 0.4, 0.6, 0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5};//, 10.0, 15.0, 20.0};
     std::vector<double> PtBin_la   = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5};//, 10.0, 15.0, 20.0};
     std::vector<double> PtBin_xi   = {1.0,1.4,1.8,2.2,2.8,3.6,4.6,6.0,7.2,10.0};
     std::vector<double> PtBin_om   = {1.5, 2.2, 2.8, 3.6, 5.0, 8.0};//, 20.0}; // PbPb
-    TFile *f_perisub      = TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/PeripheralSubtractionMB_0_n_20_V0Only.root");
-    //TFile *f_perisub_xi = TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/PeripheralSubtractionMB_0_n_20_V0Only.root");
-    //TFile *f_perisub_xi = TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/XiOmegaMB_11_5_17.root");
-    TFile *f_perisub_xi   = TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/XiOmegaMB_0_N_20_Partial_11_8_17.root");
+    TFile *f_perisub      = TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/V0MB_0_35_1_02_18.root");
+    //TFile *f_perisub = TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/PeripheralSubtractionMB_0_n_20_V0Only.root");
+    //TFile *f_perisub_xi   = TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/XiOmegaMB_0_N_20_Partial_11_8_17.root");
+    TFile *f_perisub_xi   = TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/XiMB_0_35_1_02_18.root");
+    //TFile *f_perisub_xi   = TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/XiMB_partial_0_35_12_05_17.root");
     TFile *f_perisub_om   = TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/OmegaMB_Total_0_35_MergedBin1-2_11_28_17.root");
     TFile *f_V0           = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityCorrectMultB_09_19_17.root");
     //TFile* f_Xi         = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root");
     TFile* f_Xi           = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationHM_11_07_17.root");
-    TFile *f_low_ref      = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/Combine_MB0_corr_ref.root"); //0-20
-    TFile* f_Om TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/");
+    //TFile *f_low_ref      = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/Combine_MB0_corr_ref.root"); //0-20
+    TFile *f_low_ref      = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/Combine_MB0_ref.root"); //0-35
+    TFile* f_Om = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/OmCorr/OmegaHMRapidity_Total_12_04_17.root");
     //TFile *f_high_ref   = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/XiCorrelationRapidityTotal_08_20_2017.root");
     TFile *f_high_ref     = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/Combine_HM185_corr_ref_PUrej.root");
-    int binlow_V2 = 10;
-    int binhigh_V2 = 24;
+    int binlow_V2 = 13;
+    int binhigh_V2 = 21;
+    // Only need to worry about fixd window if using fixed window function
+    double fw_low = -1.2; //Fixed window low
+    double fw_high= 1.2;
+    double sr_low = 14; //14 = -1, 12 = -1.64
+    double sr_high = 20; // 20 = 1, 22 = 1.64
 } V0;
 
-/*
-struct ParticleParam{
-
-}
-        //Low N
-        //KSHORT
-        //Containers
-        std::vector<double> Nassoc_low_ks;
-        std::vector<double> Jyieldsr_low_ks;
-        std::vector<double> Jyieldlr_low_ks;
-        std::vector<double> Jyieldsr_err_low_ks(18);
-        std::vector<double> Jyieldlr_err_low_ks(18);
-        std::vector<double> V2Values_low_ks;
-        std::vector<double> V2Values_err_low_ks;
-        std::vector<double> V3Values_low_ks;
-        std::vector<double> V3Values_err_low_ks;
-        std::vector<double> Bz_low_ks;
-        std::vector<double> nEvent_low_ks;
-
-        std::vector<double> JyieldSub_low_ks;
-        std::vector<double> JyieldSub_err_low_ks;
-
-        int arraySize_ks = PD.PtBin_ks.size();
-
-        TH1D* hsPeaksr_low_ks[3*arraySize_ks];
-        TH1D* hbPeaksr_low_ks[3*arraySize_ks];
-        TH1D* hsPeaklr_low_ks[3*arraySize_ks];
-        TH1D* hbPeaklr_low_ks[3*arraySize_ks];
-        TH1D* V2lrs_low_ks[3*arraySize_ks];
-        TH1D* V2lrb_low_ks[3*arraySize_ks];
-        TH2D* hbackgroundPeak_low_ks[3*arraySize_ks];
-        TH2D* hsignalPeak_low_ks[3*arraySize_ks];
-
-
-        //Calculate Nassoc, Jet yield, Peak region Low N
-
-        for(int i=0; i<numPtBins_ks; i++)
-        {
-            PD.f_perisub->GetObject(Form(PathBackground_low_ks.c_str(),i),hbackgroundPeak_low_ks[i]);
-            PD.f_perisub->GetObject(Form(PathSignal_low_ks.c_str(),i),hsignalPeak_low_ks[i]);
-            TH1D* mult_low_ks = (TH1D*) PD.f_perisub->Get(Form(PathMult_low_ks.c_str(),i));
-
-            hbPeaksr_low_ks[i] = hbackgroundPeak_low_ks[i]->ProjectionY(Form(("hb"+region_label+"sr_low_ks%d").c_str(),i), 14, 20);
-            hsPeaksr_low_ks[i] = hsignalPeak_low_ks[i]->ProjectionY(Form(("hs"+region_label+"sr_low_ks%d").c_str(),i), 14, 20);
-
-            TF1* quadFit13 = new TF1("quadFit13","[0]*x^2+[1]*x+[2]",0.6,2.2);
-            quadFit13->SetParameters(1,1,1);
-
-            if(i<8)
-            {
-                c_low_2Dks_1[j]->cd(i+1);
-                //TH2D* hPeak_low_2Dks = (TH2D*)PD.f_perisub->Get(Form(PathSignal_low_ks.c_str(),i));
-                TH2D* hPeak_low_2Dks = (TH2D*)hsignalPeak_low_ks[i]->Clone();
-                hPeak_low_2Dks->SetName(Form(("h"+region_label+"_low_2Dks%d").c_str(),i));
-                hPeak_low_2Dks->Divide(hbackgroundPeak_low_ks[i]);
-
-                hPeak_low_2Dks->GetXaxis()->SetRangeUser(-3,3 );
-                hPeak_low_2Dks->Draw("SURF1");
-                //hbackgroundPeak_low_ks[i]->Draw();
-            }
-            if(i>=8)
-            {
-                c_low_2Dks_2[j]->cd(i-8+1);
-                //TH2D* hPeak_low_2Dks = (TH2D*)PD.f_perisub->Get(Form(PathSignal_low_ks.c_str(),i));
-                TH2D* hPeak_low_2Dks = (TH2D*)hsignalPeak_low_ks[i]->Clone();
-                hPeak_low_2Dks->SetName(Form(("h"+region_label+"_low_2Dks%d").c_str(),i));
-                hPeak_low_2Dks->Divide(hbackgroundPeak_low_ks[i]);
-                hPeak_low_2Dks->GetXaxis()->SetRangeUser(-3,3 );
-                hPeak_low_2Dks->Draw("SURF1");
-            }
-            c->cd();
-
-
-            //nEvent_low_ks.push_back(mult_low_ks->Integral(0,100000));
-            nEvent_low_ks.push_back(mult_low_ks->Integral(2,100000));
-            Bz_low_ks.push_back(hbackgroundPeak_low_ks[i]->GetBinContent(hbackgroundPeak_low_ks[i]->FindBin(0,0)));
-
-            hsPeaksr_low_ks[i]->Divide(hbPeaksr_low_ks[i]);
-            hsPeaksr_low_ks[i]->Scale(Bz_low_ks[i]/nEvent_low_ks[i]/BW2D);
-            //hsPeaksr_low_ks[i]->Scale(Bz_low_ks[i]/BW2D);
-
-            hsPeaksr_low_ks[i]->Fit("quadFit13","R");
-            hsPeaksr_low_ks[i]->Fit("quadFit13","R");
-            hsPeaksr_low_ks[i]->Fit("quadFit13","R");
-
-            c_sr_low_ks[j]->cd(i+1);
-            double minVal_sr = quadFit13->GetMinimum(0.6,2.2);
-            double minVal_srX = quadFit13->GetMinimumX(0.6,2.2);
-            TF1* minConst_sr = new TF1("minConst_sr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
-            minConst_sr->SetParameter(0,-minVal_sr);
-            TH1D* hsPeaksr_zeroed_low_ks = (TH1D*)hsPeaksr_low_ks[i]->Clone();
-            TH1D* hsPeaksr_drawed_low_ks = (TH1D*)hsPeaksr_low_ks[i]->Clone();
-            hsPeaksr_drawed_low_ks->Draw();
-            hsPeaksr_zeroed_low_ks->Add(minConst_sr);
-            //hsPeaksr_low_ks[i]->Draw();
-            double xcoor = 0.52;
-            double ycoor = 0.90;
-            double increment = 0.07;
-            tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
-            tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_ks[i],PD.PtBin_ks[i+1]));
-            tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
-            c->cd();
-            Jyieldsr_low_ks.push_back(hsPeaksr_zeroed_low_ks->IntegralAndError(hsPeaksr_zeroed_low_ks->FindBin(0),hsPeaksr_zeroed_low_ks->FindBin(minVal_srX),Jyieldsr_err_low_ks[i],"width"));
-            double bin0yield = hsPeaksr_zeroed_low_ks->GetBinContent(hsPeaksr_zeroed_low_ks->FindBin(0.0))*0.19635;
-            Jyieldsr_low_ks[i] = Jyieldsr_low_ks[i]*2 - bin0yield;
-
-            hbPeaklr_low_ks[i] = hbackgroundPeak_low_ks[i]->ProjectionY("hbPeaklr_low_ks",1,10);
-            TH1D* ahbPeaklr_low_ks = hbackgroundPeak_low_ks[i]->ProjectionY("ahbPeaklr_low_ks",24,33);
-            c_lr_low_ks[j]->cd(i+1);
-            hsPeaklr_low_ks[i] = hsignalPeak_low_ks[i]->ProjectionY("hsPeaklr_low_ks",1,10);
-            TH1D* ahsPeaklr_low_ks = hsignalPeak_low_ks[i]->ProjectionY("ahsPeaklr_low_ks",24,33);
-
-            hbPeaklr_low_ks[i]->Add(ahbPeaklr_low_ks);
-            hsPeaklr_low_ks[i]->Add(ahsPeaklr_low_ks);
-            hsPeaklr_low_ks[i]->Divide(hbPeaklr_low_ks[i]);
-            hsPeaklr_low_ks[i]->Scale(Bz_low_ks[i]/nEvent_low_ks[i]/BW2D);
-            //hsPeaklr_low_ks[i]->Scale(Bz_low_ks[i]/BW2D);
-
-            TF1* quadFit2 = new TF1("quadFit2","[0]*x^2+[1]*x+[2]",0.0,2.0);
-            quadFit2->SetParameters(1,1,1);
-
-            hsPeaklr_low_ks[i]->Fit("quadFit2","R");
-            //hsPeaklr_low_ks[i]->Fit("quadFit2","R");
-            //hsPeaklr_low_ks[i]->Fit("quadFit2","R");
-
-            double minVal_lr = quadFit2->GetMinimum(0.0,2.0);
-            double minVal_lrX = quadFit2->GetMinimumX(0.0,2.0);
-            TF1* minConst_lr = new TF1("minConst_lr","[0]",-(0.5-1.0/32)*3.1416,(1.5-1.0/32)*3.1416);
-            minConst_lr->SetParameter(0,-minVal_lr);
-            //hsPeaklr_low_ks[i]->Draw();
-            TH1D* hsPeaklr_zeroed_low_ks = (TH1D*)hsPeaklr_low_ks[i]->Clone();
-            TH1D* hsPeaklr_drawed_low_ks = (TH1D*)hsPeaklr_low_ks[i]->Clone();
-            hsPeaklr_drawed_low_ks->Draw();
-            hsPeaklr_zeroed_low_ks->Add(minConst_lr);
-            xcoor = 0.52;
-            ycoor = 0.90;
-            increment = 0.07;
-            tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
-            tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_ks[i],PD.PtBin_ks[i+1]));
-            tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
-            Jyieldlr_low_ks.push_back(hsPeaklr_zeroed_low_ks->IntegralAndError(hsPeaklr_zeroed_low_ks->FindBin(0.0),hsPeaklr_zeroed_low_ks->FindBin(minVal_lrX),Jyieldlr_err_low_ks[i],"width"));
-            bin0yield = hsPeaklr_zeroed_low_ks->GetBinContent(hsPeaklr_zeroed_low_ks->FindBin(0.0))*0.19635;
-            Jyieldlr_low_ks[i] = Jyieldlr_low_ks[i]*2 - bin0yield;
-
-            JyieldSub_low_ks.push_back(Jyieldsr_low_ks[i] - Jyieldlr_low_ks[i]);
-            JyieldSub_err_low_ks.push_back(sqrt(Jyieldsr_err_low_ks[i]*Jyieldsr_err_low_ks[i] + Jyieldlr_err_low_ks[i]*Jyieldlr_err_low_ks[i]));
-            c->cd();
-
-            TF1* fit1 = new TF1("fit1","[0]*(1.0+2.0*[1]*cos(x)+2.0*[2]*cos(2.0*x)+2.0*[3]*cos(3.0*x)+2.0*[4]*cos(4.0*x))",-0.5*TMath::Pi(),1.5*TMath::Pi());
-            fit1->SetParNames("N","V1","V2","V3");
-            fit1->SetParameters(10,1,1,1);
-            fit1->SetLineColor(2);
-
-            V2lrs_low_ks[i] = hsignalPeak_low_ks[i]->ProjectionY(Form("V2lrs_low_ks%d",i),1,PD.binlow_V2);
-            TH1D* aV2lrs_low_ks = hsignalPeak_low_ks[i]->ProjectionY("aV2lrs_low_ks",PD.binhigh_V2,33);
-            V2lrb_low_ks[i] = hbackgroundPeak_low_ks[i]->ProjectionY(Form("V2lrb_low_ks%d",i),1,PD.binlow_V2);
-            TH1D* aV2lrb_low_ks = hbackgroundPeak_low_ks[i]->ProjectionY("aV2lrb_low_ks",PD.binhigh_V2,33);
-            V2lrs_low_ks[i]->Add(aV2lrs_low_ks);
-            V2lrb_low_ks[i]->Add(aV2lrb_low_ks);
-            V2lrs_low_ks[i]->Divide(V2lrb_low_ks[i]);
-            V2lrs_low_ks[i]->Scale(Bz_low_ks[i]/nEvent_low_ks[i]/BW2D);
-            //V2lrs_low_ks[i]->Scale(Bz_low_ks[i]/BW2D);
-
-            V2lrs_low_ks[i]->Fit("fit1","R");
-            V2lrs_low_ks[i]->Fit("fit1","R");
-            V2lrs_low_ks[i]->Fit("fit1","R");
-
-            V2Values_low_ks.push_back(fit1->GetParameter(2));
-            V2Values_err_low_ks.push_back(fit1->GetParError(2));
-            V3Values_low_ks.push_back(fit1->GetParameter(3));
-            V3Values_err_low_ks.push_back(fit1->GetParError(3));
-
-            Nassoc_low_ks.push_back(fit1->GetParameter(0));
-            c->cd();
-            //if(i==4) return;
-        }
-*/
 void PeriSubFixedWindow(ParticleData PD)
 {
     TH1::SetDefaultSumw2();
@@ -406,8 +240,8 @@ void PeriSubFixedWindow(ParticleData PD)
     PD.f_low_ref->GetObject("pPbCorr/signal",hsignalPeak_low_ref);
     TH1D* mult_low_ref = (TH1D*) PD.f_low_ref->Get("pPbCorr/mult");
 
-    hbPeaksr_low_ref = hbackgroundPeak_low_ref->ProjectionY("hbPeaksr_low_ref", 14, 20);
-    hsPeaksr_low_ref = hsignalPeak_low_ref->ProjectionY("hsPeaksr_low_ref", 14, 20);
+    hbPeaksr_low_ref = hbackgroundPeak_low_ref->ProjectionY("hbPeaksr_low_ref", PD.sr_low, PD.sr_high);
+    hsPeaksr_low_ref = hsignalPeak_low_ref->ProjectionY("hsPeaksr_low_ref", PD.sr_low, PD.sr_high);
 
     //nEvent_low_ref.push_back(mult_low_ref->Integral(0,100000));
     nEvent_low_ref.push_back(mult_low_ref->Integral(3,100000));
@@ -455,12 +289,12 @@ void PeriSubFixedWindow(ParticleData PD)
     double ycoor = 0.90;
     double increment = 0.07;
     tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-    tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+    tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
     tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",0.3,3.0));
     tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
     tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
     c->cd();
-    Jyieldsr_low_ref.push_back(hsPeaksr_zeroed_low_ref->IntegralAndError(hsPeaksr_zeroed_low_ref->FindBin(-1.2),hsPeaksr_zeroed_low_ref->FindBin(1.2),Jyieldsr_err_low_ref,"width"));
+    Jyieldsr_low_ref.push_back(hsPeaksr_zeroed_low_ref->IntegralAndError(hsPeaksr_zeroed_low_ref->FindBin(PD.fw_low),hsPeaksr_zeroed_low_ref->FindBin(PD.fw_high),Jyieldsr_err_low_ref,"width"));
     //bin0yield = hsPeaklr_zeroed_low_ref->GetBinContent(hsPeaklr_zeroed_low_ref->FindBin(0.0))*0.19635;
     //Jyieldlr_low_ref[0] = Jyieldlr_low_ref[0]*2 - bin0yield;
 
@@ -534,8 +368,8 @@ void PeriSubFixedWindow(ParticleData PD)
     PD.f_high_ref->GetObject("pPbCorr/signal",hsignalPeak_high_ref);
     TH1D* mult_high_ref = (TH1D*) PD.f_high_ref->Get("pPbCorr/mult");
 
-    hbPeaksr_high_ref = hbackgroundPeak_high_ref->ProjectionY("hbPeaksr_high_ref", 14, 20);
-    hsPeaksr_high_ref = hsignalPeak_high_ref->ProjectionY("hsPeaksr_high_ref", 14, 20);
+    hbPeaksr_high_ref = hbackgroundPeak_high_ref->ProjectionY("hbPeaksr_high_ref", PD.sr_low, PD.sr_high);
+    hsPeaksr_high_ref = hsignalPeak_high_ref->ProjectionY("hsPeaksr_high_ref", PD.sr_low, PD.sr_high);
 
     //nEvent_high_ref.push_back(mult_high_ref->Integral(0,100000));
     nEvent_high_ref.push_back(mult_high_ref->Integral(3,100000));
@@ -575,12 +409,12 @@ void PeriSubFixedWindow(ParticleData PD)
     ycoor = 0.90;
     increment = 0.07;
     tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-    tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+    tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
     tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",0.3,3.0));
     tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
     tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
     c->cd();
-    Jyieldsr_high_ref.push_back(hsPeaksr_zeroed_high_ref->IntegralAndError(hsPeaksr_zeroed_high_ref->FindBin(-1.2),hsPeaksr_zeroed_high_ref->FindBin(1.2),Jyieldsr_err_high_ref,"width"));
+    Jyieldsr_high_ref.push_back(hsPeaksr_zeroed_high_ref->IntegralAndError(hsPeaksr_zeroed_high_ref->FindBin(PD.fw_low),hsPeaksr_zeroed_high_ref->FindBin(PD.fw_high),Jyieldsr_err_high_ref,"width"));
     //bin0yield = hsPeaksr_zeroed_high_ref->GetBinContent(hsPeaksr_zeroed_high_ref->FindBin(0.0))*0.19635;
     //Jyieldsr_high_ref[0] = Jyieldsr_high_ref[0]*2 - bin0yield;
 
@@ -758,8 +592,8 @@ void PeriSubFixedWindow(ParticleData PD)
             PD.f_perisub->GetObject(Form(PathSignal_low_ks.c_str(),i),hsignalPeak_low_ks[i]);
             TH1D* mult_low_ks = (TH1D*) PD.f_perisub->Get(Form(PathMult_low_ks.c_str(),i));
 
-            hbPeaksr_low_ks[i] = hbackgroundPeak_low_ks[i]->ProjectionY(Form("hbPeaksr_low_ks%d",i), 14, 20);
-            hsPeaksr_low_ks[i] = hsignalPeak_low_ks[i]->ProjectionY(Form(("hs"+region_label+"sr_low_ks%d").c_str(),i), 14, 20);
+            hbPeaksr_low_ks[i] = hbackgroundPeak_low_ks[i]->ProjectionY(Form("hbPeaksr_low_ks%d",i), PD.sr_low, PD.sr_high);
+            hsPeaksr_low_ks[i] = hsignalPeak_low_ks[i]->ProjectionY(Form(("hs"+region_label+"sr_low_ks%d").c_str(),i), PD.sr_low, PD.sr_high);
 
             TF1* quadFit13 = new TF1("quadFit13","[0]*x^2+[1]*x+[2]",0.6,2.2);
             quadFit13->SetParameters(1,1,1);
@@ -849,12 +683,12 @@ void PeriSubFixedWindow(ParticleData PD)
             double ycoor = 0.90;
             double increment = 0.07;
             tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_ks[i],PD.PtBin_ks[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
             c->cd();
-            Jyieldsr_low_ks.push_back(hsPeaksr_zeroed_low_ks->IntegralAndError(hsPeaksr_zeroed_low_ks->FindBin(-1.2),hsPeaksr_zeroed_low_ks->FindBin(1.2),Jyieldsr_err_low_ks[i],"width"));
+            Jyieldsr_low_ks.push_back(hsPeaksr_zeroed_low_ks->IntegralAndError(hsPeaksr_zeroed_low_ks->FindBin(PD.fw_low),hsPeaksr_zeroed_low_ks->FindBin(PD.fw_high),Jyieldsr_err_low_ks[i],"width"));
             //double bin0yield = hsPeaksr_zeroed_low_ks->GetBinContent(hsPeaksr_zeroed_low_ks->FindBin(0.0))*0.19635;
             //Jyieldsr_low_ks[i] = Jyieldsr_low_ks[i]*2 - bin0yield;
 
@@ -869,10 +703,10 @@ void PeriSubFixedWindow(ParticleData PD)
             fit1->SetParameters(10,1,1,1);
             fit1->SetLineColor(2);
 
-            V2lrs_low_ks[i] = hsignalPeak_low_ks[i]->ProjectionY(Form("V2lrs_low_ks%d",i),1,14);
-            TH1D* aV2lrs_low_ks = hsignalPeak_low_ks[i]->ProjectionY("aV2lrs_low_ks",20,33);
-            V2lrb_low_ks[i] = hbackgroundPeak_low_ks[i]->ProjectionY(Form("V2lrb_low_ks%d",i),1,14);
-            TH1D* aV2lrb_low_ks = hbackgroundPeak_low_ks[i]->ProjectionY("aV2lrb_low_ks",20,33);
+            V2lrs_low_ks[i] = hsignalPeak_low_ks[i]->ProjectionY(Form("V2lrs_low_ks%d",i),1,PD.binlow_V2);
+            TH1D* aV2lrs_low_ks = hsignalPeak_low_ks[i]->ProjectionY("aV2lrs_low_ks",PD.binhigh_V2,33);
+            V2lrb_low_ks[i] = hbackgroundPeak_low_ks[i]->ProjectionY(Form("V2lrb_low_ks%d",i),1,PD.binlow_V2);
+            TH1D* aV2lrb_low_ks = hbackgroundPeak_low_ks[i]->ProjectionY("aV2lrb_low_ks",PD.binhigh_V2,33);
             V2lrs_low_ks[i]->Add(aV2lrs_low_ks);
             V2lrb_low_ks[i]->Add(aV2lrb_low_ks);
             V2lrs_low_ks[i]->Divide(V2lrb_low_ks[i]);
@@ -929,8 +763,8 @@ void PeriSubFixedWindow(ParticleData PD)
             PD.f_perisub->GetObject(Form(PathSignal_low_la.c_str(),i),hsignalPeak_low_la[i]);
             TH1D* mult_low_la = (TH1D*) PD.f_perisub->Get(Form(PathMult_low_la.c_str(),i));
 
-            hbPeaksr_low_la[i] = hbackgroundPeak_low_la[i]->ProjectionY("hbPeaksr_low_la", 14, 20);
-            hsPeaksr_low_la[i] = hsignalPeak_low_la[i]->ProjectionY(("hs"+region_label+"sr_low_la").c_str(), 14, 20);
+            hbPeaksr_low_la[i] = hbackgroundPeak_low_la[i]->ProjectionY("hbPeaksr_low_la", PD.sr_low, PD.sr_high);
+            hsPeaksr_low_la[i] = hsignalPeak_low_la[i]->ProjectionY(("hs"+region_label+"sr_low_la").c_str(), PD.sr_low, PD.sr_high);
 
             if(i<8 && j==0)
             {
@@ -1021,12 +855,12 @@ void PeriSubFixedWindow(ParticleData PD)
             double ycoor = 0.90;
             double increment = 0.07;
             tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_la[i],PD.PtBin_la[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
             c->cd();
-            Jyieldsr_low_la.push_back(hsPeaksr_zeroed_low_la->IntegralAndError(hsPeaksr_zeroed_low_la->FindBin(-1.2),hsPeaksr_zeroed_low_la->FindBin(1.2),Jyieldsr_err_low_la[i],"width"));
+            Jyieldsr_low_la.push_back(hsPeaksr_zeroed_low_la->IntegralAndError(hsPeaksr_zeroed_low_la->FindBin(PD.fw_low),hsPeaksr_zeroed_low_la->FindBin(PD.fw_high),Jyieldsr_err_low_la[i],"width"));
             //double bin0yield = hsPeaksr_zeroed_low_la->GetBinContent(hsPeaksr_zeroed_low_la->FindBin(0.0))*0.19635;
             //Jyieldsr_low_la[i] = Jyieldsr_low_la[i]*2 - bin0yield;
 
@@ -1038,10 +872,10 @@ void PeriSubFixedWindow(ParticleData PD)
             fit1->SetParameters(10,1,1,1);
             fit1->SetLineColor(2);
 
-            V2lrs_low_la[i] = hsignalPeak_low_la[i]->ProjectionY(Form("V2lrs_low_la%d",i),1,14);
-            TH1D* aV2lrs_low_la = hsignalPeak_low_la[i]->ProjectionY("aV2lrs_low_la",20,33);
-            V2lrb_low_la[i] = hbackgroundPeak_low_la[i]->ProjectionY(Form("V2lrb_low_la%d",i),1,14);
-            TH1D* aV2lrb_low_la = hbackgroundPeak_low_la[i]->ProjectionY("aV2lrb_low_la",20,33);
+            V2lrs_low_la[i] = hsignalPeak_low_la[i]->ProjectionY(Form("V2lrs_low_la%d",i),1,PD.binlow_V2);
+            TH1D* aV2lrs_low_la = hsignalPeak_low_la[i]->ProjectionY("aV2lrs_low_la",PD.binhigh_V2,33);
+            V2lrb_low_la[i] = hbackgroundPeak_low_la[i]->ProjectionY(Form("V2lrb_low_la%d",i),1,PD.binlow_V2);
+            TH1D* aV2lrb_low_la = hbackgroundPeak_low_la[i]->ProjectionY("aV2lrb_low_la",PD.binhigh_V2,33);
             V2lrs_low_la[i]->Add(aV2lrs_low_la);
             V2lrb_low_la[i]->Add(aV2lrb_low_la);
             V2lrs_low_la[i]->Divide(V2lrb_low_la[i]);
@@ -1097,8 +931,8 @@ void PeriSubFixedWindow(ParticleData PD)
             PD.f_perisub_xi->GetObject(Form(PathSignal_low_xi.c_str(),i),hsignalPeak_low_xi[i]);
             TH1D* mult_low_xi = (TH1D*) PD.f_perisub_xi->Get(Form(PathMult_low_xi.c_str(),i));
 
-            hbPeaksr_low_xi[i] = hbackgroundPeak_low_xi[i]->ProjectionY("hbPeaksr_low_xi", 14, 20);
-            hsPeaksr_low_xi[i] = hsignalPeak_low_xi[i]->ProjectionY(Form(("hs"+region_label+"sr_low_xi%d").c_str(),i), 14, 20);
+            hbPeaksr_low_xi[i] = hbackgroundPeak_low_xi[i]->ProjectionY("hbPeaksr_low_xi", PD.sr_low, PD.sr_high);
+            hsPeaksr_low_xi[i] = hsignalPeak_low_xi[i]->ProjectionY(Form(("hs"+region_label+"sr_low_xi%d").c_str(),i), PD.sr_low, PD.sr_high);
 
             TF1* quadFit13 = new TF1("quadFit13","[0]*x^2+[1]*x+[2]",0.6,2.2);
             quadFit13->SetParameters(1,1,1);
@@ -1142,12 +976,12 @@ void PeriSubFixedWindow(ParticleData PD)
             double ycoor = 0.90;
             double increment = 0.07;
             tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_xi[i],PD.PtBin_xi[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
             c->cd();
-            Jyieldsr_low_xi.push_back(hsPeaksr_zeroed_low_xi->IntegralAndError(hsPeaksr_zeroed_low_xi->FindBin(-1.2),hsPeaksr_zeroed_low_xi->FindBin(1.2),Jyieldsr_err_low_xi[i],"width"));
+            Jyieldsr_low_xi.push_back(hsPeaksr_zeroed_low_xi->IntegralAndError(hsPeaksr_zeroed_low_xi->FindBin(PD.fw_low),hsPeaksr_zeroed_low_xi->FindBin(PD.fw_high),Jyieldsr_err_low_xi[i],"width"));
             //double bin0yield = hsPeaksr_zeroed_low_xi->GetBinContent(hsPeaksr_zeroed_low_xi->FindBin(0.0))*0.19635;
             //Jyieldsr_low_xi[i] = Jyieldsr_low_xi[i]*2 - bin0yield;
 
@@ -1159,10 +993,10 @@ void PeriSubFixedWindow(ParticleData PD)
             fit1->SetParameters(10,1,1,1);
             fit1->SetLineColor(2);
 
-            V2lrs_low_xi[i] = hsignalPeak_low_xi[i]->ProjectionY(Form("V2lrs_low_xi%d",i),1,14);
-            TH1D* aV2lrs_low_xi = hsignalPeak_low_xi[i]->ProjectionY("aV2lrs_low_xi",20,33);
-            V2lrb_low_xi[i] = hbackgroundPeak_low_xi[i]->ProjectionY(Form("V2lrb_low_xi%d",i),1,14);
-            TH1D* aV2lrb_low_xi = hbackgroundPeak_low_xi[i]->ProjectionY("aV2lrb_low_xi",20,33);
+            V2lrs_low_xi[i] = hsignalPeak_low_xi[i]->ProjectionY(Form("V2lrs_low_xi%d",i),1,PD.binlow_V2);
+            TH1D* aV2lrs_low_xi = hsignalPeak_low_xi[i]->ProjectionY("aV2lrs_low_xi",PD.binhigh_V2,33);
+            V2lrb_low_xi[i] = hbackgroundPeak_low_xi[i]->ProjectionY(Form("V2lrb_low_xi%d",i),1,PD.binlow_V2);
+            TH1D* aV2lrb_low_xi = hbackgroundPeak_low_xi[i]->ProjectionY("aV2lrb_low_xi",PD.binhigh_V2,33);
             V2lrs_low_xi[i]->Add(aV2lrs_low_xi);
             V2lrb_low_xi[i]->Add(aV2lrb_low_xi);
             V2lrs_low_xi[i]->Divide(V2lrb_low_xi[i]);
@@ -1218,8 +1052,8 @@ void PeriSubFixedWindow(ParticleData PD)
             PD.f_perisub_om->GetObject(Form(PathSignal_low_om.c_str(),i),hsignalPeak_low_om[i]);
             TH1D* mult_low_om = (TH1D*) PD.f_perisub_om->Get(Form(PathMult_low_om.c_str(),i));
 
-            hbPeaksr_low_om[i] = hbackgroundPeak_low_om[i]->ProjectionY(Form(("hb"+region_label+"sr_low_om%d").c_str(),i), 14, 20);
-            hsPeaksr_low_om[i] = hsignalPeak_low_om[i]->ProjectionY(Form(("hs"+region_label+"sr_low_om%d").c_str(),i), 14, 20);
+            hbPeaksr_low_om[i] = hbackgroundPeak_low_om[i]->ProjectionY(Form(("hb"+region_label+"sr_low_om%d").c_str(),i), PD.sr_low, PD.sr_high);
+            hsPeaksr_low_om[i] = hsignalPeak_low_om[i]->ProjectionY(Form(("hs"+region_label+"sr_low_om%d").c_str(),i), PD.sr_low, PD.sr_high);
 
             TF1* quadFit13 = new TF1("quadFit13","[0]*x^2+[1]*x+[2]",0.6,2.2);
             quadFit13->SetParameters(1,1,1);
@@ -1231,7 +1065,6 @@ void PeriSubFixedWindow(ParticleData PD)
 
             hsPeaksr_low_om[i]->Divide(hbPeaksr_low_om[i]);
             hsPeaksr_low_om[i]->Scale(Bz_low_om[i]/nEvent_low_om[i]/BW2D);
-            //hsPeaksr_low_om[i]->Scale(Bz_low_om[i]/BW2D);
 
             hbPeaklr_low_om[i] = hbackgroundPeak_low_om[i]->ProjectionY("hbPeaklr_low_om",1,10);
             TH1D* ahbPeaklr_low_om = hbackgroundPeak_low_om[i]->ProjectionY("ahbPeaklr_low_om",24,33);
@@ -1242,7 +1075,6 @@ void PeriSubFixedWindow(ParticleData PD)
             hsPeaklr_low_om[i]->Add(ahsPeaklr_low_om);
             hsPeaklr_low_om[i]->Divide(hbPeaklr_low_om[i]);
             hsPeaklr_low_om[i]->Scale(Bz_low_om[i]/nEvent_low_om[i]/BW2D);
-            //hsPeaklr_low_om[i]->Scale(Bz_low_om[i]/BW2D);
 
             hsPeaksr_low_om[i]->Add(hsPeaklr_low_om[i],-1);
 
@@ -1263,12 +1095,12 @@ void PeriSubFixedWindow(ParticleData PD)
             double ycoor = 0.90;
             double increment = 0.07;
             tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_om[i],PD.PtBin_om[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
             c->cd();
-            Jyieldsr_low_om.push_back(hsPeaksr_zeroed_low_om->IntegralAndError(hsPeaksr_zeroed_low_om->FindBin(-1.2),hsPeaksr_zeroed_low_om->FindBin(1.2),Jyieldsr_err_low_om[i],"width"));
+            Jyieldsr_low_om.push_back(hsPeaksr_zeroed_low_om->IntegralAndError(hsPeaksr_zeroed_low_om->FindBin(PD.fw_low),hsPeaksr_zeroed_low_om->FindBin(PD.fw_high),Jyieldsr_err_low_om[i],"width"));
             //double bin0yield = hsPeaksr_zeroed_low_om->GetBinContent(hsPeaksr_zeroed_low_om->FindBin(0.0))*0.19635;
             //Jyieldsr_low_om[i] = Jyieldsr_low_om[i]*2 - bin0yield;
 
@@ -1280,10 +1112,10 @@ void PeriSubFixedWindow(ParticleData PD)
             fit1->SetParameters(10,1,1,1);
             fit1->SetLineColor(2);
 
-            V2lrs_low_om[i] = hsignalPeak_low_om[i]->ProjectionY(Form("V2lrs_low_om%d",i),1,14);
-            TH1D* aV2lrs_low_om = hsignalPeak_low_om[i]->ProjectionY("aV2lrs_low_om",20,33);
-            V2lrb_low_om[i] = hbackgroundPeak_low_om[i]->ProjectionY(Form("V2lrb_low_om%d",i),1,14);
-            TH1D* aV2lrb_low_om = hbackgroundPeak_low_om[i]->ProjectionY("aV2lrb_low_om",20,33);
+            V2lrs_low_om[i] = hsignalPeak_low_om[i]->ProjectionY(Form("V2lrs_low_om%d",i),1,PD.binlow_V2);
+            TH1D* aV2lrs_low_om = hsignalPeak_low_om[i]->ProjectionY("aV2lrs_low_om",PD.binhigh_V2,33);
+            V2lrb_low_om[i] = hbackgroundPeak_low_om[i]->ProjectionY(Form("V2lrb_low_om%d",i),1,PD.binlow_V2);
+            TH1D* aV2lrb_low_om = hbackgroundPeak_low_om[i]->ProjectionY("aV2lrb_low_om",PD.binhigh_V2,33);
             V2lrs_low_om[i]->Add(aV2lrs_low_om);
             V2lrb_low_om[i]->Add(aV2lrb_low_om);
             V2lrs_low_om[i]->Divide(V2lrb_low_om[i]);
@@ -1339,8 +1171,8 @@ void PeriSubFixedWindow(ParticleData PD)
             PD.f_V0->GetObject(Form(PathSignal_high_ks.c_str(),i),hsignalPeak_ks[i]);
             TH1D* mult_ks = (TH1D*) PD.f_V0->Get(Form(PathMult_high_ks.c_str(),i));
 
-            hbPeaksr_ks[i] = hbackgroundPeak_ks[i]->ProjectionY("hbPeaksr_ks", 14, 20);
-            hsPeaksr_ks[i] = hsignalPeak_ks[i]->ProjectionY(Form(("hs"+region_label+"Peaksr_ks%d").c_str(),i), 14, 20);
+            hbPeaksr_ks[i] = hbackgroundPeak_ks[i]->ProjectionY("hbPeaksr_ks", PD.sr_low, PD.sr_high);
+            hsPeaksr_ks[i] = hsignalPeak_ks[i]->ProjectionY(Form(("hs"+region_label+"Peaksr_ks%d").c_str(),i), PD.sr_low, PD.sr_high);
 
             if(i<8 && j==0)
             {
@@ -1430,12 +1262,12 @@ void PeriSubFixedWindow(ParticleData PD)
             double ycoor = 0.90;
             double increment = 0.07;
             tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_ks[i],PD.PtBin_ks[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
             c->cd();
-            Jyieldsr_ks.push_back(hsPeaksr_zeroed_ks->IntegralAndError(hsPeaksr_zeroed_ks->FindBin(-1.2),hsPeaksr_zeroed_ks->FindBin(1.2),Jyieldsr_err_ks[i],"width"));
+            Jyieldsr_ks.push_back(hsPeaksr_zeroed_ks->IntegralAndError(hsPeaksr_zeroed_ks->FindBin(PD.fw_low),hsPeaksr_zeroed_ks->FindBin(PD.fw_high),Jyieldsr_err_ks[i],"width"));
             //double bin0yield = hsPeaksr_zeroed_ks->GetBinContent(hsPeaksr_zeroed_ks->FindBin(0.0))*0.19635;
             //Jyieldsr_ks[i] = Jyieldsr_ks[i]*2 - bin0yield;
 
@@ -1448,10 +1280,10 @@ void PeriSubFixedWindow(ParticleData PD)
             fit1->SetParameters(10,1,1,1);
             fit1->SetLineColor(2);
 
-            V2lrs_ks[i] = hsignalPeak_ks[i]->ProjectionY(Form("V2lrs_ks%d",i),1,14);
-            TH1D* aV2lrs_ks = hsignalPeak_ks[i]->ProjectionY("aV2lrs_ks",20,33);
-            V2lrb_ks[i] = hbackgroundPeak_ks[i]->ProjectionY(Form("V2lrb_ks%d",i),1,14);
-            TH1D* aV2lrb_ks = hbackgroundPeak_ks[i]->ProjectionY("aV2lrb_ks",20,33);
+            V2lrs_ks[i] = hsignalPeak_ks[i]->ProjectionY(Form("V2lrs_ks%d",i),1,PD.binlow_V2);
+            TH1D* aV2lrs_ks = hsignalPeak_ks[i]->ProjectionY("aV2lrs_ks",PD.binhigh_V2,33);
+            V2lrb_ks[i] = hbackgroundPeak_ks[i]->ProjectionY(Form("V2lrb_ks%d",i),1,PD.binlow_V2);
+            TH1D* aV2lrb_ks = hbackgroundPeak_ks[i]->ProjectionY("aV2lrb_ks",PD.binhigh_V2,33);
             V2lrs_ks[i]->Add(aV2lrs_ks);
             V2lrb_ks[i]->Add(aV2lrb_ks);
             V2lrs_ks[i]->Divide(V2lrb_ks[i]);
@@ -1552,8 +1384,8 @@ void PeriSubFixedWindow(ParticleData PD)
                 hPeak_high_2Dla->Draw("SURF1");
             }
 
-            hbPeaksr_la[i] = hbackgroundPeak_la[i]->ProjectionY("hbPeaksr_la", 14, 20);
-            hsPeaksr_la[i] = hsignalPeak_la[i]->ProjectionY(Form(("hs"+region_label+"Peaksr_la%d").c_str(),i), 14, 20);
+            hbPeaksr_la[i] = hbackgroundPeak_la[i]->ProjectionY("hbPeaksr_la", PD.sr_low, PD.sr_high);
+            hsPeaksr_la[i] = hsignalPeak_la[i]->ProjectionY(Form(("hs"+region_label+"Peaksr_la%d").c_str(),i), PD.sr_low, PD.sr_high);
 
             TF1* quadFit16 = new TF1("quadFit16","[0]*x^2+[1]*x+[2]",0.6,2.2);
             quadFit16->SetParameters(1,1,1);
@@ -1598,12 +1430,12 @@ void PeriSubFixedWindow(ParticleData PD)
             double ycoor = 0.90;
             double increment = 0.07;
             tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%4.1f<p_{T}^{trg}<%4.1f",PD.PtBin_la[i],PD.PtBin_la[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
             c->cd();
-            Jyieldsr_la.push_back(hsPeaksr_zeroed_la->IntegralAndError(hsPeaksr_zeroed_la->FindBin(-1.2),hsPeaksr_zeroed_la->FindBin(1.2),Jyieldsr_err_la[i],"width"));
+            Jyieldsr_la.push_back(hsPeaksr_zeroed_la->IntegralAndError(hsPeaksr_zeroed_la->FindBin(PD.fw_low),hsPeaksr_zeroed_la->FindBin(PD.fw_high),Jyieldsr_err_la[i],"width"));
             //double bin0yield = hsPeaksr_zeroed_la->GetBinContent(hsPeaksr_zeroed_la->FindBin(0.0))*0.19635;
             //Jyieldsr_la[i] = Jyieldsr_la[i]*2 - bin0yield;
 
@@ -1615,10 +1447,10 @@ void PeriSubFixedWindow(ParticleData PD)
             fit1->SetParameters(10,1,1,1);
             fit1->SetLineColor(2);
 
-            V2lrs_la[i] = hsignalPeak_la[i]->ProjectionY(Form("V2lrs_la%d",i),1,14);
-            TH1D* aV2lrs_la = hsignalPeak_la[i]->ProjectionY("aV2lrs_la",20,33);
-            V2lrb_la[i] = hbackgroundPeak_la[i]->ProjectionY(Form("V2lrb_la%d",i),1,14);
-            TH1D* aV2lrb_la = hbackgroundPeak_la[i]->ProjectionY("aV2lrb_la",20,33);
+            V2lrs_la[i] = hsignalPeak_la[i]->ProjectionY(Form("V2lrs_la%d",i),1,PD.binlow_V2);
+            TH1D* aV2lrs_la = hsignalPeak_la[i]->ProjectionY("aV2lrs_la",PD.binhigh_V2,33);
+            V2lrb_la[i] = hbackgroundPeak_la[i]->ProjectionY(Form("V2lrb_la%d",i),1,PD.binlow_V2);
+            TH1D* aV2lrb_la = hbackgroundPeak_la[i]->ProjectionY("aV2lrb_la",PD.binhigh_V2,33);
             V2lrs_la[i]->Add(aV2lrs_la);
             V2lrb_la[i]->Add(aV2lrb_la);
             V2lrs_la[i]->Divide(V2lrb_la[i]);
@@ -1675,8 +1507,8 @@ void PeriSubFixedWindow(ParticleData PD)
             //TH1D* mult_xi = (TH1D*) PD.f_Xi->Get((PD.fn_Xi + "/nEvtCut").c_str());
             TH1D* mult_xi = (TH1D*) PD.f_Xi->Get(Form(PathMult_high_xi.c_str(),i));
 
-            hbPeaksr_xi[i] = hbackgroundPeak_xi[i]->ProjectionY("hbPeaksr_xi", 14, 20);
-            hsPeaksr_xi[i] = hsignalPeak_xi[i]->ProjectionY(Form(("hs"+region_label+"Peaksr_xi%d").c_str(),i), 14, 20);
+            hbPeaksr_xi[i] = hbackgroundPeak_xi[i]->ProjectionY("hbPeaksr_xi", PD.sr_low, PD.sr_high);
+            hsPeaksr_xi[i] = hsignalPeak_xi[i]->ProjectionY(Form(("hs"+region_label+"Peaksr_xi%d").c_str(),i), PD.sr_low, PD.sr_high);
 
             TF1* quadFit16 = new TF1("quadFit16","[0]*x^2+[1]*x+[2]",0.6,2.2);
             quadFit16->SetParameters(1,1,1);
@@ -1726,7 +1558,7 @@ void PeriSubFixedWindow(ParticleData PD)
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
             c->cd();
-            Jyieldsr_xi.push_back(hsPeaksr_zeroed_xi->IntegralAndError(hsPeaksr_zeroed_xi->FindBin(-1.2),hsPeaksr_zeroed_xi->FindBin(1.2),Jyieldsr_err_xi[i],"width"));
+            Jyieldsr_xi.push_back(hsPeaksr_zeroed_xi->IntegralAndError(hsPeaksr_zeroed_xi->FindBin(PD.fw_low),hsPeaksr_zeroed_xi->FindBin(PD.fw_high),Jyieldsr_err_xi[i],"width"));
             //double bin0yield = hsPeaksr_zeroed_xi->GetBinContent(hsPeaksr_zeroed_xi->FindBin(0.0))*0.19635;
             //Jyieldsr_xi[i] = Jyieldsr_xi[i]*2 - bin0yield;
 
@@ -1738,10 +1570,10 @@ void PeriSubFixedWindow(ParticleData PD)
             fit1->SetParameters(10,1,1,1);
             fit1->SetLineColor(2);
 
-            V2lrs_xi[i] = hsignalPeak_xi[i]->ProjectionY(Form("V2lrs_xi%d",i),1,14);
-            TH1D* aV2lrs_xi = hsignalPeak_xi[i]->ProjectionY("aV2lrs_xi",20,33);
-            V2lrb_xi[i] = hbackgroundPeak_xi[i]->ProjectionY(Form("V2lrb_xi%d",i),1,14);
-            TH1D* aV2lrb_xi = hbackgroundPeak_xi[i]->ProjectionY("aV2lrb_xi",20,33);
+            V2lrs_xi[i] = hsignalPeak_xi[i]->ProjectionY(Form("V2lrs_xi%d",i),1,PD.binlow_V2);
+            TH1D* aV2lrs_xi = hsignalPeak_xi[i]->ProjectionY("aV2lrs_xi",PD.binhigh_V2,33);
+            V2lrb_xi[i] = hbackgroundPeak_xi[i]->ProjectionY(Form("V2lrb_xi%d",i),1,PD.binlow_V2);
+            TH1D* aV2lrb_xi = hbackgroundPeak_xi[i]->ProjectionY("aV2lrb_xi",PD.binhigh_V2,33);
             V2lrs_xi[i]->Add(aV2lrs_xi);
             V2lrb_xi[i]->Add(aV2lrb_xi);
             V2lrs_xi[i]->Divide(V2lrb_xi[i]);
@@ -1791,15 +1623,12 @@ void PeriSubFixedWindow(ParticleData PD)
 
         for(int i=0; i<numPtBins_om; i++)
         {
-            PD.f_Xi->GetObject(Form(PathBackground_high_om.c_str(),i),hbackgroundPeak_om[i]);
-            PD.f_Xi->GetObject(Form(PathSignal_high_om.c_str(),i),hsignalPeak_om[i]);
-            //hbackgroundPeak_om[i] = (TH2D*)PD.f_V0->Get(Form((fn_V0 + "/backgroundlambda_pt%d").c_str(),i));
-            //hsignalPeak_om[i] = (TH2D*)f_V0->Get(Form((fn_V0 + "/signallambda_pt%d").c_str(),i));
-            //TH1D* mult_om = (TH1D*) PD.f_Xi->Get((PD.fn_Xi + "/nEvtCut").c_str());
-            TH1D* mult_om = (TH1D*) PD.f_Xi->Get(Form(PathMult_high_om.c_str(),i));
+            PD.f_Om->GetObject(Form(PathBackground_high_om.c_str(),i),hbackgroundPeak_om[i]);
+            PD.f_Om->GetObject(Form(PathSignal_high_om.c_str(),i),hsignalPeak_om[i]);
+            TH1D* mult_om = (TH1D*) PD.f_Om->Get(Form(PathMult_high_om.c_str(),i));
 
-            hbPeaksr_om[i] = hbackgroundPeak_om[i]->ProjectionY("hbPeaksr_om", 14, 20);
-            hsPeaksr_om[i] = hsignalPeak_om[i]->ProjectionY(Form(("hs"+region_label+"Peaksr_om%d").c_str(),i), 14, 20);
+            hbPeaksr_om[i] = hbackgroundPeak_om[i]->ProjectionY("hbPeaksr_om", PD.sr_low, PD.sr_high);
+            hsPeaksr_om[i] = hsignalPeak_om[i]->ProjectionY(Form(("hs"+region_label+"Peaksr_om%d").c_str(),i), PD.sr_low, PD.sr_high);
 
             TF1* quadFit16 = new TF1("quadFit16","[0]*x^2+[1]*x+[2]",0.6,2.2);
             quadFit16->SetParameters(1,1,1);
@@ -1849,7 +1678,7 @@ void PeriSubFixedWindow(ParticleData PD)
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
             c->cd();
-            Jyieldsr_om.push_back(hsPeaksr_zeroed_om->IntegralAndError(hsPeaksr_zeroed_om->FindBin(-1.2),hsPeaksr_zeroed_om->FindBin(1.2),Jyieldsr_err_om[i],"width"));
+            Jyieldsr_om.push_back(hsPeaksr_zeroed_om->IntegralAndError(hsPeaksr_zeroed_om->FindBin(PD.fw_low),hsPeaksr_zeroed_om->FindBin(PD.fw_high),Jyieldsr_err_om[i],"width"));
             //double bin0yield = hsPeaksr_zeroed_om->GetBinContent(hsPeaksr_zeroed_om->FindBin(0.0))*0.19635;
             //Jyieldsr_om[i] = Jyieldsr_om[i]*2 - bin0yield;
 
@@ -1861,10 +1690,10 @@ void PeriSubFixedWindow(ParticleData PD)
             fit1->SetParameters(10,1,1,1);
             fit1->SetLineColor(2);
 
-            V2lrs_om[i] = hsignalPeak_om[i]->ProjectionY(Form("V2lrs_om%d",i),1,14);
-            TH1D* aV2lrs_om = hsignalPeak_om[i]->ProjectionY("aV2lrs_om",20,33);
-            V2lrb_om[i] = hbackgroundPeak_om[i]->ProjectionY(Form("V2lrb_om%d",i),1,14);
-            TH1D* aV2lrb_om = hbackgroundPeak_om[i]->ProjectionY("aV2lrb_om",20,33);
+            V2lrs_om[i] = hsignalPeak_om[i]->ProjectionY(Form("V2lrs_om%d",i),1,PD.binlow_V2);
+            TH1D* aV2lrs_om = hsignalPeak_om[i]->ProjectionY("aV2lrs_om",PD.binhigh_V2,33);
+            V2lrb_om[i] = hbackgroundPeak_om[i]->ProjectionY(Form("V2lrb_om%d",i),1,PD.binlow_V2);
+            TH1D* aV2lrb_om = hbackgroundPeak_om[i]->ProjectionY("aV2lrb_om",PD.binhigh_V2,33);
             V2lrs_om[i]->Add(aV2lrs_om);
             V2lrb_om[i]->Add(aV2lrb_om);
             V2lrs_om[i]->Divide(V2lrb_om[i]);
@@ -1955,6 +1784,25 @@ void PeriSubFixedWindow(ParticleData PD)
             V3sube_xi.push_back(sqrt(TMath::Power(V3Values_err_xi[i],2) + sqrt(TMath::Power(V3Values_err_low_xi[i]/V3Values_low_xi[i],2) + TMath::Power(JyieldSub_err_xi[i]/JyieldSub_xi[i],2) + TMath::Power(JyieldSub_err_low_xi[i]/JyieldSub_low_xi[i],2))*V3Values_low_xi[i]*Nassoc_low_xi[i]/Nassoc_xi[i]*JyieldSub_xi[i]/JyieldSub_low_xi[i]*sqrt(TMath::Power(V3Values_err_low_xi[i]/V3Values_low_xi[i],2) + TMath::Power(JyieldSub_err_xi[i]/JyieldSub_xi[i],2) + TMath::Power(JyieldSub_err_low_xi[i]/JyieldSub_low_xi[i],2))*V3Values_low_xi[i]*Nassoc_low_xi[i]/Nassoc_xi[i]*JyieldSub_xi[i]/JyieldSub_low_xi[i]));
 
             jetYfactor_xi.push_back(JyieldSub_xi[i]/JyieldSub_low_xi[i]);
+        }
+
+        //Om Vn correction
+        std::vector<double> V2sub_om;
+        std::vector<double> V2sube_om;
+
+        std::vector<double> V3sub_om;
+        std::vector<double> V3sube_om;
+
+        std::vector<double> jetYfactor_om;
+
+        for(unsigned i=0; i<numPtBins_om; i++){
+            V2sub_om.push_back(V2Values_om[i] - V2Values_low_om[i]*Nassoc_low_om[i]/Nassoc_om[i]*JyieldSub_om[i]/JyieldSub_low_om[i]);
+            V2sube_om.push_back(sqrt(TMath::Power(V2Values_err_om[i],2) + sqrt(TMath::Power(V2Values_err_low_om[i]/V2Values_low_om[i],2) + TMath::Power(JyieldSub_err_om[i]/JyieldSub_om[i],2) + TMath::Power(JyieldSub_err_low_om[i]/JyieldSub_low_om[i],2))*V2Values_low_om[i]*Nassoc_low_om[i]/Nassoc_om[i]*JyieldSub_om[i]/JyieldSub_low_om[i]*sqrt(TMath::Power(V2Values_err_low_om[i]/V2Values_low_om[i],2) + TMath::Power(JyieldSub_err_om[i]/JyieldSub_om[i],2) + TMath::Power(JyieldSub_err_low_om[i]/JyieldSub_low_om[i],2))*V2Values_low_om[i]*Nassoc_low_om[i]/Nassoc_om[i]*JyieldSub_om[i]/JyieldSub_low_om[i]));
+
+            V3sub_om.push_back(V3Values_om[i] - V3Values_low_om[i]*Nassoc_low_om[i]/Nassoc_om[i]*JyieldSub_om[i]/JyieldSub_low_om[i]);
+            V3sube_om.push_back(sqrt(TMath::Power(V3Values_err_om[i],2) + sqrt(TMath::Power(V3Values_err_low_om[i]/V3Values_low_om[i],2) + TMath::Power(JyieldSub_err_om[i]/JyieldSub_om[i],2) + TMath::Power(JyieldSub_err_low_om[i]/JyieldSub_low_om[i],2))*V3Values_low_om[i]*Nassoc_low_om[i]/Nassoc_om[i]*JyieldSub_om[i]/JyieldSub_low_om[i]*sqrt(TMath::Power(V3Values_err_low_om[i]/V3Values_low_om[i],2) + TMath::Power(JyieldSub_err_om[i]/JyieldSub_om[i],2) + TMath::Power(JyieldSub_err_low_om[i]/JyieldSub_low_om[i],2))*V3Values_low_om[i]*Nassoc_low_om[i]/Nassoc_om[i]*JyieldSub_om[i]/JyieldSub_low_om[i]));
+
+            jetYfactor_om.push_back(JyieldSub_om[i]/JyieldSub_low_om[i]);
         }
 
 
@@ -2063,6 +1911,41 @@ void PeriSubFixedWindow(ParticleData PD)
             v3e_low_xi.push_back(sqrt(TMath::Power(V3Values_err_low_xi[i]/V3Values_low_xi[i],2) + TMath::Power(v3e_low_ref/v3_low_ref,2))*v3_low_xi[i]);
         }
 
+        //Om vn calculation
+        std::vector<double> v2sub_om;
+        std::vector<double> v2sube_om;
+        std::vector<double> v2_om;
+        std::vector<double> v2e_om;
+        std::vector<double> v2_low_om;
+        std::vector<double> v2e_low_om;
+
+        std::vector<double> v3sub_om;
+        std::vector<double> v3sube_om;
+        std::vector<double> v3_om;
+        std::vector<double> v3e_om;
+        std::vector<double> v3_low_om;
+        std::vector<double> v3e_low_om;
+
+        for(unsigned i=0; i<numPtBins_om; i++){
+            v2sub_om.push_back(V2sub_om[i]/v2sub_ref);
+            v2sube_om.push_back(fabs(sqrt(TMath::Power(V2sube_om[i]/V2sub_om[i],2) + TMath::Power(v2sube_ref/v2sub_ref,2)))*v2sub_om[i]);
+
+            v2_om.push_back(V2Values_om[i]/v2_high_ref);
+            v2e_om.push_back(sqrt(TMath::Power(V2Values_err_om[i]/V2Values_om[i],2) + TMath::Power(v2e_high_ref/v2_high_ref,2))*v2_om[i]);
+
+            v2_low_om.push_back(V2Values_low_om[i]/v2_low_ref);
+            v2e_low_om.push_back(sqrt(TMath::Power(V2Values_err_low_om[i]/V2Values_low_om[i],2) + TMath::Power(v2e_low_ref/v2_low_ref,2))*v2_low_om[i]);
+
+            v3sub_om.push_back(V3sub_om[i]/v3sub_ref);
+            v3sube_om.push_back(fabs(sqrt(TMath::Power(V3sube_om[i]/V3sub_om[i],2) + TMath::Power(v3sube_ref/v3sub_ref,2))*v3sub_om[i]));
+
+            v3_om.push_back(V3Values_om[i]/v3_high_ref);
+            v3e_om.push_back(sqrt(TMath::Power(V3Values_err_om[i]/V3Values_om[i],2) + TMath::Power(v3e_high_ref/v3_high_ref,2))*v3_om[i]);
+
+            v3_low_om.push_back(V3Values_low_om[i]/v3_low_ref);
+            v3e_low_om.push_back(sqrt(TMath::Power(V3Values_err_low_om[i]/V3Values_low_om[i],2) + TMath::Power(v3e_low_ref/v3_low_ref,2))*v3_low_om[i]);
+        }
+
         //Produce RootFiles
         TFile output(PD.fn.c_str(),"UPDATE");
 
@@ -2097,6 +1980,16 @@ void PeriSubFixedWindow(ParticleData PD)
             Ket_xi.push_back(hket->GetMean(1));
         }
 
+        std::vector<double> pt_om;
+        std::vector<double> Ket_om;
+        for(unsigned i=0; i<numPtBins_om; i++){
+            TH1D* hpt = (TH1D*)PD.f_Om->Get(Form((PD.fn_Om + "/Pt_om_pt%d").c_str(),i));
+            TH1D* hket = (TH1D*)PD.f_Om->Get(Form((PD.fn_Om + "/KET_om_pt%d").c_str(),i));
+
+            pt_om.push_back(hpt->GetMean(1));
+            Ket_om.push_back(hket->GetMean(1));
+        }
+
         std::vector<double> perisubfactor_ks;
         std::vector<double> perisubfactore_ks;
         for(int i=0; i<numPtBins_ks; i++){
@@ -2115,6 +2008,13 @@ void PeriSubFixedWindow(ParticleData PD)
         for(int i=0; i<numPtBins_xi; i++){
             perisubfactor_xi.push_back(V2Values_low_xi[i]*Nassoc_low_xi[i]/JyieldSub_low_xi[i]);
             perisubfactore_xi.push_back(sqrt(TMath::Power(V2Values_err_low_xi[i]/V2Values_low_xi[i],2) + TMath::Power(JyieldSub_err_low_xi[i]/JyieldSub_low_xi[i],2))*perisubfactor_xi[i]);
+        }
+
+        std::vector<double> perisubfactor_om;
+        std::vector<double> perisubfactore_om;
+        for(int i=0; i<numPtBins_om; i++){
+            perisubfactor_om.push_back(V2Values_low_om[i]*Nassoc_low_om[i]/JyieldSub_low_om[i]);
+            perisubfactore_om.push_back(sqrt(TMath::Power(V2Values_err_low_om[i]/V2Values_low_om[i],2) + TMath::Power(JyieldSub_err_low_om[i]/JyieldSub_low_om[i],2))*perisubfactor_om[i]);
         }
 
         //Obs v2 values
@@ -2145,6 +2045,16 @@ void PeriSubFixedWindow(ParticleData PD)
         TGraphErrors* v3plot_KET_xi    = new TGraphErrors(numPtBins_xi,&Ket_xi[0],&v3_xi[0]      ,0,&v3e_xi[0]);
         TGraphErrors* v3subplot_xi     = new TGraphErrors(numPtBins_xi,&pt_xi[0] ,&v3sub_xi[0]   ,0,&v3sube_xi[0]);
         TGraphErrors* v3subplot_KET_xi = new TGraphErrors(numPtBins_xi,&Ket_xi[0],&v3sub_xi[0]   ,0,&v3sube_xi[0]);
+
+        TGraphErrors* v2plot_om        = new TGraphErrors(numPtBins_om,&pt_om[0] ,&v2_om[0]      ,0,&v2e_om[0]);
+        TGraphErrors* v2plot_low_om    = new TGraphErrors(numPtBins_om,&pt_om[0] ,&v2_low_om[0]      ,0,&v2e_low_om[0]);
+        TGraphErrors* v2plot_KET_om    = new TGraphErrors(numPtBins_om,&Ket_om[0],&v2_om[0]      ,0,&v2e_om[0]);
+        TGraphErrors* v2subplot_om     = new TGraphErrors(numPtBins_om,&pt_om[0] ,&v2sub_om[0]   ,0,&v2sube_om[0]);
+        TGraphErrors* v2subplot_KET_om = new TGraphErrors(numPtBins_om,&Ket_om[0],&v2sub_om[0]   ,0,&v2sube_om[0]);
+        TGraphErrors* v3plot_om        = new TGraphErrors(numPtBins_om,&pt_om[0] ,&v3_om[0]      ,0,&v3e_om[0]);
+        TGraphErrors* v3plot_KET_om    = new TGraphErrors(numPtBins_om,&Ket_om[0],&v3_om[0]      ,0,&v3e_om[0]);
+        TGraphErrors* v3subplot_om     = new TGraphErrors(numPtBins_om,&pt_om[0] ,&v3sub_om[0]   ,0,&v3sube_om[0]);
+        TGraphErrors* v3subplot_KET_om = new TGraphErrors(numPtBins_om,&Ket_om[0],&v3sub_om[0]   ,0,&v3sube_om[0]);
 
         //Obs V2 values
         TGraphErrors* V2plot_ks        = new TGraphErrors(numPtBins_ks,&pt_ks[0] ,&V2Values_ks[0]    ,0,&V2Values_err_ks[0]);
@@ -2177,6 +2087,16 @@ void PeriSubFixedWindow(ParticleData PD)
         TGraphErrors* V3subplot_xi     = new TGraphErrors(numPtBins_xi,&pt_xi[0] ,&V3sub_xi[0]       ,0,&V3sube_xi[0]);
         TGraphErrors* V3subplot_KET_xi = new TGraphErrors(numPtBins_xi,&Ket_xi[0],&V3sub_xi[0]       ,0,&V3sube_xi[0]);
 
+        TGraphErrors* V2plot_om        = new TGraphErrors(numPtBins_om,&pt_om[0] ,&V2Values_om[0]    ,0,&V2Values_err_om[0]);
+        TGraphErrors* V2plot_low_om    = new TGraphErrors(numPtBins_om,&pt_om[0] ,&V2Values_low_om[0],0,&V2Values_err_low_om[0]);
+        TGraphErrors* V2plot_KET_om    = new TGraphErrors(numPtBins_om,&Ket_om[0],&V2Values_om[0]    ,0,&V2Values_err_om[0]);
+        TGraphErrors* V2subplot_om     = new TGraphErrors(numPtBins_om,&pt_om[0] ,&V2sub_om[0]       ,0,&V2sube_om[0]);
+        TGraphErrors* V2subplot_KET_om = new TGraphErrors(numPtBins_om,&Ket_om[0],&V2sub_om[0]       ,0,&V2sube_om[0]);
+        TGraphErrors* V3plot_om        = new TGraphErrors(numPtBins_om,&pt_om[0] ,&V3Values_om[0]    ,0,&V3Values_err_om[0]);
+        TGraphErrors* V3plot_KET_om    = new TGraphErrors(numPtBins_om,&Ket_om[0],&V3Values_om[0]    ,0,&V3Values_err_om[0]);
+        TGraphErrors* V3subplot_om     = new TGraphErrors(numPtBins_om,&pt_om[0] ,&V3sub_om[0]       ,0,&V3sube_om[0]);
+        TGraphErrors* V3subplot_KET_om = new TGraphErrors(numPtBins_om,&Ket_om[0],&V3sub_om[0]       ,0,&V3sube_om[0]);
+
         //Yields
         TGraphErrors* srYieldPlot_ks       = new TGraphErrors(numPtBins_ks,&pt_ks[0],&Jyieldsr_ks[0]     ,0,&Jyieldsr_err_ks[0]);
         //TGraphErrors* lrYieldPlot_ks       = new TGraphErrors(numPtBins_ks,&pt_ks[0],&Jyieldlr_ks[0]     ,0,&Jyieldlr_err_ks[0]);
@@ -2199,6 +2119,13 @@ void PeriSubFixedWindow(ParticleData PD)
         TGraphErrors* subYieldPlot_xi      = new TGraphErrors(numPtBins_xi,&pt_xi[0],&JyieldSub_xi[0]    ,0,&JyieldSub_err_xi[0]);
         TGraphErrors* perisubfactorplot_xi = new TGraphErrors(numPtBins_xi,&pt_xi[0],&perisubfactor_xi[0],0,&perisubfactore_xi[0]);
 
+        TGraphErrors* srYieldPlot_om       = new TGraphErrors(numPtBins_om,&pt_om[0],&Jyieldsr_om[0]     ,0,&Jyieldsr_err_om[0]);
+        //TGraphErrors* lrYieldPlot_om       = new TGraphErrors(numPtBins_om,&pt_om[0],&Jyieldlr_om[0]     ,0,&Jyieldlr_err_om[0]);
+        TGraphErrors* srYieldPlot_low_om       = new TGraphErrors(numPtBins_om,&pt_om[0],&Jyieldsr_low_om[0]     ,0,&Jyieldsr_err_low_om[0]);
+        //TGraphErrors* lrYieldPlot_low_om       = new TGraphErrors(numPtBins_om,&pt_om[0],&Jyieldlr_low_om[0]     ,0,&Jyieldlr_err_low_om[0]);
+        TGraphErrors* subYieldPlot_om      = new TGraphErrors(numPtBins_om,&pt_om[0],&JyieldSub_om[0]    ,0,&JyieldSub_err_om[0]);
+        TGraphErrors* perisubfactorplot_om = new TGraphErrors(numPtBins_om,&pt_om[0],&perisubfactor_om[0],0,&perisubfactore_om[0]);
+
         //For Direct subtraction method
         TGraphErrors* Nasslow_ks         = new TGraphErrors(numPtBins_ks,&pt_ks[0],&Nassoc_low_ks[0]   ,0,0);
         TGraphErrors* Nass_ks            = new TGraphErrors(numPtBins_ks,&pt_ks[0],&Nassoc_ks[0]       ,0,0);
@@ -2212,9 +2139,14 @@ void PeriSubFixedWindow(ParticleData PD)
         TGraphErrors* Nass_xi            = new TGraphErrors(numPtBins_xi,&pt_xi[0],&Nassoc_xi[0]       ,0,0);
         TGraphErrors* subYieldPlotLow_xi = new TGraphErrors(numPtBins_xi,&pt_xi[0],&JyieldSub_low_xi[0],0,&JyieldSub_err_low_xi[0]);
 
+        TGraphErrors* Nasslow_om         = new TGraphErrors(numPtBins_om,&pt_om[0],&Nassoc_low_om[0]   ,0,0);
+        TGraphErrors* Nass_om            = new TGraphErrors(numPtBins_om,&pt_om[0],&Nassoc_om[0]       ,0,0);
+        TGraphErrors* subYieldPlotLow_om = new TGraphErrors(numPtBins_om,&pt_om[0],&JyieldSub_low_om[0],0,&JyieldSub_err_low_om[0]);
+
         TGraphErrors* bz_ks = new TGraphErrors(numPtBins_ks,&pt_ks[0],&Bz_ks[0],0,0);
         TGraphErrors* bz_la = new TGraphErrors(numPtBins_la,&pt_la[0],&Bz_la[0],0,0);
         TGraphErrors* bz_xi = new TGraphErrors(numPtBins_xi,&pt_xi[0],&Bz_xi[0],0,0);
+        TGraphErrors* bz_om = new TGraphErrors(numPtBins_om,&pt_om[0],&Bz_om[0],0,0);
 
         std::string region;
         if(j == 0) region = "obs";
@@ -2248,6 +2180,16 @@ void PeriSubFixedWindow(ParticleData PD)
         v3subplot_xi    ->Write(("v3subplot_" + region + "_xi"    ).c_str(),TObject::kOverwrite);
         v3subplot_KET_xi->Write(("v3subplot_KET_" + region + "_xi").c_str(),TObject::kOverwrite);
 
+        v2plot_om       ->Write(("v2plot_" + region + "_om"       ).c_str(),TObject::kOverwrite);
+        v2plot_low_om       ->Write(("v2plot_" + region + "_low_om"       ).c_str(),TObject::kOverwrite);
+        v2plot_KET_om   ->Write(("v2plot_KET_" + region + "_om"   ).c_str(),TObject::kOverwrite);
+        v2subplot_om    ->Write(("v2subplot_" + region + "_om"    ).c_str(),TObject::kOverwrite);
+        v2subplot_KET_om->Write(("v2subplot_KET_" + region + "_om").c_str(),TObject::kOverwrite);
+        v3plot_om       ->Write(("v3plot_" + region + "_om"       ).c_str(),TObject::kOverwrite);
+        v3plot_KET_om   ->Write(("v3plot_KET_" + region + "_om"   ).c_str(),TObject::kOverwrite);
+        v3subplot_om    ->Write(("v3subplot_" + region + "_om"    ).c_str(),TObject::kOverwrite);
+        v3subplot_KET_om->Write(("v3subplot_KET_" + region + "_om").c_str(),TObject::kOverwrite);
+
         V2plot_ks        -> Write(("V2plot_" + region + "_ks"       ).c_str(),TObject::kOverwrite);
         V2plot_low_ks    -> Write(("V2plot_" + region + "_low_ks"   ).c_str(),TObject::kOverwrite);
         V2plot_KET_ks    -> Write(("V2plot_KET_" + region + "_ks"   ).c_str(),TObject::kOverwrite);
@@ -2278,9 +2220,20 @@ void PeriSubFixedWindow(ParticleData PD)
         V3subplot_xi     -> Write(("V3subplot_" + region + "_xi"    ).c_str(),TObject::kOverwrite);
         V3subplot_KET_xi -> Write(("V3subplot_KET_" + region + "_xi").c_str(),TObject::kOverwrite);
 
+        V2plot_om        -> Write(("V2plot_" + region + "_om"       ).c_str(),TObject::kOverwrite);
+        V2plot_low_om    -> Write(("V2plot_" + region + "_low_om"   ).c_str(),TObject::kOverwrite);
+        V2plot_KET_om    -> Write(("V2plot_KET_" + region + "_om"   ).c_str(),TObject::kOverwrite);
+        V2subplot_om     -> Write(("V2subplot_" + region + "_om"    ).c_str(),TObject::kOverwrite);
+        V2subplot_KET_om -> Write(("V2subplot_KET_" + region + "_om").c_str(),TObject::kOverwrite);
+        V3plot_om        -> Write(("V3plot_" + region + "_om"       ).c_str(),TObject::kOverwrite);
+        V3plot_KET_om    -> Write(("V3plot_KET_" + region + "_om"   ).c_str(),TObject::kOverwrite);
+        V3subplot_om     -> Write(("V3subplot_" + region + "_om"    ).c_str(),TObject::kOverwrite);
+        V3subplot_KET_om -> Write(("V3subplot_KET_" + region + "_om").c_str(),TObject::kOverwrite);
+
         perisubfactorplot_ks->Write(("perisubfactor_" + region + "_ks").c_str(),TObject::kOverwrite);
         perisubfactorplot_la->Write(("perisubfactor_" + region + "_la").c_str(),TObject::kOverwrite);
         perisubfactorplot_xi->Write(("perisubfactor_" + region + "_xi").c_str(),TObject::kOverwrite);
+        perisubfactorplot_om->Write(("perisubfactor_" + region + "_om").c_str(),TObject::kOverwrite);
 
         Nass_ks           ->Write(("Nassoc_" + region + "_ks"       ).c_str(),TObject::kOverwrite);
         Nasslow_ks        ->Write(("Nassoc_low_" + region + "_ks"   ).c_str(),TObject::kOverwrite);
@@ -2309,13 +2262,28 @@ void PeriSubFixedWindow(ParticleData PD)
         srYieldPlot_low_xi->Write(("YieldsrPlot_" + region + "low_xi").c_str(),TObject::kOverwrite);
         //lrYieldPlot_low_xi->Write(("YieldlrPlot_" + region + "low_xi").c_str(),TObject::kOverwrite);
 
+        Nass_om           ->Write(("Nassoc_" + region + "_om"       ).c_str(),TObject::kOverwrite);
+        Nasslow_om        ->Write(("Nassoc_low_" + region + "_om"   ).c_str(),TObject::kOverwrite);
+        subYieldPlotLow_om->Write(("YieldPlot_low_" + region + "_om").c_str(),TObject::kOverwrite);
+        subYieldPlot_om   ->Write(("YieldPlot_" + region + "_om"    ).c_str(),TObject::kOverwrite);
+        srYieldPlot_om->Write(("YieldsrPlot_" + region + "_om").c_str(),TObject::kOverwrite);
+        //lrYieldPlot_om->Write(("YieldlrPlot_" + region + "_om").c_str(),TObject::kOverwrite);
+        srYieldPlot_low_om->Write(("YieldsrPlot_" + region + "low_om").c_str(),TObject::kOverwrite);
+        //lrYieldPlot_low_om->Write(("YieldlrPlot_" + region + "low_om").c_str(),TObject::kOverwrite);
+
         bz_ks->Write(("bz_" + region + "_ks").c_str(),TObject::kOverwrite);
         bz_la->Write(("bz_" + region + "_la").c_str(),TObject::kOverwrite);
         bz_xi->Write(("bz_" + region + "_xi").c_str(),TObject::kOverwrite);
+        bz_om->Write(("bz_" + region + "_om").c_str(),TObject::kOverwrite);
 
         //c_lr_low_Fourier_xi[j]->Print(("Image/PeriSub/Fourier_" + region + "_low_xiEG2_2terms.pdf").c_str());
         c_sr_low_xi[j]->Print(("Image/PeriSub/Yield_sr_" + region + "_low_xi.pdf").c_str());
         //c_lr_low_xi[j]->Print(("Image/PeriSub/Yield_lr_" + region + "_low_xi.pdf").c_str());
+
+        //c_lr_low_Fourier_om[j]->Print(("Image/PeriSub/Fourier_" + region + "_low_omEG2_2terms.pdf").c_str());
+        c_sr_low_om[j]->Print(("Image/PeriSub/Yield_sr_" + region + "_low_om.pdf").c_str());
+        //c_lr_low_om[j]->Print(("Image/PeriSub/Yield_lr_" + region + "_low_om.pdf").c_str());
+
     }
 }
 
@@ -2544,8 +2512,8 @@ void PeriSubObs(ParticleData PD)
     PD.f_low_ref->GetObject("pPbCorr/signal",hsignalPeak_low_ref);
     TH1D* mult_low_ref = (TH1D*) PD.f_low_ref->Get("pPbCorr/mult");
 
-    hbPeaksr_low_ref = hbackgroundPeak_low_ref->ProjectionY("hbPeaksr_low_ref", 14, 20);
-    hsPeaksr_low_ref = hsignalPeak_low_ref->ProjectionY("hsPeaksr_low_ref", 14, 20);
+    hbPeaksr_low_ref = hbackgroundPeak_low_ref->ProjectionY("hbPeaksr_low_ref", PD.sr_low, PD.sr_high);
+    hsPeaksr_low_ref = hsignalPeak_low_ref->ProjectionY("hsPeaksr_low_ref", PD.sr_low, PD.sr_high);
 
     TF1* quadFit1 = new TF1("quadFit1","[0]*x^2+[1]*x+[2]",0.6,2.2);
     quadFit1->SetParameters(1,1,1);
@@ -2574,7 +2542,7 @@ void PeriSubObs(ParticleData PD)
     double ycoor = 0.90;
     double increment = 0.07;
     tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-    tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+    tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
     tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",0.3,3.0));
     tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
     tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
@@ -2612,7 +2580,7 @@ void PeriSubObs(ParticleData PD)
     ycoor = 0.90;
     increment = 0.07;
     tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-    tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+    tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
     tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",0.3,3.0));
     tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
     tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
@@ -2692,8 +2660,8 @@ void PeriSubObs(ParticleData PD)
     PD.f_high_ref->GetObject("pPbCorr/signal",hsignalPeak_high_ref);
     TH1D* mult_high_ref = (TH1D*) PD.f_high_ref->Get("pPbCorr/mult");
 
-    hbPeaksr_high_ref = hbackgroundPeak_high_ref->ProjectionY("hbPeaksr_high_ref", 14, 20);
-    hsPeaksr_high_ref = hsignalPeak_high_ref->ProjectionY("hsPeaksr_high_ref", 14, 20);
+    hbPeaksr_high_ref = hbackgroundPeak_high_ref->ProjectionY("hbPeaksr_high_ref", PD.sr_low, PD.sr_high);
+    hsPeaksr_high_ref = hsignalPeak_high_ref->ProjectionY("hsPeaksr_high_ref", PD.sr_low, PD.sr_high);
 
     TF1* quadFit12 = new TF1("quadFit12","[0]*x^2+[1]*x+[2]",0.6,2.2);
     quadFit12->SetParameters(1,1,1);
@@ -2721,7 +2689,7 @@ void PeriSubObs(ParticleData PD)
     ycoor = 0.90;
     increment = 0.07;
     tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-    tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+    tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
     tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",0.3,3.0));
     tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
     tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
@@ -2759,7 +2727,7 @@ void PeriSubObs(ParticleData PD)
     ycoor = 0.90;
     increment = 0.07;
     tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-    tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+    tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
     tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",0.3,3.0));
     tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
     tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
@@ -2835,6 +2803,7 @@ void PeriSubObs(ParticleData PD)
     int numPtBins_ks = PD.PtBin_ks.size()-1;
     int numPtBins_la = PD.PtBin_la.size()-1;
     int numPtBins_xi = PD.PtBin_xi.size()-1;
+    int numPtBins_om = PD.PtBin_om.size()-1;
 
 
     for(int j=0; j<2; j++)
@@ -2942,8 +2911,8 @@ void PeriSubObs(ParticleData PD)
             PD.f_perisub->GetObject(Form(PathSignal_low_ks.c_str(),i),hsignalPeak_low_ks[i]);
             TH1D* mult_low_ks = (TH1D*) PD.f_perisub->Get(Form(PathMult_low_ks.c_str(),i));
 
-            hbPeaksr_low_ks[i] = hbackgroundPeak_low_ks[i]->ProjectionY(Form(("hb"+region_label+"sr_low_ks%d").c_str(),i), 14, 20);
-            hsPeaksr_low_ks[i] = hsignalPeak_low_ks[i]->ProjectionY(Form(("hs"+region_label+"sr_low_ks%d").c_str(),i), 14, 20);
+            hbPeaksr_low_ks[i] = hbackgroundPeak_low_ks[i]->ProjectionY(Form(("hb"+region_label+"sr_low_ks%d").c_str(),i), PD.sr_low, PD.sr_high);
+            hsPeaksr_low_ks[i] = hsignalPeak_low_ks[i]->ProjectionY(Form(("hs"+region_label+"sr_low_ks%d").c_str(),i), PD.sr_low, PD.sr_high);
 
             TF1* quadFit13 = new TF1("quadFit13","[0]*x^2+[1]*x+[2]",0.6,2.2);
             quadFit13->SetParameters(1,1,1);
@@ -2999,7 +2968,7 @@ void PeriSubObs(ParticleData PD)
             double ycoor = 0.90;
             double increment = 0.07;
             tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_ks[i],PD.PtBin_ks[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
@@ -3040,7 +3009,7 @@ void PeriSubObs(ParticleData PD)
             ycoor = 0.90;
             increment = 0.07;
             tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_ks[i],PD.PtBin_ks[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
@@ -3117,8 +3086,8 @@ void PeriSubObs(ParticleData PD)
             PD.f_perisub->GetObject(Form(PathSignal_low_la.c_str(),i),hsignalPeak_low_la[i]);
             TH1D* mult_low_la = (TH1D*) PD.f_perisub->Get(Form(PathMult_low_la.c_str(),i));
 
-            hbPeaksr_low_la[i] = hbackgroundPeak_low_la[i]->ProjectionY(("hb"+region_label+"sr_low_la").c_str(), 14, 20);
-            hsPeaksr_low_la[i] = hsignalPeak_low_la[i]->ProjectionY(("hs"+region_label+"sr_low_la").c_str(), 14, 20);
+            hbPeaksr_low_la[i] = hbackgroundPeak_low_la[i]->ProjectionY(("hb"+region_label+"sr_low_la").c_str(), PD.sr_low, PD.sr_high);
+            hsPeaksr_low_la[i] = hsignalPeak_low_la[i]->ProjectionY(("hs"+region_label+"sr_low_la").c_str(), PD.sr_low, PD.sr_high);
 
             if(i<8)
             {
@@ -3173,7 +3142,7 @@ void PeriSubObs(ParticleData PD)
             double ycoor = 0.90;
             double increment = 0.07;
             tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_la[i],PD.PtBin_la[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
@@ -3213,7 +3182,7 @@ void PeriSubObs(ParticleData PD)
             ycoor = 0.90;
             increment = 0.07;
             tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_la[i],PD.PtBin_la[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
@@ -3289,8 +3258,8 @@ void PeriSubObs(ParticleData PD)
             PD.f_perisub_xi->GetObject(Form(PathSignal_low_xi.c_str(),i),hsignalPeak_low_xi[i]);
             TH1D* mult_low_xi = (TH1D*) PD.f_perisub_xi->Get(Form(PathMult_low_xi.c_str(),i));
 
-            hbPeaksr_low_xi[i] = hbackgroundPeak_low_xi[i]->ProjectionY(Form(("hb"+region_label+"sr_low_xi%d").c_str(),i), 14, 20);
-            hsPeaksr_low_xi[i] = hsignalPeak_low_xi[i]->ProjectionY(Form(("hs+"region_label+"sr_low_xi%d").c_str(),i), 14, 20);
+            hbPeaksr_low_xi[i] = hbackgroundPeak_low_xi[i]->ProjectionY(Form(("hb"+region_label+"sr_low_xi%d").c_str(),i), PD.sr_low, PD.sr_high);
+            hsPeaksr_low_xi[i] = hsignalPeak_low_xi[i]->ProjectionY(Form(("hs"+region_label+"sr_low_xi%d").c_str(),i), PD.sr_low, PD.sr_high);
 
             TF1* quadFit13 = new TF1("quadFit13","[0]*x^2+[1]*x+[2]",0.6,2.2);
             quadFit13->SetParameters(1,1,1);
@@ -3319,8 +3288,8 @@ void PeriSubObs(ParticleData PD)
             }
 
 
-            nEvent_low_xi.push_back(mult_low_xi->Integral(0,100000));
-            //nEvent_low_xi.push_back(mult_low_xi->Integral(2,100000));
+            //nEvent_low_xi.push_back(mult_low_xi->Integral(0,100000));
+            nEvent_low_xi.push_back(mult_low_xi->Integral(2,100000));
             Bz_low_xi.push_back(hbackgroundPeak_low_xi[i]->GetBinContent(hbackgroundPeak_low_xi[i]->FindBin(0,0)));
 
             hsPeaksr_low_xi[i]->Divide(hbPeaksr_low_xi[i]);
@@ -3344,7 +3313,7 @@ void PeriSubObs(ParticleData PD)
             double ycoor = 0.90;
             double increment = 0.07;
             tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_xi[i],PD.PtBin_xi[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
@@ -3384,7 +3353,7 @@ void PeriSubObs(ParticleData PD)
             ycoor = 0.90;
             increment = 0.07;
             tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_xi[i],PD.PtBin_xi[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
@@ -3465,8 +3434,8 @@ void PeriSubObs(ParticleData PD)
             PD.f_perisub_om->GetObject(Form(PathSignal_low_om.c_str(),i),hsignalPeak_low_om[i]);
             TH1D* mult_low_om = (TH1D*) PD.f_perisub_om->Get(Form(PathMult_low_om.c_str(),i));
 
-            hbPeaksr_low_om[i] = hbackgroundPeak_low_om[i]->ProjectionY(Form(("hb"+region_label+"sr_low_om%d").c_str(),i), 14, 20);
-            hsPeaksr_low_om[i] = hsignalPeak_low_om[i]->ProjectionY(Form(("hs"+region_label+"sr_low_om%d").c_str(),i), 14, 20);
+            hbPeaksr_low_om[i] = hbackgroundPeak_low_om[i]->ProjectionY(Form(("hb"+region_label+"sr_low_om%d").c_str(),i), PD.sr_low, PD.sr_high);
+            hsPeaksr_low_om[i] = hsignalPeak_low_om[i]->ProjectionY(Form(("hs"+region_label+"sr_low_om%d").c_str(),i), PD.sr_low, PD.sr_high);
 
             TF1* quadFit13 = new TF1("quadFit13","[0]*x^2+[1]*x+[2]",0.6,2.2);
             quadFit13->SetParameters(1,1,1);
@@ -3494,7 +3463,7 @@ void PeriSubObs(ParticleData PD)
                 hPeak_low_2Dom->Draw("SURF1");
             }
 
-            nEvent_low_om.push_back(mult_low_om->Integral(0,100000));
+            nEvent_low_om.push_back(mult_low_om->Integral(2,100000));
             //nEvent_low_om.push_back(mult_low_om->Integral(2,100000));
             Bz_low_om.push_back(hbackgroundPeak_low_om[i]->GetBinContent(hbackgroundPeak_low_om[i]->FindBin(0,0)));
 
@@ -3519,7 +3488,7 @@ void PeriSubObs(ParticleData PD)
             double ycoor = 0.90;
             double increment = 0.07;
             tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_om[i],PD.PtBin_om[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
@@ -3559,7 +3528,7 @@ void PeriSubObs(ParticleData PD)
             ycoor = 0.90;
             increment = 0.07;
             tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_om[i],PD.PtBin_om[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
@@ -3569,6 +3538,7 @@ void PeriSubObs(ParticleData PD)
 
             JyieldSub_low_om.push_back(Jyieldsr_low_om[i] - Jyieldlr_low_om[i]);
             JyieldSub_err_low_om.push_back(sqrt(Jyieldsr_err_low_om[i]*Jyieldsr_err_low_om[i] + Jyieldlr_err_low_om[i]*Jyieldlr_err_low_om[i]));
+            c->cd();
 
             //TF1* fit1 = new TF1("fit1","[0]*(1.0+2.0*[1]*cos(x)+2.0*[2]*cos(2.0*x)+2.0*[3]*cos(3.0*x)+2.0*[4]*cos(4.0*x))",-0.5*TMath::Pi(),1.5*TMath::Pi());
             //TF1* fit1 = new TF1("fit1","[0]*(1.0+2.0*[1]*cos(x)+2.0*[2]*cos(2.0*x)+2.0*[3]*cos(3.0*x))",-0.5*TMath::Pi(),1.5*TMath::Pi());
@@ -3586,8 +3556,6 @@ void PeriSubObs(ParticleData PD)
             V2lrs_low_om[i]->Divide(V2lrb_low_om[i]);
             V2lrs_low_om[i]->Scale(Bz_low_om[i]/nEvent_low_om[i]/BW2D);
             //V2lrs_low_om[i]->Scale(Bz_low_om[i]/BW2D);
-            
-            c_lr_low_Fourier_om[j]->cd(i+1);
 
             V2lrs_low_om[i]->Fit("fit1","R");
             V2lrs_low_om[i]->Fit("fit1","R");
@@ -3640,8 +3608,8 @@ void PeriSubObs(ParticleData PD)
             PD.f_V0->GetObject(Form(PathSignal_high_ks.c_str(),i),hsignalPeak_ks[i]);
             TH1D* mult_ks = (TH1D*) PD.f_V0->Get(Form(PathMult_high_ks.c_str(),i));
 
-            hbPeaksr_ks[i] = hbackgroundPeak_ks[i]->ProjectionY(("hb"+region_label+"sr_ks").c_str(), 14, 20);
-            hsPeaksr_ks[i] = hsignalPeak_ks[i]->ProjectionY(("hs"+region_label+"sr_ks").c_str(), 14, 20);
+            hbPeaksr_ks[i] = hbackgroundPeak_ks[i]->ProjectionY(("hb"+region_label+"sr_ks").c_str(), PD.sr_low, PD.sr_high);
+            hsPeaksr_ks[i] = hsignalPeak_ks[i]->ProjectionY(("hs"+region_label+"sr_ks").c_str(), PD.sr_low, PD.sr_high);
 
             if(i<8)
             {
@@ -3695,7 +3663,7 @@ void PeriSubObs(ParticleData PD)
             double ycoor = 0.90;
             double increment = 0.07;
             tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_ks[i],PD.PtBin_ks[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
@@ -3736,7 +3704,7 @@ void PeriSubObs(ParticleData PD)
             ycoor = 0.90;
             increment = 0.07;
             tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_ks[i],PD.PtBin_ks[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
@@ -3812,8 +3780,8 @@ void PeriSubObs(ParticleData PD)
             //hsignalPeak_la[i] = (TH2D*)f_V0->Get(Form((fn_V0 + "/signallambda_pt%d").c_str(),i));
             TH1D* mult_la = (TH1D*) PD.f_V0->Get(Form(PathMult_high_la.c_str(),i));
 
-            hbPeaksr_la[i] = hbackgroundPeak_la[i]->ProjectionY(("hb"+region_label+"sr_la").c_str(), 14, 20);
-            hsPeaksr_la[i] = hsignalPeak_la[i]->ProjectionY(("hs"+region_label+"sr_la").c_str(), 14, 20);
+            hbPeaksr_la[i] = hbackgroundPeak_la[i]->ProjectionY(("hb"+region_label+"sr_la").c_str(), PD.sr_low, PD.sr_high);
+            hsPeaksr_la[i] = hsignalPeak_la[i]->ProjectionY(("hs"+region_label+"sr_la").c_str(), PD.sr_low, PD.sr_high);
 
             if(i<8)
             {
@@ -3869,7 +3837,7 @@ void PeriSubObs(ParticleData PD)
             double ycoor = 0.90;
             double increment = 0.07;
             tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%4.1f<p_{T}^{trg}<%4.1f",PD.PtBin_la[i],PD.PtBin_la[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|<1");
@@ -3910,7 +3878,7 @@ void PeriSubObs(ParticleData PD)
             ycoor = 0.90;
             increment = 0.07;
             tex->DrawLatex(xcoor,ycoor-=increment,"CMS pPb 8.16 TeV");
-            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}<20");
+            tex->DrawLatex(xcoor,ycoor-=increment,"0<N_{trk}^{offline}35");
             tex->DrawLatex(xcoor,ycoor-=increment,Form("%f<p_{T}^{trg}<%f",PD.PtBin_la[i],PD.PtBin_la[i+1]));
             tex->DrawLatex(xcoor,ycoor-=increment,"0.3<p_{T}^{assoc}<3GeV");
             tex->DrawLatex(xcoor,ycoor-=increment,"|#Delta#eta|>2");
@@ -3987,8 +3955,8 @@ void PeriSubObs(ParticleData PD)
             //TH1D* mult_xi = (TH1D*) PD.f_Xi->Get((PD.fn_Xi + "/nEvtCut").c_str());
             TH1D* mult_xi = (TH1D*) PD.f_Xi->Get(Form(PathMult_high_xi.c_str(),i));
 
-            hbPeaksr_xi[i] = hbackgroundPeak_xi[i]->ProjectionY(Form(("hb"+region_label+"sr_xi%d").c_str(),i), 14, 20);
-            hsPeaksr_xi[i] = hsignalPeak_xi[i]->ProjectionY(Form(("hs"+region_label+"sr_xi%d").c_str(),i), 14, 20);
+            hbPeaksr_xi[i] = hbackgroundPeak_xi[i]->ProjectionY(Form(("hb"+region_label+"sr_xi%d").c_str(),i), PD.sr_low, PD.sr_high);
+            hsPeaksr_xi[i] = hsignalPeak_xi[i]->ProjectionY(Form(("hs"+region_label+"sr_xi%d").c_str(),i), PD.sr_low, PD.sr_high);
 
             if(i<8)
             {
@@ -4154,13 +4122,10 @@ void PeriSubObs(ParticleData PD)
         {
             PD.f_Om->GetObject(Form(PathBackground_high_om.c_str(),i),hbackgroundPeak_om[i]);
             PD.f_Om->GetObject(Form(PathSignal_high_om.c_str(),i),hsignalPeak_om[i]);
-            //hbackgroundPeak_om[i] = (TH2D*)PD.f_V0->Get(Form((fn_V0 + "/backgroundlambda_pt%d").c_str(),i));
-            //hsignalPeak_om[i] = (TH2D*)f_V0->Get(Form((fn_V0 + "/signallambda_pt%d").c_str(),i));
-            //TH1D* mult_om = (TH1D*) PD.f_Om->Get((PD.fn_Om + "/nEvtCut").c_str());
             TH1D* mult_om = (TH1D*) PD.f_Om->Get(Form(PathMult_high_om.c_str(),i));
 
-            hbPeaksr_om[i] = hbackgroundPeak_om[i]->ProjectionY(Form(("hb"+region_label+"sr_om%d").c_str(),i), 14, 20);
-            hsPeaksr_om[i] = hsignalPeak_om[i]->ProjectionY(Form(("hs"+region_label+"sr_om%d").c_str(),i), 14, 20);
+            hbPeaksr_om[i] = hbackgroundPeak_om[i]->ProjectionY(Form(("hb"+region_label+"sr_om%d").c_str(),i), PD.sr_low, PD.sr_high);
+            hsPeaksr_om[i] = hsignalPeak_om[i]->ProjectionY(Form(("hs"+region_label+"sr_om%d").c_str(),i), PD.sr_low, PD.sr_high);
 
             if(i<8)
             {
@@ -4194,7 +4159,6 @@ void PeriSubObs(ParticleData PD)
 
             hsPeaksr_om[i]->Divide(hbPeaksr_om[i]);
             hsPeaksr_om[i]->Scale(Bz_om[i]/nEvent_om[i]/BW2D);
-            //hsPeaksr_om[i]->Scale(Bz_om[i]/BW2D);
 
             c_sr_om[j]->cd(i+1);
 
@@ -4232,7 +4196,6 @@ void PeriSubObs(ParticleData PD)
             hsPeaklr_om[i]->Add(ahsPeaklr_om);
             hsPeaklr_om[i]->Divide(hbPeaklr_om[i]);
             hsPeaklr_om[i]->Scale(Bz_om[i]/nEvent_om[i]/BW2D);
-            //hsPeaklr_om[i]->Scale(Bz_om[i]/BW2D);
 
             c_lr_om[j]->cd(i+1);
 
@@ -4271,8 +4234,6 @@ void PeriSubObs(ParticleData PD)
             fit1->SetParameters(10,1,1,1);
             fit1->SetLineColor(2);
 
-            c_lr_high_Fourier_om[j]->cd(i+1);
-
             V2lrs_om[i] = hsignalPeak_om[i]->ProjectionY(Form("V2lrs_om%d",i),1,PD.binlow_V2);
             TH1D* aV2lrs_om = hsignalPeak_om[i]->ProjectionY("aV2lrs_om",PD.binhigh_V2,33);
             V2lrb_om[i] = hbackgroundPeak_om[i]->ProjectionY(Form("V2lrb_om%d",i),1,PD.binlow_V2);
@@ -4281,7 +4242,6 @@ void PeriSubObs(ParticleData PD)
             V2lrb_om[i]->Add(aV2lrb_om);
             V2lrs_om[i]->Divide(V2lrb_om[i]);
             V2lrs_om[i]->Scale(Bz_om[i]/nEvent_om[i]/BW2D);
-            //V2lrs_om[i]->Scale(Bz_om[i]/BW2D);
 
             V2lrs_om[i]->Fit("fit1","R");
             V2lrs_om[i]->Fit("fit1","R");
@@ -4369,6 +4329,25 @@ void PeriSubObs(ParticleData PD)
             V3sube_xi.push_back(sqrt(TMath::Power(V3Values_err_xi[i],2) + sqrt(TMath::Power(V3Values_err_low_xi[i]/V3Values_low_xi[i],2) + TMath::Power(JyieldSub_err_xi[i]/JyieldSub_xi[i],2) + TMath::Power(JyieldSub_err_low_xi[i]/JyieldSub_low_xi[i],2))*V3Values_low_xi[i]*Nassoc_low_xi[i]/Nassoc_xi[i]*JyieldSub_xi[i]/JyieldSub_low_xi[i]*sqrt(TMath::Power(V3Values_err_low_xi[i]/V3Values_low_xi[i],2) + TMath::Power(JyieldSub_err_xi[i]/JyieldSub_xi[i],2) + TMath::Power(JyieldSub_err_low_xi[i]/JyieldSub_low_xi[i],2))*V3Values_low_xi[i]*Nassoc_low_xi[i]/Nassoc_xi[i]*JyieldSub_xi[i]/JyieldSub_low_xi[i]));
 
             jetYfactor_xi.push_back(JyieldSub_xi[i]/JyieldSub_low_xi[i]);
+        }
+
+        //Om Vn correction
+        std::vector<double> V2sub_om;
+        std::vector<double> V2sube_om;
+
+        std::vector<double> V3sub_om;
+        std::vector<double> V3sube_om;
+
+        std::vector<double> jetYfactor_om;
+
+        for(unsigned i=0; i<numPtBins_om; i++){
+            V2sub_om.push_back(V2Values_om[i] - V2Values_low_om[i]*Nassoc_low_om[i]/Nassoc_om[i]*JyieldSub_om[i]/JyieldSub_low_om[i]);
+            V2sube_om.push_back(sqrt(TMath::Power(V2Values_err_om[i],2) + sqrt(TMath::Power(V2Values_err_low_om[i]/V2Values_low_om[i],2) + TMath::Power(JyieldSub_err_om[i]/JyieldSub_om[i],2) + TMath::Power(JyieldSub_err_low_om[i]/JyieldSub_low_om[i],2))*V2Values_low_om[i]*Nassoc_low_om[i]/Nassoc_om[i]*JyieldSub_om[i]/JyieldSub_low_om[i]*sqrt(TMath::Power(V2Values_err_low_om[i]/V2Values_low_om[i],2) + TMath::Power(JyieldSub_err_om[i]/JyieldSub_om[i],2) + TMath::Power(JyieldSub_err_low_om[i]/JyieldSub_low_om[i],2))*V2Values_low_om[i]*Nassoc_low_om[i]/Nassoc_om[i]*JyieldSub_om[i]/JyieldSub_low_om[i]));
+
+            V3sub_om.push_back(V3Values_om[i] - V3Values_low_om[i]*Nassoc_low_om[i]/Nassoc_om[i]*JyieldSub_om[i]/JyieldSub_low_om[i]);
+            V3sube_om.push_back(sqrt(TMath::Power(V3Values_err_om[i],2) + sqrt(TMath::Power(V3Values_err_low_om[i]/V3Values_low_om[i],2) + TMath::Power(JyieldSub_err_om[i]/JyieldSub_om[i],2) + TMath::Power(JyieldSub_err_low_om[i]/JyieldSub_low_om[i],2))*V3Values_low_om[i]*Nassoc_low_om[i]/Nassoc_om[i]*JyieldSub_om[i]/JyieldSub_low_om[i]*sqrt(TMath::Power(V3Values_err_low_om[i]/V3Values_low_om[i],2) + TMath::Power(JyieldSub_err_om[i]/JyieldSub_om[i],2) + TMath::Power(JyieldSub_err_low_om[i]/JyieldSub_low_om[i],2))*V3Values_low_om[i]*Nassoc_low_om[i]/Nassoc_om[i]*JyieldSub_om[i]/JyieldSub_low_om[i]));
+
+            jetYfactor_om.push_back(JyieldSub_om[i]/JyieldSub_low_om[i]);
         }
 
 
@@ -4477,6 +4456,41 @@ void PeriSubObs(ParticleData PD)
             v3e_low_xi.push_back(sqrt(TMath::Power(V3Values_err_low_xi[i]/V3Values_low_xi[i],2) + TMath::Power(v3e_low_ref/v3_low_ref,2))*v3_low_xi[i]);
         }
 
+        //Om vn calculation
+        std::vector<double> v2sub_om;
+        std::vector<double> v2sube_om;
+        std::vector<double> v2_om;
+        std::vector<double> v2e_om;
+        std::vector<double> v2_low_om;
+        std::vector<double> v2e_low_om;
+
+        std::vector<double> v3sub_om;
+        std::vector<double> v3sube_om;
+        std::vector<double> v3_om;
+        std::vector<double> v3e_om;
+        std::vector<double> v3_low_om;
+        std::vector<double> v3e_low_om;
+
+        for(unsigned i=0; i<numPtBins_om; i++){
+            v2sub_om.push_back(V2sub_om[i]/v2sub_ref);
+            v2sube_om.push_back(fabs(sqrt(TMath::Power(V2sube_om[i]/V2sub_om[i],2) + TMath::Power(v2sube_ref/v2sub_ref,2)))*v2sub_om[i]);
+
+            v2_om.push_back(V2Values_om[i]/v2_high_ref);
+            v2e_om.push_back(sqrt(TMath::Power(V2Values_err_om[i]/V2Values_om[i],2) + TMath::Power(v2e_high_ref/v2_high_ref,2))*v2_om[i]);
+
+            v2_low_om.push_back(V2Values_low_om[i]/v2_low_ref);
+            v2e_low_om.push_back(sqrt(TMath::Power(V2Values_err_low_om[i]/V2Values_low_om[i],2) + TMath::Power(v2e_low_ref/v2_low_ref,2))*v2_low_om[i]);
+
+            v3sub_om.push_back(V3sub_om[i]/v3sub_ref);
+            v3sube_om.push_back(fabs(sqrt(TMath::Power(V3sube_om[i]/V3sub_om[i],2) + TMath::Power(v3sube_ref/v3sub_ref,2))*v3sub_om[i]));
+
+            v3_om.push_back(V3Values_om[i]/v3_high_ref);
+            v3e_om.push_back(sqrt(TMath::Power(V3Values_err_om[i]/V3Values_om[i],2) + TMath::Power(v3e_high_ref/v3_high_ref,2))*v3_om[i]);
+
+            v3_low_om.push_back(V3Values_low_om[i]/v3_low_ref);
+            v3e_low_om.push_back(sqrt(TMath::Power(V3Values_err_low_om[i]/V3Values_low_om[i],2) + TMath::Power(v3e_low_ref/v3_low_ref,2))*v3_low_om[i]);
+        }
+
         //Produce RootFiles
         std::string command = "";
         if(j==0) command = "RECREATE";
@@ -4514,6 +4528,16 @@ void PeriSubObs(ParticleData PD)
             Ket_xi.push_back(hket->GetMean(1));
         }
 
+        std::vector<double> pt_om;
+        std::vector<double> Ket_om;
+        for(unsigned i=0; i<numPtBins_om; i++){
+            TH1D* hpt = (TH1D*)PD.f_Om->Get(Form((PD.fn_Om + "/Pt_om_pt%d").c_str(),i));
+            TH1D* hket = (TH1D*)PD.f_Om->Get(Form((PD.fn_Om + "/KET_om_pt%d").c_str(),i));
+
+            pt_om.push_back(hpt->GetMean(1));
+            Ket_om.push_back(hket->GetMean(1));
+        }
+
         std::vector<double> perisubfactor_ks;
         std::vector<double> perisubfactore_ks;
         for(int i=0; i<numPtBins_ks; i++){
@@ -4532,6 +4556,13 @@ void PeriSubObs(ParticleData PD)
         for(int i=0; i<numPtBins_xi; i++){
             perisubfactor_xi.push_back(V2Values_low_xi[i]*Nassoc_low_xi[i]/JyieldSub_low_xi[i]);
             perisubfactore_xi.push_back(sqrt(TMath::Power(V2Values_err_low_xi[i]/V2Values_low_xi[i],2) + TMath::Power(JyieldSub_err_low_xi[i]/JyieldSub_low_xi[i],2))*perisubfactor_xi[i]);
+        }
+
+        std::vector<double> perisubfactor_om;
+        std::vector<double> perisubfactore_om;
+        for(int i=0; i<numPtBins_om; i++){
+            perisubfactor_om.push_back(V2Values_low_om[i]*Nassoc_low_om[i]/JyieldSub_low_om[i]);
+            perisubfactore_om.push_back(sqrt(TMath::Power(V2Values_err_low_om[i]/V2Values_low_om[i],2) + TMath::Power(JyieldSub_err_low_om[i]/JyieldSub_low_om[i],2))*perisubfactor_om[i]);
         }
 
         //Obs v2 values
@@ -4562,6 +4593,16 @@ void PeriSubObs(ParticleData PD)
         TGraphErrors* v3plot_KET_xi    = new TGraphErrors(numPtBins_xi,&Ket_xi[0],&v3_xi[0]      ,0,&v3e_xi[0]);
         TGraphErrors* v3subplot_xi     = new TGraphErrors(numPtBins_xi,&pt_xi[0] ,&v3sub_xi[0]   ,0,&v3sube_xi[0]);
         TGraphErrors* v3subplot_KET_xi = new TGraphErrors(numPtBins_xi,&Ket_xi[0],&v3sub_xi[0]   ,0,&v3sube_xi[0]);
+
+        TGraphErrors* v2plot_om        = new TGraphErrors(numPtBins_om,&pt_om[0] ,&v2_om[0]      ,0,&v2e_om[0]);
+        TGraphErrors* v2plot_low_om    = new TGraphErrors(numPtBins_om,&pt_om[0] ,&v2_low_om[0]      ,0,&v2e_low_om[0]);
+        TGraphErrors* v2plot_KET_om    = new TGraphErrors(numPtBins_om,&Ket_om[0],&v2_om[0]      ,0,&v2e_om[0]);
+        TGraphErrors* v2subplot_om     = new TGraphErrors(numPtBins_om,&pt_om[0] ,&v2sub_om[0]   ,0,&v2sube_om[0]);
+        TGraphErrors* v2subplot_KET_om = new TGraphErrors(numPtBins_om,&Ket_om[0],&v2sub_om[0]   ,0,&v2sube_om[0]);
+        TGraphErrors* v3plot_om        = new TGraphErrors(numPtBins_om,&pt_om[0] ,&v3_om[0]      ,0,&v3e_om[0]);
+        TGraphErrors* v3plot_KET_om    = new TGraphErrors(numPtBins_om,&Ket_om[0],&v3_om[0]      ,0,&v3e_om[0]);
+        TGraphErrors* v3subplot_om     = new TGraphErrors(numPtBins_om,&pt_om[0] ,&v3sub_om[0]   ,0,&v3sube_om[0]);
+        TGraphErrors* v3subplot_KET_om = new TGraphErrors(numPtBins_om,&Ket_om[0],&v3sub_om[0]   ,0,&v3sube_om[0]);
 
         //Obs V2 values
         TGraphErrors* V2plot_ks        = new TGraphErrors(numPtBins_ks,&pt_ks[0] ,&V2Values_ks[0]    ,0,&V2Values_err_ks[0]);
@@ -4594,11 +4635,21 @@ void PeriSubObs(ParticleData PD)
         TGraphErrors* V3subplot_xi     = new TGraphErrors(numPtBins_xi,&pt_xi[0] ,&V3sub_xi[0]       ,0,&V3sube_xi[0]);
         TGraphErrors* V3subplot_KET_xi = new TGraphErrors(numPtBins_xi,&Ket_xi[0],&V3sub_xi[0]       ,0,&V3sube_xi[0]);
 
+        TGraphErrors* V2plot_om        = new TGraphErrors(numPtBins_om,&pt_om[0] ,&V2Values_om[0]    ,0,&V2Values_err_om[0]);
+        TGraphErrors* V2plot_low_om    = new TGraphErrors(numPtBins_om,&pt_om[0] ,&V2Values_low_om[0],0,&V2Values_err_low_om[0]);
+        TGraphErrors* V2plot_KET_om    = new TGraphErrors(numPtBins_om,&Ket_om[0],&V2Values_om[0]    ,0,&V2Values_err_om[0]);
+        TGraphErrors* V2subplot_om     = new TGraphErrors(numPtBins_om,&pt_om[0] ,&V2sub_om[0]       ,0,&V2sube_om[0]);
+        TGraphErrors* V2subplot_KET_om = new TGraphErrors(numPtBins_om,&Ket_om[0],&V2sub_om[0]       ,0,&V2sube_om[0]);
+        TGraphErrors* V3plot_om        = new TGraphErrors(numPtBins_om,&pt_om[0] ,&V3Values_om[0]    ,0,&V3Values_err_om[0]);
+        TGraphErrors* V3plot_KET_om    = new TGraphErrors(numPtBins_om,&Ket_om[0],&V3Values_om[0]    ,0,&V3Values_err_om[0]);
+        TGraphErrors* V3subplot_om     = new TGraphErrors(numPtBins_om,&pt_om[0] ,&V3sub_om[0]       ,0,&V3sube_om[0]);
+        TGraphErrors* V3subplot_KET_om = new TGraphErrors(numPtBins_om,&Ket_om[0],&V3sub_om[0]       ,0,&V3sube_om[0]);
+
         //Yields
         TGraphErrors* srYieldPlot_ks       = new TGraphErrors(numPtBins_ks,&pt_ks[0],&Jyieldsr_ks[0]     ,0,&Jyieldsr_err_ks[0]);
         TGraphErrors* lrYieldPlot_ks       = new TGraphErrors(numPtBins_ks,&pt_ks[0],&Jyieldlr_ks[0]     ,0,&Jyieldlr_err_ks[0]);
-        TGraphErrors* srYieldPlot_low_ks       = new TGraphErrors(numPtBins_ks,&pt_ks[0],&Jyieldsr_low_ks[0]     ,0,&Jyieldsr_err_low_ks[0]);
-        TGraphErrors* lrYieldPlot_low_ks       = new TGraphErrors(numPtBins_ks,&pt_ks[0],&Jyieldlr_low_ks[0]     ,0,&Jyieldlr_err_low_ks[0]);
+        TGraphErrors* srYieldPlot_low_ks   = new TGraphErrors(numPtBins_ks,&pt_ks[0],&Jyieldsr_low_ks[0]     ,0,&Jyieldsr_err_low_ks[0]);
+        TGraphErrors* lrYieldPlot_low_ks   = new TGraphErrors(numPtBins_ks,&pt_ks[0],&Jyieldlr_low_ks[0]     ,0,&Jyieldlr_err_low_ks[0]);
         TGraphErrors* subYieldPlot_ks      = new TGraphErrors(numPtBins_ks,&pt_ks[0],&JyieldSub_ks[0]    ,0,&JyieldSub_err_ks[0]);
         TGraphErrors* perisubfactorplot_ks = new TGraphErrors(numPtBins_ks,&pt_ks[0],&perisubfactor_ks[0],0,&perisubfactore_ks[0]);
 
@@ -4616,6 +4667,13 @@ void PeriSubObs(ParticleData PD)
         TGraphErrors* subYieldPlot_xi      = new TGraphErrors(numPtBins_xi,&pt_xi[0],&JyieldSub_xi[0]    ,0,&JyieldSub_err_xi[0]);
         TGraphErrors* perisubfactorplot_xi = new TGraphErrors(numPtBins_xi,&pt_xi[0],&perisubfactor_xi[0],0,&perisubfactore_xi[0]);
 
+        TGraphErrors* srYieldPlot_om       = new TGraphErrors(numPtBins_om,&pt_om[0],&Jyieldsr_om[0]     ,0,&Jyieldsr_err_om[0]);
+        TGraphErrors* lrYieldPlot_om       = new TGraphErrors(numPtBins_om,&pt_om[0],&Jyieldlr_om[0]     ,0,&Jyieldlr_err_om[0]);
+        TGraphErrors* srYieldPlot_low_om       = new TGraphErrors(numPtBins_om,&pt_om[0],&Jyieldsr_low_om[0]     ,0,&Jyieldsr_err_low_om[0]);
+        TGraphErrors* lrYieldPlot_low_om       = new TGraphErrors(numPtBins_om,&pt_om[0],&Jyieldlr_low_om[0]     ,0,&Jyieldlr_err_low_om[0]);
+        TGraphErrors* subYieldPlot_om      = new TGraphErrors(numPtBins_om,&pt_om[0],&JyieldSub_om[0]    ,0,&JyieldSub_err_om[0]);
+        TGraphErrors* perisubfactorplot_om = new TGraphErrors(numPtBins_om,&pt_om[0],&perisubfactor_om[0],0,&perisubfactore_om[0]);
+
         //For Direct subtraction method
         TGraphErrors* Nasslow_ks         = new TGraphErrors(numPtBins_ks,&pt_ks[0],&Nassoc_low_ks[0]   ,0,0);
         TGraphErrors* Nass_ks            = new TGraphErrors(numPtBins_ks,&pt_ks[0],&Nassoc_ks[0]       ,0,0);
@@ -4629,9 +4687,14 @@ void PeriSubObs(ParticleData PD)
         TGraphErrors* Nass_xi            = new TGraphErrors(numPtBins_xi,&pt_xi[0],&Nassoc_xi[0]       ,0,0);
         TGraphErrors* subYieldPlotLow_xi = new TGraphErrors(numPtBins_xi,&pt_xi[0],&JyieldSub_low_xi[0],0,&JyieldSub_err_low_xi[0]);
 
+        TGraphErrors* Nasslow_om         = new TGraphErrors(numPtBins_om,&pt_om[0],&Nassoc_low_om[0]   ,0,0);
+        TGraphErrors* Nass_om            = new TGraphErrors(numPtBins_om,&pt_om[0],&Nassoc_om[0]       ,0,0);
+        TGraphErrors* subYieldPlotLow_om = new TGraphErrors(numPtBins_om,&pt_om[0],&JyieldSub_low_om[0],0,&JyieldSub_err_low_om[0]);
+
         TGraphErrors* bz_ks = new TGraphErrors(numPtBins_ks,&pt_ks[0],&Bz_ks[0],0,0);
         TGraphErrors* bz_la = new TGraphErrors(numPtBins_la,&pt_la[0],&Bz_la[0],0,0);
         TGraphErrors* bz_xi = new TGraphErrors(numPtBins_xi,&pt_xi[0],&Bz_xi[0],0,0);
+        TGraphErrors* bz_om = new TGraphErrors(numPtBins_om,&pt_om[0],&Bz_om[0],0,0);
 
         std::string region;
         if(j == 0) region = "obs";
@@ -4665,6 +4728,16 @@ void PeriSubObs(ParticleData PD)
         v3subplot_xi    ->Write(("v3subplot_" + region + "_xi"    ).c_str(),TObject::kOverwrite);
         v3subplot_KET_xi->Write(("v3subplot_KET_" + region + "_xi").c_str(),TObject::kOverwrite);
 
+        v2plot_om       ->Write(("v2plot_" + region + "_om"       ).c_str(),TObject::kOverwrite);
+        v2plot_low_om       ->Write(("v2plot_" + region + "_low_om"       ).c_str(),TObject::kOverwrite);
+        v2plot_KET_om   ->Write(("v2plot_KET_" + region + "_om"   ).c_str(),TObject::kOverwrite);
+        v2subplot_om    ->Write(("v2subplot_" + region + "_om"    ).c_str(),TObject::kOverwrite);
+        v2subplot_KET_om->Write(("v2subplot_KET_" + region + "_om").c_str(),TObject::kOverwrite);
+        v3plot_om       ->Write(("v3plot_" + region + "_om"       ).c_str(),TObject::kOverwrite);
+        v3plot_KET_om   ->Write(("v3plot_KET_" + region + "_om"   ).c_str(),TObject::kOverwrite);
+        v3subplot_om    ->Write(("v3subplot_" + region + "_om"    ).c_str(),TObject::kOverwrite);
+        v3subplot_KET_om->Write(("v3subplot_KET_" + region + "_om").c_str(),TObject::kOverwrite);
+
         V2plot_ks        -> Write(("V2plot_" + region + "_ks"       ).c_str(),TObject::kOverwrite);
         V2plot_low_ks    -> Write(("V2plot_" + region + "_low_ks"   ).c_str(),TObject::kOverwrite);
         V2plot_KET_ks    -> Write(("V2plot_KET_" + region + "_ks"   ).c_str(),TObject::kOverwrite);
@@ -4695,9 +4768,20 @@ void PeriSubObs(ParticleData PD)
         V3subplot_xi     -> Write(("V3subplot_" + region + "_xi"    ).c_str(),TObject::kOverwrite);
         V3subplot_KET_xi -> Write(("V3subplot_KET_" + region + "_xi").c_str(),TObject::kOverwrite);
 
+        V2plot_om        -> Write(("V2plot_" + region + "_om"       ).c_str(),TObject::kOverwrite);
+        V2plot_low_om    -> Write(("V2plot_" + region + "_low_om"   ).c_str(),TObject::kOverwrite);
+        V2plot_KET_om    -> Write(("V2plot_KET_" + region + "_om"   ).c_str(),TObject::kOverwrite);
+        V2subplot_om     -> Write(("V2subplot_" + region + "_om"    ).c_str(),TObject::kOverwrite);
+        V2subplot_KET_om -> Write(("V2subplot_KET_" + region + "_om").c_str(),TObject::kOverwrite);
+        V3plot_om        -> Write(("V3plot_" + region + "_om"       ).c_str(),TObject::kOverwrite);
+        V3plot_KET_om    -> Write(("V3plot_KET_" + region + "_om"   ).c_str(),TObject::kOverwrite);
+        V3subplot_om     -> Write(("V3subplot_" + region + "_om"    ).c_str(),TObject::kOverwrite);
+        V3subplot_KET_om -> Write(("V3subplot_KET_" + region + "_om").c_str(),TObject::kOverwrite);
+
         perisubfactorplot_ks->Write(("perisubfactor_" + region + "_ks").c_str(),TObject::kOverwrite);
         perisubfactorplot_la->Write(("perisubfactor_" + region + "_la").c_str(),TObject::kOverwrite);
         perisubfactorplot_xi->Write(("perisubfactor_" + region + "_xi").c_str(),TObject::kOverwrite);
+        perisubfactorplot_om->Write(("perisubfactor_" + region + "_om").c_str(),TObject::kOverwrite);
 
         Nass_ks           ->Write(("Nassoc_" + region + "_ks"       ).c_str(),TObject::kOverwrite);
         Nasslow_ks        ->Write(("Nassoc_low_" + region + "_ks"   ).c_str(),TObject::kOverwrite);
@@ -4726,14 +4810,49 @@ void PeriSubObs(ParticleData PD)
         srYieldPlot_low_xi->Write(("YieldsrPlot_" + region + "low_xi").c_str(),TObject::kOverwrite);
         lrYieldPlot_low_xi->Write(("YieldlrPlot_" + region + "low_xi").c_str(),TObject::kOverwrite);
 
+        Nass_om           ->Write(("Nassoc_" + region + "_om"       ).c_str(),TObject::kOverwrite);
+        Nasslow_om        ->Write(("Nassoc_low_" + region + "_om"   ).c_str(),TObject::kOverwrite);
+        subYieldPlotLow_om->Write(("YieldPlot_low_" + region + "_om").c_str(),TObject::kOverwrite);
+        subYieldPlot_om   ->Write(("YieldPlot_" + region + "_om"    ).c_str(),TObject::kOverwrite);
+        srYieldPlot_om->Write(("YieldsrPlot_" + region + "_om").c_str(),TObject::kOverwrite);
+        lrYieldPlot_om->Write(("YieldlrPlot_" + region + "_om").c_str(),TObject::kOverwrite);
+        srYieldPlot_low_om->Write(("YieldsrPlot_" + region + "low_om").c_str(),TObject::kOverwrite);
+        lrYieldPlot_low_om->Write(("YieldlrPlot_" + region + "low_om").c_str(),TObject::kOverwrite);
+
         bz_ks->Write(("bz_" + region + "_ks").c_str(),TObject::kOverwrite);
         bz_la->Write(("bz_" + region + "_la").c_str(),TObject::kOverwrite);
         bz_xi->Write(("bz_" + region + "_xi").c_str(),TObject::kOverwrite);
+        bz_om->Write(("bz_" + region + "_om").c_str(),TObject::kOverwrite);
 
         c_lr_low_Fourier_xi[j]->Print(("Image/PeriSub/Fourier_" + region + "_low_xiEG2_2terms.pdf").c_str());
         c_sr_low_xi[j]->Print(("Image/PeriSub/Yield_sr_" + region + "_low_xi.pdf").c_str());
         c_lr_low_xi[j]->Print(("Image/PeriSub/Yield_lr_" + region + "_low_xi.pdf").c_str());
+
+        //c_lr_low_Fourier_om[j]->Print(("Image/PeriSub/Fourier_" + region + "_low_omEG2_2terms.pdf").c_str());
+        //c_sr_low_om[j]->Print(("Image/PeriSub/Yield_sr_" + region + "_low_om.pdf").c_str());
+        //c_lr_low_om[j]->Print(("Image/PeriSub/Yield_lr_" + region + "_low_om.pdf").c_str());
+
+        c_sr_low_ks[j] ->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_sr_low_ks[j]->GetTitle() + ".pdf").c_str() );
+        c_lr_low_ks[j] ->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_lr_low_ks[j]->GetTitle() + ".pdf").c_str() );
+        c_sr_ks[j]     ->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_sr_ks[j]->GetTitle()     + ".pdf").c_str() );
+        c_lr_ks[j]     ->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_lr_ks[j]->GetTitle()     + ".pdf").c_str() );
+        c_sr_low_la[j] ->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_sr_low_la[j]->GetTitle() + ".pdf").c_str() );
+        c_lr_low_la[j] ->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_lr_low_la[j]->GetTitle() + ".pdf").c_str() );
+        c_sr_la[j]     ->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_sr_la[j]->GetTitle()     + ".pdf").c_str() );
+        c_lr_la[j]     ->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_lr_la[j]->GetTitle()     + ".pdf").c_str() );
+        c_sr_low_xi[j] ->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_sr_low_xi[j]->GetTitle() + ".pdf").c_str() );
+        c_lr_low_xi[j] ->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_lr_low_xi[j]->GetTitle() + ".pdf").c_str() );
+        c_sr_xi[j]     ->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_sr_xi[j]->GetTitle()     + ".pdf").c_str() );
+        c_lr_xi[j]     ->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_lr_xi[j]->GetTitle()     + ".pdf").c_str() );
+        c_sr_low_om[j] ->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_sr_low_om[j]->GetTitle() + ".pdf").c_str() );
+        c_lr_low_om[j] ->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_lr_low_om[j]->GetTitle() + ".pdf").c_str() );
+        c_sr_om[j]     ->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_sr_om[j]->GetTitle()     + ".pdf").c_str() );
+        c_lr_om[j]     ->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_lr_om[j]->GetTitle()     + ".pdf").c_str() );
     }
+    c_sr_low_ref ->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_sr_low_ref ->GetTitle()+".pdf").c_str());
+    c_lr_low_ref ->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_lr_low_ref ->GetTitle()+".pdf").c_str());
+    c_sr_high_ref->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_sr_high_ref->GetTitle()+".pdf").c_str());
+    c_lr_high_ref->Print(("Image/PeriSub/JetPeakFitting/"+(std::string)c_lr_high_ref->GetTitle()+".pdf").c_str());
 }
 
 void PeriSubSigIndirect(ParticleData PD)
@@ -4772,6 +4891,16 @@ void PeriSubSigIndirect(ParticleData PD)
     TGraphErrors* v2bkg_KET_xi;
     TGraphErrors* v2bkg_KET_sub_xi;
 
+    TGraphErrors* v2obs_om;
+    TGraphErrors* v2obs_sub_om;
+    TGraphErrors* v2bkg_om;
+    TGraphErrors* v2bkg_sub_om;
+
+    TGraphErrors* v2obs_KET_om;
+    TGraphErrors* v2obs_KET_sub_om;
+    TGraphErrors* v2bkg_KET_om;
+    TGraphErrors* v2bkg_KET_sub_om;
+
     f->GetObject("v2plot_obs_ks"   ,v2obs_ks);
     f->GetObject("v2subplot_obs_ks",v2obs_sub_ks);
     f->GetObject("v2plot_bkg_ks"   ,v2bkg_ks);
@@ -4801,6 +4930,16 @@ void PeriSubSigIndirect(ParticleData PD)
     f->GetObject("v2subplot_KET_obs_xi",v2obs_KET_sub_xi);
     f->GetObject("v2plot_KET_bkg_xi"   ,v2bkg_KET_xi);
     f->GetObject("v2subplot_KET_bkg_xi",v2bkg_KET_sub_xi);
+
+    f->GetObject("v2plot_obs_om"   ,v2obs_om);
+    f->GetObject("v2subplot_obs_om",v2obs_sub_om);
+    f->GetObject("v2plot_bkg_om"   ,v2bkg_om);
+    f->GetObject("v2subplot_bkg_om",v2bkg_sub_om);
+
+    f->GetObject("v2plot_KET_obs_om"   ,v2obs_KET_om);
+    f->GetObject("v2subplot_KET_obs_om",v2obs_KET_sub_om);
+    f->GetObject("v2plot_KET_bkg_om"   ,v2bkg_KET_om);
+    f->GetObject("v2subplot_KET_bkg_om",v2bkg_KET_sub_om);
 
     double* v2_obs_ks     = v2obs_ks->GetY();
     double* v2_obs_err_ks = v2obs_ks->GetEY();
@@ -4832,13 +4971,25 @@ void PeriSubSigIndirect(ParticleData PD)
     double* v2_bkg_sub_xi     = v2bkg_sub_xi->GetY();
     double* v2_bkg_err_sub_xi = v2bkg_sub_xi->GetEY();
 
+    double* v2_obs_om     = v2obs_om->GetY();
+    double* v2_obs_err_om = v2obs_om->GetEY();
+    double* v2_bkg_om     = v2bkg_om->GetY();
+    double* v2_bkg_err_om = v2bkg_om->GetEY();
+
+    double* v2_obs_sub_om     = v2obs_sub_om->GetY();
+    double* v2_obs_err_sub_om = v2obs_sub_om->GetEY();
+    double* v2_bkg_sub_om     = v2bkg_sub_om->GetY();
+    double* v2_bkg_err_sub_om = v2bkg_sub_om->GetEY();
+
     double* pt_ks = v2obs_ks->GetX();
     double* pt_la = v2obs_la->GetX();
     double* pt_xi = v2obs_xi->GetX();
+    double* pt_om = v2obs_om->GetX();
 
     double* KET_ks = v2obs_KET_ks->GetX();
     double* KET_la = v2obs_KET_la->GetX();
     double* KET_xi = v2obs_KET_xi->GetX();
+    double* KET_om = v2obs_KET_om->GetX();
 
     std::vector<double> bkgfrac_ks;
     std::vector<double> v2true_ks;
@@ -4857,6 +5008,12 @@ void PeriSubSigIndirect(ParticleData PD)
     std::vector<double> v2true_err_xi;
     std::vector<double> v2true_sub_xi;
     std::vector<double> v2true_sub_err_xi;
+
+    std::vector<double> bkgfrac_om;
+    std::vector<double> v2true_om;
+    std::vector<double> v2true_err_om;
+    std::vector<double> v2true_sub_om;
+    std::vector<double> v2true_sub_err_om;
 
     for(unsigned i=0; i<PD.PtBin_ks.size(); i++)
     {
@@ -4885,9 +5042,19 @@ void PeriSubSigIndirect(ParticleData PD)
         v2true_sub_err_xi.push_back(sqrt(TMath::Power(v2_bkg_err_sub_xi[i]*bkgfrac_xi[i],2) + TMath::Power(v2_obs_err_sub_xi[i],2))/PD.fsig_xi[i]);
     }
 
+    for(unsigned i=0; i<PD.PtBin_om.size(); i++)
+    {
+        bkgfrac_om.push_back(1 - PD.fsig_om[i]);
+        v2true_om.push_back((v2_obs_om[i] - v2_bkg_om[i]*bkgfrac_om[i])/PD.fsig_om[i]);
+        v2true_err_om.push_back(sqrt(TMath::Power((v2_bkg_err_om[i]*bkgfrac_om[i]),2) + TMath::Power(v2_obs_err_om[i],2))/PD.fsig_om[i]);
+        v2true_sub_om.push_back((v2_obs_sub_om[i] - v2_bkg_sub_om[i]*bkgfrac_om[i])/PD.fsig_om[i]);
+        v2true_sub_err_om.push_back(sqrt(TMath::Power(v2_bkg_err_sub_om[i]*bkgfrac_om[i],2) + TMath::Power(v2_obs_err_sub_om[i],2))/PD.fsig_om[i]);
+    }
+
     int numPtBins_ks = PD.PtBin_ks.size()-1;
     int numPtBins_la = PD.PtBin_la.size()-1;
     int numPtBins_xi = PD.PtBin_xi.size()-1;
+    int numPtBins_om = PD.PtBin_om.size()-1;
 
     TGraphErrors* ksv2true    = new TGraphErrors(numPtBins_ks,pt_ks,&v2true_ks[0]    ,0,&v2true_err_ks[0]);
     TGraphErrors* ksv2truesub = new TGraphErrors(numPtBins_ks,pt_ks,&v2true_sub_ks[0],0,&v2true_sub_err_ks[0]);
@@ -4907,6 +5074,12 @@ void PeriSubSigIndirect(ParticleData PD)
     TGraphErrors* xiv2true_KET    = new TGraphErrors(numPtBins_xi,KET_xi,&v2true_xi[0]    ,0,&v2true_err_xi[0]);
     TGraphErrors* xiv2truesub_KET = new TGraphErrors(numPtBins_xi,KET_xi,&v2true_sub_xi[0],0,&v2true_sub_err_xi[0]);
 
+    TGraphErrors* omv2true    = new TGraphErrors(numPtBins_om,pt_om,&v2true_om[0]    ,0,&v2true_err_om[0]);
+    TGraphErrors* omv2truesub = new TGraphErrors(numPtBins_om,pt_om,&v2true_sub_om[0],0,&v2true_sub_err_om[0]);
+
+    TGraphErrors* omv2true_KET    = new TGraphErrors(numPtBins_om,KET_om,&v2true_om[0]    ,0,&v2true_err_om[0]);
+    TGraphErrors* omv2truesub_KET = new TGraphErrors(numPtBins_om,KET_om,&v2true_sub_om[0],0,&v2true_sub_err_om[0]);
+
     TFile output(PD.fn.c_str(),"UPDATE");
 
     ksv2true       ->Write("kshortv2true"       ,TObject::kOverwrite);
@@ -4923,6 +5096,11 @@ void PeriSubSigIndirect(ParticleData PD)
     xiv2truesub    ->Write("xiv2truesub"    ,TObject::kOverwrite);
     xiv2true_KET   ->Write("xiv2true_KET"   ,TObject::kOverwrite);
     xiv2truesub_KET->Write("xiv2truesub_KET",TObject::kOverwrite);
+
+    omv2true       ->Write("omv2true"       ,TObject::kOverwrite);
+    omv2truesub    ->Write("omv2truesub"    ,TObject::kOverwrite);
+    omv2true_KET   ->Write("omv2true_KET"   ,TObject::kOverwrite);
+    omv2truesub_KET->Write("omv2truesub_KET",TObject::kOverwrite);
 }
 
 void PeriSubSigDirect(ParticleData PD)
@@ -5223,11 +5401,274 @@ void PeriSubSigDirect(ParticleData PD)
     }
 }
 
+void PrintV2(ParticleData PD)
+{
+    TFile* f_corr = TFile::Open("FitRootFiles/PeriSub/V0v2perisub_Default_AllStrange_EG1_0_35_CorrectRef_CorrectGap_12_06_17.root");
+    TFile* f_incorr = TFile::Open("FitRootFiles/PeriSub/V0v2perisub_Default_EG1_0_35_CorrectRef_InCorrectGap_12_05_17.root");
+    TFile* f_corr_20 = TFile::Open("FitRootFiles/PeriSub/V0v2perisub_Default_EG1_0_20_CorrectRef_CorrectGap_12_06_17.root");
+    TFile* f_incorr_20 = TFile::Open("FitRootFiles/PeriSub/V0v2perisub_Default_EG1_0_20_CorrectRef_InCorrectGap_12_05_17.root");
+
+    TGraphErrors* Nasslow_obs_ks_corr = (TGraphErrors*)f_corr->Get("Nassoc_low_obs_ks");
+    TGraphErrors* Nasslow_bkg_ks_corr = (TGraphErrors*)f_corr->Get("Nassoc_low_bkg_ks");
+    TGraphErrors* Nasslow_obs_la_corr = (TGraphErrors*)f_corr->Get("Nassoc_low_obs_la");
+    TGraphErrors* Nasslow_bkg_la_corr = (TGraphErrors*)f_corr->Get("Nassoc_low_bkg_la");
+    TGraphErrors* Nasslow_obs_xi_corr = (TGraphErrors*)f_corr->Get("Nassoc_low_obs_xi");
+    TGraphErrors* Nasslow_bkg_xi_corr = (TGraphErrors*)f_corr->Get("Nassoc_low_bkg_xi");
+    TGraphErrors* Nasslow_obs_om_corr = (TGraphErrors*)f_corr->Get("Nassoc_low_obs_om");
+    TGraphErrors* Nasslow_bkg_om_corr = (TGraphErrors*)f_corr->Get("Nassoc_low_bkg_om");
+
+    TGraphErrors* V2low_obs_ks_corr = (TGraphErrors*)f_corr->Get("V2plot_obs_low_ks");
+    TGraphErrors* V2low_bkg_ks_corr = (TGraphErrors*)f_corr->Get("V2plot_bkg_low_ks");
+    TGraphErrors* V2low_obs_la_corr = (TGraphErrors*)f_corr->Get("V2plot_obs_low_la");
+    TGraphErrors* V2low_bkg_la_corr = (TGraphErrors*)f_corr->Get("V2plot_bkg_low_la");
+    TGraphErrors* V2low_obs_xi_corr = (TGraphErrors*)f_corr->Get("V2plot_obs_low_xi");
+    TGraphErrors* V2low_bkg_xi_corr = (TGraphErrors*)f_corr->Get("V2plot_bkg_low_xi");
+    TGraphErrors* V2low_obs_om_corr = (TGraphErrors*)f_corr->Get("V2plot_obs_low_om");
+    TGraphErrors* V2low_bkg_om_corr = (TGraphErrors*)f_corr->Get("V2plot_bkg_low_om");
+
+    TGraphErrors* Nasslow_obs_ks_incorr = (TGraphErrors*)f_incorr->Get("Nassoc_low_obs_ks");
+    TGraphErrors* Nasslow_bkg_ks_incorr = (TGraphErrors*)f_incorr->Get("Nassoc_low_bkg_ks");
+    TGraphErrors* Nasslow_obs_la_incorr = (TGraphErrors*)f_incorr->Get("Nassoc_low_obs_la");
+    TGraphErrors* Nasslow_bkg_la_incorr = (TGraphErrors*)f_incorr->Get("Nassoc_low_bkg_la");
+    TGraphErrors* Nasslow_obs_om_incorr = (TGraphErrors*)f_incorr->Get("Nassoc_low_obs_om");
+    TGraphErrors* Nasslow_bkg_om_incorr = (TGraphErrors*)f_incorr->Get("Nassoc_low_bkg_om");
+
+    TGraphErrors* V2low_obs_ks_incorr = (TGraphErrors*)f_incorr->Get("V2plot_obs_low_ks");
+    TGraphErrors* V2low_bkg_ks_incorr = (TGraphErrors*)f_incorr->Get("V2plot_bkg_low_ks");
+    TGraphErrors* V2low_obs_la_incorr = (TGraphErrors*)f_incorr->Get("V2plot_obs_low_la");
+    TGraphErrors* V2low_bkg_la_incorr = (TGraphErrors*)f_incorr->Get("V2plot_bkg_low_la");
+    TGraphErrors* V2low_obs_om_incorr = (TGraphErrors*)f_incorr->Get("V2plot_obs_low_om");
+    TGraphErrors* V2low_bkg_om_incorr = (TGraphErrors*)f_incorr->Get("V2plot_bkg_low_om");
+
+    TGraphErrors* Nasslow_obs_ks_corr_20 = (TGraphErrors*)f_corr_20->Get("Nassoc_low_obs_ks");
+    TGraphErrors* Nasslow_bkg_ks_corr_20 = (TGraphErrors*)f_corr_20->Get("Nassoc_low_bkg_ks");
+    TGraphErrors* Nasslow_obs_la_corr_20 = (TGraphErrors*)f_corr_20->Get("Nassoc_low_obs_la");
+    TGraphErrors* Nasslow_bkg_la_corr_20 = (TGraphErrors*)f_corr_20->Get("Nassoc_low_bkg_la");
+    TGraphErrors* Nasslow_obs_xi_corr_20 = (TGraphErrors*)f_corr_20->Get("Nassoc_low_obs_xi");
+    TGraphErrors* Nasslow_bkg_xi_corr_20 = (TGraphErrors*)f_corr_20->Get("Nassoc_low_bkg_xi");
+
+    TGraphErrors* V2low_obs_ks_corr_20 = (TGraphErrors*)f_corr_20->Get("V2plot_obs_low_ks");
+    TGraphErrors* V2low_bkg_ks_corr_20 = (TGraphErrors*)f_corr_20->Get("V2plot_bkg_low_ks");
+    TGraphErrors* V2low_obs_la_corr_20 = (TGraphErrors*)f_corr_20->Get("V2plot_obs_low_la");
+    TGraphErrors* V2low_bkg_la_corr_20 = (TGraphErrors*)f_corr_20->Get("V2plot_bkg_low_la");
+    TGraphErrors* V2low_obs_xi_corr_20 = (TGraphErrors*)f_corr_20->Get("V2plot_obs_low_xi");
+    TGraphErrors* V2low_bkg_xi_corr_20 = (TGraphErrors*)f_corr_20->Get("V2plot_bkg_low_xi");
+
+    TGraphErrors* Nasslow_obs_ks_incorr_20 = (TGraphErrors*)f_incorr_20->Get("Nassoc_low_obs_ks");
+    TGraphErrors* Nasslow_bkg_ks_incorr_20 = (TGraphErrors*)f_incorr_20->Get("Nassoc_low_bkg_ks");
+    TGraphErrors* Nasslow_obs_la_incorr_20 = (TGraphErrors*)f_incorr_20->Get("Nassoc_low_obs_la");
+    TGraphErrors* Nasslow_bkg_la_incorr_20 = (TGraphErrors*)f_incorr_20->Get("Nassoc_low_bkg_la");
+
+    TGraphErrors* V2low_obs_ks_incorr_20 = (TGraphErrors*)f_incorr_20->Get("V2plot_obs_low_ks");
+    TGraphErrors* V2low_bkg_ks_incorr_20 = (TGraphErrors*)f_incorr_20->Get("V2plot_bkg_low_ks");
+    TGraphErrors* V2low_obs_la_incorr_20 = (TGraphErrors*)f_incorr_20->Get("V2plot_obs_low_la");
+    TGraphErrors* V2low_bkg_la_incorr_20 = (TGraphErrors*)f_incorr_20->Get("V2plot_bkg_low_la");
+
+    Nasslow_obs_ks_corr->SetMarkerColor(kRed);
+    Nasslow_obs_ks_corr->SetMarkerStyle(20);
+    Nasslow_obs_la_corr->SetMarkerColor(kBlue);
+    Nasslow_obs_la_corr->SetMarkerStyle(22);
+    Nasslow_obs_xi_corr->SetMarkerColor(kGreen+2);
+    Nasslow_obs_xi_corr->SetMarkerStyle(21);
+    Nasslow_obs_om_corr->SetMarkerColor(kMagenta);
+    Nasslow_obs_om_corr->SetMarkerStyle(29);
+    Nasslow_obs_ks_corr_20->SetMarkerColor(kRed);
+    Nasslow_obs_ks_corr_20->SetMarkerStyle(24);
+    Nasslow_obs_la_corr_20->SetMarkerColor(kBlue);
+    Nasslow_obs_la_corr_20->SetMarkerStyle(26);
+    Nasslow_obs_xi_corr_20->SetMarkerColor(kGreen+2);
+    Nasslow_obs_xi_corr_20->SetMarkerStyle(25);
+
+    Nasslow_bkg_ks_corr->SetMarkerColor(kRed);
+    Nasslow_bkg_ks_corr->SetMarkerStyle(20);
+    Nasslow_bkg_la_corr->SetMarkerColor(kBlue);
+    Nasslow_bkg_la_corr->SetMarkerStyle(22);
+    Nasslow_bkg_xi_corr->SetMarkerColor(kGreen+2);
+    Nasslow_bkg_xi_corr->SetMarkerStyle(21);
+    Nasslow_bkg_om_corr->SetMarkerColor(kMagenta);
+    Nasslow_bkg_om_corr->SetMarkerStyle(29);
+    Nasslow_bkg_ks_corr_20->SetMarkerColor(kRed);
+    Nasslow_bkg_ks_corr_20->SetMarkerStyle(24);
+    Nasslow_bkg_la_corr_20->SetMarkerColor(kBlue);
+    Nasslow_bkg_la_corr_20->SetMarkerStyle(26);
+    Nasslow_bkg_xi_corr_20->SetMarkerColor(kGreen+2);
+    Nasslow_bkg_xi_corr_20->SetMarkerStyle(25);
+
+
+    TCanvas* CompNass = new TCanvas("CompNass","CompNass",1200,600);
+    CompNass->Divide(1,2);
+    TH1F* Frame1 = CompNass->cd(1)->DrawFrame(0,0,9,2);
+    Frame1->GetYaxis()->SetTitle("Nassoc Obs");
+    TLegend* leg1 = new TLegend(0.20,0.60,0.27,0.8);
+    leg1->AddEntry(Nasslow_obs_ks_corr,"Ks 0-35", "P");
+    leg1->AddEntry(Nasslow_obs_la_corr,"La 0-35", "P");
+    leg1->AddEntry(Nasslow_obs_ks_corr_20,"Ks 0-20", "P");
+    leg1->AddEntry(Nasslow_obs_la_corr_20,"La 0-20", "P");
+    leg1->Draw();
+    Nasslow_obs_ks_corr->Draw("P");
+    Nasslow_obs_la_corr->Draw("PSAME");
+    Nasslow_obs_ks_corr_20->Draw("PSAME");
+    Nasslow_obs_la_corr_20->Draw("PSAME");
+
+    TH1F* Frame2 = CompNass->cd(2)->DrawFrame(0,0,9,2);
+    Frame2->GetYaxis()->SetTitle("Nassoc Bkg");
+    TLegend* leg2 = new TLegend(0.20,0.60,0.27,0.8);
+    leg2->AddEntry(Nasslow_bkg_ks_corr,"Ks 0-35", "P");
+    leg2->AddEntry(Nasslow_bkg_la_corr,"La 0-35", "P");
+    leg2->AddEntry(Nasslow_bkg_ks_corr_20,"Ks 0-20", "P");
+    leg2->AddEntry(Nasslow_bkg_la_corr_20,"La 0-20", "P");
+    leg2->Draw();
+    Nasslow_bkg_ks_corr->Draw("P");
+    Nasslow_bkg_la_corr->Draw("PSAME");
+    Nasslow_bkg_ks_corr_20->Draw("PSAME");
+    Nasslow_bkg_la_corr_20->Draw("PSAME");
+
+    TFile* f_print = new TFile("Nassoc_V0CasOmComparison_20_v_35.root","RECREATE");
+    Nasslow_obs_ks_corr->Write("Kshort_obs_35");
+    Nasslow_obs_ks_corr_20->Write("Kshort_obs_20");
+    Nasslow_obs_la_corr->Write("Lambda_obs_35");
+    Nasslow_obs_la_corr_20->Write("Lambda_obs_20");
+    Nasslow_obs_xi_corr->Write("Xi_obs_35");
+    Nasslow_obs_xi_corr_20->Write("Xi_obs_20");
+    Nasslow_obs_om_corr->Write("Omega_obs_35");
+    Nasslow_bkg_ks_corr->Write("Kshort_bkg_35");
+    Nasslow_bkg_ks_corr_20->Write("Kshort_bkg_20");
+    Nasslow_bkg_la_corr->Write("Lambda_bkg_35");
+    Nasslow_bkg_la_corr_20->Write("Lambda_bkg_20");
+    Nasslow_bkg_xi_corr->Write("Xi_bkg_35");
+    Nasslow_bkg_xi_corr_20->Write("Xi_bkg_20");
+    Nasslow_bkg_om_corr->Write("Omega_bkg_35");
+
+
+    double* Nasslow_obs_ks_Y_corr = Nasslow_obs_ks_corr->GetY();
+    double* Nasslow_bkg_ks_Y_corr = Nasslow_bkg_ks_corr->GetY();
+    double* Nasslow_obs_la_Y_corr = Nasslow_obs_la_corr->GetY();
+    double* Nasslow_bkg_la_Y_corr = Nasslow_bkg_la_corr->GetY();
+    double* Nasslow_obs_om_Y_corr = Nasslow_obs_om_corr->GetY();
+    double* Nasslow_bkg_om_Y_corr = Nasslow_bkg_om_corr->GetY();
+
+    double* V2low_obs_ks_Y_corr = V2low_obs_ks_corr->GetY();
+    double* V2low_bkg_ks_Y_corr = V2low_bkg_ks_corr->GetY();
+    double* V2low_obs_la_Y_corr = V2low_obs_la_corr->GetY();
+    double* V2low_bkg_la_Y_corr = V2low_bkg_la_corr->GetY();
+    double* V2low_obs_om_Y_corr = V2low_obs_om_corr->GetY();
+    double* V2low_bkg_om_Y_corr = V2low_bkg_om_corr->GetY();
+
+    double* Nasslow_obs_ks_Y_incorr = Nasslow_obs_ks_incorr->GetY();
+    double* Nasslow_bkg_ks_Y_incorr = Nasslow_bkg_ks_incorr->GetY();
+    double* Nasslow_obs_la_Y_incorr = Nasslow_obs_la_incorr->GetY();
+    double* Nasslow_bkg_la_Y_incorr = Nasslow_bkg_la_incorr->GetY();
+    double* Nasslow_obs_om_Y_incorr = Nasslow_obs_om_incorr->GetY();
+    double* Nasslow_bkg_om_Y_incorr = Nasslow_bkg_om_incorr->GetY();
+
+    double* V2low_obs_ks_Y_incorr = V2low_obs_ks_incorr->GetY();
+    double* V2low_bkg_ks_Y_incorr = V2low_bkg_ks_incorr->GetY();
+    double* V2low_obs_la_Y_incorr = V2low_obs_la_incorr->GetY();
+    double* V2low_bkg_la_Y_incorr = V2low_bkg_la_incorr->GetY();
+    double* V2low_obs_om_Y_incorr = V2low_obs_om_incorr->GetY();
+    double* V2low_bkg_om_Y_incorr = V2low_bkg_om_incorr->GetY();
+
+    double* Nasslow_obs_ks_Y_corr_20 = Nasslow_obs_ks_corr_20->GetY();
+    double* Nasslow_bkg_ks_Y_corr_20 = Nasslow_bkg_ks_corr_20->GetY();
+    double* Nasslow_obs_la_Y_corr_20 = Nasslow_obs_la_corr_20->GetY();
+    double* Nasslow_bkg_la_Y_corr_20 = Nasslow_bkg_la_corr_20->GetY();
+
+    double* V2low_obs_ks_Y_corr_20 = V2low_obs_ks_corr_20->GetY();
+    double* V2low_bkg_ks_Y_corr_20 = V2low_bkg_ks_corr_20->GetY();
+    double* V2low_obs_la_Y_corr_20 = V2low_obs_la_corr_20->GetY();
+    double* V2low_bkg_la_Y_corr_20 = V2low_bkg_la_corr_20->GetY();
+
+    double* Nasslow_obs_ks_Y_incorr_20 = Nasslow_obs_ks_incorr_20->GetY();
+    double* Nasslow_bkg_ks_Y_incorr_20 = Nasslow_bkg_ks_incorr_20->GetY();
+    double* Nasslow_obs_la_Y_incorr_20 = Nasslow_obs_la_incorr_20->GetY();
+    double* Nasslow_bkg_la_Y_incorr_20 = Nasslow_bkg_la_incorr_20->GetY();
+
+    double* V2low_obs_ks_Y_incorr_20 = V2low_obs_ks_incorr_20->GetY();
+    double* V2low_bkg_ks_Y_incorr_20 = V2low_bkg_ks_incorr_20->GetY();
+    double* V2low_obs_la_Y_incorr_20 = V2low_obs_la_incorr_20->GetY();
+    double* V2low_bkg_la_Y_incorr_20 = V2low_bkg_la_incorr_20->GetY();
+
+    cout << "Low N Kshort obs Nassoc (0-35 Correct gap | Incorrect gap | difference || 0-20 ...)" << endl;
+    for(int i=0; i<Nasslow_obs_ks_corr->GetN(); i++)
+    {
+        cout << "Pt bin " << i << ": " << std::left << std::setw(10) << Nasslow_obs_ks_Y_corr[i] << std::left << std::setw(10) << Nasslow_obs_ks_Y_incorr[i] << std::left << std::setw(10) << Nasslow_obs_ks_Y_corr[i] - Nasslow_obs_ks_Y_incorr[i] <<  "\t || \t" << std::left << std::setw(10) << Nasslow_obs_ks_Y_corr_20[i] << std::left << std::setw(10) << Nasslow_obs_ks_Y_incorr_20[i] << std::left << std::setw(10) << Nasslow_obs_ks_Y_corr_20[i] - Nasslow_obs_ks_Y_incorr_20[i] << endl;
+    }
+
+    cout << "Low N Kshort bkg Nassoc" << endl;
+    for(int i=0; i<Nasslow_bkg_ks_corr->GetN(); i++)
+    {
+        cout << "Pt bin " << i << ": " << std::left << std::setw(10) << Nasslow_bkg_ks_Y_corr[i] << std::left << std::setw(10) << Nasslow_bkg_ks_Y_incorr[i] << std::left << std::setw(10) << Nasslow_bkg_ks_Y_corr[i] - Nasslow_bkg_ks_Y_incorr[i] << "\t || \t" << std::left << std::setw(10) << Nasslow_bkg_ks_Y_corr_20[i] << std::left << std::setw(10) << Nasslow_bkg_ks_Y_incorr_20[i] << std::left << std::setw(10) << Nasslow_bkg_ks_Y_corr_20[i] - Nasslow_bkg_ks_Y_incorr_20[i] << endl;
+    }
+
+    cout << "Low N Lambda obs Nassoc" << endl;
+    for(int i=0; i<Nasslow_obs_la_corr->GetN(); i++)
+    {
+        cout << "Pt bin " << i << ": " << std::left << std::setw(10) << Nasslow_obs_la_Y_corr[i] << std::left << std::setw(10) << Nasslow_obs_la_Y_incorr[i] << std::left << std::setw(10) << Nasslow_obs_la_Y_corr[i] - Nasslow_obs_la_Y_incorr[i] <<  "\t || \t" << std::left << std::setw(10) << Nasslow_obs_la_Y_corr_20[i] << std::left << std::setw(10) << Nasslow_obs_la_Y_incorr_20[i] << std::left << std::setw(10) << Nasslow_obs_la_Y_corr_20[i] - Nasslow_obs_la_Y_incorr_20[i] << endl;
+    }
+
+    cout << "Low N Lambda bkg Nassoc" << endl;
+    for(int i=0; i<Nasslow_bkg_la_corr->GetN(); i++)
+    {
+        cout << "Pt bin " << i << ": " << std::left << std::setw(10) << Nasslow_bkg_la_Y_corr[i] << std::left << std::setw(10) << Nasslow_bkg_la_Y_incorr[i] << std::left << std::setw(10) << Nasslow_bkg_la_Y_corr[i] - Nasslow_bkg_la_Y_incorr[i] << "\t || \t" << std::left << std::setw(10) << Nasslow_bkg_la_Y_corr_20[i] << std::left << std::setw(10) << Nasslow_bkg_la_Y_incorr_20[i] << std::left << std::setw(10) << Nasslow_bkg_la_Y_corr_20[i] - Nasslow_bkg_la_Y_incorr_20[i] << endl;
+    }
+
+    cout << "Low N Omega obs Nassoc" << endl;
+    for(int i=0; i<Nasslow_obs_om_corr->GetN(); i++)
+    {
+        cout << "Pt bin " << i << ": " << std::left << std::setw(15) << Nasslow_obs_om_Y_corr[i] << std::left << std::setw(15) << Nasslow_bkg_om_Y_incorr[i] << std::left << std::setw(15) << Nasslow_obs_om_Y_corr[i] - Nasslow_bkg_om_Y_incorr[i] <<  endl;
+    }
+
+    cout << "Low N Omega bkg Nassoc" << endl;
+    for(int i=0; i<Nasslow_bkg_om_corr->GetN(); i++)
+    {
+        cout << "Pt bin " << i << ": " << std::left << std::setw(15) << Nasslow_bkg_om_Y_corr[i] << std::left << std::setw(15) << Nasslow_bkg_om_Y_incorr[i] << std::left << std::setw(15) << Nasslow_bkg_om_Y_corr[i] - Nasslow_bkg_om_Y_incorr[i] << endl;
+    }
+
+    //V2
+    cout << "Low N Kshort obs V2" << endl;
+    for(int i=0; i<V2low_obs_ks_corr->GetN(); i++)
+    {
+        cout << "Pt bin " << i << ": " << std::left << std::setw(15) << V2low_obs_ks_Y_corr[i] << std::left << std::setw(15) << V2low_obs_ks_Y_incorr[i] << std::left << std::setw(15) << V2low_obs_ks_Y_corr[i] - V2low_obs_ks_Y_incorr[i] << "\t || \t" << std::left << std::setw(15) << V2low_obs_ks_Y_corr_20[i] << std::left << std::setw(15) << V2low_obs_ks_Y_incorr_20[i] << std::left << std::setw(15) << V2low_obs_ks_Y_corr_20[i] - V2low_obs_ks_Y_incorr_20[i] << endl;
+    }
+
+    cout << "Low N Kshort bkg V2" << endl;
+    for(int i=0; i<V2low_bkg_ks_corr->GetN(); i++)
+    {
+        cout << "Pt bin " << i << ": " << std::left << std::setw(15) << V2low_bkg_ks_Y_corr[i] << std::left << std::setw(15) << V2low_bkg_ks_Y_incorr[i] << std::left << std::setw(15) << V2low_bkg_ks_Y_corr[i] - V2low_bkg_ks_Y_incorr[i] << "\t || \t" << std::left << std::setw(15) << V2low_bkg_ks_Y_corr_20[i] << std::left << std::setw(15) << V2low_bkg_ks_Y_incorr_20[i] << std::left << std::setw(15) << V2low_bkg_ks_Y_corr_20[i] - V2low_bkg_ks_Y_incorr_20[i] << endl;
+    }
+
+    cout << "Low N Lambda obs V2" << endl;
+    for(int i=0; i<V2low_obs_la_corr->GetN(); i++)
+    {
+        cout << "Pt bin " << i << ": " << std::left << std::setw(15) << V2low_obs_la_Y_corr[i] << std::left << std::setw(15) << V2low_obs_la_Y_incorr[i] << std::left << std::setw(15) << V2low_obs_la_Y_corr[i] - V2low_obs_la_Y_incorr[i] << "\t || \t" << std::left << std::setw(15) << V2low_obs_la_Y_corr_20[i] << std::left << std::setw(15) << V2low_obs_la_Y_incorr_20[i] << std::left << std::setw(15) << V2low_obs_la_Y_corr_20[i] - V2low_obs_la_Y_incorr_20[i] << endl;
+    }
+
+    cout << "Low N Lambda bkg V2" << endl;
+    for(int i=0; i<V2low_bkg_la_corr->GetN(); i++)
+    {
+        cout << "Pt bin "<< i << ": " << std::left << std::setw(15) << V2low_bkg_la_Y_corr[i] << std::left << std::setw(15) << V2low_bkg_la_Y_incorr[i] << std::left << std::setw(15) << V2low_bkg_la_Y_corr[i] - V2low_bkg_la_Y_incorr[i] << "\t || \t" << std::left << std::setw(15) << V2low_bkg_la_Y_corr_20[i] << std::left << std::setw(15) << V2low_bkg_la_Y_incorr_20[i] << std::left << std::setw(15) << V2low_bkg_la_Y_corr_20[i] - V2low_bkg_la_Y_incorr_20[i] << endl;
+    }
+
+    cout << "Low N Omega obs V2" << endl;
+    for(int i=0; i<V2low_obs_om_corr->GetN(); i++)
+    {
+        cout << "Pt bin " << i << ": " << V2low_obs_om_Y_corr[i] << "\t" << V2low_obs_om_Y_incorr[i] << "\t" << V2low_obs_om_Y_corr[i] - V2low_obs_om_Y_incorr[i] << endl;
+    }
+
+    cout << "Low N Omega bkg V2" << endl;
+    for(int i=0; i<V2low_bkg_om_corr->GetN(); i++)
+    {
+        cout << "Pt bin " << i << ": " << V2low_bkg_om_Y_corr[i] << "\t" << V2low_bkg_om_Y_incorr[i] << "\t" << V2low_bkg_om_Y_corr[i] - V2low_bkg_om_Y_incorr[i] << endl;
+    }
+
+}
+
 int main()
 {
     //PeriSubFixedWindow(V0);
     PeriSubObs(V0);
     PeriSubSigIndirect(V0);
     PeriSubSigDirect(V0);
+    PrintV2(V0);
     return 1;
 }

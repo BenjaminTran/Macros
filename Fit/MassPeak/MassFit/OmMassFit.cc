@@ -65,7 +65,7 @@ void OmMassFit()
     std::vector<double> covQual_om;
     bool doRap = true;
     bool doPbPb = false;
-    bool mb = true;
+    bool mb = false;
 
     //std::vector<double> pom = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,72, 73,85, 86,100, 101,200, 201,300};
     //std::vector<double> pom = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,100, 101,200};//, 201,300};
@@ -100,7 +100,7 @@ void OmMassFit()
     //file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/OmegaMB0_35_MergedBin1-2_11_22_17.root"); //MB 0-35 Merged bin 1-2
     //file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/MinBias/Comparison/XiOmegaMassPtMBPD1_0_35_11_10_17.root"); //MB one PD for comp to 0-35
     //file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/MinBias/Comparison/OmegaHMPD1Comparison_11_14_17.root"); //HM one PD for comp to 0-35
-    if(doRap && !doPbPb && !mb)     file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/OmCorr/OmCorrelationRapidityTotal_09_24_17.root"); //pPb Full Stats
+    if(doRap && !doPbPb && !mb)     file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/OmCorr/OmegaHMRapidity_Total_12_04_17.root"); //pPb Full Stats
     else if(doRap && doPbPb && !mb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/V0CasCorrelationPbPbTotal_10_30_17.root"); //PbPb Full Stats
     else if(doRap && !doPbPb && mb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/OmegaMB0_35_MergedBin1-2_11_22_17.root"); //MB 0-35
     //else  file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MassPt/Omega/OmMassPt.root"); //only one PD
@@ -110,7 +110,7 @@ void OmMassFit()
     //MassXi = (TH2D*)file->Get("v0CasCorrelationRapidityPeriSub/MassPtOm");//pPb MB
     //MassPtRapXi = (TH3D*)file->Get("MassPtRapidityMB/OmMassPt");
     //MassXi = (TH2D*)MassPtRapXi->Project3D("yx");
-    if(doRap && !doPbPb && !mb)     MassXi = (TH2D*)file->Get("omCorrelationRapidity/MassPt");//pPb
+    if(doRap && !doPbPb && !mb)     MassXi = (TH2D*)file->Get("v0CasCorrelationRapidity/MassPtOm");//pPb
     else if(doRap && doPbPb && !mb) MassXi = (TH2D*)file->Get("v0CasCorrelationRapidityPbPb/MassPtOm"); //PbPb
     else if(doRap && !doPbPb && mb) MassXi = (TH2D*)file->Get("v0CasCorrelationRapidityPeriSub/MassPtOm"); //mb
 
@@ -172,7 +172,7 @@ void OmMassFit()
         RooRealVar sigma2("sigma2","sigma2",0.005,0.001,0.04);
         RooRealVar sig1("sig1","signal1",4500,0,1000000);
         RooRealVar sig2("sig2","signal2",4500,0,1000000);
-        RooRealVar qsig("qsig","qsig",22000,0,1000000);
+        RooRealVar qsig("qsig","qsig",52000,0,1000000);
         //RooRealVar sig1("sig1","signal1",1000,-100,1000000);
         //RooRealVar sig2("sig2","signal2",1000,-100,1000000);
         //RooRealVar qsig("qsig","qsig",1000,0,1000000);
