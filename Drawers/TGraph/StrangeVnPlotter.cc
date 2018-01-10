@@ -33,6 +33,7 @@ TGraphErrors* TGDivideSameX(TGraphErrors* TG1, TGraphErrors* TG2, bool useAbs = 
     double* TG1_Y = TG1->GetY();
     double* TG1_EY = TG1->GetEY();
     double* TG2_Y = TG2->GetY();
+    double* TG2_EY = TG2->GetEY();
 
     std::vector<double> TGDiv_Y;
     std::vector<double> TGDiv_EY;
@@ -43,6 +44,35 @@ TGraphErrors* TGDivideSameX(TGraphErrors* TG1, TGraphErrors* TG2, bool useAbs = 
         {
             TGDiv_Y.push_back(TG1_Y[i]/TG2_Y[i]);
             TGDiv_EY.push_back(TG1_EY[i]/TG2_Y[i]);
+        }
+        else
+        {
+            TGDiv_Y.push_back(abs(TG1_Y[i]/TG2_Y[i]));
+            TGDiv_EY.push_back(abs(TG1_EY[i]/TG2_Y[i]));
+        }
+    }
+    TGDiv = new TGraphErrors(TG1->GetN(),X,&TGDiv_Y[0],0,&TGDiv_EY[0]);
+    return TGDiv;
+}
+
+TGraphErrors* TGDivideSameXCorrErr(TGraphErrors* TG1, TGraphErrors* TG2, bool useAbs = false) // For dividing tgraph 1 by tgraph2 with correlated errors. Need to have the same X axis.
+{
+    TGraphErrors* TGDiv;
+    double* X = TG1->GetX();
+    double* TG1_Y = TG1->GetY();
+    double* TG1_EY = TG1->GetEY();
+    double* TG2_Y = TG2->GetY();
+    double* TG2_EY = TG2->GetEY();
+
+    std::vector<double> TGDiv_Y;
+    std::vector<double> TGDiv_EY;
+
+    for(int i=0; i<TG1->GetN(); i++)
+    {
+        if(!useAbs)
+        {
+            TGDiv_Y.push_back(TG1_Y[i]/TG2_Y[i]);
+            TGDiv_EY.push_back(sqrt(fabs(TMath::Power(TG1_EY[i],2) - TMath::Power(TG2_EY[i],2)))/TG2_Y[i]);
         }
         else
         {
@@ -103,6 +133,8 @@ TH1F* MakePanelFrame(TVirtualPad* pad, double x1=0, double y1=0, double x2=0, do
     frame->SetTitleOffset(1.2,"X");
     frame->GetXaxis()->SetTitle(XaxisTitle.c_str());
     frame->GetYaxis()->SetTitle(YaxisTitle.c_str());
+
+    return frame;
 }
 
 void MakePanelPad(TH1F* frame, TVirtualPad* pad, double x1=0, double y1=0, double x2=0, double y2=0, std::string XaxisTitle = "", std::string YaxisTitle = "", double XlabSize = 0.04, double YlabSize = 0.04, double XTitleSize = 0.05, double YTitleSize = 0.05, double YTitleOff = 1.1)
@@ -4600,6 +4632,10 @@ void RapSys_RecoCutsV0()
 
 void RapSys_RecoCutsXi()
 {
+
+    TFile* f_loose = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_XiRecoCutCheck_loose_ARC3_1_10_18.root"); //For ARC3 check
+    TFile* f_tight = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_XiRecoCutCheck_tight_ARC3_1_10_18.root"); //For ARC3 check
+
     MITStyle();
     gStyle->SetTitleAlign(33);
     const int xi_npoints = 8;
@@ -4622,20 +4658,14 @@ void RapSys_RecoCutsXi()
     TGraphErrors* standard_v2_xi = new TGraphErrors(xi_npoints,pTstandard_xi,v2standard_xi,0,v2standard_xiE);
 	TGraphErrors* tight_v2_xi = new TGraphErrors(xi_npoints,pTtight_xi,v2tight_xi,0,v2tight_xiE);
 
-    standard_v2_xi->SetMarkerColor(kRed);
-    standard_v2_xi->SetMarkerStyle(20);
-    standard_v2_xi->SetMarkerSize(1);
-    standard_v2_xi->SetLineColor(kRed);
+    TGraphErrors* loose_v2_xi_ARC = (TGraphErrors*)f_loose->Get("v2xi");
+    TGraphErrors* tight_v2_xi_ARC = (TGraphErrors*)f_tight->Get("v2xi");
 
-    loose_v2_xi->SetMarkerColor(kRed);
-    loose_v2_xi->SetMarkerStyle(25);
-    loose_v2_xi->SetMarkerSize(1);
-    loose_v2_xi->SetLineColor(kRed);
-
-    tight_v2_xi->SetMarkerColor(kRed);
-    tight_v2_xi->SetMarkerStyle(26);
-    tight_v2_xi->SetMarkerSize(1);
-    tight_v2_xi->SetLineColor(kRed);
+    SetTGattributes(standard_v2_xi,kRed,20,1);
+    SetTGattributes(loose_v2_xi,kMagenta,25,1);
+    SetTGattributes(tight_v2_xi,kMagenta,26,1);
+    SetTGattributes(loose_v2_xi_ARC,kBlue,25,1);
+    SetTGattributes(tight_v2_xi_ARC,kBlue,26,1);
 
     TCanvas* c1_xi = MakeCanvas("c1_xi", "Plot_xi");
     c1_xi->cd();
@@ -4648,7 +4678,7 @@ void RapSys_RecoCutsXi()
     /*TH1F* frame_xi = c1_xi->DrawFrame(0,0.01,20,1);*/
     gPad->SetTickx();
     gPad->SetTicky();
-    frame_xi->SetTitle("K_{S}^{0} Reconstruction Cuts");
+    frame_xi->SetTitle("#Xi^{#pm} Reconstruction Cuts");
     frame_xi->SetTitleSize(0.055,"t");
     frame_xi->GetXaxis()->CenterTitle(1);
     frame_xi->GetYaxis()->CenterTitle(1);
@@ -4663,16 +4693,15 @@ void RapSys_RecoCutsXi()
     standard_v2_xi->Draw("P");
     tight_v2_xi->Draw("P");
     loose_v2_xi->Draw("P");
+    loose_v2_xi_ARC->Draw("P");
+    tight_v2_xi_ARC->Draw("P");
 
-    TLegend* leg_xi = new TLegend(0.15,0.55,0.27,0.75);
-    leg_xi->SetFillColor(10);
-    leg_xi->SetFillStyle(0);
-    leg_xi->SetBorderSize(0);
-    leg_xi->SetTextFont(42);
-    leg_xi->SetTextSize(0.03);
+    TLegend* leg_xi = MakeTLegend(0.15,0.55,0.27,0.75);
     leg_xi->AddEntry(standard_v2_xi, "Standard reconstruction", "P");
     leg_xi->AddEntry(tight_v2_xi, "Tight reconstruction", "P");
     leg_xi->AddEntry(loose_v2_xi, "Loose reconstruction", "P");
+    leg_xi->AddEntry(tight_v2_xi_ARC, "Tight reconstruction #pi only", "P");
+    leg_xi->AddEntry(loose_v2_xi_ARC, "Loose reconstruction #pi only", "P");
     leg_xi->Draw();
 
     TLatex *tex = new TLatex();
@@ -4683,9 +4712,6 @@ void RapSys_RecoCutsXi()
     tex->SetTextSize(0.04);
     tex->SetTextFont(42);
     tex->DrawLatex(0.40,0.2,"185 #leq N_{trk}^{offline} < 250");
-    TLine* line = new TLine(0,0,6,0);
-    line->SetLineStyle(2);
-    line->Draw("same");
 
     c1_xi->Print("v2RecoSystematicsXi.pdf");
 
@@ -4716,16 +4742,13 @@ void RapSys_RecoCutsXi()
 
     TGraphErrors* Ratioloose_v2_xi = new TGraphErrors(xi_npoints,pTloose_xi,av2RatioLooseXi,0,av2ErrorRatioLooseXi);
 	TGraphErrors* Ratiotight_v2_xi = new TGraphErrors(xi_npoints,pTtight_xi,av2RatioTightXi,0,av2ErrorRatioTightXi);
+    TGraphErrors* Ratioloose_v2_xi_ARC = TGDivideSameXCorrErr(loose_v2_xi_ARC,standard_v2_xi);
+    TGraphErrors* Ratiotight_v2_xi_ARC = TGDivideSameXCorrErr(tight_v2_xi_ARC,standard_v2_xi);
 
-    Ratioloose_v2_xi->SetMarkerColor(kRed);
-    Ratioloose_v2_xi->SetMarkerStyle(20);
-    Ratioloose_v2_xi->SetMarkerSize(1.5);
-    Ratioloose_v2_xi->SetLineColor(kRed);
-
-    Ratiotight_v2_xi->SetMarkerColor(kBlue-4);
-    Ratiotight_v2_xi->SetMarkerStyle(21);
-    Ratiotight_v2_xi->SetMarkerSize(1.5);
-    Ratiotight_v2_xi->SetLineColor(kBlue-4);
+    SetTGattributes(Ratioloose_v2_xi,kRed,20,1.5);
+    SetTGattributes(Ratiotight_v2_xi,kBlue,21,1.5);
+    SetTGattributes(Ratioloose_v2_xi_ARC,kRed,24,1.5);
+    SetTGattributes(Ratiotight_v2_xi_ARC,kBlue,25,1.5);
 
     TCanvas* c1_ratio_xi = MakeCanvas("c1_ratio_xi", "Plot_ratio_xi");
     TH1F* frame_Ratio_xi = c1_ratio_xi->DrawFrame(0,0.8,8,1.2);
@@ -4756,26 +4779,18 @@ void RapSys_RecoCutsXi()
 
     Ratioloose_v2_xi->Draw("P");
     Ratiotight_v2_xi->Draw("P");
+    Ratioloose_v2_xi_ARC->Draw("P");
+    Ratiotight_v2_xi_ARC->Draw("P");
 
-    TLegend* leg_ratio_xi = new TLegend(0.45,0.2,0.57,0.3);
-    leg_ratio_xi->SetFillColor(10);
-    leg_ratio_xi->SetFillStyle(0);
-    leg_ratio_xi->SetBorderSize(0);
-    leg_ratio_xi->SetTextFont(42);
-    leg_ratio_xi->SetTextSize(0.03);
+    TLegend* leg_ratio_xi = MakeTLegend(0.45,0.2,0.57,0.35);
     leg_ratio_xi->AddEntry(Ratioloose_v2_xi, "Loose #Xi^{#pm} Reconstruction", "P");
     leg_ratio_xi->AddEntry(Ratiotight_v2_xi, "Tight #Xi^{#pm} Reconstruction", "P");
+    leg_ratio_xi->AddEntry(Ratioloose_v2_xi_ARC, "Loose #Xi^{#pm} Reconstruction #pi only", "P");
+    leg_ratio_xi->AddEntry(Ratiotight_v2_xi_ARC, "Tight #Xi^{#pm} Reconstruction #pi only", "P");
     leg_ratio_xi->Draw();
 
     c1_ratio_xi->Print("v2RecoRatioSystematicsXi.pdf");
 
-    // Write points into rootfile
-    TFile out("V0ReconstructionSys.root","RECREATE");
-    standard_v2_xi->Write("StandardXi");
-    tight_v2_xi->Write("TightXi");
-    loose_v2_xi->Write("LooseXi");
-    Ratioloose_v2_xi->Write("RatioLooseXi");
-    Ratiotight_v2_xi->Write("RatioTightXi");
 }
 
 void RapSys_Closure_Study()
@@ -4843,7 +4858,7 @@ void RapSys_Closure_Study()
 
     // draw the frame_ks using a histogram frame_ks
 
-    TH1F* frame_ks = MakePanelFrame(c1_ks->cd()0,-0.08,8.5,1.00,0.12,"p_{T} (GeV)","v_{2}^{sig}");
+    TH1F* frame_ks = MakePanelFrame(c1_ks->cd(),0,-0.08,8.5,1.00,0.12,"p_{T} (GeV)","v_{2}^{sig}");
     frame_ks->SetTitle("K_{S}^{0} Reconstruction Cuts");
     frame_ks->SetTitleSize(0.055,"t");
 
@@ -4913,7 +4928,7 @@ void RapSys_Closure_Study()
 
     // draw the frame_la using a histogram frame_la
 
-    TH1F* frame_la = MakePanelFrame(c1_la->cd(),0,-0.15,8.5,1.0,"p_{T} (GeV)","v_{2}^{sig}");
+    TH1F* frame_la = MakePanelFrame(c1_la->cd(),0,-0.15,8.5,1.0,0.12,"p_{T} (GeV)","v_{2}^{sig}");
 
     TF1* laFit = new TF1("laFit","([0]/(1 + exp(-(x-[1])/[2])) - [3])*pol1(4) + [5]*pol2(6)",0,8);
     laFit->SetParameter(0,1);
@@ -5222,7 +5237,7 @@ void RapSys_Closure_Study()
     }
 
     TCanvas* c1_ratio_la = MakeCanvas("la_ratio", "Plot_la_ratio");
-    TH1F* frame_Ratio_la = MakePanelFrame(c1_ratio_la->cd()0,0.8,8.5,1.2,0.12,"p_{T} (GeV)","#frac{Combination v^{sig}_{2}}{Gen/Gen v^{sig}_{2}}");
+    TH1F* frame_Ratio_la = MakePanelFrame(c1_ratio_la->cd(),0,0.8,8.5,1.2,0.12,"p_{T} (GeV)","#frac{Combination v^{sig}_{2}}{Gen/Gen v^{sig}_{2}}");
 
     RatioReco_v2_la->Draw("P");
     RatioRecoMatch_recoref_v2_la->Draw("P");
