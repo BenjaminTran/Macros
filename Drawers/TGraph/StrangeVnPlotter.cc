@@ -901,6 +901,7 @@ void Rap_v2sig_pPb()
     TCanvas* c1 = MakeCanvas("c1", "Pt");
     TCanvas* c2 = MakeCanvas("c2", "NQS");
     TCanvas* c3 = new TCanvas("c3", "V0 Dau DCA",1000,600);
+    TCanvas* c4 = new TCanvas("c4", "V0 Eff Test",1000,600);
 
     c1->cd();
 
@@ -916,6 +917,8 @@ void Rap_v2sig_pPb()
     // Pull TGraph for Kshort and lambda
     TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_FixedGap_12_05_17.root");
     TFile* file_pidv2_V0Dau_DCA = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_V0DauDCA_12_18_17.root");
+    //TFile* file_pidv2_V0EffTest = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_TestV0ARC3FilewoEff_1_10_18.root");
+    TFile* file_pidv2_V0EffTest = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_TestV0ARC3FileWEff_1_10_18.root");
 
 
     //TGraphErrors* om8_v2_Fixed = (TGraphErrors*)file_pidv2_Omega->Get("v2omega");
@@ -926,6 +929,9 @@ void Rap_v2sig_pPb()
 
     TGraphErrors* ks8_v2_V0Dau_DCA = (TGraphErrors*)file_pidv2_V0Dau_DCA->Get("v2kshort");
     TGraphErrors* la8_v2_V0Dau_DCA = (TGraphErrors*)file_pidv2_V0Dau_DCA->Get("v2lambda");
+
+    TGraphErrors* ks8_v2_V0EffTest = (TGraphErrors*)file_pidv2_V0EffTest->Get("v2kshort");
+    TGraphErrors* la8_v2_V0EffTest = (TGraphErrors*)file_pidv2_V0EffTest->Get("v2lambda");
 
     TGraphErrors* om8_v2kn = (TGraphErrors*)file_pidv2->Get("v2omega_ket_nq");
     TGraphErrors* xi8_v2kn = (TGraphErrors*)file_pidv2->Get("v2xi_ket_nq");
@@ -1007,6 +1013,41 @@ void Rap_v2sig_pPb()
     line_ratio_1->Draw();
     c3->Print("Image/Rap_v2sig_pPb/v2SigDauEffCheck.pdf");
 
+    //Draw V0Dau check w DCA
+    c4->Divide(2,1);
+    SetTGattributes(ks8_v2,kRed,24,1.5);
+    SetTGattributes(la8_v2,kBlue,26,1.5);
+    SetTGattributes(ks8_v2_V0EffTest,kRed,20,1.5);
+    SetTGattributes(la8_v2_V0EffTest,kBlue,22,1.5);
+
+    MakePanel(frame1,c4->cd(1),0,-0.01,9,0.45,0.12,"p_{T} (GeV)","v_{2}^{sig}");
+    TLegend* leg_V0Eff = MakeTLegend(0.15,0.60,0.27,0.80);
+    leg_V0Eff->AddEntry(ks8_v2 , (PKzS + " Default").c_str()     , "P");
+    leg_V0Eff->AddEntry(ks8_v2_V0EffTest , (PKzS + " 5% rejection").c_str()     , "P");
+    leg_V0Eff->AddEntry(la8_v2 , (PgL_PagL + " Default").c_str() , "P");
+    leg_V0Eff->AddEntry(la8_v2_V0EffTest , (PgL_PagL + " 5% rejection").c_str() , "P");
+    leg_V0Eff->Draw();
+
+    ks8_v2->Draw("P");
+    la8_v2->Draw("P");
+    ks8_v2_V0EffTest->Draw("P");
+    la8_v2_V0EffTest->Draw("P");
+
+    tex->SetTextFont(62);
+    tex->SetTextSize(0.05);
+    tex->DrawLatex(0.15,0.85,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
+
+    MakePanel(frame1,c4->cd(2),0,0.85,9,1.15,0.12,"p_{T} (GeV)","Ratio v_{2}^{sig}");
+    TGraphErrors* ks8_v2_V0EffTest_ratio = TGDivideSameX(ks8_v2,ks8_v2_V0EffTest);
+    TGraphErrors* la8_v2_V0EffTest_ratio = TGDivideSameX(la8_v2,la8_v2_V0EffTest);
+    SetTGattributes(ks8_v2_V0EffTest_ratio,kRed,20,1.5);
+    SetTGattributes(la8_v2_V0EffTest_ratio,kBlue,20,1.5);
+    line_ratio_1->SetLineStyle(2);
+    ks8_v2_V0EffTest_ratio->Draw("P");
+    la8_v2_V0EffTest_ratio->Draw("P");
+    line_ratio->Draw();
+    line_ratio_1->Draw();
+    c4->Print("Image/Rap_v2sig_pPb/v2SigV05percentRejectCheck.pdf");
 
     //Draw NQS
     c2->cd();
@@ -2353,6 +2394,8 @@ void Rap_perisub()
     TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_EG1_60percXi_0_35_12_18_17.root");
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_FullXiHM.root");
     TFile* file_pidv2_FixedWindow = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubFixedWindow.root"); //Fixed window 1.2
+    //TFile* file_pidv2_V0RandDump = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_AllStrange_EG1_0_35_CorrectRef_CorrectGap_FullStats_5percentReject_1_10_18.root");
+    TFile* file_pidv2_V0RandDump = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_AllStrange_EG1_0_35_CorrectRef_CorrectGap_FullStats_5percentReject_1_11_18.root");
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubFixedWindow.root");
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubXiFixedPartialStatsEG2Ref.root");
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubXiFixedPartialStatsEG2RefLowOnly.root");
@@ -2371,6 +2414,9 @@ void Rap_perisub()
     TGraphErrors* xi8_v2Dsub = (TGraphErrors*)file_pidv2->Get("xiv2trueDirectSub");
     TGraphErrors* om8_v2     = (TGraphErrors*)file_pidv2->Get("omv2true");
     TGraphErrors* om8_v2sub  = (TGraphErrors*)file_pidv2->Get("omv2truesub");
+
+    TGraphErrors* ks8_v2_V0RandDump = (TGraphErrors*)file_pidv2_V0RandDump->Get("kshortv2truesub");
+    TGraphErrors* la8_v2_V0RandDump = (TGraphErrors*)file_pidv2_V0RandDump->Get("lambdav2truesub");
 
     TGraphErrors* ks8_v2_fw     = (TGraphErrors*)file_pidv2_FixedWindow->Get("kshortv2true");
     TGraphErrors* ks8_v2sub_fw  = (TGraphErrors*)file_pidv2_FixedWindow->Get("kshortv2truesub");
@@ -2995,6 +3041,46 @@ void Rap_perisub()
 
     c6->Print("v2SigRapiditySubtractedNQS.pdf");
     c6->Print("v2SigRapiditySubtractedNQS.png");
+    //
+    //Draw V0Dau check w DCA
+    TH1F* frame10;
+    TCanvas* c7 = new TCanvas("c7", "V0 RandDump",1000,600);
+    c7->Divide(2,1);
+    SetTGattributes(la8_v2sub, kBlue, 26,1.5);
+    SetTGattributes(ks8_v2_V0RandDump,kRed,20,1.5);
+    SetTGattributes(la8_v2_V0RandDump,kBlue,22,1.5);
+
+    MakePanel(frame10,c7->cd(1),0,-0.01,9,0.45,0.12,"p_{T} (GeV)","v_{2}^{sub}");
+    TLegend* leg_V0Dump = MakeTLegend(0.15,0.60,0.27,0.80);
+    leg_V0Dump->AddEntry(ks8_v2sub , (PKzS + " Default").c_str()     , "P");
+    leg_V0Dump->AddEntry(ks8_v2_V0RandDump , (PKzS + " 5% rejection").c_str()     , "P");
+    leg_V0Dump->AddEntry(la8_v2sub , (PgL_PagL + " Default").c_str() , "P");
+    leg_V0Dump->AddEntry(la8_v2_V0RandDump , (PgL_PagL + " 5% rejection").c_str() , "P");
+    leg_V0Dump->Draw();
+
+    ks8_v2sub->Draw("P");
+    la8_v2sub->Draw("P");
+    ks8_v2_V0RandDump->Draw("P");
+    la8_v2_V0RandDump->Draw("P");
+
+    tex->SetTextFont(62);
+    tex->SetTextSize(0.05);
+    tex->DrawLatex(0.15,0.85,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
+
+    MakePanel(frame1,c7->cd(2),0,0.85,9,1.15,0.12,"p_{T} (GeV)","Ratio v_{2}^{sig}");
+    //TGraphErrors* ks8_v2_V0RandDump_ratio = TGDivideSameXCorrErr(ks8_v2,ks8_v2_V0RandDump);
+    //TGraphErrors* la8_v2_V0RandDump_ratio = TGDivideSameXCorrErr(la8_v2,la8_v2_V0RandDump);
+    TGraphErrors* ks8_v2_V0RandDump_ratio = TGDivideSameX(ks8_v2,ks8_v2_V0RandDump);
+    TGraphErrors* la8_v2_V0RandDump_ratio = TGDivideSameX(la8_v2,la8_v2_V0RandDump);
+    SetTGattributes(ks8_v2_V0RandDump_ratio,kRed,20,1.5);
+    SetTGattributes(la8_v2_V0RandDump_ratio,kBlue,20,1.5);
+    cout << "Test3" << endl;
+    ks8_v2_V0RandDump_ratio->Draw("P");
+    la8_v2_V0RandDump_ratio->Draw("P");
+    TLine* line_ratio = new TLine(0,1,9,1);
+    line_ratio->Draw();
+    c7->Print("Image/Rap_v2sig_pPb/v2SigRandDumpCheck.pdf");
+
 
 }
 void RapSys_perisub()
@@ -4633,6 +4719,11 @@ void RapSys_RecoCutsV0()
 void RapSys_RecoCutsXi()
 {
 
+    TLine* LineRatio_min_xi[10];
+    TLine* LineRatio_max_xi[10];
+
+    TH1F* frame[10];
+
     TFile* f_loose = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_XiRecoCutCheck_loose_ARC3_1_10_18.root"); //For ARC3 check
     TFile* f_tight = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_XiRecoCutCheck_tight_ARC3_1_10_18.root"); //For ARC3 check
 
@@ -4662,10 +4753,10 @@ void RapSys_RecoCutsXi()
     TGraphErrors* tight_v2_xi_ARC = (TGraphErrors*)f_tight->Get("v2xi");
 
     SetTGattributes(standard_v2_xi,kRed,20,1);
-    SetTGattributes(loose_v2_xi,kMagenta,25,1);
-    SetTGattributes(tight_v2_xi,kMagenta,26,1);
-    SetTGattributes(loose_v2_xi_ARC,kBlue,25,1);
-    SetTGattributes(tight_v2_xi_ARC,kBlue,26,1);
+    SetTGattributes(loose_v2_xi,kBlue,25,1);
+    SetTGattributes(tight_v2_xi,kBlue,26,1);
+    SetTGattributes(loose_v2_xi_ARC,kMagenta,25,1);
+    SetTGattributes(tight_v2_xi_ARC,kMagenta,26,1);
 
     TCanvas* c1_xi = MakeCanvas("c1_xi", "Plot_xi");
     c1_xi->cd();
@@ -4700,8 +4791,8 @@ void RapSys_RecoCutsXi()
     leg_xi->AddEntry(standard_v2_xi, "Standard reconstruction", "P");
     leg_xi->AddEntry(tight_v2_xi, "Tight reconstruction", "P");
     leg_xi->AddEntry(loose_v2_xi, "Loose reconstruction", "P");
-    leg_xi->AddEntry(tight_v2_xi_ARC, "Tight reconstruction #pi only", "P");
-    leg_xi->AddEntry(loose_v2_xi_ARC, "Loose reconstruction #pi only", "P");
+    //leg_xi->AddEntry(tight_v2_xi_ARC, "Tight reconstruction #Lambda fixed", "P");
+    //leg_xi->AddEntry(loose_v2_xi_ARC, "Loose reconstruction #Lambda fixed", "P");
     leg_xi->Draw();
 
     TLatex *tex = new TLatex();
@@ -4718,54 +4809,68 @@ void RapSys_RecoCutsXi()
     //Calculate Ratios
     TGraphErrors* Ratioloose_v2_xi = TGDivideSameXCorrErr(loose_v2_xi,standard_v2_xi);
 	TGraphErrors* Ratiotight_v2_xi = TGDivideSameXCorrErr(tight_v2_xi,standard_v2_xi);
-    TGraphErrors* Ratioloose_v2_xi_ARC = TGDivideSameXCorrErr(loose_v2_xi_ARC,standard_v2_xi);
-    TGraphErrors* Ratiotight_v2_xi_ARC = TGDivideSameXCorrErr(tight_v2_xi_ARC,standard_v2_xi);
+    //TGraphErrors* Ratioloose_v2_xi_ARC = TGDivideSameXCorrErr(loose_v2_xi_ARC,standard_v2_xi);
+    //TGraphErrors* Ratiotight_v2_xi_ARC = TGDivideSameXCorrErr(tight_v2_xi_ARC,standard_v2_xi);
 
     SetTGattributes(Ratioloose_v2_xi,kRed,20,1.5);
     SetTGattributes(Ratiotight_v2_xi,kBlue,21,1.5);
-    SetTGattributes(Ratioloose_v2_xi_ARC,kRed,24,1.5);
-    SetTGattributes(Ratiotight_v2_xi_ARC,kBlue,25,1.5);
+    //SetTGattributes(Ratioloose_v2_xi_ARC,kRed,24,1.5);
+    //SetTGattributes(Ratiotight_v2_xi_ARC,kBlue,25,1.5);
+    //
+    TCanvas* c1_ratio_xi[10];
 
-    TCanvas* c1_ratio_xi = MakeCanvas("c1_ratio_xi", "Plot_ratio_xi");
-    TH1F* frame_Ratio_xi = c1_ratio_xi->DrawFrame(0,0.8,8,1.2);
-    /*TH1F* frame_co = c1_co->DrawFrame(0,0.01,20,1);*/
-    gPad->SetTickx();
-    gPad->SetTicky();
-    /*frame_Ratio_xi->SetTitle("K_{S}^{-1} Reconstruction Cut Ratio");*/
-    frame_Ratio_xi->GetXaxis()->CenterTitle(1);
-    frame_Ratio_xi->GetYaxis()->CenterTitle(1);
-    frame_Ratio_xi->GetXaxis()->SetTitleSize(0.05);
-    frame_Ratio_xi->GetXaxis()->SetTitle("p_{T} (GeV)");
-    frame_Ratio_xi->GetYaxis()->SetTitle("v_{2}^{sig}");
-    frame_Ratio_xi->GetYaxis()->SetTitleSize(0.05);
-    frame_Ratio_xi->SetTitleOffset(1.2,"Y");
-    frame_Ratio_xi->SetTitleOffset(1.2,"X");
+    c1_ratio_xi[0] = MakeCanvas("c1_ratio_xi", "Plot_ratio_xi");
+    frame[0] = MakePanelFrame(c1_ratio_xi[0]->cd(),0,0.8,8,1.2,0.12,"p_{T} (GeV)","#frac{loose/tight}{standard}");
 
     TLine* LineRatio_xi = new TLine(0,1,8,1);
-    /*LineRatio_xi->SetLineStyle(2);*/
     LineRatio_xi->Draw();
 
-    TLine* LineRatio_min_xi = new TLine(0,0.98,8,0.98);
-    LineRatio_min_xi->SetLineStyle(2);
-    LineRatio_min_xi->Draw();
+    LineRatio_min_xi[0] = new TLine(0,0.95,8,0.95);
+    LineRatio_min_xi[0]->SetLineStyle(2);
+    LineRatio_min_xi[0]->Draw();
 
-    TLine* LineRatio_max_xi = new TLine(0,1.02,8,1.02);
-    LineRatio_max_xi->SetLineStyle(2);
-    LineRatio_max_xi->Draw();
+    LineRatio_max_xi[0] = new TLine(0,1.05,8,1.05);
+    LineRatio_max_xi[0]->SetLineStyle(2);
+    LineRatio_max_xi[0]->Draw();
 
     Ratioloose_v2_xi->Draw("P");
     Ratiotight_v2_xi->Draw("P");
-    Ratioloose_v2_xi_ARC->Draw("P");
-    Ratiotight_v2_xi_ARC->Draw("P");
+    //Ratioloose_v2_xi_ARC->Draw("P");
+    //Ratiotight_v2_xi_ARC->Draw("P");
 
     TLegend* leg_ratio_xi = MakeTLegend(0.45,0.2,0.57,0.35);
     leg_ratio_xi->AddEntry(Ratioloose_v2_xi, "Loose #Xi^{#pm} Reconstruction", "P");
     leg_ratio_xi->AddEntry(Ratiotight_v2_xi, "Tight #Xi^{#pm} Reconstruction", "P");
-    leg_ratio_xi->AddEntry(Ratioloose_v2_xi_ARC, "Loose #Xi^{#pm} Reconstruction #pi only", "P");
-    leg_ratio_xi->AddEntry(Ratiotight_v2_xi_ARC, "Tight #Xi^{#pm} Reconstruction #pi only", "P");
+    //leg_ratio_xi->AddEntry(Ratioloose_v2_xi_ARC, "Loose #Xi^{#pm} Reconstruction #Lambda fixed", "P");
+    //leg_ratio_xi->AddEntry(Ratiotight_v2_xi_ARC, "Tight #Xi^{#pm} Reconstruction #Lambda fixed", "P");
     leg_ratio_xi->Draw();
 
-    c1_ratio_xi->Print("v2RecoRatioSystematicsXi.pdf");
+    c1_ratio_xi[0]->Print("v2RecoRatioSystematicsXi.pdf");
+
+    c1_ratio_xi[1] = MakeCanvas("c1_ratio_xi_LambdaFixed", "Plot_ratio_xi_LambdaFixed");
+    frame[1] = MakePanelFrame(c1_ratio_xi[1]->cd(),0,0.8,8,1.2,0.12,"p_{T} (GeV)","#frac{loose/tight}{standard}");
+
+    TLine* LineRatio_xi = new TLine(0,1,8,1);
+    LineRatio_xi->Draw();
+
+    LineRatio_min_xi[1] = new TLine(0,0.95,8,0.95);
+    LineRatio_min_xi[1]->SetLineStyle(2);
+    LineRatio_min_xi[1]->Draw();
+
+    LineRatio_max_xi[1] = new TLine(0,1.05,8,1.05);
+    LineRatio_max_xi[1]->SetLineStyle(2);
+    LineRatio_max_xi[1]->Draw();
+
+    Ratioloose_v2_xi_ARC->Draw("P");
+    Ratiotight_v2_xi_ARC->Draw("P");
+
+    TLegend* leg_ratio_xi = MakeTLegend(0.45,0.2,0.57,0.35);
+    leg_ratio_xi->AddEntry(Ratioloose_v2_xi_ARC, "Loose #Xi^{#pm} Reconstruction #Lambda fixed", "P");
+    leg_ratio_xi->AddEntry(Ratiotight_v2_xi_ARC, "Tight #Xi^{#pm} Reconstruction #Lambda fixed", "P");
+    leg_ratio_xi->Draw();
+
+    c1_ratio_xi[1]->Print("v2RecoRatioSystematicsXi_LambdaFixed.pdf");
+
 
 }
 
@@ -7066,4 +7171,95 @@ void CascadeRebin()
     c_om2->Print("OmegaPtRebin_PeriSub.pdf");
     c_om2->Print("OmegaPtRebin_PeriSub.png");
 
+}
+
+void Rap_v2sig_pPbTEST()
+{
+    MITStyle();
+    TCanvas* c1 = MakeCanvas("c1", "Pt");
+    TCanvas* c2 = MakeCanvas("c2", "NQS");
+
+    c1->cd();
+
+    // draw the frame using a histogram frame
+    TH1F* frame1;
+    TH1F* frame2;
+
+    const int om_npoints = 8;
+    const int xi_npoints = 9;
+    const int ks_npoints = 13;
+    const int la_npoints = 10;
+
+    // Pull TGraph for Kshort and lambda
+    TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_FixedGap_12_05_17.root");
+    TFile* file_pidv2_V0Dau_DCA = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_V0DauDCA_12_18_17.root");
+    //TFile* file_pidv2_V0EffTest = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_TestV0ARC3FilewoEff_1_10_18.root");
+    TFile* file_pidv2_V0EffTest = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_TestV0ARC3FileWEff_1_11_18.root");
+
+
+    TGraphErrors* ks8_v2_obs = (TGraphErrors*)file_pidv2->Get("v2obskshort");
+    TGraphErrors* la8_v2_obs = (TGraphErrors*)file_pidv2->Get("v2obslambda");
+    TGraphErrors* ks8_v2_bkg = (TGraphErrors*)file_pidv2->Get("v2bkgkshort");
+    TGraphErrors* la8_v2_bkg = (TGraphErrors*)file_pidv2->Get("v2bkglambda");
+
+    TGraphErrors* ks8_v2_V0EffTest_obs = (TGraphErrors*)file_pidv2_V0EffTest->Get("v2obskshort");
+    TGraphErrors* la8_v2_V0EffTest_obs = (TGraphErrors*)file_pidv2_V0EffTest->Get("v2obslambda");
+    TGraphErrors* ks8_v2_V0EffTest_bkg = (TGraphErrors*)file_pidv2_V0EffTest->Get("v2bkgkshort");
+    TGraphErrors* la8_v2_V0EffTest_bkg = (TGraphErrors*)file_pidv2_V0EffTest->Get("v2bkglambda");
+
+    SetTGattributes(ks8_v2_obs,kRed,20,1.5);
+    SetTGattributes(la8_v2_obs,kBlue,21,1.5);
+    SetTGattributes(ks8_v2_bkg,kRed,20,1.5);
+    SetTGattributes(la8_v2_bkg,kBlue,21,1.5);
+
+    SetTGattributes(ks8_v2_V0EffTest_obs,kRed,24,1.5);
+    SetTGattributes(la8_v2_V0EffTest_obs,kBlue,25,1.5);
+    SetTGattributes(ks8_v2_V0EffTest_bkg,kRed,24,1.5);
+    SetTGattributes(la8_v2_V0EffTest_bkg,kBlue,25,1.5);
+
+
+    //Draw v2 vs Pt
+    MakePanel(frame1,c1->cd(),0,-0.01,9,0.45,0.12,"p_{T} (GeV)","v_{2}^{sig}");
+    TLegend* leg = MakeTLegend(0.15,0.55,0.27,0.75);
+    leg->SetHeader("Obs");
+    leg->AddEntry(ks8_v2_obs , PKzS.c_str()     , "P");
+    leg->AddEntry(la8_v2_obs , PgL_PagL.c_str() , "P");
+    leg->AddEntry(ks8_v2_V0EffTest_obs , PKzS.c_str()     , "P");
+    leg->AddEntry(la8_v2_V0EffTest_obs , PgL_PagL.c_str() , "P");
+    leg->Draw();
+
+    ks8_v2_obs->Draw("P");
+    la8_v2_obs->Draw("P");
+    ks8_v2_V0EffTest_obs->Draw("P");
+    la8_v2_V0EffTest_obs->Draw("P");
+
+    TLatex *tex = new TLatex();
+    tex->SetNDC();
+    tex->SetTextFont(62);
+    tex->SetTextSize(0.05);
+    tex->DrawLatex(0.15,0.8,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
+    tex->SetTextSize(0.045);
+    tex->SetTextFont(42);
+    tex->DrawLatex(0.34,0.72,HM_ntrk.c_str());
+
+    //Draw v2 vs Pt
+    MakePanel(frame1,c2->cd(),0,-0.01,9,0.45,0.12,"p_{T} (GeV)","v_{2}^{sig}");
+    TLegend* legbkg = MakeTLegend(0.15,0.55,0.27,0.75);
+    legbkg->SetHeader("Bkg");
+    legbkg->AddEntry(ks8_v2_bkg , PKzS.c_str()     , "P");
+    legbkg->AddEntry(la8_v2_bkg , PgL_PagL.c_str() , "P");
+    legbkg->AddEntry(ks8_v2_V0EffTest_bkg , PKzS.c_str()     , "P");
+    legbkg->AddEntry(la8_v2_V0EffTest_bkg , PgL_PagL.c_str() , "P");
+    legbkg->Draw();
+
+    ks8_v2_bkg->Draw("P");
+    la8_v2_bkg->Draw("P");
+    ks8_v2_V0EffTest_bkg->Draw("P");
+    la8_v2_V0EffTest_bkg->Draw("P");
+
+    tex->SetTextSize(0.05);
+    tex->DrawLatex(0.15,0.8,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
+    tex->SetTextSize(0.045);
+    tex->SetTextFont(42);
+    tex->DrawLatex(0.34,0.72,HM_ntrk.c_str());
 }
