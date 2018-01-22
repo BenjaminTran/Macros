@@ -193,6 +193,8 @@ std::map<std::string, std::vector<double> > vnCalculateMap(int degree, std::stri
     std::vector<double> vnBkg_errors_nq;
     std::vector<double> vnRefError;
 
+    //vnvalues_h[degree] = 1;
+
     for(unsigned i=0; i<fsig.size(); i++)
     {
         double vnObs_ = vnvalues_peak[i]/TMath::Sqrt(vnvalues_h[degree]);
@@ -258,6 +260,8 @@ std::map<std::string, std::vector<double> > vnCalculateMapGen(int degree, std::s
     std::vector<double> vnBkg_nq;
     std::vector<double> vnBkg_errors_nq;
     std::vector<double> vnRefError;
+
+    vnvalues_h[degree] = 1;
 
     for(unsigned i=0; i<fsig.size(); i++)
     {
@@ -484,18 +488,26 @@ void V0vnFit()
     //TFile *f = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityCorrectMultB_09_19_17.root"); //For V0s only pPb Directory not called v0CasCorrelationRapidity Dont use
     //
     //Newest Files for pPb and MB
-    //TFile *f_V0 = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityHM185_250.root"); //For V0s only pPb
+    //TFile *f_V0 = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityHM185_250.root"); //For V0s only pPb. This file derived from V0CorrelationRapidityCorrectMultB_09_19_17.root
+    TFile *f_V0 = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0Correlation_TrkEff_1_11_18.root"); //For V0s only pPb. This file derived from V0CorrelationRapidityCorrectMultB_09_19_17.root
     //TFile *f_Xi = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationHM_11_07_17.root" ); //pPb
-    //TFile *f_Om = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/OmCorr/OmegaHMRapidity_Total_12_04_17.root" ); //pPb
-    //TFile *fhad = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/Combine_HM185_corr_ref_PUrej.root" ); //pPb
+    TFile *f_Om = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/OmCorr/OmegaHMRapidity_Total_12_04_17.root" ); //pPb
+    TFile *fhad = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/Combine_HM185_corr_ref_PUrej.root" ); //pPb
     //
     //pPb w/ Dau Eff check requested by Olga during first Arc meeting.
     //TFile *f_V0 = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0DauCheck_w_DCA_HM_Total_12_15_17.root"); //Using DCA > 1
     //TFile *f_V0 = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0DauCheck_w_DCA_HM_Total_12_18_17.root"); //Using DCA > 1
     //
     //pPb Xi reco cut check requested by arc3
-    //TFile *f_Xi = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationHM_11_07_17.root" ); //pPb
-    //TFile *f_Xi = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationHM_11_07_17.root" ); //pPb
+    //TFile *f_Xi = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/Xi_RecoCut_loose_ARC3_1_10_18.root" ); //pPb loose Lambda Fixed
+    //TFile *f_Xi = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/Xi_RecoCut_tight_ARC3_1_10_18.root" ); //pPb tight Lambda Fixed
+    //TFile *f_Xi = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/Xi_ARC3_Loose_PiVarOnly_1_11_18.root" ); //pPb loose Pi Only
+    TFile *f_Xi = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/Xi_ARC3_Tight_PiVarOnly_1_11_18.root" ); //pPb tight Pi Only
+    //
+    //pPb V0 Remove random 5% data requested by arc3
+    //TFile *f_V0 = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0_5percentDump_ARC3_1_10_18.root"); // V0s
+    //TFile *f_V0 = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0_OLD_5percentDump_ARC3_1_11_18.root"); // V0s
+
     //
     //TFile *f_V0 = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityHM185_250.root"); //No DCA
     //
@@ -511,6 +523,7 @@ void V0vnFit()
 
     //Peri Sub 0-35
     //TFile *f_V0 = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/V0MB_0_35_1_02_18.root"); //MB PeriSub 0_35 partial stats
+    //TFile *f_V0 = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/V0MB_w8p5-10pt_1_08_18.root"); //MB Perisub 0_35 with 8.5-10 pt bin
     //TFile *f_Xi = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/XiMB_0_35_1_02_18.root"); //MB PeriSub 0_35 partial stats
     //TFile *f_Om = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/OmegaMB_Total_0_35_MergedBin1-2_11_28_17.root"); //MB PeriSub 0_35 MergedBin1-2
     //TFile *fhad = new TFile("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/Combine_MB0_ref.root" ); //MB peripheral subtraction 0-35
@@ -547,11 +560,13 @@ void V0vnFit()
     ofstream vnCalculator;
     bool doKs = true;
     bool doLa = true;
-    bool doXi = true;
-    bool doOm = true;
+    bool doXi = false;
+    bool doOm = false;
     bool doGen = false;
-    std::string fn = "v0CasCorrelationRapidityPeriSub";
-    //std::string fn = "v0CasCorrelationRapidity";
+    //std::string fn = "v0CasCorrelationRapidityPeriSub";
+    std::string fn = "v0CasCorrelationRapidity";
+    //std::string fn = "v0CasCorrelationlooseRapidity";
+    //std::string fn = "v0CasCorrelationtightRapidity";
     //std::string fn = "v0CasCorrelationRapidityPbPb";
     //std::string fn = "v0CorrelationRapidity";
     //std::string fn = "xiCorrelationRapidity";
@@ -594,10 +609,17 @@ void V0vnFit()
     std::string branchname_ket_om_bkg = fn + "/KET_om_bkg_pt";
     //std::string graphName = "FitRootFiles/v2valuesRapidityClosureReco_RecoRef_Total_11_8_17.root";
     //std::string graphName = "FitRootFiles/PbPb/v2valuesRapidity_Cent_30_50_EtaGap1_FixedRef_FixedGap_12_05_17.root"; //PbPb
-    //std::string graphName = "FitRootFiles/HM/v2valuesRapidityHM_185_250_EtaGap1_HigherPtBinV0_1_05_18.root"; //HM
+    std::string graphName = "FitRootFiles/HM/v2valuesRapidityHM_185_250_EtaGap1_V0_wTrkEff_1_11_18.root"; //HM
+    //std::string graphName = "FitRootFiles/HM/v2valuesRapidityHM_185_250_EtaGap1_TestV0ARC3FileWEff_1_10_18.root"; //HM
+    //std::string graphName = "FitRootFiles/HM/v2valuesRapidityHM_185_250_EtaGap1_TestV0ARC3FileWEff_1_11_18.root"; //HM
+    //std::string graphName = "FitRootFiles/HM/v2valuesRapidityHM_185_250_EtaGap1_V0_1_10_18.root"; //HM
+    //std::string graphName = "FitRootFiles/HM/v2valuesRapidityHM_185_250_EtaGap1_8p5-10GeV_1_10_18.root"; //HM
     //std::string graphName = "FitRootFiles/HM/v2valuesRapidityHM_185_250_EtaGap1_V0DauCheck_1_05_18.root"; //HM V0Dau w DCA
+    //std::string graphName = "FitRootFiles/HM/v2valuesRapidityHM_185_250_EtaGap1_XiRecoCutCheck_tight_ARC3_1_10_18.root"; //HM Xi Tight Reco Cut ARC3 check Lambda Fixed
+    //std::string graphName = "FitRootFiles/HM/v2valuesRapidityHM_185_250_EtaGap1_XiRecoCutCheck_tight_ARC3_1_11_18.root"; //HM Xi Tight Reco Cut ARC3 check Pi Var only
+    //std::string graphName = "FitRootFiles/HM/v2valuesRapidityHM_185_250_EtaGap1_XiRecoCutCheck_loose_ARC3_1_11_18.root"; //HM Xi Loose Reco Cut ARC3 check Pi Var only
     //std::string graphName = "FitRootFiles/MB/v2valuesRapidityMB_0_20_EtaGap2_11_9_17.root"; //MB 0-20
-    std::string graphName = "FitRootFiles/MB/v2valuesRapidityMB_AllStrange_0_35_EtaGap1_1_05_18.root"; //MB 0-35
+    //std::string graphName = "FitRootFiles/MB/v2valuesRapidityMB_AllStrange_0_35_EtaGap1_8p5-10GeV_1_10_18.root"; //MB 0-35
     //std::string graphName = "FitRootFiles/MB/v2valuesRapidityMB_0_35_Omega_Merged1-2_EtaGap1_11_28_17.root"; //MB Omega 0_35 Merged bin1-2
     //std::string graphName = "FitRootFiles/MB/v2valuesRapidityMB_0_35_V0_EtaGap1_11_28_17.root"; //MB Omega 0_35 Merged bin1-2
     //std::string graphName = "FitRootFiles/MB/v2valuesRapidityMB_0_35_Omega_EtaGap1_11_22_17.root"; //MB Omega 0_35
@@ -616,8 +638,11 @@ void V0vnFit()
 
     TVirtualFitter::SetMaxIterations(300000);
     TH1::SetDefaultSumw2();
-    std::vector<double> PtBin_ks = {0.2, 0.4, 0.6, 0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5};//,10.0};
-    std::vector<double> PtBin_la = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5};//,10.0};
+    //std::vector<double> PtBin_ks = {0.2, 0.4, 0.6, 0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5, 10.0};
+    //std::vector<double> PtBin_la = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5, 10.0};
+
+    std::vector<double> PtBin_ks = {0.2, 0.4, 0.6, 0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5};
+    std::vector<double> PtBin_la = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5};
     std::vector<double> PtBin_om = {1.5, 2.2, 2.8, 3.6, 5.0, 8.0};//, 20.0}; // pPb
     std::vector<double> PtBin_xi = {1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.2, 10.0};//, 20.0};
     //std::vector<double> PtBin_xi = {1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.2};//, 20.0}; // PbPb
@@ -685,16 +710,22 @@ void V0vnFit()
     std::vector<double> vnErrors_h = {-999,-999};
 
     //Fsig for vn calculations
-    //std::vector<double> fsig_ks = {0.991743 , 0.992798 , 0.993457 , 0.993601 , 0.992867 , 0.990667 , 0.98788  , 0.984159 , 0.979121 , 0.973607     , 0.968452    , 0.962748 , 0.957971};//                         , 0.99836};// , 0.890106 , 0.481433}; //Rapidity pPb full stats
-    //std::vector<double> fsig_la = {0.899098 , 0.969946 , 0.981187 , 0.983357 , 0.98448  , 0.984754 , 0.983104 , 0.97844  , 0.970099 , 0.960906};// , 0.92718};// , 0.990913 , 0.421011}; //Rapidity pPb full stats
-    //std::vector<double> fsig_xi = {0.946441 ,0.969308 ,0.972483 ,0.973308 ,0.973584 ,0.972577 ,0.972438 ,0.968581 ,0.966521};// ,0.976012}; //Rapidity pPb Full Stats
-    //std::vector<double> fsig_om = {0.777092, 0.874139, 0.922723, 0.953088, 0.966968};// ,0.976012}; Rapidity pPb Rebinned Full Stats
-    //std::vector<double> fsig_om = {0.722342, 0.806663, 0.874069, 0.922878, 0.950436, 0.965793, 0.970866, 0.96041};// ,0.976012}; Rapidity pPb removed 1.0-1.5 Full Stats
+    //std::vector<double> fsig_ks = {0.991743 , 0.992798 , 0.993457 , 0.993601 , 0.992867 , 0.990667 , 0.98788  , 0.984159 , 0.979121 , 0.973607 , 0.968452    , 0.962748 , 0.957971, 0.949};// with 8.5-10 Pt Bin
+    //std::vector<double> fsig_la = {0.899098 , 0.969946 , 0.981187 , 0.983357 , 0.98448  , 0.984754 , 0.983104 , 0.97844  , 0.970099 , 0.960906, 0.945}; // with 8.5-10 Pt Bin
+
+    std::vector<double> fsig_ks = {0.991743 , 0.992798 , 0.993457 , 0.993601 , 0.992867 , 0.990667 , 0.98788  , 0.984159 , 0.979121 , 0.973607 , 0.968452    , 0.962748 , 0.957971}; //Rapidity pPb full stats
+    std::vector<double> fsig_la = {0.899098 , 0.969946 , 0.981187 , 0.983357 , 0.98448  , 0.984754 , 0.983104 , 0.97844  , 0.970099 , 0.960906};// , 0.92718};// , 0.990913 , 0.421011}; //Rapidity pPb full stats
+    std::vector<double> fsig_xi = {0.946441 ,0.969308 ,0.972483 ,0.973308 ,0.973584 ,0.972577 ,0.972438 ,0.968581 ,0.966521};// ,0.976012}; //Rapidity pPb Full Stats
+    std::vector<double> fsig_om = {0.777092, 0.874139, 0.922723, 0.953088, 0.966968};// ,0.976012}; Rapidity pPb Rebinned Full Stats (USE THIS)
+    //std::vector<double> fsig_om = {0.722342, 0.806663, 0.874069, 0.922878, 0.950436, 0.965793, 0.970866, 0.96041};// ,0.976012}; Rapidity pPb removed 1.0-1.5 Before rebin Full Stats
     //
-    std::vector<double> fsig_ks = {0.997    , 0.997    , 0.993    , 0.997    , 0.995    , 0.993    , 0.991    , 0.989    , 0.986    , 0.982    , 0.978    , 0.971    , 0.968};//, 0.965}; //MB 0-35
-    std::vector<double> fsig_la = {0.996    , 0.994   , 0.995    , 0.994    , 0.992    , 0.990    , 0.987    , 0.981   , 0.973   , 0.963};// , 0.952}; //MB 0-35
-    std::vector<double> fsig_xi = {0.967  , 0.977 , 0.980 , 0.983   , 0.982 , 0.980 , 0.983 , 0.981 , 0.971}; //MB 0-35
-    std::vector<double> fsig_om = {0.896448 ,0.941455 ,0.956581 ,0.966235 ,0.978242};// ,0.976012}; //For Peripheral Sub Merged first bin 0-35
+    //std::vector<double> fsig_ks = {0.997    , 0.997    , 0.993    , 0.997    , 0.995    , 0.993    , 0.991    , 0.989    , 0.986    , 0.982    , 0.978    , 0.971    , 0.968, 0.965}; //MB 0-35 with 8.5-10 Pt Bin
+    //std::vector<double> fsig_la = {0.996    , 0.994   , 0.995    , 0.994    , 0.992    , 0.990    , 0.987    , 0.981   , 0.973   , 0.963 , 0.952}; //MB 0-35 with 8.5-10 Pt Bin
+    //
+    //std::vector<double> fsig_ks = {0.997    , 0.997    , 0.993    , 0.997    , 0.995    , 0.993    , 0.991    , 0.989    , 0.986    , 0.982    , 0.978    , 0.971    , 0.968}; //MB 0-35
+    //std::vector<double> fsig_la = {0.996    , 0.994   , 0.995    , 0.994    , 0.992    , 0.990    , 0.987    , 0.981   , 0.973   , 0.963}; //MB 0-35
+    //std::vector<double> fsig_xi = {0.967  , 0.977 , 0.980 , 0.983   , 0.982 , 0.980 , 0.983 , 0.981 , 0.971}; //MB 0-35
+    //std::vector<double> fsig_om = {0.896448 ,0.941455 ,0.956581 ,0.966235 ,0.978242};// ,0.976012}; //For Peripheral Sub Merged first bin 0-35
     //std::vector<double> fsig_om = {0.871526 ,0.912086 ,0.941455 ,0.956581 ,0.966235, 0.978242};// ,0.976012}; //For Peripheral Sub Unmerged first bin 0-35
     //
     //std::vector<double> fsig_ks = {0.892205,0.92336 ,0.935079 ,0.946728 ,0.961131 ,0.960816 ,0.951312 ,0.935589 ,0.922555,0.91897 ,0.918127 ,0.908964,0.897616}; //PbPb full stats
@@ -716,6 +747,10 @@ void V0vnFit()
     //std::vector<double> fsig_la = {0.685977,0.851926 ,0.928584 ,0.944353 ,0.952072 ,0.951948 ,0.946417 ,0.931891 ,0.88348 ,0.872633}; //PbPb Partial Stats 
     //std::vector<double> fsig_xi = {0.869648 ,0.90817 ,0.939477 ,0.944172 ,0.940623 ,0.930704 ,0.936042 ,0.938471};//,0.976012}; //PbPb Partial Stats
     //std::vector<double> fsig_om = {0.647487 ,0.774924 ,0.872547 ,0.911986 ,0.937495 ,0.95909};// ,0.976012}; //For PbPb partial Stat
+
+    //ARC3 5% rejection
+    //std::vector<double> fsig_ks = {0.9918, 0.9928, 0.9934, 0.9936, 0.9929, 0.9906, 0.9879, 0.9841, 0.9793, 0.9736, 0.9685, 0.9633, 0.9577};
+    //std::vector<double> fsig_la = {0.8979, 0.9977, 0.9811, 0.9833, 0.9835, 0.9847, 0.9831, 0.9785, 0.9702, 0.9609};
 
 
     if((PtBin_ks.size()-1 != fsig_ks.size()) || (PtBin_la.size()-1 != fsig_la.size()) || (PtBin_xi.size()-1 != fsig_xi.size()) || PtBin_om.size()-1 != fsig_om.size())

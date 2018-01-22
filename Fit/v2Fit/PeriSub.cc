@@ -14,19 +14,35 @@ using namespace std;
 
 struct ParticleData{
     //std::string fn = "V0v2perisubFixedWindow.root";
-    std::string fn = "FitRootFiles/PeriSub/V0v2perisub_Default_AllStrange_EG1_0_35_CorrectRef_CorrectGap_FullStats_1_05_18.root";
+    //std::string fn = "FitRootFiles/PeriSub/V0v2perisub_Default_AllStrange_EG1_0_35_CorrectRef_CorrectGap_FullStats_5percentReject_1_11_18.root"; USing Old V0 data
+    //std::string fn = "FitRootFiles/PeriSub/V0v2perisub_Default_AllStrange_EG1_0_35_CorrectRef_CorrectGap_FullStats_5percentReject_1_10_18.root";
+    //std::string fn = "FitRootFiles/PeriSub/V0v2perisub_Default_AllStrange_EG1_0_35_CorrectRef_CorrectGap_FullStats_8p5-10GeV_1_10_18.root";
+    std::string fn = "FitRootFiles/PeriSub/V0v2perisub_Default_EG1_0_35_V0wTrkEff_01_11_18.root";
     //std::string fn = "FitRootFiles/PeriSub/V0v2perisub_Default_EG1_0_35_CorrectRef_InCorrectGap_12_05_17.root";
-    //std::string fn = "FitRootFiles/PeriSub/V0v2perisub_Default_EG1_60percXi_0_35_12_18_17.root";
     //std::string fn = "FitRootFiles/PeriSub/V0v2perisub_Default_EG1_0_35_JetPeak1p64_12_17_17.root";
     //std::string fn = "FitRootFiles/PeriSub/V0v2perisub_FixedWindow1p7_EG1_0_35_12_17_17.root";
     //std::string fn = "FitRootFiles/PeriSub/V0v2perisub_FixedWindow1p2_EG1_0_35_12_17_17.root";
     //std::string fn = "FitRootFiles/PeriSub/V0v2perisub_FixedWindow0p5_EG1_0_35_12_17_17.root";
     //std::string fn = "JustForPrintingNassoc.root";
-    std::string fn_V0 = "v0CorrelationRapidity";
+    //std::string fn_V0 = "v0CorrelationRapidity"; //For original HM V0
+    std::string fn_V0 = "v0CasCorrelationRapidity";
     //std::string fn_Xi = "xiCorrelationRapidity";
     std::string fn_Xi = "v0CasCorrelationRapidity";
     std::string fn_Om = "v0CasCorrelationRapidity";
     std::string fn_v0cas = "v0CasCorrelationRapidityPeriSub";
+    // For 8.5-10 Pt Bin
+    //std::vector<double> fsig_ks    = {0.989638 , 0.992109 , 0.992861 , 0.992984 , 0.992159 , 0.989499 , 0.986445 , 0.982275 , 0.976946 , 0.970546 , 0.964845 , 0.958563 , 0.969557 , 0.949};
+    //std::vector<double> fsig_ks_MB = {0.997    , 0.997    , 0.993    , 0.997    , 0.995    , 0.993    , 0.991    , 0.989    , 0.986    , 0.982    , 0.978    , 0.971    , 0.968, 0.965};
+    //std::vector<double> fsig_la    = {0.908266 , 0.96779 , 0.979912 , 0.981899 , 0.982888 , 0.982854 , 0.980766 , 0.97569 , 0.97569 , 0.964048, 0.945};
+    //std::vector<double> fsig_la_MB = {0.996    , 0.994   , 0.995    , 0.994    , 0.992    , 0.990    , 0.987    , 0.981   , 0.973   , 0.963 , 0.952};
+    //std::vector<double> PtBin_ks   = {0.2, 0.4, 0.6, 0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5, 10.0};
+    //std::vector<double> PtBin_la   = {0.8, 1.0, 1.4, 1.8, 2.2, 2.8, 3.6, 4.6, 6.0, 7.0, 8.5, 10.0};
+
+    // For 5% rejection
+    //std::vector<double> fsig_ks = {0.9918, 0.9928, 0.9934, 0.9936, 0.9929, 0.9906, 0.9879, 0.9841, 0.9793, 0.9736, 0.9685, 0.9633, 0.9577};
+    //std::vector<double> fsig_la = {0.8979, 0.9977, 0.9811, 0.9833, 0.9835, 0.9847, 0.9831, 0.9785, 0.9702, 0.9609};
+
+    // Default
     std::vector<double> fsig_ks    = {0.989638 , 0.992109 , 0.992861 , 0.992984 , 0.992159 , 0.989499 , 0.986445 , 0.982275 , 0.976946 , 0.970546 , 0.964845 , 0.958563 , 0.969557};
     std::vector<double> fsig_ks_MB = {0.997    , 0.997    , 0.993    , 0.997    , 0.995    , 0.993    , 0.991    , 0.989    , 0.986    , 0.982    , 0.978    , 0.971    , 0.968};
     std::vector<double> fsig_la    = {0.908266 , 0.96779 , 0.979912 , 0.981899 , 0.982888 , 0.982854 , 0.980766 , 0.97569 , 0.97569 , 0.964048};
@@ -40,12 +56,16 @@ struct ParticleData{
     std::vector<double> PtBin_xi   = {1.0,1.4,1.8,2.2,2.8,3.6,4.6,6.0,7.2,10.0};
     std::vector<double> PtBin_om   = {1.5, 2.2, 2.8, 3.6, 5.0, 8.0};//, 20.0}; // PbPb
     TFile *f_perisub      = TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/V0MB_0_35_1_02_18.root");
+    //TFile *f_perisub      = TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/V0MB_w8p5-10pt_1_08_18.root");
     //TFile *f_perisub = TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/PeripheralSubtractionMB_0_n_20_V0Only.root");
     //TFile *f_perisub_xi   = TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/XiOmegaMB_0_N_20_Partial_11_8_17.root");
     TFile *f_perisub_xi   = TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/XiMB_0_35_1_02_18.root");
     //TFile *f_perisub_xi   = TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/XiMB_partial_0_35_12_05_17.root");
     TFile *f_perisub_om   = TFile::Open("/volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/OmegaMB_Total_0_35_MergedBin1-2_11_28_17.root");
-    TFile *f_V0           = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityCorrectMultB_09_19_17.root");
+    //TFile *f_V0           = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityCorrectMultB_09_19_17.root"); Old No trk eff DO NOT USE
+    TFile *f_V0           = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0Correlation_TrkEff_1_11_18.root");
+    //TFile *f_V0           = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0_5percentDump_ARC3_1_10_18.root"); //Throw away 5% of data as requested by ARC3
+    //TFile *f_V0           = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0_OLD_5percentDump_ARC3_1_11_18.root"); //Throw away 5% of data as requested by ARC3 (FROM OLD FILE)
     //TFile* f_Xi         = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationRapidityTotal_08_20_2017.root");
     TFile* f_Xi           = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationHM_11_07_17.root");
     //TFile *f_low_ref      = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/HadCorr/Combine_MB0_corr_ref.root"); //0-20

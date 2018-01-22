@@ -59,9 +59,9 @@ void V0MassFitFromHist()
     TH3D* MassKs3D;
     TH3D* MassLa3D;
     bool doPbPb = false;
-    bool pPb = false;
+    bool pPb = true;
     bool mc = false;
-    bool mb = true;
+    bool mb = false;
     bool lambda;
 
     std::vector<RooPlot*> Xframe_Ks;
@@ -69,12 +69,14 @@ void V0MassFitFromHist()
     std::vector<double> std_ks;
     std::vector<double> fsig_ks;
     std::vector<double> covQual_ks;
+    std::vector<double> pt_ks;
 
     std::vector<RooPlot*> Xframe_La;
     std::vector<double> mass_la;
     std::vector<double> std_la;
     std::vector<double> fsig_la;
     std::vector<double> covQual_la;
+    std::vector<double> pt_la;
 
     //int pTksLength = 26; // the number of bins to be fitted is half of this number
     //std::vector<double> pks = {3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70, 71,85, 86,100};//, 201,250, 251,300};
@@ -102,7 +104,8 @@ void V0MassFitFromHist()
     if(doPbPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/V0CasCorrelationPbPbTotal_10_30_17.root");
     else if(mc) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/All/MCMassPtTotal_08_23_2017.root");
     else if(mb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/V0MB_0_35_1_02_18.root");
-    else if(pPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityCorrectMultB_09_19_17.root");
+    //else if(pPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityCorrectMultB_09_19_17.root");
+    else if(pPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0_OLD_5percentDump_ARC3_1_11_18.root");
 
     if(mc)
     {
@@ -146,12 +149,16 @@ void V0MassFitFromHist()
         {
             massks[i] = (TH1D*)file->Get(Form("v0CorrelationRapidity/masskshort_pt%d",i));
             massla[i] = (TH1D*)file->Get(Form("v0CorrelationRapidity/masslambda_pt%d",i));
+            //massks[i] = (TH1D*)file->Get(Form("v0CasCorrelationRapidity/masskshort_pt%d",i));
+            //massla[i] = (TH1D*)file->Get(Form("v0CasCorrelationRapidity/masslambda_pt%d",i));
         }
         massks[i]->Rebin(1);
         massla[i]->Rebin(1);
         massks[i]->GetXaxis()->SetRangeUser(0.43,0.565);
         massla[i]->GetXaxis()->SetRangeUser(1.08,1.16);
 
+        pt_ks.push_back(massks[i]->GetMean(1));
+        pt_la.push_back(massla[i]->GetMean(1));
 
         TLatex* tex = new TLatex();
         tex->SetNDC();
@@ -597,6 +604,7 @@ void V0MassFitFromHist()
         osYield << "Yield: " << std::setprecision(2) << yield_ks;
         tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
         osYield.str(std::string());
+        tex->SetTextSize(0.07);
         osYield << "fsig: " << std::setprecision(6) << Fsig_ks;
         tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
         osYield.str(std::string());
@@ -637,6 +645,12 @@ void V0MassFitFromHist()
             //RooRealVar polysig("polysig","polysig",2e3,1e3,1e6);
             RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,poly),RooArgList(sig1,sig2,polysig));
 
+            if(i==0 && pPb)
+            {
+                sig1.setVal(1e3);
+                sig2.setVal(1e3);
+                polysig.setVal(1e5);
+            }
             if(i>=7 && i<10 && pPb)
             {
                 sig1.setVal(1e6);
@@ -1119,6 +1133,7 @@ void V0MassFitFromHist()
             osYield << "Yield: " << std::setprecision(2) << yield_la;
             tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
             osYield.str(std::string());
+        tex->SetTextSize(0.07);
             osYield << "fsig: " << std::setprecision(6) << Fsig_la;
             tex->DrawLatex(xpos,ypos-=increment,osYield.str().c_str());
             osYield.str(std::string());
@@ -1144,6 +1159,8 @@ void V0MassFitFromHist()
         Composite_La->Print("LaMassFitComposite.pdf");
     }
     //Output
+    //TFile fs = new TFile("V0SigFrac.root","RECREATE");
+    //TGraphErrors* fs_ks = new TGraphErrros();
     pkscounter = 0;
     myfile << "KSHORT KSHORT KSHORT\n";
     for(unsigned i=0; i<mass_ks.size(); i++)
