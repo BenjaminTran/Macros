@@ -917,8 +917,8 @@ void Rap_v2sig_pPb()
     // Pull TGraph for Kshort and lambda
     TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_FixedGap_12_05_17.root");
     TFile* file_pidv2_V0Dau_DCA = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_V0DauDCA_12_18_17.root");
-    //TFile* file_pidv2_V0EffTest = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_TestV0ARC3FilewoEff_1_10_18.root");
-    TFile* file_pidv2_V0EffTest = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_TestV0ARC3FileWEff_1_10_18.root");
+    TFile* file_pidv2_V0EffTest = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_V0_wTrkEff_1_11_18.root");
+    //TFile* file_pidv2_V0EffTest = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_TestV0ARC3FileWEff_1_10_18.root");
 
 
     //TGraphErrors* om8_v2_Fixed = (TGraphErrors*)file_pidv2_Omega->Get("v2omega");
@@ -1013,7 +1013,7 @@ void Rap_v2sig_pPb()
     line_ratio_1->Draw();
     c3->Print("Image/Rap_v2sig_pPb/v2SigDauEffCheck.pdf");
 
-    //Draw V0Dau check w DCA
+    //Comparing old V0 from sept to new V0 from Jan 2018
     c4->Divide(2,1);
     SetTGattributes(ks8_v2,kRed,24,1.5);
     SetTGattributes(la8_v2,kBlue,26,1.5);
@@ -1047,7 +1047,7 @@ void Rap_v2sig_pPb()
     la8_v2_V0EffTest_ratio->Draw("P");
     line_ratio->Draw();
     line_ratio_1->Draw();
-    c4->Print("Image/Rap_v2sig_pPb/v2SigV05percentRejectCheck.pdf");
+    c4->Print("Image/Rap_v2sig_pPb/v2SigV0Compare.pdf");
 
     //Draw NQS
     c2->cd();
@@ -2195,7 +2195,7 @@ void Rap_fsig_pPb_MB()
     //tex->DrawLatex(0.15,0.72, "L_{#lower[-0.25]{int}} = #color[38]{35} nb^{#font[122]{\55}1}, #color[46]{62} nb^{#font[122]{\55}1}");
     // tex->DrawLatex(0.23,0.72, "L_{#lower[-0.25]{int}} = #color[kOrange+8]{35} nb^{#font[122]{\55}1}, 62 nb^{#font[122]{\55}1}");
     tex->SetTextFont(42);
-    tex->DrawLatex(0.15,0.75,"0 #leq N_{trk}^{offline} < 20");
+    tex->DrawLatex(0.15,0.75,"0 < N_{trk}^{offline} < 35");
     /*tex->DrawLatex(0.15,0.74,"|y| < 1");*/
     //tex->DrawLatex(0.4,0.7, "L_{#lower[-0.25]{int}} = 35 nb^{#font[122]{\55}1}, 185 nb^{#font[122]{\55}1}");
     TLine* line = new TLine(0,1,9,1);
@@ -2326,6 +2326,84 @@ void Rap_fsig_PbPb()
 
 }
 
+void RapSys_JetYield()
+{
+    /* Yield plots for Post-Approval. Compare 0-20 and 0-35 with one particle species per plot and one plot for obs and bkg
+     * giving 8 plots in total
+     * */
+    TLatex* tex = new TLatex();
+    tex->SetNDC();
+    tex->SetTextFont(42);
+    tex->SetTextSize(0.042);
+    TFile* file_pidv2_0_20 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubXiFixedPartialStats.root"); // Most recent for 0-20
+    TFile* file_pidv2_0_35 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_EG1_0_35_V0wTrkEff_01_11_18.root"); //Most Recent for 0-35
+    TH1F* frame;
+
+    /*
+     * 0. Ks
+     * 1. La
+     * 2. Xi
+     * 3. Om
+     * */
+
+    TGraphErrors* Yield_obs_35[4];
+    TGraphErrors* Yield_bkg_35[4];
+    TGraphErrors* Yield_obs_20[4];
+    TGraphErrors* Yield_bkg_20[4];
+
+    TLegend* leg_obs[4];
+    TLegend* leg_bkg[4];
+
+    TCanvas* Yield_obs[4];
+    TCanvas* Yield_bkg[4];
+
+    std::string pid[4] = {"ks","la","xi","om"};
+    std::string mult_label[2] = {"N_{trk}^{offline} #leq 35", "N_{trk}^{offline} #leq 20"};
+    std::string leg_header[4] = {PKzS,PgL_PagL,PgXm,PgOm};
+
+    for(int i=0; i<4; i++)
+    {
+        Yield_obs[i] = new TCanvas((leg_header[i] + " Obs").c_str(),(leg_header[i] + " Obs").c_str(),800,600);
+        Yield_bkg[i] = new TCanvas((leg_header[i] + " Bkg").c_str(),(leg_header[i] + " Bkg").c_str(),800,600);
+        Yield_obs_35[i] = (TGraphErrors*)file_pidv2_0_35->Get(("YieldPlot_low_obs_" + pid[i]).c_str());
+        Yield_bkg_35[i] = (TGraphErrors*)file_pidv2_0_35->Get(("YieldPlot_low_bkg_" + pid[i]).c_str());
+        if(i<3) //Avoid choosing omega for 0-20 which doesn't exist
+        {
+            Yield_obs_20[i] = (TGraphErrors*)file_pidv2_0_20->Get(("YieldPlot_low_obs_" + pid[i]).c_str());
+            Yield_bkg_20[i] = (TGraphErrors*)file_pidv2_0_20->Get(("YieldPlot_low_bkg_" + pid[i]).c_str());
+            SetTGattributes(Yield_obs_20[i], kBlue, 20, 1.3);
+            SetTGattributes(Yield_bkg_20[i], kBlue, 20, 1.3);
+        }
+        leg_obs[i] = MakeTLegend(0.14,0.65,0.3,0.85);
+        leg_bkg[i] = MakeTLegend(0.14,0.65,0.3,0.85);
+        SetTGattributes(Yield_obs_35[i], kRed, 20, 1.3);
+        SetTGattributes(Yield_bkg_35[i], kRed, 20, 1.3);
+        MakePanel(frame,Yield_obs[i]->cd(),0,0,9,2,0.12,"p_{T} GeV","Yield^{obs}");
+        leg_obs[i]->SetHeader(leg_header[i].c_str());
+        leg_obs[i]->AddEntry(Yield_obs_35[i],mult_label[0].c_str(),"P");
+        Yield_obs_35[i]->Draw("P");
+        if(i<3)
+        {
+            leg_obs[i]->AddEntry(Yield_obs_20[i],mult_label[1].c_str(),"P");
+            Yield_obs_20[i]->Draw("P");
+        }
+        leg_obs[i]->Draw();
+        MakePanel(frame,Yield_bkg[i]->cd(),0,0,9,2,0.12,"p_{T} GeV","Yield^{bkg}");
+        leg_bkg[i]->SetHeader(leg_header[i].c_str());
+        leg_bkg[i]->AddEntry(Yield_bkg_35[i],mult_label[0].c_str(),"P");
+        Yield_bkg_35[i]->Draw("P");
+        if(i<3)
+        {
+            leg_bkg[i]->AddEntry(Yield_bkg_20[i],mult_label[1].c_str(),"P");
+            Yield_bkg_20[i]->Draw("P");
+        }
+        leg_bkg[i]->Draw();
+
+        Yield_obs[i]->Print(("Image/RapSys_JetYield/" + pid[i] + "_obs.pdf").c_str());
+        Yield_bkg[i]->Print(("Image/RapSys_JetYield/" + pid[i] + "_bkg.pdf").c_str());
+    }
+}
+
 void Rap_perisub()
 {
     MITStyle();
@@ -2391,17 +2469,18 @@ void Rap_perisub()
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubXiFixedPartialStats.root");
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_EG1_0_35_CorrectRef_12_04_17.root");
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_AllStrange_EG1_0_35_CorrectRef_CorrectGap_12_05_17.root");
-    TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_EG1_60percXi_0_35_12_18_17.root");
-    //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_FullXiHM.root");
+    //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_EG1_60percXi_0_35_12_18_17.root");
+    TFile* file_pidv2_old = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_FullXiHM.root"); // Old w/ No V0 Trk Eff DO NOT USE
+    TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_EG1_0_35_V0wTrkEff_01_11_18.root"); //Newest Default iteration
     TFile* file_pidv2_FixedWindow = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubFixedWindow.root"); //Fixed window 1.2
-    //TFile* file_pidv2_V0RandDump = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_AllStrange_EG1_0_35_CorrectRef_CorrectGap_FullStats_5percentReject_1_10_18.root");
-    TFile* file_pidv2_V0RandDump = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_AllStrange_EG1_0_35_CorrectRef_CorrectGap_FullStats_5percentReject_1_11_18.root");
+    TFile* file_pidv2_V0RandDump = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_AllStrange_EG1_0_35_CorrectRef_CorrectGap_FullStats_5percentReject_1_10_18.root");
+    //TFile* file_pidv2_V0RandDump = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_AllStrange_EG1_0_35_CorrectRef_CorrectGap_FullStats_5percentReject_1_11_18.root"); // Using 95% of old data
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubFixedWindow.root");
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubXiFixedPartialStatsEG2Ref.root");
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubXiFixedPartialStatsEG2RefLowOnly.root");
 
-    //TGraphErrors* ha_v2 = (TGraphErrors*)file_hadv2->Get("hadronv2");
-    //TGraphErrors* ha_v2 = (TGraphErrors*)GetGraphWithSymmYErrorsFromFile(Form("data/%s","n185_220_ptass033pPb_v2.txt"),1,28,1.2);
+    TGraphErrors* ks8_v2sub_old = (TGraphErrors*)file_pidv2_old->Get("kshortv2truesub");
+    TGraphErrors* la8_v2sub_old = (TGraphErrors*)file_pidv2_old->Get("lambdav2truesub");
 
     TGraphErrors* ks8_v2     = (TGraphErrors*)file_pidv2->Get("kshortv2true");
     TGraphErrors* ks8_v2sub  = (TGraphErrors*)file_pidv2->Get("kshortv2truesub");
@@ -2493,6 +2572,8 @@ void Rap_perisub()
     double* pt_la = la8_v2->GetX();
     double* pt_xi = xi8_v2->GetX();
 
+    SetTGattributes(ks8_v2sub_old, kRed , 24 , 1.5);
+    SetTGattributes(la8_v2sub_old, kBlue , 25 , 1.5);
 
     SetTGattributes(ks8_v2        , kRed     , 20 , 1.5);
     SetTGattributes(ks8_v2sub     , kRed     , 24 , 1.5);
@@ -3081,6 +3162,40 @@ void Rap_perisub()
     line_ratio->Draw();
     c7->Print("Image/Rap_v2sig_pPb/v2SigRandDumpCheck.pdf");
 
+    TCanvas* c8 = new TCanvas("c8", "V0 PeriSub Comp Old v New",1000,600);
+    c8->Divide(2,1);
+    SetTGattributes(ks8_v2sub, kRed, 20,1.5);
+    SetTGattributes(la8_v2sub, kBlue, 21,1.5);
+
+    MakePanel(frame1,c8->cd(1),0,-0.01,9,0.45,0.12,"p_{T} (GeV)","v_{2}^{sub}");
+    TLegend* leg_V0Comp = MakeTLegend(0.15,0.60,0.27,0.80);
+    leg_V0Comp->AddEntry(ks8_v2sub , (PKzS + " New").c_str()     , "P");
+    leg_V0Comp->AddEntry(ks8_v2sub_old , (PKzS + " Old").c_str()     , "P");
+    leg_V0Comp->AddEntry(la8_v2sub , (PgL_PagL + " New").c_str() , "P");
+    leg_V0Comp->AddEntry(la8_v2sub_old , (PgL_PagL + " Old").c_str() , "P");
+    leg_V0Comp->Draw();
+
+    ks8_v2sub->Draw("P");
+    la8_v2sub->Draw("P");
+    ks8_v2sub_old->Draw("P");
+    la8_v2sub_old->Draw("P");
+
+    tex->SetTextFont(62);
+    tex->SetTextSize(0.05);
+    tex->DrawLatex(0.15,0.85,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
+
+    MakePanel(frame1,c8->cd(2),0,0.85,9,1.15,0.12,"p_{T} (GeV)","Ratio v_{2}^{sig}");
+    //TGraphErrors* ks8_v2sub_old_ratio = TGDivideSameXCorrErr(ks8_v2,ks8_v2sub_old);
+    //TGraphErrors* la8_v2sub_old_ratio = TGDivideSameXCorrErr(la8_v2,la8_v2sub_old);
+    TGraphErrors* ks8_v2sub_old_ratio = TGDivideSameX(ks8_v2sub,ks8_v2sub_old);
+    TGraphErrors* la8_v2sub_old_ratio = TGDivideSameX(la8_v2sub,la8_v2sub_old);
+    SetTGattributes(ks8_v2sub_old_ratio,kRed,20,1.5);
+    SetTGattributes(la8_v2sub_old_ratio,kBlue,20,1.5);
+    ks8_v2sub_old_ratio->Draw("P");
+    la8_v2sub_old_ratio->Draw("P");
+    line_ratio->Draw();
+    c8->Print("Image/Rap_v2sig_pPb/v2V0PerisubComparison.pdf");
+
 
 }
 void RapSys_perisub()
@@ -3091,9 +3206,10 @@ void RapSys_perisub()
     tex->SetTextSize(0.042);
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubEG1.root");
     //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisubXiFixedPartialStats.root");
-    //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_EG1.root");
-    TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_EG1_60percXi_0_35_12_18_17.root"); //Subtract results
-    TFile* file_pidv2_0_35 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_AllStrange_EG1_0_35_CorrectRef_CorrectGap_12_05_17.root");
+    TFile* file_pidv2_0_20 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_EG1.root"); // Most recent for 0-20
+    //TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_EG1_60percXi_0_35_12_18_17.root"); //Subtract results
+    //TFile* file_pidv2_0_35 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_AllStrange_EG1_0_35_CorrectRef_CorrectGap_12_05_17.root");
+    TFile* file_pidv2_0_35 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_Default_EG1_0_35_V0wTrkEff_01_11_18.root"); //Most Recent for 0-35
     //TFile* file_pidv2_FixedWindow1p2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_FixedWindow1p7_EG1_0_35_12_17_17.root");
     TFile* file_pidv2_FixedWindow1p2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_FixedWindow1p2_EG1_0_35_12_17_17.root");
     TFile* file_pidv2_FixedWindow0p5 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/V0v2perisub_FixedWindow0p5_EG1_0_35_12_17_17.root");
@@ -3114,10 +3230,10 @@ void RapSys_perisub()
     TLegend* leg_fw_comp[4];
     TLegend* leg_JP_comp[4];
 
-    ks8_v2[0] = (TGraphErrors*)file_pidv2->Get("kshortv2truesub");
-    la8_v2[0] = (TGraphErrors*)file_pidv2->Get("lambdav2truesub");
-    xi8_v2[0] = (TGraphErrors*)file_pidv2->Get("xiv2truesub");
-    om8_v2[0] = (TGraphErrors*)file_pidv2->Get("omv2truesub");
+    ks8_v2[0] = (TGraphErrors*)file_pidv2_0_35->Get("kshortv2truesub");
+    la8_v2[0] = (TGraphErrors*)file_pidv2_0_35->Get("lambdav2truesub");
+    xi8_v2[0] = (TGraphErrors*)file_pidv2_0_35->Get("xiv2truesub");
+    om8_v2[0] = (TGraphErrors*)file_pidv2_0_35->Get("omv2truesub");
     ks8_v2[1] = (TGraphErrors*)file_pidv2_FixedWindow1p2->Get("kshortv2truesub");
     la8_v2[1] = (TGraphErrors*)file_pidv2_FixedWindow1p2->Get("lambdav2truesub");
     xi8_v2[1] = (TGraphErrors*)file_pidv2_FixedWindow1p2->Get("xiv2truesub");
@@ -3132,31 +3248,31 @@ void RapSys_perisub()
     om8_v2[3] = (TGraphErrors*)file_pidv2_JetPeak1p5->Get("omv2truesub");
 
     //Nass
-    TGraphErrors* DirectSubNass_ks     = (TGraphErrors*)file_pidv2->Get("DirectSubNass_ks");
-    TGraphErrors* Nassoc_bkg_ks        = (TGraphErrors*)file_pidv2->Get("Nassoc_bkg_ks");
-    TGraphErrors* Nassoc_obs_ks        = (TGraphErrors*)file_pidv2->Get("Nassoc_obs_ks");
-    TGraphErrors* DirectSubNass_low_ks = (TGraphErrors*)file_pidv2->Get("DirectSubNass_low_ks");
-    TGraphErrors* Nassoc_bkg_low_ks    = (TGraphErrors*)file_pidv2->Get("Nassoc_low_bkg_ks");
-    TGraphErrors* Nassoc_obs_low_ks    = (TGraphErrors*)file_pidv2->Get("Nassoc_low_obs_ks");
+    TGraphErrors* DirectSubNass_ks     = (TGraphErrors*)file_pidv2_0_35->Get("DirectSubNass_ks");
+    TGraphErrors* Nassoc_bkg_ks        = (TGraphErrors*)file_pidv2_0_35->Get("Nassoc_bkg_ks");
+    TGraphErrors* Nassoc_obs_ks        = (TGraphErrors*)file_pidv2_0_35->Get("Nassoc_obs_ks");
+    TGraphErrors* DirectSubNass_low_ks = (TGraphErrors*)file_pidv2_0_35->Get("DirectSubNass_low_ks");
+    TGraphErrors* Nassoc_bkg_low_ks    = (TGraphErrors*)file_pidv2_0_35->Get("Nassoc_low_bkg_ks");
+    TGraphErrors* Nassoc_obs_low_ks    = (TGraphErrors*)file_pidv2_0_35->Get("Nassoc_low_obs_ks");
 
-    TGraphErrors* DirectSubNass_la     = (TGraphErrors*)file_pidv2->Get("DirectSubNass_la");
-    TGraphErrors* Nassoc_bkg_la        = (TGraphErrors*)file_pidv2->Get("Nassoc_bkg_la");
-    TGraphErrors* Nassoc_obs_la        = (TGraphErrors*)file_pidv2->Get("Nassoc_obs_la");
-    TGraphErrors* DirectSubNass_low_la = (TGraphErrors*)file_pidv2->Get("DirectSubNass_low_la");
-    TGraphErrors* Nassoc_bkg_low_la    = (TGraphErrors*)file_pidv2->Get("Nassoc_low_bkg_la");
-    TGraphErrors* Nassoc_obs_low_la    = (TGraphErrors*)file_pidv2->Get("Nassoc_low_obs_la");
+    TGraphErrors* DirectSubNass_la     = (TGraphErrors*)file_pidv2_0_35->Get("DirectSubNass_la");
+    TGraphErrors* Nassoc_bkg_la        = (TGraphErrors*)file_pidv2_0_35->Get("Nassoc_bkg_la");
+    TGraphErrors* Nassoc_obs_la        = (TGraphErrors*)file_pidv2_0_35->Get("Nassoc_obs_la");
+    TGraphErrors* DirectSubNass_low_la = (TGraphErrors*)file_pidv2_0_35->Get("DirectSubNass_low_la");
+    TGraphErrors* Nassoc_bkg_low_la    = (TGraphErrors*)file_pidv2_0_35->Get("Nassoc_low_bkg_la");
+    TGraphErrors* Nassoc_obs_low_la    = (TGraphErrors*)file_pidv2_0_35->Get("Nassoc_low_obs_la");
 
-    TGraphErrors* DirectSubNass_xi     = (TGraphErrors*)file_pidv2->Get("DirectSubNass_xi");
-    TGraphErrors* Nassoc_bkg_xi        = (TGraphErrors*)file_pidv2->Get("Nassoc_bkg_xi");
-    TGraphErrors* Nassoc_obs_xi        = (TGraphErrors*)file_pidv2->Get("Nassoc_obs_xi");
-    TGraphErrors* DirectSubNass_low_xi = (TGraphErrors*)file_pidv2->Get("DirectSubNass_low_xi");
-    TGraphErrors* Nassoc_bkg_low_xi    = (TGraphErrors*)file_pidv2->Get("Nassoc_low_bkg_xi");
-    TGraphErrors* Nassoc_obs_low_xi    = (TGraphErrors*)file_pidv2->Get("Nassoc_low_obs_xi");
+    TGraphErrors* DirectSubNass_xi     = (TGraphErrors*)file_pidv2_0_35->Get("DirectSubNass_xi");
+    TGraphErrors* Nassoc_bkg_xi        = (TGraphErrors*)file_pidv2_0_35->Get("Nassoc_bkg_xi");
+    TGraphErrors* Nassoc_obs_xi        = (TGraphErrors*)file_pidv2_0_35->Get("Nassoc_obs_xi");
+    TGraphErrors* DirectSubNass_low_xi = (TGraphErrors*)file_pidv2_0_35->Get("DirectSubNass_low_xi");
+    TGraphErrors* Nassoc_bkg_low_xi    = (TGraphErrors*)file_pidv2_0_35->Get("Nassoc_low_bkg_xi");
+    TGraphErrors* Nassoc_obs_low_xi    = (TGraphErrors*)file_pidv2_0_35->Get("Nassoc_low_obs_xi");
 
-    TGraphErrors* Nassoc_bkg_om        = (TGraphErrors*)file_pidv2->Get("Nassoc_bkg_om");
-    TGraphErrors* Nassoc_obs_om        = (TGraphErrors*)file_pidv2->Get("Nassoc_obs_om");
-    TGraphErrors* Nassoc_bkg_low_om    = (TGraphErrors*)file_pidv2->Get("Nassoc_low_bkg_om");
-    TGraphErrors* Nassoc_obs_low_om    = (TGraphErrors*)file_pidv2->Get("Nassoc_low_obs_om");
+    TGraphErrors* Nassoc_bkg_om        = (TGraphErrors*)file_pidv2_0_35->Get("Nassoc_bkg_om");
+    TGraphErrors* Nassoc_obs_om        = (TGraphErrors*)file_pidv2_0_35->Get("Nassoc_obs_om");
+    TGraphErrors* Nassoc_bkg_low_om    = (TGraphErrors*)file_pidv2_0_35->Get("Nassoc_low_bkg_om");
+    TGraphErrors* Nassoc_obs_low_om    = (TGraphErrors*)file_pidv2_0_35->Get("Nassoc_low_obs_om");
 
     int numKs = Nassoc_bkg_ks->GetN();
     int numLa = Nassoc_bkg_la->GetN();
@@ -3365,33 +3481,33 @@ void RapSys_perisub()
 
 
     //Yield
-    TGraphErrors* DirectSubYield_ks     = (TGraphErrors*)file_pidv2->Get("DirectSubYield_ks");
-    TGraphErrors* Yield_bkg_ks        = (TGraphErrors*)file_pidv2->Get("YieldPlot_bkg_ks");
-    TGraphErrors* Yield_obs_ks        = (TGraphErrors*)file_pidv2->Get("YieldPlot_obs_ks");
-    TGraphErrors* DirectSubYield_low_ks = (TGraphErrors*)file_pidv2->Get("DirectSubYield_low_ks");
-    TGraphErrors* Yield_bkg_low_ks    = (TGraphErrors*)file_pidv2->Get("YieldPlot_low_bkg_ks");
-    TGraphErrors* Yield_obs_low_ks    = (TGraphErrors*)file_pidv2->Get("YieldPlot_low_obs_ks");
+    TGraphErrors* DirectSubYield_ks     = (TGraphErrors*)file_pidv2_0_35->Get("DirectSubYield_ks");
+    TGraphErrors* Yield_bkg_ks        = (TGraphErrors*)file_pidv2_0_35->Get("YieldPlot_bkg_ks");
+    TGraphErrors* Yield_obs_ks        = (TGraphErrors*)file_pidv2_0_35->Get("YieldPlot_obs_ks");
+    TGraphErrors* DirectSubYield_low_ks = (TGraphErrors*)file_pidv2_0_35->Get("DirectSubYield_low_ks");
+    TGraphErrors* Yield_bkg_low_ks    = (TGraphErrors*)file_pidv2_0_35->Get("YieldPlot_low_bkg_ks");
+    TGraphErrors* Yield_obs_low_ks    = (TGraphErrors*)file_pidv2_0_35->Get("YieldPlot_low_obs_ks");
 
-    TGraphErrors* DirectSubYield_la     = (TGraphErrors*)file_pidv2->Get("DirectSubYield_la");
-    TGraphErrors* Yield_bkg_la        = (TGraphErrors*)file_pidv2->Get("YieldPlot_bkg_la");
-    TGraphErrors* Yield_obs_la        = (TGraphErrors*)file_pidv2->Get("YieldPlot_obs_la");
-    TGraphErrors* DirectSubYield_low_la = (TGraphErrors*)file_pidv2->Get("DirectSubYield_low_la");
-    TGraphErrors* Yield_bkg_low_la    = (TGraphErrors*)file_pidv2->Get("YieldPlot_low_bkg_la");
-    TGraphErrors* Yield_obs_low_la    = (TGraphErrors*)file_pidv2->Get("YieldPlot_low_obs_la");
+    TGraphErrors* DirectSubYield_la     = (TGraphErrors*)file_pidv2_0_35->Get("DirectSubYield_la");
+    TGraphErrors* Yield_bkg_la        = (TGraphErrors*)file_pidv2_0_35->Get("YieldPlot_bkg_la");
+    TGraphErrors* Yield_obs_la        = (TGraphErrors*)file_pidv2_0_35->Get("YieldPlot_obs_la");
+    TGraphErrors* DirectSubYield_low_la = (TGraphErrors*)file_pidv2_0_35->Get("DirectSubYield_low_la");
+    TGraphErrors* Yield_bkg_low_la    = (TGraphErrors*)file_pidv2_0_35->Get("YieldPlot_low_bkg_la");
+    TGraphErrors* Yield_obs_low_la    = (TGraphErrors*)file_pidv2_0_35->Get("YieldPlot_low_obs_la");
 
-    TGraphErrors* DirectSubYield_xi     = (TGraphErrors*)file_pidv2->Get("DirectSubYield_xi");
-    TGraphErrors* Yield_bkg_xi        = (TGraphErrors*)file_pidv2->Get("YieldPlot_bkg_xi");
-    TGraphErrors* Yield_obs_xi        = (TGraphErrors*)file_pidv2->Get("YieldPlot_obs_xi");
-    TGraphErrors* DirectSubYield_low_xi = (TGraphErrors*)file_pidv2->Get("DirectSubYield_low_xi");
-    TGraphErrors* Yield_bkg_low_xi    = (TGraphErrors*)file_pidv2->Get("YieldPlot_low_bkg_xi");
-    TGraphErrors* Yield_obs_low_xi    = (TGraphErrors*)file_pidv2->Get("YieldPlot_low_obs_xi");
+    TGraphErrors* DirectSubYield_xi     = (TGraphErrors*)file_pidv2_0_35->Get("DirectSubYield_xi");
+    TGraphErrors* Yield_bkg_xi        = (TGraphErrors*)file_pidv2_0_35->Get("YieldPlot_bkg_xi");
+    TGraphErrors* Yield_obs_xi        = (TGraphErrors*)file_pidv2_0_35->Get("YieldPlot_obs_xi");
+    TGraphErrors* DirectSubYield_low_xi = (TGraphErrors*)file_pidv2_0_35->Get("DirectSubYield_low_xi");
+    TGraphErrors* Yield_bkg_low_xi    = (TGraphErrors*)file_pidv2_0_35->Get("YieldPlot_low_bkg_xi");
+    TGraphErrors* Yield_obs_low_xi    = (TGraphErrors*)file_pidv2_0_35->Get("YieldPlot_low_obs_xi");
 
-    TGraphErrors* DirectSubYield_om     = (TGraphErrors*)file_pidv2->Get("DirectSubYield_om");
-    TGraphErrors* Yield_bkg_om        = (TGraphErrors*)file_pidv2->Get("YieldPlot_bkg_om");
-    TGraphErrors* Yield_obs_om        = (TGraphErrors*)file_pidv2->Get("YieldPlot_obs_om");
-    TGraphErrors* DirectSubYield_low_om = (TGraphErrors*)file_pidv2->Get("DirectSubYield_low_om");
-    TGraphErrors* Yield_bkg_low_om    = (TGraphErrors*)file_pidv2->Get("YieldPlot_low_bkg_om");
-    TGraphErrors* Yield_obs_low_om    = (TGraphErrors*)file_pidv2->Get("YieldPlot_low_obs_om");
+    TGraphErrors* DirectSubYield_om     = (TGraphErrors*)file_pidv2_0_35->Get("DirectSubYield_om");
+    TGraphErrors* Yield_bkg_om        = (TGraphErrors*)file_pidv2_0_35->Get("YieldPlot_bkg_om");
+    TGraphErrors* Yield_obs_om        = (TGraphErrors*)file_pidv2_0_35->Get("YieldPlot_obs_om");
+    TGraphErrors* DirectSubYield_low_om = (TGraphErrors*)file_pidv2_0_35->Get("DirectSubYield_low_om");
+    TGraphErrors* Yield_bkg_low_om    = (TGraphErrors*)file_pidv2_0_35->Get("YieldPlot_low_bkg_om");
+    TGraphErrors* Yield_obs_low_om    = (TGraphErrors*)file_pidv2_0_35->Get("YieldPlot_low_obs_om");
 
     TGraphErrors* TGYield_high_ratio_ks = TGDivideSameX(Yield_obs_ks     , Yield_bkg_ks);
     TGraphErrors* TGYield_low_ratio_ks  = TGDivideSameX(Yield_obs_low_ks , Yield_bkg_low_ks);
@@ -3407,7 +3523,7 @@ void RapSys_perisub()
     TGraphErrors* TGYield_Dratio_xi    = TGDivideSameX(DirectSubYield_xi , DirectSubYield_low_xi , true);
     TGraphErrors* TGYield_ratio_obs_xi = TGDivideSameX(Yield_obs_xi      , Yield_obs_low_xi      , true);
     TGraphErrors* TGYield_ratio_bkg_xi = TGDivideSameX(Yield_bkg_xi      , Yield_bkg_low_xi      , true);
-    TGraphErrors* TGYield_Dratio_om    = TGDivideSameX(DirectSubYield_om , DirectSubYield_low_om , true);
+    //TGraphErrors* TGYield_Dratio_om    = TGDivideSameX(DirectSubYield_om , DirectSubYield_low_om , true);
     TGraphErrors* TGYield_ratio_obs_om = TGDivideSameX(Yield_obs_om      , Yield_obs_low_om      , true);
     TGraphErrors* TGYield_ratio_bkg_om = TGDivideSameX(Yield_bkg_om      , Yield_bkg_low_om      , true);
 
@@ -3415,6 +3531,7 @@ void RapSys_perisub()
     TGraphErrors* TGYield_ratio2_la = TGDivideSameX(TGYield_ratio_obs_la,TGYield_ratio_bkg_la);
     TGraphErrors* TGYield_ratio2_xi = TGDivideSameX(TGYield_ratio_obs_xi,TGYield_ratio_bkg_xi);
     TGraphErrors* TGYield_ratio2_om = TGDivideSameX(TGYield_ratio_obs_om,TGYield_ratio_bkg_om);
+
 
     SetTGattributes(TGYield_high_ratio_ks , kRed     , 20 , 1.2);
     SetTGattributes(TGYield_low_ratio_ks  , kBlue    , 20 , 1.2);
@@ -3442,7 +3559,7 @@ void RapSys_perisub()
     SetTGattributes(TGYield_Dratio_xi , kGreen-2 , 24, 1.5);
     SetTGattributes(TGYield_ratio_obs_xi , kRed , 24, 1.5);
     SetTGattributes(TGYield_ratio_bkg_xi , kBlue , 24, 1.5);
-    SetTGattributes(TGYield_Dratio_om , kGreen-2 , 24, 1.5);
+    //SetTGattributes(TGYield_Dratio_om , kGreen-2 , 24, 1.5);
     SetTGattributes(TGYield_ratio_obs_om , kRed , 24, 1.5);
     SetTGattributes(TGYield_ratio_bkg_om , kBlue , 24, 1.5);
 
@@ -3577,37 +3694,37 @@ void RapSys_perisub()
     line_ratio->Draw("same");
 
     //V2 obs and bkg
-    TGraphErrors* V2_bkg_ks     = (TGraphErrors*)file_pidv2->Get("V2plot_bkg_ks");
-    TGraphErrors* V2_obs_ks     = (TGraphErrors*)file_pidv2->Get("V2plot_obs_ks");
-    TGraphErrors* V2_bkg_low_ks = (TGraphErrors*)file_pidv2->Get("V2plot_bkg_low_ks");
-    TGraphErrors* V2_obs_low_ks = (TGraphErrors*)file_pidv2->Get("V2plot_obs_low_ks");
+    TGraphErrors* V2_bkg_ks     = (TGraphErrors*)file_pidv2_0_35->Get("V2plot_bkg_ks");
+    TGraphErrors* V2_obs_ks     = (TGraphErrors*)file_pidv2_0_35->Get("V2plot_obs_ks");
+    TGraphErrors* V2_bkg_low_ks = (TGraphErrors*)file_pidv2_0_35->Get("V2plot_bkg_low_ks");
+    TGraphErrors* V2_obs_low_ks = (TGraphErrors*)file_pidv2_0_35->Get("V2plot_obs_low_ks");
 
-    TGraphErrors* V2_bkg_la     = (TGraphErrors*)file_pidv2->Get("V2plot_bkg_la");
-    TGraphErrors* V2_obs_la     = (TGraphErrors*)file_pidv2->Get("V2plot_obs_la");
-    TGraphErrors* V2_bkg_low_la = (TGraphErrors*)file_pidv2->Get("V2plot_bkg_low_la");
-    TGraphErrors* V2_obs_low_la = (TGraphErrors*)file_pidv2->Get("V2plot_obs_low_la");
+    TGraphErrors* V2_bkg_la     = (TGraphErrors*)file_pidv2_0_35->Get("V2plot_bkg_la");
+    TGraphErrors* V2_obs_la     = (TGraphErrors*)file_pidv2_0_35->Get("V2plot_obs_la");
+    TGraphErrors* V2_bkg_low_la = (TGraphErrors*)file_pidv2_0_35->Get("V2plot_bkg_low_la");
+    TGraphErrors* V2_obs_low_la = (TGraphErrors*)file_pidv2_0_35->Get("V2plot_obs_low_la");
 
-    TGraphErrors* V2_bkg_xi     = (TGraphErrors*)file_pidv2->Get("V2plot_bkg_xi");
-    TGraphErrors* V2_obs_xi     = (TGraphErrors*)file_pidv2->Get("V2plot_obs_xi");
-    TGraphErrors* V2_bkg_low_xi = (TGraphErrors*)file_pidv2->Get("V2plot_bkg_low_xi");
-    TGraphErrors* V2_obs_low_xi = (TGraphErrors*)file_pidv2->Get("V2plot_obs_low_xi");
+    TGraphErrors* V2_bkg_xi     = (TGraphErrors*)file_pidv2_0_35->Get("V2plot_bkg_xi");
+    TGraphErrors* V2_obs_xi     = (TGraphErrors*)file_pidv2_0_35->Get("V2plot_obs_xi");
+    TGraphErrors* V2_bkg_low_xi = (TGraphErrors*)file_pidv2_0_35->Get("V2plot_bkg_low_xi");
+    TGraphErrors* V2_obs_low_xi = (TGraphErrors*)file_pidv2_0_35->Get("V2plot_obs_low_xi");
 
-    TGraphErrors* V2_bkg_om     = (TGraphErrors*)file_pidv2->Get("V2plot_bkg_om");
-    TGraphErrors* V2_obs_om     = (TGraphErrors*)file_pidv2->Get("V2plot_obs_om");
-    TGraphErrors* V2_bkg_low_om = (TGraphErrors*)file_pidv2->Get("V2plot_bkg_low_om");
-    TGraphErrors* V2_obs_low_om = (TGraphErrors*)file_pidv2->Get("V2plot_obs_low_om");
+    TGraphErrors* V2_bkg_om     = (TGraphErrors*)file_pidv2_0_35->Get("V2plot_bkg_om");
+    TGraphErrors* V2_obs_om     = (TGraphErrors*)file_pidv2_0_35->Get("V2plot_obs_om");
+    TGraphErrors* V2_bkg_low_om = (TGraphErrors*)file_pidv2_0_35->Get("V2plot_bkg_low_om");
+    TGraphErrors* V2_obs_low_om = (TGraphErrors*)file_pidv2_0_35->Get("V2plot_obs_low_om");
 
-    TGraphErrors* V2Sub_bkg_ks = (TGraphErrors*)file_pidv2->Get("V2subplot_bkg_ks");
-    TGraphErrors* V2Sub_obs_ks = (TGraphErrors*)file_pidv2->Get("V2subplot_obs_ks");
+    TGraphErrors* V2Sub_bkg_ks = (TGraphErrors*)file_pidv2_0_35->Get("V2subplot_bkg_ks");
+    TGraphErrors* V2Sub_obs_ks = (TGraphErrors*)file_pidv2_0_35->Get("V2subplot_obs_ks");
 
-    TGraphErrors* V2Sub_bkg_la = (TGraphErrors*)file_pidv2->Get("V2subplot_bkg_la");
-    TGraphErrors* V2Sub_obs_la = (TGraphErrors*)file_pidv2->Get("V2subplot_obs_la");
+    TGraphErrors* V2Sub_bkg_la = (TGraphErrors*)file_pidv2_0_35->Get("V2subplot_bkg_la");
+    TGraphErrors* V2Sub_obs_la = (TGraphErrors*)file_pidv2_0_35->Get("V2subplot_obs_la");
 
-    TGraphErrors* V2Sub_bkg_xi = (TGraphErrors*)file_pidv2->Get("V2subplot_bkg_xi");
-    TGraphErrors* V2Sub_obs_xi = (TGraphErrors*)file_pidv2->Get("V2subplot_obs_xi");
+    TGraphErrors* V2Sub_bkg_xi = (TGraphErrors*)file_pidv2_0_35->Get("V2subplot_bkg_xi");
+    TGraphErrors* V2Sub_obs_xi = (TGraphErrors*)file_pidv2_0_35->Get("V2subplot_obs_xi");
 
-    TGraphErrors* V2Sub_bkg_om = (TGraphErrors*)file_pidv2->Get("V2subplot_bkg_om");
-    TGraphErrors* V2Sub_obs_om = (TGraphErrors*)file_pidv2->Get("V2subplot_obs_om");
+    TGraphErrors* V2Sub_bkg_om = (TGraphErrors*)file_pidv2_0_35->Get("V2subplot_bkg_om");
+    TGraphErrors* V2Sub_obs_om = (TGraphErrors*)file_pidv2_0_35->Get("V2subplot_obs_om");
 
     TGraphErrors* TGV2_high_ratio_ks = TGDivideSameX(V2_obs_ks     , V2_bkg_ks);
     TGraphErrors* TGV2_low_ratio_ks  = TGDivideSameX(V2_obs_low_ks , V2_bkg_low_ks);
@@ -4041,8 +4158,8 @@ void RapSys_perisub()
     SetTGattributes(TGYield_ratio_bkg_la , kBlue    , 22 , 1.5);
     SetTGattributes(TGYield_ratio_obs_xi , kGreen-2 , 21 , 1.5);
     SetTGattributes(TGYield_ratio_bkg_xi , kGreen-2 , 21 , 1.5);
-    SetTGattributes(TGYield_ratio_obs_om , kGreen-2 , 21 , 1.5);
-    SetTGattributes(TGYield_ratio_bkg_om , kGreen-2 , 21 , 1.5);
+    SetTGattributes(TGYield_ratio_obs_om , kMagenta , 29 , 1.5);
+    SetTGattributes(TGYield_ratio_bkg_om , kMagenta , 29 , 1.5);
 
     TCanvas* yieldhigh_yieldlow = new TCanvas("yieldhigh_yieldlow","yieldhigh_yieldlow",1000,600);
     yieldhigh_yieldlow->Divide(2,1);
@@ -4087,6 +4204,7 @@ void RapSys_perisub()
     SetTGattributes(Nassoc_bkg_low_xi , kGreen-2 , 21 , 1.5);
     SetTGattributes(Nassoc_obs_low_xi , kGreen-2 , 21 , 1.5);
 
+    //Plots for Nassociated for AN
     TCanvas* Nassociated = new TCanvas("Nassociated","Nassociated",1200,1000);
     Nassociated->Divide(2,2);
 
@@ -4152,14 +4270,14 @@ void RapSys_perisub()
     SetTGattributes(Yield_obs_la     , kBlue    , 26 , 1.5);
     SetTGattributes(Yield_bkg_low_la , kBlue    , 26 , 1.5);
     SetTGattributes(Yield_obs_low_la , kBlue    , 26 , 1.5);
-    SetTGattributes(Yield_bkg_xi     , kGreen-2 , 26 , 1.5);
-    SetTGattributes(Yield_obs_xi     , kGreen-2 , 26 , 1.5);
-    SetTGattributes(Yield_bkg_low_xi , kGreen-2 , 26 , 1.5);
-    SetTGattributes(Yield_obs_low_xi , kGreen-2 , 26 , 1.5);
-    SetTGattributes(Yield_bkg_om     , kGreen-2 , 26 , 1.5);
-    SetTGattributes(Yield_obs_om     , kGreen-2 , 26 , 1.5);
-    SetTGattributes(Yield_bkg_low_om , kGreen-2 , 26 , 1.5);
-    SetTGattributes(Yield_obs_low_om , kGreen-2 , 26 , 1.5);
+    SetTGattributes(Yield_bkg_xi     , kGreen-2 , 25 , 1.5);
+    SetTGattributes(Yield_obs_xi     , kGreen-2 , 25 , 1.5);
+    SetTGattributes(Yield_bkg_low_xi , kGreen-2 , 25 , 1.5);
+    SetTGattributes(Yield_obs_low_xi , kGreen-2 , 25 , 1.5);
+    SetTGattributes(Yield_bkg_om     , kMagenta , 30 , 1.5);
+    SetTGattributes(Yield_obs_om     , kMagenta , 30 , 1.5);
+    SetTGattributes(Yield_bkg_low_om , kMagenta , 30 , 1.5);
+    SetTGattributes(Yield_obs_low_om , kMagenta , 30 , 1.5);
 
     TLegend* leg_Yield[4];
     TH1F* frame_Yield[4];
@@ -4220,11 +4338,11 @@ void RapSys_perisub()
     Yield_c           ->Print("Image/RapSys_perisub/Yield_AN_EG1.pdf");
 
     //Compare 0-20 to 0-35
-    TGraphErrors* ks8_v2_20 = (TGraphErrors*)file_pidv2->Get("kshortv2truesub");
+    TGraphErrors* ks8_v2_20 = (TGraphErrors*)file_pidv2_0_20->Get("kshortv2truesub");
     TGraphErrors* ks8_v2_35 = (TGraphErrors*)file_pidv2_0_35->Get("kshortv2truesub");
-    TGraphErrors* la8_v2_20 = (TGraphErrors*)file_pidv2->Get("lambdav2truesub");
+    TGraphErrors* la8_v2_20 = (TGraphErrors*)file_pidv2_0_20->Get("lambdav2truesub");
     TGraphErrors* la8_v2_35 = (TGraphErrors*)file_pidv2_0_35->Get("lambdav2truesub");
-    TGraphErrors* xi8_v2_20 = (TGraphErrors*)file_pidv2->Get("xiv2truesub");
+    TGraphErrors* xi8_v2_20 = (TGraphErrors*)file_pidv2_0_20->Get("xiv2truesub");
     TGraphErrors* xi8_v2_35 = (TGraphErrors*)file_pidv2_0_35->Get("xiv2truesub");
 
     SetTGattributes(ks8_v2_20,kRed,24,1.5);
@@ -4285,9 +4403,13 @@ void RapSys_perisub()
 
     MakePanelPad(frame_20_v_35,pad2->cd(),0.0,0.1,9.0,2.09,"p_{T} (GeV)","ratio",0.07,0.07,0.08,0.08,0.7);
     TLegend* leg_ratio_35 = MakeTLegend(0.17,0.70,0.28,0.95,42,0.07);
+    cout << "0" << endl;
     TGraphErrors* ks_ratio = TGDivideSameX(ks8_v2_35,ks8_v2_20);
+    cout << "1" << endl;
     TGraphErrors* la_ratio = TGDivideSameX(la8_v2_35,la8_v2_20);
+    cout << "2" << endl;
     TGraphErrors* xi_ratio = TGDivideSameX(xi8_v2_35,xi8_v2_20);
+    cout << "2" << endl;
     SetTGattributes(ks_ratio,kRed,20,1.2);
     SetTGattributes(la_ratio,kBlue-4,22,1.2);
     SetTGattributes(xi_ratio,kGreen-2,21,1.2);
@@ -4470,7 +4592,7 @@ void RapSys_RecoCutsV0()
     line->SetLineStyle(2);
     line->Draw("same");
 
-    c1_ks->Print("v2RecoSystematicsKshort.pdf");
+    c1_ks->Print("Image/RapSys_RecoCutsV0/v2RecoSystematicsKshort.pdf");
 
     //Do lambda
     const int la_npoints = 13;
@@ -4553,7 +4675,7 @@ void RapSys_RecoCutsV0()
     tex->DrawLatex(0.40,0.32,"185 #leq N_{trk}^{offline} < 250");
     line->Draw("same");
 
-    c1_la->Print("v2RecoSystematicsLambda.pdf");
+    c1_la->Print("Image/RapSys_RecoCutsV0/v2RecoSystematicsLambda.pdf");
 
     //Combined
     TCanvas* c1_co = MakeCanvas("c1_co", "Plot_co");
@@ -4592,7 +4714,7 @@ void RapSys_RecoCutsV0()
     tex->DrawLatex(0.40,0.32,"185 #leq N_{trk}^{offline} < 250");
     line->Draw("same");
 
-    c1_co->Print("v2CombinedRecoSystematicsV0.pdf");
+    c1_co->Print("Image/RapSys_RecoCutsV0/v2CombinedRecoSystematicsV0.pdf");
 
     //Calculate Ratios
     std::vector<double> v2RatioLooseKs;
@@ -4699,8 +4821,8 @@ void RapSys_RecoCutsV0()
     leg_ratio_la->AddEntry(Ratiotight_v2_la, "Tight #Lambda / #bar{#Lambda} Reconstruction", "P");
     leg_ratio_la->Draw();
 
-    c1_ratio_ks->Print("v2RecoRatioSystematicsKs.pdf");
-    c1_ratio_la->Print("v2RecoRatioSystematicsLa.pdf");
+    c1_ratio_ks->Print("Image/RapSys_RecoCutsV0/v2RecoRatioSystematicsKs.pdf");
+    c1_ratio_la->Print("Image/RapSys_RecoCutsV0/v2RecoRatioSystematicsLa.pdf");
 
     // Write points into rootfile
     TFile out("V0ReconstructionSys.root","RECREATE");
@@ -4724,8 +4846,10 @@ void RapSys_RecoCutsXi()
 
     TH1F* frame[10];
 
-    TFile* f_loose = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_XiRecoCutCheck_loose_ARC3_1_10_18.root"); //For ARC3 check
-    TFile* f_tight = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_XiRecoCutCheck_tight_ARC3_1_10_18.root"); //For ARC3 check
+    TFile* f_loose = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_XiRecoCutCheck_loose_ARC3_1_10_18.root"); //For ARC3 check lambda fixed
+    TFile* f_tight = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_XiRecoCutCheck_tight_ARC3_1_10_18.root"); //For ARC3 check lambda fixed
+    TFile* f_loose_pi = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_XiRecoCutCheck_loose_ARC3_1_11_18.root"); //For ARC3 check pi var only
+    TFile* f_tight_pi = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_XiRecoCutCheck_tight_ARC3_1_11_18.root"); //For ARC3 check pi var only
 
     MITStyle();
     gStyle->SetTitleAlign(33);
@@ -4751,12 +4875,16 @@ void RapSys_RecoCutsXi()
 
     TGraphErrors* loose_v2_xi_ARC = (TGraphErrors*)f_loose->Get("v2xi");
     TGraphErrors* tight_v2_xi_ARC = (TGraphErrors*)f_tight->Get("v2xi");
+    TGraphErrors* loose_v2_xi_ARC_pi = (TGraphErrors*)f_loose_pi->Get("v2xi");
+    TGraphErrors* tight_v2_xi_ARC_pi = (TGraphErrors*)f_tight_pi->Get("v2xi");
 
     SetTGattributes(standard_v2_xi,kRed,20,1);
     SetTGattributes(loose_v2_xi,kBlue,25,1);
     SetTGattributes(tight_v2_xi,kBlue,26,1);
     SetTGattributes(loose_v2_xi_ARC,kMagenta,25,1);
     SetTGattributes(tight_v2_xi_ARC,kMagenta,26,1);
+    SetTGattributes(loose_v2_xi_ARC_pi,kMagenta,25,1);
+    SetTGattributes(tight_v2_xi_ARC_pi,kMagenta,26,1);
 
     TCanvas* c1_xi = MakeCanvas("c1_xi", "Plot_xi");
     c1_xi->cd();
@@ -4784,8 +4912,8 @@ void RapSys_RecoCutsXi()
     standard_v2_xi->Draw("P");
     tight_v2_xi->Draw("P");
     loose_v2_xi->Draw("P");
-    loose_v2_xi_ARC->Draw("P");
-    tight_v2_xi_ARC->Draw("P");
+    //loose_v2_xi_ARC->Draw("P");
+    //tight_v2_xi_ARC->Draw("P");
 
     TLegend* leg_xi = MakeTLegend(0.15,0.55,0.27,0.75);
     leg_xi->AddEntry(standard_v2_xi, "Standard reconstruction", "P");
@@ -4804,20 +4932,25 @@ void RapSys_RecoCutsXi()
     tex->SetTextFont(42);
     tex->DrawLatex(0.40,0.2,"185 #leq N_{trk}^{offline} < 250");
 
-    c1_xi->Print("v2RecoSystematicsXi.pdf");
+    c1_xi->Print("Image/RapSys_RecoCutsXi/v2RecoSystematicsXi.pdf");
 
     //Calculate Ratios
     TGraphErrors* Ratioloose_v2_xi = TGDivideSameXCorrErr(loose_v2_xi,standard_v2_xi);
 	TGraphErrors* Ratiotight_v2_xi = TGDivideSameXCorrErr(tight_v2_xi,standard_v2_xi);
-    //TGraphErrors* Ratioloose_v2_xi_ARC = TGDivideSameXCorrErr(loose_v2_xi_ARC,standard_v2_xi);
-    //TGraphErrors* Ratiotight_v2_xi_ARC = TGDivideSameXCorrErr(tight_v2_xi_ARC,standard_v2_xi);
+    TGraphErrors* Ratioloose_v2_xi_ARC = TGDivideSameXCorrErr(loose_v2_xi_ARC,standard_v2_xi);
+    TGraphErrors* Ratiotight_v2_xi_ARC = TGDivideSameXCorrErr(tight_v2_xi_ARC,standard_v2_xi);
+    TGraphErrors* Ratioloose_v2_xi_ARC_pi = TGDivideSameXCorrErr(loose_v2_xi_ARC_pi,standard_v2_xi);
+    TGraphErrors* Ratiotight_v2_xi_ARC_pi = TGDivideSameXCorrErr(tight_v2_xi_ARC_pi,standard_v2_xi);
 
-    SetTGattributes(Ratioloose_v2_xi,kRed,20,1.5);
-    SetTGattributes(Ratiotight_v2_xi,kBlue,21,1.5);
-    //SetTGattributes(Ratioloose_v2_xi_ARC,kRed,24,1.5);
-    //SetTGattributes(Ratiotight_v2_xi_ARC,kBlue,25,1.5);
-    //
+    SetTGattributes(Ratioloose_v2_xi,kRed,20,1.1);
+    SetTGattributes(Ratiotight_v2_xi,kBlue,21,1.1);
+    SetTGattributes(Ratioloose_v2_xi_ARC,kRed,20,1.1);
+    SetTGattributes(Ratiotight_v2_xi_ARC,kBlue,21,1.1);
+    SetTGattributes(Ratioloose_v2_xi_ARC_pi,kRed,20,1.1);
+    SetTGattributes(Ratiotight_v2_xi_ARC_pi,kBlue,21,1.1);
+
     TCanvas* c1_ratio_xi[10];
+    TLegend* leg_ratio_xi[10];
 
     c1_ratio_xi[0] = MakeCanvas("c1_ratio_xi", "Plot_ratio_xi");
     frame[0] = MakePanelFrame(c1_ratio_xi[0]->cd(),0,0.8,8,1.2,0.12,"p_{T} (GeV)","#frac{loose/tight}{standard}");
@@ -4825,52 +4958,69 @@ void RapSys_RecoCutsXi()
     TLine* LineRatio_xi = new TLine(0,1,8,1);
     LineRatio_xi->Draw();
 
-    LineRatio_min_xi[0] = new TLine(0,0.95,8,0.95);
+    LineRatio_min_xi[0] = new TLine(0,0.94,8,0.94);
     LineRatio_min_xi[0]->SetLineStyle(2);
     LineRatio_min_xi[0]->Draw();
 
-    LineRatio_max_xi[0] = new TLine(0,1.05,8,1.05);
+    LineRatio_max_xi[0] = new TLine(0,1.06,8,1.06);
     LineRatio_max_xi[0]->SetLineStyle(2);
     LineRatio_max_xi[0]->Draw();
 
     Ratioloose_v2_xi->Draw("P");
     Ratiotight_v2_xi->Draw("P");
-    //Ratioloose_v2_xi_ARC->Draw("P");
-    //Ratiotight_v2_xi_ARC->Draw("P");
 
-    TLegend* leg_ratio_xi = MakeTLegend(0.45,0.2,0.57,0.35);
-    leg_ratio_xi->AddEntry(Ratioloose_v2_xi, "Loose #Xi^{#pm} Reconstruction", "P");
-    leg_ratio_xi->AddEntry(Ratiotight_v2_xi, "Tight #Xi^{#pm} Reconstruction", "P");
-    //leg_ratio_xi->AddEntry(Ratioloose_v2_xi_ARC, "Loose #Xi^{#pm} Reconstruction #Lambda fixed", "P");
-    //leg_ratio_xi->AddEntry(Ratiotight_v2_xi_ARC, "Tight #Xi^{#pm} Reconstruction #Lambda fixed", "P");
-    leg_ratio_xi->Draw();
+    leg_ratio_xi[0] = MakeTLegend(0.45,0.2,0.57,0.35);
+    leg_ratio_xi[0]->AddEntry(Ratioloose_v2_xi, "Loose #Xi^{#pm} Reconstruction", "P");
+    leg_ratio_xi[0]->AddEntry(Ratiotight_v2_xi, "Tight #Xi^{#pm} Reconstruction", "P");
+    leg_ratio_xi[0]->Draw();
 
-    c1_ratio_xi[0]->Print("v2RecoRatioSystematicsXi.pdf");
+    c1_ratio_xi[0]->Print("Image/RapSys_RecoCutsXi/v2RecoRatioSystematicsXi.pdf");
 
     c1_ratio_xi[1] = MakeCanvas("c1_ratio_xi_LambdaFixed", "Plot_ratio_xi_LambdaFixed");
     frame[1] = MakePanelFrame(c1_ratio_xi[1]->cd(),0,0.8,8,1.2,0.12,"p_{T} (GeV)","#frac{loose/tight}{standard}");
 
-    TLine* LineRatio_xi = new TLine(0,1,8,1);
     LineRatio_xi->Draw();
 
-    LineRatio_min_xi[1] = new TLine(0,0.95,8,0.95);
+    LineRatio_min_xi[1] = new TLine(0,0.94,8,0.94);
     LineRatio_min_xi[1]->SetLineStyle(2);
     LineRatio_min_xi[1]->Draw();
 
-    LineRatio_max_xi[1] = new TLine(0,1.05,8,1.05);
+    LineRatio_max_xi[1] = new TLine(0,1.06,8,1.06);
     LineRatio_max_xi[1]->SetLineStyle(2);
     LineRatio_max_xi[1]->Draw();
 
     Ratioloose_v2_xi_ARC->Draw("P");
     Ratiotight_v2_xi_ARC->Draw("P");
 
-    TLegend* leg_ratio_xi = MakeTLegend(0.45,0.2,0.57,0.35);
-    leg_ratio_xi->AddEntry(Ratioloose_v2_xi_ARC, "Loose #Xi^{#pm} Reconstruction #Lambda fixed", "P");
-    leg_ratio_xi->AddEntry(Ratiotight_v2_xi_ARC, "Tight #Xi^{#pm} Reconstruction #Lambda fixed", "P");
-    leg_ratio_xi->Draw();
+    leg_ratio_xi[1] = MakeTLegend(0.45,0.2,0.57,0.35);
+    leg_ratio_xi[1]->AddEntry(Ratioloose_v2_xi_ARC, "Loose #Xi^{#pm} Reconstruction #Lambda fixed", "P");
+    leg_ratio_xi[1]->AddEntry(Ratiotight_v2_xi_ARC, "Tight #Xi^{#pm} Reconstruction #Lambda fixed", "P");
+    leg_ratio_xi[1]->Draw();
 
-    c1_ratio_xi[1]->Print("v2RecoRatioSystematicsXi_LambdaFixed.pdf");
+    c1_ratio_xi[1]->Print("Image/RapSys_RecoCutsXi/v2RecoRatioSystematicsXi_LambdaFixed.pdf");
 
+    c1_ratio_xi[2] = MakeCanvas("c1_ratio_xi_PiVar", "Plot_ratio_xi_PiVar");
+    frame[2] = MakePanelFrame(c1_ratio_xi[2]->cd(),0,0.8,8,1.2,0.12,"p_{T} (GeV)","#frac{loose/tight}{standard}");
+
+    LineRatio_xi->Draw();
+
+    LineRatio_min_xi[2] = new TLine(0,0.94,8,0.94);
+    LineRatio_min_xi[2]->SetLineStyle(2);
+    LineRatio_min_xi[2]->Draw();
+
+    LineRatio_max_xi[2] = new TLine(0,1.06,8,1.06);
+    LineRatio_max_xi[2]->SetLineStyle(2);
+    LineRatio_max_xi[2]->Draw();
+
+    Ratioloose_v2_xi_ARC_pi->Draw("P");
+    Ratiotight_v2_xi_ARC_pi->Draw("P");
+
+    leg_ratio_xi[2] = MakeTLegend(0.45,0.2,0.57,0.35);
+    leg_ratio_xi[2]->AddEntry(Ratioloose_v2_xi_ARC_pi, "Loose #Xi^{#pm} Reconstruction varied #pi^{#pm}", "P");
+    leg_ratio_xi[2]->AddEntry(Ratiotight_v2_xi_ARC_pi, "Tight #Xi^{#pm} Reconstruction varied #pi^{#pm}", "P");
+    leg_ratio_xi[2]->Draw();
+
+    c1_ratio_xi[2]->Print("Image/RapSys_RecoCutsXi/v2RecoRatioSystematicsXi_PiVarOnly.pdf");
 
 }
 
@@ -7176,8 +7326,9 @@ void CascadeRebin()
 void Rap_v2sig_pPbTEST()
 {
     MITStyle();
-    TCanvas* c1 = MakeCanvas("c1", "Pt");
-    TCanvas* c2 = MakeCanvas("c2", "NQS");
+    TCanvas* c1 = MakeCanvas("c1", "Obs");
+    TCanvas* c2 = MakeCanvas("c2", "Bkg");
+    TCanvas* c3 = new TCanvas("c3", "Sig",1000,600);
 
     c1->cd();
 
@@ -7192,20 +7343,29 @@ void Rap_v2sig_pPbTEST()
 
     // Pull TGraph for Kshort and lambda
     TFile* file_pidv2 = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_FixedGap_12_05_17.root");
-    TFile* file_pidv2_V0Dau_DCA = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_V0DauDCA_12_18_17.root");
     //TFile* file_pidv2_V0EffTest = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_TestV0ARC3FilewoEff_1_10_18.root");
-    TFile* file_pidv2_V0EffTest = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_TestV0ARC3FileWEff_1_11_18.root");
+    //TFile* file_pidv2_V0EffTest = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_TestV0ARC3FileWEff_1_11_18.root");
+    TFile* file_pidv2_V0EffTest = TFile::Open("/Volumes/MacHD/Users/blt1/research/Macros/Drawers/TGraph/rootFiles/v2valuesRapidityHM_185_250_EtaGap1_V0_wTrkEff_1_11_18.root");
 
 
+    TGraphErrors* ks8_v2_sig = (TGraphErrors*)file_pidv2->Get("v2kshort");
+    TGraphErrors* la8_v2_sig = (TGraphErrors*)file_pidv2->Get("v2lambda");
     TGraphErrors* ks8_v2_obs = (TGraphErrors*)file_pidv2->Get("v2obskshort");
     TGraphErrors* la8_v2_obs = (TGraphErrors*)file_pidv2->Get("v2obslambda");
     TGraphErrors* ks8_v2_bkg = (TGraphErrors*)file_pidv2->Get("v2bkgkshort");
     TGraphErrors* la8_v2_bkg = (TGraphErrors*)file_pidv2->Get("v2bkglambda");
 
+    TGraphErrors* ks8_v2_V0EffTest_sig = (TGraphErrors*)file_pidv2_V0EffTest->Get("v2kshort");
+    TGraphErrors* la8_v2_V0EffTest_sig = (TGraphErrors*)file_pidv2_V0EffTest->Get("v2lambda");
     TGraphErrors* ks8_v2_V0EffTest_obs = (TGraphErrors*)file_pidv2_V0EffTest->Get("v2obskshort");
     TGraphErrors* la8_v2_V0EffTest_obs = (TGraphErrors*)file_pidv2_V0EffTest->Get("v2obslambda");
     TGraphErrors* ks8_v2_V0EffTest_bkg = (TGraphErrors*)file_pidv2_V0EffTest->Get("v2bkgkshort");
     TGraphErrors* la8_v2_V0EffTest_bkg = (TGraphErrors*)file_pidv2_V0EffTest->Get("v2bkglambda");
+
+    SetTGattributes(ks8_v2_sig,kRed,24,1.5);
+    SetTGattributes(la8_v2_sig,kBlue,25,1.5);
+    SetTGattributes(ks8_v2_V0EffTest_sig,kRed,20,1.5);
+    SetTGattributes(la8_v2_V0EffTest_sig,kBlue,21,1.5);
 
     SetTGattributes(ks8_v2_obs,kRed,20,1.5);
     SetTGattributes(la8_v2_obs,kBlue,21,1.5);
@@ -7218,15 +7378,15 @@ void Rap_v2sig_pPbTEST()
     SetTGattributes(la8_v2_V0EffTest_bkg,kBlue,25,1.5);
 
 
-    //Draw v2 vs Pt
-    MakePanel(frame1,c1->cd(),0,-0.01,9,0.45,0.12,"p_{T} (GeV)","v_{2}^{sig}");
-    TLegend* leg = MakeTLegend(0.15,0.55,0.27,0.75);
-    leg->SetHeader("Obs");
-    leg->AddEntry(ks8_v2_obs , PKzS.c_str()     , "P");
-    leg->AddEntry(la8_v2_obs , PgL_PagL.c_str() , "P");
-    leg->AddEntry(ks8_v2_V0EffTest_obs , PKzS.c_str()     , "P");
-    leg->AddEntry(la8_v2_V0EffTest_obs , PgL_PagL.c_str() , "P");
-    leg->Draw();
+    //Obs
+    MakePanel(frame1,c1->cd(),0,-0.01,9,0.45,0.12,"p_{T} (GeV)","v_{2}^{obs}");
+    TLegend* legobs = MakeTLegend(0.15,0.55,0.27,0.75);
+    legobs->SetHeader("Obs");
+    legobs->AddEntry(ks8_v2_obs , PKzS.c_str()     , "P");
+    legobs->AddEntry(la8_v2_obs , PgL_PagL.c_str() , "P");
+    legobs->AddEntry(ks8_v2_V0EffTest_obs , PKzS.c_str()     , "P");
+    legobs->AddEntry(la8_v2_V0EffTest_obs , PgL_PagL.c_str() , "P");
+    legobs->Draw();
 
     ks8_v2_obs->Draw("P");
     la8_v2_obs->Draw("P");
@@ -7242,8 +7402,8 @@ void Rap_v2sig_pPbTEST()
     tex->SetTextFont(42);
     tex->DrawLatex(0.34,0.72,HM_ntrk.c_str());
 
-    //Draw v2 vs Pt
-    MakePanel(frame1,c2->cd(),0,-0.01,9,0.45,0.12,"p_{T} (GeV)","v_{2}^{sig}");
+    //Bkg
+    MakePanel(frame1,c2->cd(),0,-0.01,9,0.45,0.12,"p_{T} (GeV)","v_{2}^{bkg}");
     TLegend* legbkg = MakeTLegend(0.15,0.55,0.27,0.75);
     legbkg->SetHeader("Bkg");
     legbkg->AddEntry(ks8_v2_bkg , PKzS.c_str()     , "P");
@@ -7262,4 +7422,36 @@ void Rap_v2sig_pPbTEST()
     tex->SetTextSize(0.045);
     tex->SetTextFont(42);
     tex->DrawLatex(0.34,0.72,HM_ntrk.c_str());
+
+    //Sig
+    c3->Divide(2,1);
+    MakePanel(frame1,c3->cd(1),0,-0.01,9,0.45,0.12,"p_{T} (GeV)","v_{2}^{sig}");
+    TLegend* legsig = MakeTLegend(0.15,0.55,0.27,0.75);
+    legsig->SetHeader("Bkg");
+    legsig->AddEntry(ks8_v2_sig , PKzS.c_str()     , "P");
+    legsig->AddEntry(la8_v2_sig , PgL_PagL.c_str() , "P");
+    legsig->AddEntry(ks8_v2_V0EffTest_sig , PKzS.c_str()     , "P");
+    legsig->AddEntry(la8_v2_V0EffTest_sig , PgL_PagL.c_str() , "P");
+    legsig->Draw();
+
+    ks8_v2_sig->Draw("P");
+    la8_v2_sig->Draw("P");
+    ks8_v2_V0EffTest_sig->Draw("P");
+    la8_v2_V0EffTest_sig->Draw("P");
+
+    tex->SetTextSize(0.05);
+    tex->DrawLatex(0.15,0.8,"CMS pPb #sqrt{S_{#lower[-0.3]{NN}}} = 8.16 TeV");
+    tex->SetTextSize(0.045);
+    tex->SetTextFont(42);
+    tex->DrawLatex(0.34,0.72,HM_ntrk.c_str());
+
+    MakePanel(frame1,c3->cd(2),0,0.85,9,1.15,0.12,"p_{T} (GeV)","Ratio v_{2}^{sig}");
+    TGraphErrors* ks8_v2sub_old_ratio = TGDivideSameX(ks8_v2_sig,ks8_v2_V0EffTest_sig);
+    TGraphErrors* la8_v2sub_old_ratio = TGDivideSameX(la8_v2_sig,la8_v2_V0EffTest_sig);
+    SetTGattributes(ks8_v2sub_old_ratio,kRed,20,1.5);
+    SetTGattributes(la8_v2sub_old_ratio,kBlue,20,1.5);
+    ks8_v2sub_old_ratio->Draw("P");
+    la8_v2sub_old_ratio->Draw("P");
+    TLine* line_ratio = new TLine(0,1,9,1);
+    line_ratio->Draw();
 }
