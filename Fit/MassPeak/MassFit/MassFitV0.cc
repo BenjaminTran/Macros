@@ -31,7 +31,7 @@ void MassFitV0()
     TGaxis::SetMaxDigits(3);
     gStyle->SetMarkerSize(0.8);
 
-    bool do_pPb = true;
+    bool do_pPb = false;
     bool do_PbPb = !do_pPb;
     bool doks = true;
     bool dola = true;
@@ -70,7 +70,11 @@ void MassFitV0()
     char label_pt[200] = {"1 < p_{T} < 3 GeV"};
     char label_sigma[2][200]={"Average #sigma: 0.0047 GeV","Average #sigma: 0.0018 GeV"};
     char label_cms[2][200]={"Preliminary","L_{int} = 162 nb^{-1}"};
-    
+
+    char label_energy_PbPb[2][200]={"CMS #scale[1.1]{#font[12]{Preliminary}}","PbPb #sqrt{s_{NN}} = 5.02 TeV"};
+    char label_n_PbPb[200]={"30-50% Centrality"};
+    char label_sigma_PbPb[2][200]={"Average #sigma: 0.0046 GeV","Average #sigma: 0.0020 GeV"};
+
     tex->SetTextSize(tex->GetTextSize()*0.75);
 
     std::vector<TH1D*> massks_h;
@@ -98,8 +102,7 @@ void MassFitV0()
 
     massks = massks_h[0];
     massla = massla_h[0];
-    cout << "Setup" << endl;
-    
+
     if(doks)
     {
         //kshort
@@ -115,7 +118,8 @@ void MassFitV0()
         xframe->GetXaxis()->SetTitleSize(xframe->GetXaxis()->GetTitleSize()*1.3);
         xframe->GetYaxis()->SetTitleSize(xframe->GetYaxis()->GetTitleSize()*1.2);
         xframe->GetYaxis()->SetTitleOffset(1);
-        xframe->GetYaxis()->SetRangeUser(0,20e6);
+        if(do_pPb) xframe->GetYaxis()->SetRangeUser(0,20e6);
+        else if(do_PbPb) xframe->GetYaxis()->SetRangeUser(0,7e6);
         RooRealVar mean("mean","mean",0.5,0.49,0.51);
         RooRealVar sigma1("sigma1","sigma1",0.005,0.001,0.01);
         RooRealVar sigma2("sigma2","sigma2",0.005,0.0001,0.01);
@@ -135,8 +139,16 @@ void MassFitV0()
         //RooRealVar dp("dp","dp",1,-100,100);
         RooChebychev poly("poly","poly",x,RooArgList(ap,bp,cp,dp));
         //RooPolynomial poly("poly","poly",x,RooArgList(ap,bp,cp,dp));
-        RooRealVar polysig("polysig","polysig",4e6,0,10000000);
+        RooRealVar polysig("polysig","polysig",4e6,0,1e7);
         RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,poly),RooArgList(sig1,sig2,polysig));
+
+        if(do_PbPb)
+        {
+            sig1.setVal(2e5);
+            sig2.setVal(2e5);
+            polysig.setVal(4e6);
+            polysig.setMax(1e8);
+        }
 
         x.setRange("cut",0.44,0.56);
 
@@ -149,8 +161,16 @@ void MassFitV0()
         gPad->SetTickx();
         gPad->SetTicky();
         xframe->Draw();
-        tex->DrawLatex(0.55,0.77,label_mean[0]);
-        tex->DrawLatex(0.55,0.71,label_sigma[0]);
+        if(do_pPb)
+        {
+            tex->DrawLatex(0.55,0.77,label_mean[0]);
+            tex->DrawLatex(0.55,0.71,label_sigma[0]);
+        }
+        else if(do_PbPb)
+        {
+            tex->DrawLatex(0.55,0.77,label_mean[0]);
+            tex->DrawLatex(0.55,0.71,label_sigma_PbPb[0]);
+        }
     }
     cout << "Did Ks" << endl;
     if(dola)
@@ -167,7 +187,8 @@ void MassFitV0()
         xframe->GetXaxis()->SetTitleSize(xframe->GetXaxis()->GetTitleSize()*1.3);
         xframe->GetYaxis()->SetTitleSize(xframe->GetYaxis()->GetTitleSize()*1.2);
         xframe->GetYaxis()->SetTitleOffset(1);
-        xframe->GetYaxis()->SetRangeUser(0,12e6);
+        if(do_pPb) xframe->GetYaxis()->SetRangeUser(0,12e6);
+        else if(do_PbPb) xframe->GetYaxis()->SetRangeUser(0,4.5e6);
         data.plotOn(xframe,Name("data"));
         RooRealVar mean("mean","mean",1.115,1.11,1.12);
         RooRealVar sigma1("sigma1","sigma1",0.002,0.001,0.01);
@@ -186,7 +207,13 @@ void MassFitV0()
         RooRealVar polysig("polysig","polysig",1.0e7,0,1e9);
         RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,poly),RooArgList(sig1,sig2,polysig));
 
-        x.setRange("cut",1.085,1.155);
+        if(do_PbPb)
+        {
+            sig1.setVal(2e5);
+            sig2.setVal(2e5);
+        }
+
+        x.setRange("cut",1.090,1.15);
 
         sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
 
@@ -196,33 +223,72 @@ void MassFitV0()
         gPad->SetTickx();
         gPad->SetTicky();
         xframe->Draw();
-        tex->DrawLatex(0.55,0.77,label_mean[1]);
-        tex->DrawLatex(0.55,0.71,label_sigma[1]);
+        if(do_pPb)
+        {
+            tex->DrawLatex(0.55,0.77,label_mean[1]);
+            tex->DrawLatex(0.55,0.71,label_sigma[1]);
+        }
+        else if(do_PbPb)
+        {
+            tex->DrawLatex(0.55,0.77,label_mean[1]);
+            tex->DrawLatex(0.55,0.71,label_sigma_PbPb[1]);
+        }
 
         cc1->cd();
         double x_start = 0.139;
         double y_start = 0.83+0.06;
         double increment = 0.06;
-        tex->DrawLatex(x_start,y_start-=increment,label_energy[0]);
-        tex->DrawLatex(x_start,y_start-=increment,label_energy[1]);
-        tex->DrawLatex(x_start,y_start-=increment,label_cms[1]);
-        tex->DrawLatex(x_start,y_start-=increment,label_n);
-        tex->DrawLatex(x_start,y_start-=increment,label_pt);
-        //tex->DrawLatex(x_start,y_start-=increment,label_cms[0]);
-        tex->DrawLatex(x_start,y_start-=increment,label_pid[0]);
+        if(do_pPb)
+        {
+            tex->DrawLatex(x_start,y_start-=increment,label_energy[0]);
+            tex->DrawLatex(x_start,y_start-=increment,label_energy[1]);
+            //tex->DrawLatex(x_start,y_start-=increment,label_cms[1]);
+            tex->DrawLatex(x_start,y_start-=increment,label_n);
+            tex->DrawLatex(x_start,y_start-=increment,label_pt);
+            tex->DrawLatex(x_start,y_start-=increment,label_pid[0]);
+        }
+        else if(do_PbPb)
+        {
+            tex->DrawLatex(x_start,y_start-=increment,label_energy_PbPb[0]);
+            tex->DrawLatex(x_start,y_start-=increment,label_energy_PbPb[1]);
+            //tex->DrawLatex(x_start,y_start-=increment,label_cms[1]);
+            tex->DrawLatex(x_start,y_start-=increment,label_n_PbPb);
+            tex->DrawLatex(x_start,y_start-=increment,label_pt);
+            tex->DrawLatex(x_start,y_start-=increment,label_pid[0]);
+        }
 
         cc2->cd();
         x_start = 0.139;
         y_start = 0.83+0.06;
-        tex->DrawLatex(x_start,y_start-=increment,label_energy[0]);
-        tex->DrawLatex(x_start,y_start-=increment,label_energy[1]);
-        tex->DrawLatex(x_start,y_start-=increment,label_cms[1]);
-        tex->DrawLatex(x_start,y_start-=increment,label_n);
-        tex->DrawLatex(x_start,y_start-=increment,label_pt);
-        tex_pid->DrawLatex(x_start,y_start-=increment,label_pid[1]);
-        //tex->DrawLatex(0.22,0.70,label_cms[0]);
+        if(do_pPb)
+        {
+            tex->DrawLatex(x_start,y_start-=increment,label_energy[0]);
+            tex->DrawLatex(x_start,y_start-=increment,label_energy[1]);
+            //tex->DrawLatex(x_start,y_start-=increment,label_cms[1]);
+            tex->DrawLatex(x_start,y_start-=increment,label_n);
+            tex->DrawLatex(x_start,y_start-=increment,label_pt);
+            tex_pid->DrawLatex(x_start,y_start-=increment,label_pid[1]);
+            //tex->DrawLatex(0.22,0.70,label_cms[0]);
+        }
+        else if(do_PbPb)
+        {
+            tex->DrawLatex(x_start,y_start-=increment,label_energy_PbPb[0]);
+            tex->DrawLatex(x_start,y_start-=increment,label_energy_PbPb[1]);
+            //tex->DrawLatex(x_start,y_start-=increment,label_cms[1]);
+            tex->DrawLatex(x_start,y_start-=increment,label_n_PbPb);
+            tex->DrawLatex(x_start,y_start-=increment,label_pt);
+            tex_pid->DrawLatex(x_start,y_start-=increment,label_pid[1]);
+        }
     }
 
-    cc1->Print("Image/MassFitV0/massfit_ks.pdf");
-    cc2->Print("Image/MassFitV0/massfit_la.pdf");
+    if(do_pPb)
+    {
+        cc1->Print("Image/MassFitV0/massfit_pPb_ks.pdf");
+        cc2->Print("Image/MassFitV0/massfit_pPb_la.pdf");
+    }
+    else if(do_PbPb)
+    {
+        cc1->Print("Image/MassFitV0/massfit_PbPb_ks.pdf");
+        cc2->Print("Image/MassFitV0/massfit_PbPb_la.pdf");
+    }
 }

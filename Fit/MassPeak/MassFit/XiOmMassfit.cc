@@ -30,13 +30,26 @@ void XiOmMassfit()
     RooMsgService::instance().setStreamStatus(1,kFALSE);
     TGaxis::SetMaxDigits(3);
     gStyle->SetMarkerSize(0.8);
-    TFile* f1_Xi = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationHM_11_07_17.root");
-    TFile* f1_Om = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/OmCorr/OmegaHMRapidity_Total_12_04_17.root");
+    TFile* f1_Xi;
+    TFile* f1_Om;
     using namespace RooFit;
     gStyle->SetOptTitle(kFALSE);
 
+    bool do_pPb = true;
+    bool do_PbPb = !do_pPb;
     bool doxi = true;
     bool doom = true;
+
+    if(do_pPb)
+    {
+        f1_Xi = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/XiCorr/XiCorrelationHM_11_07_17.root");
+        f1_Om = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/OmCorr/OmegaHMRapidity_Total_12_04_17.root");
+    }
+    else if(do_PbPb)
+    {
+        f1_Xi = TFile::Open("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/AllCorrelation/V0CasCorrelationPbPbTotal_10_30_17.root");
+        f1_Om = f1_Xi;
+    }
 
     TCanvas* cc1 = new TCanvas("cc1","cc1",700,550);
     TCanvas* cc2 = new TCanvas("cc2","cc2",700,550);
@@ -52,28 +65,35 @@ void XiOmMassfit()
     tex->SetNDC();
     tex_pid->SetNDC();
     
-    char label_energy[200]={"CMS pPb #sqrt{s_{NN}} = 8.16 TeV"};
+    char label_energy[2][200]={"CMS #scale[1.1]{#font[12]{Preliminary}}","pPb #sqrt{s_{NN}} = 8.16 TeV"};
     char label_n[200]={"185 #leq N^{offline}_{trk} < 250"};
     char label_pid[2][200]={"#Xi^{-}","#Omega^{-}"};
     char label_mean[2][200]={"Mean: 1.3228 GeV","Mean: 1.6727 GeV"};
-    char label_pt[200] = {"1 < p_{T} < 3 GeV"};
-    char label_ptom[200] = {"1 < p_{T} < 3 GeV"};
+    char label_pt[2][200] = {"1 < p_{T} < 3 GeV","1.5 < p_{T} < 3 GeV"};
     char label_sigma[2][200]={"Average #sigma: 0.0043 GeV","Average #sigma: 0.0044 GeV"};
     char label_cms[2][200]={"Preliminary","L_{int} = 162 nb^{-1}"};
+
+    char label_energy_PbPb[2][200]={"CMS #scale[1.1]{#font[12]{Preliminary}}","PbPb #sqrt{s_{NN}} = 5.02 TeV"};
+    char label_n_PbPb[200]={"30-50% Centrality"};
+    char label_mean_PbPb[2][200]={"Mean: 1.3227 GeV","Mean: 1.6727 GeV"};
+    char label_sigma_PbPb[2][200]={"Average #sigma: 0.0042 GeV","Average #sigma: 0.0059 GeV"};
     
     tex->SetTextSize(tex->GetTextSize()*0.75);
     tex_pid->SetTextSize(tex_pid->GetTextSize());
 
-    std::vector<double> pxi = {1.0,1.4,1.8,2.2,2.8};//pPb
-    std::vector<double> pom = {1.5,2.2,2.8}; //pPb
-
-    MassXi = (TH2D*)f1_Xi->Get("v0CasCorrelationRapidity/MassPtXi");
-    MassOm = (TH2D*)f1_Om->Get("v0CasCorrelationRapidity/MassPtOm");
+    if(do_pPb)
+    {
+        MassXi = (TH2D*)f1_Xi->Get("v0CasCorrelationRapidity/MassPtXi");
+        MassOm = (TH2D*)f1_Om->Get("v0CasCorrelationRapidity/MassPtOm");
+    }
+    if(do_PbPb)
+    {
+        MassXi = (TH2D*)f1_Xi->Get("v0CasCorrelationRapidityPbPb/MassPtXi");
+        MassOm = (TH2D*)f1_Om->Get("v0CasCorrelationRapidityPbPb/MassPtOm");
+    }
 
     massxi = (TH1D*)MassXi->ProjectionX("massxi", 11,30);
-    massom = (TH1D*)MassOm->ProjectionX("massom", 11,30);
-    cout << "4" << endl;
-
+    massom = (TH1D*)MassOm->ProjectionX("massom", 16,30);
     
     if(doxi)
     {
@@ -119,8 +139,16 @@ void XiOmMassfit()
         gPad->SetTickx();
         gPad->SetTicky();
         xframe->Draw();
-        tex->DrawLatex(0.55,0.80,label_mean[0]);
-        tex->DrawLatex(0.55,0.74,label_sigma[0]);
+        if(do_pPb)
+        {
+            tex->DrawLatex(0.55,0.80,label_mean[0]);
+            tex->DrawLatex(0.55,0.74,label_sigma[0]);
+        }
+        else if(do_PbPb)
+        {
+            tex->DrawLatex(0.55,0.80,label_mean[0]);
+            tex->DrawLatex(0.55,0.74,label_sigma_PbPb[0]);
+        }
     }
     if(doom)
     {
@@ -172,31 +200,72 @@ void XiOmMassfit()
         gPad->SetTickx();
         gPad->SetTicky();
         xframe->Draw();
-        tex->DrawLatex(0.55,0.80,label_mean[1]);
-        tex->DrawLatex(0.55,0.74,label_sigma[1]);
+        if(do_pPb)
+        {
+            tex->DrawLatex(0.55,0.80,label_mean[1]);
+            tex->DrawLatex(0.55,0.74,label_sigma[1]);
+        }
+        else if(do_PbPb)
+        {
+            tex->DrawLatex(0.55,0.80,label_mean[1]);
+            tex->DrawLatex(0.55,0.74,label_sigma_PbPb[1]);
+        }
 
         cc1->cd();
         double x_start = 0.139;
         double y_start = 0.83+0.06;
         double increment = 0.06;
-        tex->DrawLatex(x_start,y_start-=increment,label_energy);
-        tex->DrawLatex(x_start,y_start-=increment,label_cms[1]);
-        tex->DrawLatex(x_start,y_start-=increment,label_n);
-        tex->DrawLatex(x_start,y_start-=increment,label_pt);
-        //tex->DrawLatex(x_start,y_start-=increment,label_cms[0]);
-        tex_pid->DrawLatex(x_start,y_start-=increment,label_pid[0]);
+        if(do_pPb)
+        {
+            tex->DrawLatex(x_start,y_start-=increment,label_energy[0]);
+            tex->DrawLatex(x_start,y_start-=increment,label_energy[1]);
+            //tex->DrawLatex(x_start,y_start-=increment,label_cms[1]);
+            tex->DrawLatex(x_start,y_start-=increment,label_n);
+            tex->DrawLatex(x_start,y_start-=increment,label_pt[0]);
+            tex_pid->DrawLatex(x_start,y_start-=increment,label_pid[0]);
+        }
+        else if(do_PbPb)
+        {
+            tex->DrawLatex(x_start,y_start-=increment,label_energy_PbPb[0]);
+            tex->DrawLatex(x_start,y_start-=increment,label_energy_PbPb[1]);
+            //tex->DrawLatex(x_start,y_start-=increment,label_cms[1]);
+            tex->DrawLatex(x_start,y_start-=increment,label_n_PbPb);
+            tex->DrawLatex(x_start,y_start-=increment,label_pt[0]);
+            tex_pid->DrawLatex(x_start,y_start-=increment,label_pid[0]);
+        }
 
         cc2->cd();
         x_start = 0.139;
         y_start = 0.83+0.06;
-        tex->DrawLatex(x_start,y_start-=increment,label_energy);
-        tex->DrawLatex(x_start,y_start-=increment,label_cms[1]);
-        tex->DrawLatex(x_start,y_start-=increment,label_n);
-        tex->DrawLatex(x_start,y_start-=increment,label_pt);
-        tex_pid->DrawLatex(x_start,y_start-=increment,label_pid[1]);
-        //tex->DrawLatex(0.22,0.70,label_cms[0]);
+        if(do_pPb)
+        {
+            tex->DrawLatex(x_start,y_start-=increment,label_energy[0]);
+            tex->DrawLatex(x_start,y_start-=increment,label_energy[1]);
+            //tex->DrawLatex(x_start,y_start-=increment,label_cms[1]);
+            tex->DrawLatex(x_start,y_start-=increment,label_n);
+            tex->DrawLatex(x_start,y_start-=increment,label_pt[1]);
+            tex_pid->DrawLatex(x_start,y_start-=increment,label_pid[1]);
+            //tex->DrawLatex(0.22,0.70,label_cms[0]);
+        }
+        else if(do_PbPb)
+        {
+            tex->DrawLatex(x_start,y_start-=increment,label_energy_PbPb[0]);
+            tex->DrawLatex(x_start,y_start-=increment,label_energy_PbPb[1]);
+            //tex->DrawLatex(x_start,y_start-=increment,label_cms[1]);
+            tex->DrawLatex(x_start,y_start-=increment,label_n_PbPb);
+            tex->DrawLatex(x_start,y_start-=increment,label_pt[1]);
+            tex_pid->DrawLatex(x_start,y_start-=increment,label_pid[1]);
+        }
     }
 
-    cc1->Print("massfit_Xi.pdf");
-    cc2->Print("massfit_Om.pdf");
+    if(do_pPb)
+    {
+        cc1->Print("Image/XiOmMassfit/massfit_pPb_Xi.pdf");
+        cc2->Print("Image/XiOmMassfit/massfit_pPb_Om.pdf");
+    }
+    else if(do_PbPb)
+    {
+        cc1->Print("Image/XiOmMassfit/massfit_PbPb_Xi.pdf");
+        cc2->Print("Image/XiOmMassfit/massfit_PbPb_Om.pdf");
+    }
 }
