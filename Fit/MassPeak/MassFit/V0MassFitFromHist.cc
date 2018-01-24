@@ -58,8 +58,8 @@ void V0MassFitFromHist()
     TH2D* MassLa;
     TH3D* MassKs3D;
     TH3D* MassLa3D;
-    bool doPbPb = false;
-    bool pPb = true;
+    bool doPbPb = true;
+    bool pPb = false;
     bool mc = false;
     bool mb = false;
     bool lambda;
@@ -621,10 +621,10 @@ void V0MassFitFromHist()
             RooRealVar sigma2("sigma2","sigma2",0.005,0.001,0.01);
             //RooRealVar sig1("sig1","signal1",2e6,0,10000000); //pPb
             //RooRealVar sig2("sig2","signal2",8e6,0,10000000);
-            //RooRealVar sig1("sig1","signal1",1e6,0,10000000); //pbpb
-            //RooRealVar sig2("sig2","signal2",5e6,0,10000000);
-            RooRealVar sig1("sig1","signal1",1e4,0,10000000); //mc
-            RooRealVar sig2("sig2","signal2",5e4,0,10000000);
+            RooRealVar sig1("sig1","signal1",1e6,0,10000000); //pbpb
+            RooRealVar sig2("sig2","signal2",5e6,0,10000000);
+            //RooRealVar sig1("sig1","signal1",1e4,0,10000000); //mc
+            //RooRealVar sig2("sig2","signal2",5e4,0,10000000);
             RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
             RooGaussian gaus2("gaus2","gaus2",x,mean,sigma2);
             RooRealVar ap("ap" , "ap" , 0    , -5 , 2);
@@ -637,8 +637,8 @@ void V0MassFitFromHist()
             //RooRealVar dp("dp","dp",10,0,1000000);
             //RooPolynomial poly("poly","poly",x,RooArgList(ap,bp,cp,dp));
             RooChebychev poly("poly","poly",x,RooArgList(ap,bp,cp,dp));
-            //RooRealVar polysig("polysig","polysig",8.0e6,0,1e7);
-            RooRealVar polysig("polysig","polysig",1.0e5,0,1e7); //mc
+            RooRealVar polysig("polysig","polysig",8.0e6,0,1e7);
+            //RooRealVar polysig("polysig","polysig",1.0e5,0,1e7); //mc
             //RooRealVar polysig("polysig","polysig",2e3,1e3,1e6);
             RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,poly),RooArgList(sig1,sig2,polysig));
 

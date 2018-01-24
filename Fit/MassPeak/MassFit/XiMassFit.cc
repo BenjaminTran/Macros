@@ -60,9 +60,9 @@ void XiMassFit()
     std::vector<double> std_xi;
     std::vector<double> fsig_xi;
     std::vector<double> covQual_xi;
-    bool doPbPb = false;
+    bool doPbPb = true;
     bool doMB = false;
-    bool pPb = true;
+    bool pPb = false;
 
     //std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,72, 73,85, 86,100, 101,200, 201,300};
     //std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,100, 101,200};//, 201,300};
@@ -315,7 +315,7 @@ void XiMassFit()
             leg->AddEntry(t1_xi,"#pm 2#sigma","l");
             leg->Draw();
 
-            c_xi->Print("XiPlotForZhenyu.pdf");
+            c_xi->Print("Image/XiMassFit/XiPlotForZhenyu.pdf");
         }
 
         cc1->cd(index);
@@ -522,16 +522,16 @@ void XiMassFit()
         line2->Draw("same");
 
         hbincounter++;
-        if(!doPbPb) cc2->Print(Form("XiMassFit_Pull_pPb%d.pdf",i/2));
-        else if(doMB) cc2->Print(Form("XiMassFit_Pull_MB%d.pdf",i/2));
-        else cc2->Print(Form("XiMassFit_Pull_PbPb%d.pdf",i/2));
+        if(!doPbPb) cc2->Print(Form("Image/XiMassFit/XiMassFit_Pull_pPb%d.pdf",i/2));
+        else if(doMB) cc2->Print(Form("Image/XiMassFit/XiMassFit_Pull_MB%d.pdf",i/2));
+        else cc2->Print(Form("Image/XiMassFit/XiMassFit_Pull_PbPb%d.pdf",i/2));
         //if(i==0) cc2->Print("XiMassFitInd.pdf(","pdf");
         //else if(i < pxi.size() - 2) cc2->Print("XiMassFitInd.pdf","pdf");
         //else cc2->Print("XiMassFitInd.pdf)","pdf");
         i++; //to access correct bins
     }
-    cc1->Print("XiMassFitComposite.pdf");
-    cc1->Print("XiMassFitComposite.png");
+    cc1->Print("Image/XiMassFit/XiMassFitComposite.pdf");
+    cc1->Print("Image/XiMassFit/XiMassFitComposite.png");
 
     //Output
     pxicounter = 0;
