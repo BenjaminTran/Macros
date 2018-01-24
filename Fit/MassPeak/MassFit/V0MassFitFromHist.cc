@@ -78,9 +78,6 @@ void V0MassFitFromHist()
     std::vector<double> covQual_la;
     std::vector<double> pt_la;
 
-    //int pTksLength = 26; // the number of bins to be fitted is half of this number
-    //std::vector<double> pks = {3,4, 5,6, 7,8, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70, 71,85, 86,100};//, 201,250, 251,300};
-    //std::vector<double> pla = {0,0, 0,0, 0,0, 9,10, 11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,70, 71,85, 86,100};//, 201,250, 251,300};
     std::vector<double> pks = {0.2,0.4,0.6,0.8,1.0,1.4,1.8,2.2,2.8,3.6,4.6,6.0,7.0,8.5,10.0};//pPb
     std::vector<double> pla = {0.8,1.0,1.4,1.8,2.2,2.8,3.6,4.6,6.0,7.0,8.5,10.0}; //pPb
     //std::vector<double> pks = {0.2,0.4,0.6,0.8,1.0,1.4,1.8,2.2,2.8,3.6,4.6,6.0,7.0,8.5};//PbPb
@@ -105,7 +102,7 @@ void V0MassFitFromHist()
     else if(mc) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MC/All/MCMassPtTotal_08_23_2017.root");
     else if(mb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/MBCorr/V0MB_0_35_1_02_18.root");
     //else if(pPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0CorrelationRapidityCorrectMultB_09_19_17.root");
-    else if(pPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0_OLD_5percentDump_ARC3_1_11_18.root");
+    else if(pPb) file = new TFile("/Volumes/MacHD/Users/blt1/research/RootFiles/Flow/V0Corr/V0Correlation_TrkEff_1_11_18.root");
 
     if(mc)
     {
@@ -147,8 +144,8 @@ void V0MassFitFromHist()
         }
         else if(pPb)
         {
-            massks[i] = (TH1D*)file->Get(Form("v0CorrelationRapidity/masskshort_pt%d",i));
-            massla[i] = (TH1D*)file->Get(Form("v0CorrelationRapidity/masslambda_pt%d",i));
+            massks[i] = (TH1D*)file->Get(Form("v0CasCorrelationRapidity/masskshort_pt%d",i));
+            massla[i] = (TH1D*)file->Get(Form("v0CasCorrelationRapidity/masslambda_pt%d",i));
             //massks[i] = (TH1D*)file->Get(Form("v0CasCorrelationRapidity/masskshort_pt%d",i));
             //massla[i] = (TH1D*)file->Get(Form("v0CasCorrelationRapidity/masslambda_pt%d",i));
         }

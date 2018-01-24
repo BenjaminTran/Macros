@@ -61,8 +61,8 @@ void XiMassFit()
     std::vector<double> fsig_xi;
     std::vector<double> covQual_xi;
     bool doPbPb = false;
-    bool doMB = true;
-    bool pPb = false;
+    bool doMB = false;
+    bool pPb = true;
 
     //std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,72, 73,85, 86,100, 101,200, 201,300};
     //std::vector<double> pxi = {11,14, 15,18, 19,22, 23,28, 29,36, 37,46, 47,60, 61,100, 101,200};//, 201,300};
