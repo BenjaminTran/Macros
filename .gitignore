@@ -4,7 +4,7 @@
 *.jpg
 *.un*
 *.swp
-*.so
+*.so*
 *.d
 *_Store
 *.root

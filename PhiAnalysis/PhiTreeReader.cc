@@ -1,6 +1,6 @@
 #include "interface/PhiTreeReader.h"
 
-const double kaonMass = 0.493677;
+//const double kaonMass = 0.493677;
 
 PhiTreeReader::PhiTreeReader(long int event_start_, long int event_stop_ , int check_interval_, std::string filename_)
 {
@@ -331,7 +331,7 @@ bool PhiTreeReader::ReadTreeV3()
         "Nhits",
         "DCAz",
         "DCAxy",
-        "mult",
+        "mult"
     };
 
     const int nDim = AxisLabels.size();
@@ -537,7 +537,7 @@ void PhiTreeReader::ReadSparse()
 
 int main()
 {
-    PhiTreeReader p(1000000,2000000,10000,"/Volumes/MacHD/Users/blt1/research/Macros/PhiAnalysis/TreeReader/rootFiles/Sparse_v1_1-2M.root");
+    PhiTreeReader p(0,20000,10000,"outputFiles/Test.root");
     //PhiTreeReader p(100000,200000,10000,"/Volumes/MacHD/Users/blt1/research/Macros/PhiAnalysis/TreeReader/rootFiles/Test.root");
     p.ReadTreeV3();
 

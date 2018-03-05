@@ -65,7 +65,13 @@
 
 class PhiTreeReader{
     private :
-        static const double kaonMass;
+
+        long int event_start;
+        long int event_stop;
+        int check_interval;
+
+    public :
+        static constexpr double kaonMass = 0.493677;
 
         struct kaon{
             double p;
@@ -82,11 +88,6 @@ class PhiTreeReader{
                 p(p_), pt(pt_), px(px_), py(py_), pz(pz_), dedx(dedx_), energy(energy_), charge(charge_), nhits(nhits_)  {}
         };
 
-        long int event_start;
-        long int event_stop;
-        int check_interval;
-
-    public :
         PhiTreeReader(long int event_start_, long int event_stop_, int check_interval_, std::string filename_);
         ~PhiTreeReader();
 
