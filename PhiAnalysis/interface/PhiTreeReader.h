@@ -8,6 +8,7 @@
 #include "TImage.h"
 #include "TH1D.h"
 #include "TH2D.h"
+#include "TH3D.h"
 #include "THnSparse.h"
 #include "TTree.h"
 #include <TString.h>

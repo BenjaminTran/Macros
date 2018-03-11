@@ -491,7 +491,7 @@ bool PhiTreeReader::ReadTreeV3()
 void PhiTreeReader::ReadSparse()
 {
     TH1::SetDefaultSumw2();
-    TFile *f = new TFile("TreeReader/rootFiles/Sparse_v1.root");
+    TFile *f = new TFile("PhiTreeProofSparse/Sparse_v1.root");
     THnSparseF *h;
     gStyle->SetOptStat(1111111);
 
@@ -504,17 +504,29 @@ void PhiTreeReader::ReadSparse()
     std::vector<TH1D*> hist_containers;
     std::vector<float> VptBins  = {0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100};
 
-    h->GetAxis(2)->SetRange(0,24); //eta
-    //h->GetAxis(3)->SetRange(0,10); //rapidity
-    h->GetAxis(4)->SetRange(12,-1); //nhits
-    h->GetAxis(5)->SetRange(0,2); //DCAz
-    h->GetAxis(6)->SetRange(0,2); //DCAxy
+    h->GetAxis(3)->SetRange(0,24); //eta
+    h->GetAxis(4)->SetRange(0,24); //eta
+    h->GetAxis(5)->SetRange(0,10); //rapidity
+    h->GetAxis(6)->SetRange(0,10); //rapidity
+    h->GetAxis(7)->SetRange(5,35); //nhits
+    h->GetAxis(8)->SetRange(5,35); //nhits
+    h->GetAxis(9)->SetRange(0,2); //DCAz
+    h->GetAxis(10)->SetRange(0,2); //DCAz
+    h->GetAxis(11)->SetRange(0,2); //DCAxy
+    h->GetAxis(12)->SetRange(0,2); //DCAxy
     //h->GetAxis(7)->SetRange(); //multiplicity
     
+    TH1D* h_rap = h->Projection(3);
     TH1D* h_test = h->Projection(0);
 
-    TCanvas* c = new TCanvas("can","can",600,600);
-    //h_test->Draw();
+    TCanvas* c = new TCanvas("can","can",1200,600);
+    c->Divide(2,1);
+    c->cd(1);
+    h_rap->Draw();
+    c->cd(2);
+    h_test->Draw();
+
+    return;
 
     for(int i=0; i<VptBins.size()-1; ++i)
     {

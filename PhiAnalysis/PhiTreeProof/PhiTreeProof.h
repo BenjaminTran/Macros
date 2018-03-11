@@ -1,5 +1,6 @@
 #include "../interface/PhiTreeReader.h"
 
+#include "TH3D.h"
 #include "TSelector.h"
 
 class PhiTreeProof : public TSelector {
@@ -45,14 +46,28 @@ class PhiTreeProof : public TSelector {
         TH1D* h_nEvt;
         TH1D* h_mass;
         TH2D* h_dedx;
+        TH2D* h_mass_pt;
 
-        TF1 f_Dedx_bot;
-        TF1 f_Dedx_top;
+        TF1 *f_Dedx_bot;
+        TF1 *f_Dedx_top;
 
         TFile* out;
 
         std::vector<kaon_proof> Pkp;
         std::vector<kaon_proof> Pkm;
+
+        std::vector<TH1D*> hist_containers;
+
+        double mass_low;
+        double mass_high;
+        double mass_numBins;
+
+        double cut_dcaz;
+        double cut_dcaxy;
+        double cut_eta;
+        double cut_rapidity;
+        double cut_nhits;
+        std::string cut_dedx;
 
         PhiTreeProof(TTree * = 0) :
             h_nEvt(0)
@@ -80,12 +95,19 @@ class PhiTreeProof : public TSelector {
             ,chi2norm(reader,"chi2norm")
             ,nhits(reader,"nhits")
             ,charge(reader,"charge")
-            //tight
-            //,f_Dedx_bot("f_Dedx_bot","0.55*(TMath::Power(1.15/x,2) - 1.7*TMath::Power(0.6/x,1)) + 2.7",0.01,100)
-            //,f_Dedx_top("f_Dedx_top","0.55*(TMath::Power(1.62/x,2) - 2.95*TMath::Power(0.6/x,1)) + 3.3",0.01,100) {}
-            //loose
-            ,f_Dedx_bot("f_Dedx_bot","0.55*(TMath::Power(1.15/x,2) - 1.7*TMath::Power(0.6/x,1)) + 2.5",0.01,5)
-            ,f_Dedx_top("f_Dedx_top","0.55*(TMath::Power(1.62/x,2) - 2*TMath::Power(0.6/x,1)) + 3.6",0.01,5) {}
+            ,f_Dedx_bot(0)
+            ,f_Dedx_top(0)
+            {
+                mass_low = 1.0;
+                mass_high = 1.05;
+                mass_numBins = 50;
+                cut_dcaz = 1.0;
+                cut_dcaxy = 1.0;
+                cut_eta = 2.4;
+                cut_rapidity = 1.0;
+                cut_nhits = 5;
+                cut_dedx = "tight";
+            }
 
         virtual ~PhiTreeProof() {}
         virtual void Init(TTree *tree);
@@ -95,6 +117,7 @@ class PhiTreeProof : public TSelector {
         virtual int Version() const {return 2;}
 
         static void CombinatorialMass(std::vector<kaon_proof> PKp, std::vector<kaon_proof> PKm, TH1D* h_mass_);
+        static void CombinatorialMass2D(std::vector<kaon_proof> PKp, std::vector<kaon_proof> PKm, TH2D* h_mass_);
 
         ClassDef(PhiTreeProof,0);
 

@@ -12,11 +12,15 @@ class PhiTreeProofSparse : public TSelector {
             double pz;
             double dedx;
             double energy;
-            int charge;
-            int nhits;
+            double eta;
+            double rapidity;
+            double DCAz;
+            double DCAxy;
+            double charge;
+            double nhits;
 
-            kaon_proof(double p_, double pt_, double px_, double py_, double pz_, double dedx_, double energy_, int charge_, int nhits_) :
-                p(p_), pt(pt_), px(px_), py(py_), pz(pz_), dedx(dedx_), energy(energy_), charge(charge_), nhits(nhits_)  {}
+            kaon_proof(double p_, double pt_, double px_, double py_, double pz_, double dedx_, double energy_, double eta_, double rapidity_, double DCAz_, double DCAxy_, double charge_, double nhits_) :
+                p(p_), pt(pt_), px(px_), py(py_), pz(pz_), dedx(dedx_), energy(energy_), eta(eta_), rapidity(rapidity_), DCAz(DCAz_), DCAxy(DCAxy_), charge(charge_), nhits(nhits_)  {}
         };
 
         TTreeReader reader;
@@ -93,7 +97,7 @@ class PhiTreeProofSparse : public TSelector {
         virtual void Terminate();
         virtual int Version() const {return 2;}
 
-        static std::vector<double> CombinatorialMassSparse(std::vector<kaon_proof> PKp, std::vector<kaon_proof> PKm);
+        //static std::vector<double> CombinatorialMassSparse(std::vector<kaon_proof> PKp, std::vector<kaon_proof> PKm);
 
         static void SparseVarSetUp(std::vector<float> &varBins_, int nBins_, float minBin_, float maxBin_);
 
