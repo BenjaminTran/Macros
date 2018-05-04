@@ -120,8 +120,8 @@ bool PhiTreeReader::ReadTreeV2()
     TTreeReaderValue<float> chi2norm(reader,"chi2norm");
     TTreeReaderValue<int> nhits(reader,"nhits");
     TTreeReaderValue<int> charge(reader,"charge");
-    TTreeReaderValue<int> mult(reader,"mult");
-    TTreeReaderValue<int> multRaw(reader,"multRaw");
+    //TTreeReaderValue<int> mult(reader,"mult");
+    //TTreeReaderValue<int> multRaw(reader,"multRaw");
 
     int counter = -1;
     int progress = 0;
