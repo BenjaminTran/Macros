@@ -31,7 +31,8 @@
 
 void MassFitPhi()
 {
-    std::string Pt_bin = "1-1.5";
+    std::string BkgModel = "MC";
+    //std::string BkgModel = "Data";
 
     TH1::SetDefaultSumw2();
     RooMsgService::instance().setStreamStatus(0,kFALSE);
@@ -42,8 +43,20 @@ void MassFitPhi()
     gStyle->SetOptTitle(kFALSE);
 
     std::vector<std::string> file_names = {
-        "/Users/btran/research/Macros/PhiAnalysis/TMVA/BDTcmsswPlotters/BDTPROOF/Test0.5-1.root",
-        "/Users/btran/research/Macros/PhiAnalysis/TMVA/BDTcmsswPlotters/BDTPROOF/Test1-1.5.root"
+        //"/Users/btran/research/Macros/PhiAnalysis/TMVA/BDTcmsswPlotters/BDTPROOF/OutputFiles/PhiBDT_30M_rapLT1_pt0.5-1.root"
+        //"/Users/btran/research/Macros/PhiAnalysis/TMVA/BDTcmsswPlotters/BDTPROOF/OutputFiles/PhiBDT_30M_rapLT1_pt1-1.5.root"
+        //"/Users/btran/research/Macros/PhiAnalysis/TMVA/BDTcmsswPlotters/BDTPROOF/OutputFiles/PhiBDT_30M_rapLT1_pt1.5-2.root"
+        "/Users/btran/research/Macros/PhiAnalysis/TMVA/BDTcmsswPlotters/BDTPROOF/OutputFiles/PhiBDT_30M_rapLT1_pt2-2.5.root"
+        //"/Users/btran/research/Macros/PhiAnalysis/TMVA/BDTcmsswPlotters/BDTPROOF/OutputFiles/PhiBDT_30M_rapLT1_pt2-2.5.root"
+        //"/Users/btran/research/Macros/PhiAnalysis/TMVA/BDTcmsswPlotters/BDTPROOF/OutputFiles/PhiBDT_30M_rapLT1_pt2.5-3.root"
+        //"/Users/btran/research/Macros/PhiAnalysis/TMVA/BDTcmsswPlotters/BDTPROOF/OutputFiles/PhiBDT_30M_rapLT1_pt3-3.5.root"
+        //"/Users/btran/research/Macros/PhiAnalysis/TMVA/BDTcmsswPlotters/BDTPROOF/OutputFiles/PhiBDT_30M_rapLT1_pt3.5-4.root"
+        //"/Users/btran/research/Macros/PhiAnalysis/TMVA/BDTcmsswPlotters/BDTPROOF/OutputFiles/PhiBDT_30M_rapLT1_pt4-4.5.root"
+
+        //"/Users/btran/research/PhiReconstruction/TMVA/BDTcmsswPlotters/BDTPROOF/PhiBDT_30M_rapLT1_pt0.5-1.root"
+        //"/Users/btran/research/PhiReconstruction/TMVA/BDTcmsswPlotters/BDTPROOF/PhiBDT_30M_rapLT1_pt1-1.5.root"
+        //"/Users/btran/research/PhiReconstruction/TMVA/BDTcmsswPlotters/BDTPROOF/PhiBDT_30M_rapLT1_pt1.5-2.root"
+        //"/Users/btran/research/Macros/PhiAnalysis/TMVA/BDTcmsswPlotters/BDTPROOF/Test1-1.5.root"
     };
 
     std::vector<TFile*> file_list;
@@ -88,35 +101,134 @@ void MassFitPhi()
         for(auto const& hist : maphist.second)
         {
             RooRealVar x("x","mass",1.00,1.04);
-            RooPlot* xframe = x.frame(80);
+            RooPlot* xframe = x.frame(40);
             RooDataHist data("data","dataset",x,hist.second);
             data.plotOn(xframe,Name("data"));
             xframe->GetXaxis()->SetTitle("K^{+}K^{-} and charge conjugate invariant mass (GeV/c^{2})");
-            xframe->GetYaxis()->SetTitle("Candidates / 0.5 MeV");
+            xframe->GetYaxis()->SetTitle("Candidates / 1.0 MeV");
             xframe->GetXaxis()->CenterTitle(1);
             xframe->GetYaxis()->CenterTitle(1);
             xframe->GetXaxis()->SetTitleSize(xframe->GetXaxis()->GetTitleSize()*1.3);
             xframe->GetYaxis()->SetTitleSize(xframe->GetYaxis()->GetTitleSize()*1.2);
             xframe->GetYaxis()->SetTitleOffset(1);
-            //xframe->GetYaxis()->SetRangeUser(0,20e6);
-            RooRealVar mean("mean","mean",1.020,1.017,1.023);
-            RooRealVar sigma1("sigma1","sigma1",0.004,0.001,0.04);
-            //RooRealVar sigma2("sigma2","sigma2",0.006,0.001,0.04);
-            RooRealVar sig1("sig1","signal1",22000,0,1000000000);
-            //RooRealVar sig2("sig2","signal2",15000,0,1000000000);
-            RooRealVar qsig("qsig","qsig",7000000,0,10000000);
-            RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
+            /*
+             * For 0.5 - 2
+             */
+            //RooRealVar mean("mean","mean",1.019,1.017,1.021);
+            //RooRealVar sigma1("sigma1","sigma1",0.002,0.001,0.004);
+            //RooRealVar sigma2("sigma2","sigma2",0.002,0.001,0.004);
+            //RooRealVar sig1("sig1","signal1",2200,0,100000);
+            //RooRealVar sig2("sig2","signal2",2200,0,100000);
+            //RooRealVar qsig("qsig","qsig",2000,0,4000000);
+            //RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
             //RooGaussian gaus2("gaus2","gaus2",x,mean,sigma2);
-            RooRealVar ap("ap","ap",-0.1,-1,1);
-            RooRealVar bp("bp","bp",-0.1,-1,1);
-            //RooRealVar cp("cp","cp",-0.1,-1,1);
-            //RooRealVar dp("dp","dp",-0.1,-1,1);
-            //RooChebychev background("background","background",x,RooArgList(ap,bp,cp,dp));
-            RooChebychev background("background","background",x,RooArgList(ap,bp));
+            //RooRealVar ap("ap","ap",0.1,-1,1);
+            //RooRealVar bp("bp","bp",0.1,-1,1);
+            //RooRealVar cp("cp","cp",0.1,-1,1);
+            //RooChebychev background("background","background",x,RooArgList(ap,bp,cp));
             //RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,background),RooArgList(sig1,sig2,qsig));
-            RooAddPdf sum("sum","sum",RooArgList(gaus1,background),RooArgList(sig1,qsig));
 
-            x.setRange("cut",1.005,1.035);
+            /*
+             * For 2 - 2.5
+             */
+            RooRealVar mean("mean","mean",1.019,1.017,1.021);
+            RooRealVar sigma1("sigma1","sigma1",0.003,0.001,0.006);
+            RooRealVar sigma2("sigma2","sigma2",0.003,0.001,0.006);
+            RooRealVar sig1("sig1","signal1",2200,0,10000);
+            RooRealVar sig2("sig2","signal2",2200,0,10000);
+            RooRealVar qsig("qsig","qsig",2000,0,800000);
+            RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
+            RooGaussian gaus2("gaus2","gaus2",x,mean,sigma2);
+            RooRealVar ap("ap","ap",0.1,-1,1);
+            RooRealVar bp("bp","bp",-0.1,-1,1);
+            RooRealVar cp("cp","cp",-0.1,-1,1);
+            //RooRealVar dp("dp","dp",0.15,-1,1);
+            //RooChebychev background("background","background",x,RooArgList(ap,bp,cp,dp));
+            RooChebychev background("background","background",x,RooArgList(ap,bp,cp));
+            RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,background),RooArgList(sig1,sig2,qsig));
+            //RooAddPdf sum("sum","sum",RooArgList(gaus1,background),RooArgList(sig1,qsig));
+
+            /*
+             * For 2.5 - 3.0
+             */
+            //RooRealVar mean("mean","mean",1.019,1.017,1.021);
+            //RooRealVar sigma1("sigma1","sigma1",0.003,0.001,0.006);
+            //RooRealVar sigma2("sigma2","sigma2",0.003,0.001,0.006);
+            //RooRealVar sig1("sig1","signal1",2200,0,10000);
+            //RooRealVar sig2("sig2","signal2",2200,0,10000);
+            //RooRealVar qsig("qsig","qsig",2000,0,900000);
+            //RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
+            //RooGaussian gaus2("gaus2","gaus2",x,mean,sigma2);
+            //RooRealVar ap("ap","ap",-0.1,-1,1);
+            //RooRealVar bp("bp","bp",-0.1,-1,1);
+            //RooRealVar cp("cp","cp",-0.1,-1,1);
+            ////RooRealVar dp("dp","dp",0.15,-1,1);
+            ////RooChebychev background("background","background",x,RooArgList(ap,bp,cp,dp));
+            //RooChebychev background("background","background",x,RooArgList(ap,bp,cp));
+            //RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,background),RooArgList(sig1,sig2,qsig));
+            ////RooAddPdf sum("sum","sum",RooArgList(gaus1,background),RooArgList(sig1,qsig));
+
+            /*
+             * For 3.0 - 3.5
+             */
+            //RooRealVar mean("mean","mean",1.019,1.017,1.021);
+            //RooRealVar sigma1("sigma1","sigma1",0.003,0.001,0.006);
+            //RooRealVar sigma2("sigma2","sigma2",0.003,0.001,0.006);
+            //RooRealVar sig1("sig1","signal1",2200,0,10000);
+            //RooRealVar sig2("sig2","signal2",2200,0,10000);
+            //RooRealVar qsig("qsig","qsig",2000,0,700000);
+            //RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
+            //RooGaussian gaus2("gaus2","gaus2",x,mean,sigma2);
+            //RooRealVar ap("ap","ap",-0.1,-1,1);
+            //RooRealVar bp("bp","bp",-0.1,-1,1);
+            //RooRealVar cp("cp","cp",-0.1,-1,1);
+            ////RooRealVar dp("dp","dp",0.15,-1,1);
+            ////RooChebychev background("background","background",x,RooArgList(ap,bp,cp,dp));
+            //RooChebychev background("background","background",x,RooArgList(ap,bp,cp));
+            //RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,background),RooArgList(sig1,sig2,qsig));
+            ////RooAddPdf sum("sum","sum",RooArgList(gaus1,background),RooArgList(sig1,qsig));
+
+            /*
+             * 3.5 - 4.0
+             */
+            //RooRealVar mean("mean","mean",1.019,1.017,1.021);
+            //RooRealVar sigma1("sigma1","sigma1",0.003,0.001,0.006);
+            //RooRealVar sigma2("sigma2","sigma2",0.003,0.001,0.006);
+            //RooRealVar sig1("sig1","signal1",2200,0,10000);
+            //RooRealVar sig2("sig2","signal2",2200,0,10000);
+            //RooRealVar qsig("qsig","qsig",2000,0,700000);
+            //RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
+            //RooGaussian gaus2("gaus2","gaus2",x,mean,sigma2);
+            //RooRealVar ap("ap","ap",-0.1,-1,1);
+            //RooRealVar bp("bp","bp",-0.1,-1,1);
+            //RooRealVar cp("cp","cp",-0.1,-1,1);
+            ////RooRealVar dp("dp","dp",0.15,-1,1);
+            ////RooChebychev background("background","background",x,RooArgList(ap,bp,cp,dp));
+            //RooChebychev background("background","background",x,RooArgList(ap,bp,cp));
+            //RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,background),RooArgList(sig1,sig2,qsig));
+            ////RooAddPdf sum("sum","sum",RooArgList(gaus1,background),RooArgList(sig1,qsig));
+            
+            /*
+             * 4.0 - 4.5
+             */
+            //RooRealVar mean("mean","mean",1.019,1.017,1.021);
+            //RooRealVar sigma1("sigma1","sigma1",0.003,0.001,0.006);
+            //RooRealVar sigma2("sigma2","sigma2",0.003,0.001,0.006);
+            //RooRealVar sig1("sig1","signal1",2200,0,10000);
+            //RooRealVar sig2("sig2","signal2",2200,0,10000);
+            //RooRealVar qsig("qsig","qsig",2000,0,700000);
+            //RooGaussian gaus1("gaus1","gaus1",x,mean,sigma1);
+            //RooGaussian gaus2("gaus2","gaus2",x,mean,sigma2);
+            //RooRealVar ap("ap","ap",0.1,-1,1);
+            //RooRealVar bp("bp","bp",0.1,-1,1);
+            //RooRealVar cp("cp","cp",0.1,-1,1);
+            ////RooRealVar dp("dp","dp",0.15,-1,1);
+            ////RooChebychev background("background","background",x,RooArgList(ap,bp,cp,dp));
+            //RooChebychev background("background","background",x,RooArgList(ap,bp,cp));
+            //RooAddPdf sum("sum","sum",RooArgList(gaus1,gaus2,background),RooArgList(sig1,sig2,qsig));
+            ////RooAddPdf sum("sum","sum",RooArgList(gaus1,background),RooArgList(sig1,qsig));
+
+            x.setRange("cut",1.000,1.04);
             RooFitResult* r_phi = NULL;
 
             r_phi = sum.fitTo(data,Save(),Minos(kTRUE),Range("cut"));
@@ -130,34 +242,50 @@ void MassFitPhi()
 
             //Calculation
             double Intgaus1E      = -999;
-            //double Intgaus2E      = -999;
+            double Intgaus2E      = -999;
             double IntbackgroundE = -999;
             double totsig         = -999;
             double sig            = -999;
             double Fsig           = -999;
             double Significance      = -999;
 
-            double _mean = mean.getVal(  );
-            //double _rms  = TMath::Sqrt( 0.5*sigma1.getVal(  )*sigma1.getVal(  ) + 0.5*sigma2.getVal(  )*sigma2.getVal(  ) );
-            double _rms  = sigma1.getVal();
-
             double gaus1F  = sig1.getVal(  );
-            //double gaus2F  = sig2.getVal(  );
+            double gaus2F  = sig2.getVal(  );
             double _qsig    = qsig.getVal(  );
+
+            x.setRange("g1", mean.getVal() - 2*sigma1.getVal(), mean.getVal() + 2*sigma1.getVal());
+            x.setRange("g2", mean.getVal() - 2*sigma2.getVal(), mean.getVal() + 2*sigma2.getVal());
+
+            RooAbsReal* Intgaus1_yield = gaus1.createIntegral(x, x, "g1");
+            RooAbsReal* Intgaus2_yield = gaus2.createIntegral(x, x, "g2");
+
+            double gaus1_yield = gaus1F*Intgaus1_yield->getVal();
+            double gaus2_yield = gaus2F*Intgaus2_yield->getVal();
+            double gausTot_yield = gaus1_yield + gaus2_yield;
+
+            double rms_gaus1_sig = gaus1_yield/gausTot_yield;
+            double rms_gaus2_sig = gaus2_yield/gausTot_yield;
+
+            double _rms  = TMath::Sqrt( rms_gaus1_sig*sigma1.getVal(  )*sigma1.getVal(  ) + rms_gaus2_sig*sigma2.getVal(  )*sigma2.getVal(  ) );
+
+            double _mean = mean.getVal(  );
+            //double _rms  = sigma1.getVal();
+
+
 
             x.setRange("int",_mean - 2*_rms,_mean + 2*_rms);
 
             RooAbsReal* Intgaus1 = gaus1.createIntegral( x, x,  "int" );
-            //RooAbsReal* Intgaus2 = gaus2.createIntegral( x, x, "int" );
+            RooAbsReal* Intgaus2 = gaus2.createIntegral( x, x, "int" );
 
             RooAbsReal* Intbackground = background.createIntegral( x, x, "int" );
 
             Intgaus1E      = gaus1F*Intgaus1->getVal(  );
-            //Intgaus2E      = gaus2F*Intgaus2->getVal(  );
+            Intgaus2E      = gaus2F*Intgaus2->getVal(  );
             IntbackgroundE = _qsig*Intbackground->getVal(  );
-            //totsig         = Intgaus1E + Intgaus2E + IntbackgroundE;
-            totsig         = Intgaus1E + IntbackgroundE;
-            sig            = Intgaus1E;
+            totsig         = Intgaus1E + Intgaus2E + IntbackgroundE;
+            //totsig         = Intgaus1E + IntbackgroundE;
+            sig            = Intgaus1E + Intgaus2E;
 
             Fsig           = sig/totsig;
             Significance   = sig/(TMath::Sqrt(totsig));
@@ -172,8 +300,23 @@ void MassFitPhi()
             ostr.str(std::string());
             ostr << "Significance #frac{S}{#sqrt{S+B}} " << Significance;
             tex->DrawLatex(0.55,start_y-=increment,ostr.str().c_str());
+            ostr.str(std::string());
+            ostr << "CovQual: " << covQual;
+            tex->DrawLatex(0.55,start_y-=increment,ostr.str().c_str());
 
-            cc1->Print((hist.first + "_pt_" + pt_bin_range + ".pdf").c_str());
+            TLine* t1 = new TLine(mean.getVal()- 2*_rms,0,mean.getVal() - 2*_rms,gPad->GetUymax());
+            TLine* t2 = new TLine(mean.getVal()+ 2*_rms,0,mean.getVal() + 2*_rms,gPad->GetUymax());
+            t1->SetLineStyle(2);
+            t2->SetLineStyle(2);
+            t1->SetLineColor(kGreen+1);
+            t2->SetLineColor(kGreen+1);
+
+            t1->Draw();
+            t2->Draw();
+
+
+            cc1->Print((BkgModel + hist.first + "_pt_" + pt_bin_range + ".pdf").c_str());
+            cout << "RMS: " << _rms << endl;
         }
     }
 }

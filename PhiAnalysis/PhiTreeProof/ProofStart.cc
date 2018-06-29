@@ -7,16 +7,4 @@ void ProofStart()
     chain->AddFile("/Users/btran/research/TestRootFiles/PhiGenMatch_v3_1.root");
     chain->SetProof();
     chain->Process("PhiTreeProof.cc+","");
-    //chain->Process("PhiTreeProof1.cc+");
-    //chain->Process("PhiTreeProof2.cc+");
-    //chain->Process("PhiTreeProof3.cc+");
-    //chain->Process("PhiTreeProof4.cc+");
-    //chain->Process("PhiTreeProof5.cc+");
-    //chain->Process("PhiTreeProof6.cc+");
-    //chain->Process("PhiTreeProof7.cc+");
-    //chain->Process("PhiTreeProof8.cc+");
-    //chain->Process("PhiTreeProof9.cc+");
-    //chain->Process("PhiTreeProof10.cc+");
-    //chain->Process("PhiTreeProof11.cc+");
-    //chain->Process("PhiTreeProof12.cc+");
 }
